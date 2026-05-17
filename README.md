@@ -12,6 +12,13 @@ npm start
 
 Open `http://localhost:3000`.
 
+## Runtime
+
+- `GET /api/health` reports app, storage, and AI readiness without exposing secrets.
+- `GET /api/logs` returns public notes.
+- `POST /api/logs` appends a public note. In Railway, set `LEAGUE_WRITE_TOKEN` before enabling writes.
+- `LEAGUE_DATA_DIR` or `RAILWAY_VOLUME_MOUNT_PATH` controls persistent note storage.
+
 ## Paper
 
 The public paper artifacts are:
@@ -28,10 +35,8 @@ pdflatex league-practice-room.tex
 pdflatex league-practice-room.tex
 ```
 
-## Deploy To GitHub Pages
+## Deploy
 
 The intended public domain is `league.aolabs.io`.
 
-1. Commit changes on `main`.
-2. Push to `nalalalan/league-app`.
-3. Serve the `public/` folder on the `gh-pages` branch or configure Pages to publish the static files.
+Deploy with Railway for server-side storage and future AI routes.

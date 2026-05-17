@@ -22,6 +22,7 @@
     <meta name="application-name" content="league">
     <link rel="stylesheet" href="https://aolabs.io/suite-header.css?v=20260516-suite-bloom">
     <link rel="stylesheet" href="/styles.css?v=20260517-league-review-room">
+    <script src="/app.js?v=20260517-railway" defer></script>
   </head>
   <body>
     <header class="suite-topbar" aria-label="league navigation">
@@ -218,7 +219,7 @@
           <h2 id="log-title">log</h2>
           <p>Public notes.</p>
         </div>
-        <div class="notes">
+        <div class="notes" id="notes-stream" aria-live="polite">
           <article class="note">
             <time datetime="2026-05-17">May 17, 2026</time>
             <div>
