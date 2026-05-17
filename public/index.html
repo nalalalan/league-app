@@ -5,24 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#eee7dd">
     <title>league.aolabs.io</title>
-    <meta name="description" content="A public AO Labs review room for League practice rules, champion fit, mindset, and notes.">
+    <meta name="description" content="A public AO Labs review room for League situations, champion-specific rules, mindset notes, and practice logs.">
     <link rel="canonical" href="https://league.aolabs.io/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="AO Labs">
     <meta property="og:title" content="league.aolabs.io">
-    <meta property="og:description" content="A public AO Labs review room for League practice rules, champion fit, mindset, and notes.">
+    <meta property="og:description" content="A public AO Labs review room for League situations, champion-specific rules, mindset notes, and practice logs.">
     <meta property="og:url" content="https://league.aolabs.io/">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="league.aolabs.io">
-    <meta name="twitter:description" content="A public AO Labs review room for League practice rules, champion fit, mindset, and notes.">
+    <meta name="twitter:description" content="A public AO Labs review room for League situations, champion-specific rules, mindset notes, and practice logs.">
     <link rel="icon" href="https://aolabs.io/favicon.svg?v=20260516-suite-bloom" type="image/svg+xml">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="apple-touch-icon" href="https://aolabs.io/marks/ao-ink.svg?v=20260516-suite-bloom">
     <meta name="apple-mobile-web-app-title" content="league">
     <meta name="application-name" content="league">
     <link rel="stylesheet" href="https://aolabs.io/suite-header.css?v=20260516-suite-bloom">
-    <link rel="stylesheet" href="/styles.css?v=20260517-league-review-room">
-    <script src="/app.js?v=20260517-railway" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20260517-situations">
+    <script src="/app.js?v=20260517-situations" defer></script>
   </head>
   <body>
     <header class="suite-topbar" aria-label="league navigation">
@@ -46,180 +46,29 @@
     </header>
 
     <main class="page">
-      <section class="review-tray" aria-label="Pre-game review">
-        <div class="lead-panel">
-          <div>
-            <p class="mode-line">samira / intermediate bots</p>
-            <h1>Q first. Earn the E.</h1>
-            <p class="lead-copy">One danger spell. Low plus reachable. Leave after R.</p>
-          </div>
-          <div class="next-line" aria-label="Current cues">
-            <span class="pill">Lux Q</span>
-            <span class="pill">tower = feet</span>
-            <span class="pill">projectile = W</span>
-          </div>
-        </div>
+      <section class="champion-picker" aria-label="champion">
+        <div class="portrait-row" id="champion-picker"></div>
+      </section>
 
-        <div class="review-cards">
-          <article class="card cue">
-            <h2>Q creates the opening.</h2>
-            <p>E commits. Anxiety does not get the dash.</p>
-          </article>
-          <article class="card reset">
-            <h2>Damage is information.</h2>
-            <p>One hit is not proof. Step back, keep playing.</p>
-          </article>
-          <article class="card rep">
-            <h2>Choose the fight.</h2>
-            <p>Death is allowed. Winning is intended.</p>
-          </article>
+      <section class="selected-champion" id="champion-panel" aria-live="polite">
+        <div class="selected-copy">
+          <h1 id="champion-name">Samira</h1>
+          <p id="champion-focus"></p>
+          <p id="champion-note"></p>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="situations-title">
-        <div class="section-head">
+      <section class="situations" aria-labelledby="situations-title">
+        <div class="plain-head">
           <h2 id="situations-title">situations</h2>
-          <p>Short rules.</p>
+          <p id="situation-count"></p>
         </div>
-        <div class="grid">
-          <article class="situation-card">
-            <h3>low target in fog</h3>
-            <dl class="rule-list">
-              <div class="rule-row"><dt>do</dt><dd>stop at the edge, Q if visible</dd></div>
-              <div class="rule-row"><dt>avoid</dt><dd>E into unknown bodies</dd></div>
-              <div class="rule-row"><dt>drill</dt><dd>say low plus reachable</dd></div>
-            </dl>
-          </article>
-          <article class="situation-card">
-            <h3>chased by Nasus or Swain</h3>
-            <dl class="rule-list">
-              <div class="rule-row"><dt>do</dt><dd>run first, Q only with space</dd></div>
-              <div class="rule-row"><dt>avoid</dt><dd>turning to die fast</dd></div>
-              <div class="rule-row"><dt>drill</dt><dd>die slow, drag time</dd></div>
-            </dl>
-          </article>
-          <article class="situation-card">
-            <h3>W timing</h3>
-            <dl class="rule-list">
-              <div class="rule-row"><dt>do</dt><dd>wait for the flying thing</dd></div>
-              <div class="rule-row"><dt>avoid</dt><dd>W as armor</dd></div>
-              <div class="rule-row"><dt>drill</dt><dd>name one danger spell</dd></div>
-            </dl>
-          </article>
-          <article class="situation-card">
-            <h3>early ADC attacks</h3>
-            <dl class="rule-list">
-              <div class="rule-row"><dt>do</dt><dd>step back, Q, auto if safe</dd></div>
-              <div class="rule-row"><dt>avoid</dt><dd>instant duel because they hit first</dd></div>
-              <div class="rule-row"><dt>drill</dt><dd>make them walk into minions</dd></div>
-            </dl>
-          </article>
-          <article class="situation-card">
-            <h3>after R works</h3>
-            <dl class="rule-list">
-              <div class="rule-row"><dt>do</dt><dd>leave or check E</dd></div>
-              <div class="rule-row"><dt>avoid</dt><dd>standing there because it felt good</dd></div>
-              <div class="rule-row"><dt>drill</dt><dd>kill one, check E</dd></div>
-            </dl>
-          </article>
-          <article class="situation-card">
-            <h3>damage panic</h3>
-            <dl class="rule-list">
-              <div class="rule-row"><dt>do</dt><dd>take the hit, step back</dd></div>
-              <div class="rule-row"><dt>avoid</dt><dd>reading damage as judgment</dd></div>
-              <div class="rule-row"><dt>drill</dt><dd>one hit is not the game</dd></div>
-            </dl>
-          </article>
-        </div>
+        <div class="situation-list" id="situation-list"></div>
       </section>
 
-      <section class="section" aria-labelledby="champions-title">
-        <div class="section-head">
-          <h2 id="champions-title">champions</h2>
-          <p>Fit and first rule.</p>
-        </div>
-        <div class="grid">
-          <article class="champion-card">
-            <div class="champion-top"><h3>Samira</h3><span class="tag">commit</span></div>
-            <div class="mini-list">
-              <p>Reward: dash, reset, R payoff.</p>
-              <p>Trap: E as panic button.</p>
-              <p>Rule: Q first, E later.</p>
-            </div>
-          </article>
-          <article class="champion-card">
-            <div class="champion-top"><h3>Caitlyn</h3><span class="tag">range</span></div>
-            <div class="mini-list">
-              <p>Reward: sniper space.</p>
-              <p>Trap: farming forever.</p>
-              <p>Rule: unavailable until it is time to shoot.</p>
-            </div>
-          </article>
-          <article class="champion-card">
-            <div class="champion-top"><h3>Fizz</h3><span class="tag">reference</span></div>
-            <div class="mini-list">
-              <p>Reward: mark, stab, jump, leave.</p>
-              <p>Trap: expecting every champion to exit like Fizz.</p>
-              <p>Rule: feel the button shape, then translate it.</p>
-            </div>
-          </article>
-          <article class="champion-card">
-            <div class="champion-top"><h3>Kai'Sa</h3><span class="tag">maybe</span></div>
-            <div class="mini-list">
-              <p>Reward: K-pop assassin idea.</p>
-              <p>Trap: bad walk feel breaks reps.</p>
-              <p>Rule: visual feel decides spamability.</p>
-            </div>
-          </article>
-          <article class="champion-card">
-            <div class="champion-top"><h3>Miss Fortune</h3><span class="tag">easy</span></div>
-            <div class="mini-list">
-              <p>Reward: clean lane damage.</p>
-              <p>Trap: not enough escape or chaos.</p>
-              <p>Rule: use when simple farming is the rep.</p>
-            </div>
-          </article>
-          <article class="champion-card">
-            <div class="champion-top"><h3>Ezreal</h3><span class="tag">spam</span></div>
-            <div class="mini-list">
-              <p>Reward: QQQ rhythm.</p>
-              <p>Trap: wrong fantasy.</p>
-              <p>Rule: keep the spam lesson, not the obligation.</p>
-            </div>
-          </article>
-          <article class="champion-card">
-            <div class="champion-top"><h3>Jhin</h3><span class="tag">style</span></div>
-            <div class="mini-list">
-              <p>Reward: clean presentation.</p>
-              <p>Trap: style without the desired body feel.</p>
-              <p>Rule: useful to compare, not force.</p>
-            </div>
-          </article>
-          <article class="champion-card">
-            <div class="champion-top"><h3>Ashe</h3><span class="tag">control</span></div>
-            <div class="mini-list">
-              <p>Reward: clear range and slows.</p>
-              <p>Trap: ult pressure feels unrewarding.</p>
-              <p>Rule: only if calm utility is the goal.</p>
-            </div>
-          </article>
-          <article class="champion-card">
-            <div class="champion-top"><h3>Rammus</h3><span class="tag">no</span></div>
-            <div class="mini-list">
-              <p>Reward: simple body.</p>
-              <p>Trap: physically boring.</p>
-              <p>Rule: do not turn practice into punishment.</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="log-title">
-        <div class="section-head">
-          <h2 id="log-title">log</h2>
-          <p>Public notes.</p>
-        </div>
-        <div class="notes" id="notes-stream" aria-live="polite">
+      <details class="notes-panel">
+        <summary>public notes</summary>
+        <div class="notes" id="notes-stream">
           <article class="note">
             <time datetime="2026-05-17">May 17, 2026</time>
             <div>
@@ -227,22 +76,8 @@
               <p>The first page comes from the long League chat arc: farm-and-survive, sensory control, camera stability, Samira commit rules, Caitlyn comfort, death exposure, and bot-ladder practice.</p>
             </div>
           </article>
-          <article class="note">
-            <time datetime="2026-05-17">May 17, 2026</time>
-            <div>
-              <h3>practice room over judgment machine</h3>
-              <p>Bots are the practice room. Humans are performance. Go easier if overwhelmed, harder if bored, stay if anxious but playable.</p>
-            </div>
-          </article>
-          <article class="note">
-            <time datetime="2026-05-17">May 17, 2026</time>
-            <div>
-              <h3>current Samira law</h3>
-              <p>Q is the test. E is the commit. W is parry. R is reward. After kill, check E; dash again only if safe.</p>
-            </div>
-          </article>
         </div>
-      </section>
+      </details>
 
       <p class="notice">
         league.aolabs.io is an unofficial review room. It is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, League of Legends, and associated properties are trademarks or registered trademarks of Riot Games, Inc.

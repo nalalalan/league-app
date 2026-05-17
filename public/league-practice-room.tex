@@ -133,7 +133,7 @@
 \end{center}
 
 \vspace{0.35em}
-\noindent\textbf{Fast multiplayer games can convert practice into threat when social judgment, sensory load, ambiguous damage, and repeated failure are experienced as one continuous demand. This manuscript reports a single-user design study of \href{https://league.aolabs.io}{league.aolabs.io}, a public review room for League of Legends practice. The system does not claim clinical efficacy, population generality, or competitive optimization. It translates a user-provided learning arc into a low-threat review surface: compact situation rules, champion-fit cards, public notes, and a downloadable record. The strongest contribution is a design pattern rather than a gameplay result: make the next repetition easier to start by reducing the visible decision set to one champion, one mode, a few rules, and one next rep. The interface treats bots as a practice room, human games as performance, death-with-intent as a valid rep, and short review cards as mental practice. This bounded case suggests how personal learning software can support high-repetition play without becoming another source of evaluation pressure.}
+\noindent\textbf{Fast multiplayer games can convert practice into threat when social judgment, sensory load, ambiguous damage, and repeated failure are experienced as one continuous demand. This manuscript reports a single-user design study of \href{https://league.aolabs.io}{league.aolabs.io}, a public review room for League of Legends practice. The system does not claim clinical efficacy, population generality, or competitive optimization. It translates a user-provided learning arc into a low-threat review surface: image-based champion selection, champion-specific situation notes, public logs, and a downloadable record. The strongest contribution is a design pattern rather than a gameplay result: make the next repetition easier to start by letting the player choose the current champion and then read only the situations that matter for that champion. The interface treats bots as a practice room, human games as performance, death-with-intent as a valid rep, and situation review as mental practice. This bounded case suggests how personal learning software can support high-repetition play without becoming another source of evaluation pressure.}
 
 \newpage
 \pagestyle{fancy}
@@ -144,64 +144,64 @@ Expert performance depends on repeated, structured practice, but practice is onl
 
 The system described here began from a simple transfer from music practice: keep the task playable, choose one thing, trust repetitions, and let improvement compound. The same principle was applied to League of Legends. The first rule was not to win lane or outplay an opponent; it was to farm and survive. That rule later compressed into the phrase ``next safe minion.'' As the practice record grew, the problem became less about collecting more advice and more about making advice reviewable without overwhelming the player before queueing.
 
-\href{https://league.aolabs.io}{league.aolabs.io} is a public AO Labs page built for that purpose. It is not a Riot Games product, a general League guide, a ranking system, or a coaching dashboard. It is a single-page review room that turns one user's League learning arc into compact rules for pre-game mental rehearsal. The design is source-bounded: it uses the user's supplied chat arc and later public notes as its corpus, and it avoids claims that would require clinical, population-scale, or competitive outcome evidence.
+\href{https://league.aolabs.io}{league.aolabs.io} is a public AO Labs page built for that purpose. It is not a Riot Games product, a general League guide, a ranking system, or a coaching dashboard. It is a single-page review room that turns one user's League learning arc into champion-specific situation notes for mental rehearsal. The design is source-bounded: it uses the user's supplied chat arc and later public notes as its corpus, and it avoids claims that would require clinical, population-scale, or competitive outcome evidence.
 
 \section{Results}
 
 \subsection{A long learning arc was reduced to a small review surface}
 
-The seed corpus contained a long narrative account of League practice. The arc included lane fear, camera stability, sensory control, champion feel, bot practice, death tolerance, public yapping as pressure regulation, and champion-specific rules for Samira, Caitlyn, and Fizz. The design result was not a long visible essay. The site exposes a small pre-game review tray: active champion, current mode, three rule cards, one danger cue, one reset line, and one next rep.
+The seed corpus contained a long narrative account of League practice. The arc included lane fear, camera stability, sensory control, champion feel, bot practice, death tolerance, public yapping as pressure regulation, and champion-specific rules for Samira, Caitlyn, and Fizz. The revised design result was not a long visible essay or a motivational hero. The site exposes an image-only champion picker and then a plain list of detailed situations for the selected champion.
 
-This reduction is the main interface result. It makes the review surface compatible with the user's stated constraint: the page should be pretty, clean, non-poster-like, and not overwhelming. The long record remains useful as paper and log context, but the first screen does not ask the user to reread the whole history before playing.
+This reduction is the main interface result. It makes the review surface compatible with the user's stated constraint: the page should be pretty, clean, non-poster-like, and not overwhelming. The long record remains useful as paper and log context, but the first screen does not ask the user to process a giant review tray or a generic champion taxonomy before finding the current situation.
 
 \begin{table}[H]
 \centering
-\caption{Compression of the source arc into pre-game review units.}
+\caption{Compression of the source arc into champion-specific review units.}
 {\small
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{p{0.24\linewidth}p{0.30\linewidth}p{0.30\linewidth}}
 \toprule
-Source burden & Review unit & First-screen example \\
+Source burden & Review unit & Interface expression \\
 \midrule
-Enemy lane feels like judgment & One safe action & Q first; next safe minion \\
-Damage triggers panic & Reset line & Damage is information \\
-Samira has many buttons & Button hierarchy & Q test, E commit, W parry, R reward \\
-Low targets bait chase & Situation rule & Low plus reachable, not low plus fog \\
-Deaths feel like failure & Practice frame & Choose the fight; death is allowed \\
+Enemy lane feels like judgment & Champion situation & Caitlyn: next safe minion \\
+Damage triggers panic & Mindset situation & Damage is information \\
+Samira has many buttons & Button-order situation & Q before E; W saved for real danger \\
+Low targets bait chase & Chase situation & Low plus reachable, not low plus fog \\
+Champion fit affects repetition & Champion picker & Visual pick first; details after selection \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-\subsection{Situation cards preserved action without overexplaining}
+\subsection{Champion-specific situations replaced generic cards}
 
-The site organizes knowledge by situations rather than by abstract lessons. Six initial cards are used: low target in fog, chased by Nasus or Swain, W timing, early ADC attack, after R works, and damage panic. Each card has the same four fields: do, avoid, drill, and the title trigger. This format was chosen because it keeps the card operational without turning it into a tutorial paragraph.
+The site organizes knowledge by situations rather than by abstract lessons. The current version makes those situations champion-specific: selecting Samira shows entries such as before pressing E, W timing, after R works, after a takedown, early ADC attacks, tower range, and damage panic. Selecting Caitlyn shifts the same practice-room idea toward next safe minion, staying unavailable, sustain after poke, and shooting the closest safe target. This format was chosen because it gives enough detail to review while avoiding the generic labels and motivational fragments that had made the first version feel unusable.
 
 \begin{table}[H]
 \centering
-\caption{Initial situation rules imported into the public page.}
+\caption{Example Samira situations imported into the public page.}
 {\small
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{p{0.20\linewidth}p{0.24\linewidth}p{0.24\linewidth}p{0.17\linewidth}}
 \toprule
 Trigger & Do & Avoid & Drill \\
 \midrule
-Low target in fog & Stop at the edge; Q if visible & E into unknown bodies & Low plus reachable \\
-Chased by Nasus or Swain & Run first; Q with space & Turning to die fast & Die slow \\
-W timing & Wait for the projectile & W as armor & Name one danger \\
-Early ADC attack & Step back, Q, auto if safe & Instant duel & Use minion damage \\
-After R works & Leave or check E & Stay from excitement & Kill one, check E \\
-Damage panic & Take the hit, step back & Read damage as judgment & One hit is not the game \\
+Before pressing E & Q first; check ratio and reachability & E as anxiety relief & Q creates; E commits \\
+Low target in fog & Stop at edge; Q if visible & E into unknown bodies & Low plus reachable \\
+W timing & Hold W for the real projectile & W as armor or tower block & Name one danger spell \\
+After R works & Leave unless next kill is obvious & Stay from excitement & R is reward \\
+After takedown & Check E and next target & Automatic reset dash & Kill one, check E \\
+Damage panic & Step back and continue & Read damage as judgment & One hit is not the game \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-\subsection{Champion fit was treated as a practice constraint}
+\subsection{Champion fit was retained without public fit labels}
 
-The champion library is not organized as a tier list. It records fit: reward loop, panic trap, and one rule. Samira is currently the active focus because she provides a high-reward dash-reset-R loop, but she also creates the central panic trap of using E as an anxiety button. Caitlyn remains a comfort pick because range, sustain, and the sniper fantasy reduce threat. Fizz remains a reference champion because his button shape makes the desired loop clear: mark, enter, stab, dodge, leave.
+The champion library is not organized as a tier list. It records fit through the situation set shown after selection, not through short public labels. Samira is currently the active focus because she provides a high-reward dash-reset-R loop, but she also creates the central panic trap of using E as an anxiety button. Caitlyn remains a comfort pick because range, sustain, and the sniper fantasy reduce threat. Fizz remains a reference champion because his button shape makes the desired loop clear: mark, enter, stab, dodge, leave.
 
-The same logic applies to other champions. Kai'Sa is not treated as automatically correct because the user reported that walk animation and visual feel affect willingness to repeat games. Ezreal's Q rhythm is useful, even if the character fantasy is wrong. Rammus is retained as a negative fit example because mechanically simple choices can still be poor practice tools if they make the body feel bored or irritated.
+The same logic applies to other champions. Kai'Sa is not treated as automatically correct because the user reported that walk animation and visual feel affect willingness to repeat games. Ezreal's Q rhythm is useful, even if the character fantasy is wrong. Rammus is retained as a negative fit example because mechanically simple choices can still be poor practice tools if they make the body feel bored or irritated. The public page therefore shows champion imagery as the selection mechanism and reserves text for the selected champion's situations.
 
 \subsection{The public log made mindset part of the artifact}
 
@@ -209,7 +209,7 @@ The public log starts with three source entries: the seed arc import, the practi
 
 \section{Discussion}
 
-The case suggests that the useful interface for some high-repetition learners is not more instruction but better compression. A long learning conversation can contain many correct rules while still being hard to use before a game. The review room converts that record into a small number of visible decisions. That is consistent with cognitive-load theory: reducing simultaneous elements can make practice more tractable \cite{sweller1988}. It is also compatible with mental practice research, because the page gives the user a short pre-game script to rehearse before performance \cite{driskell1994}.
+The case suggests that the useful interface for some high-repetition learners is not less information in the abstract, but better placement of information. A long learning conversation can contain many correct rules while still being hard to use before a game. The revised review room hides irrelevant champions behind a visual selector and gives more detail only after a champion is chosen. That is consistent with cognitive-load theory: reducing simultaneous elements can make practice more tractable \cite{sweller1988}. It is also compatible with mental practice research, because the page gives the user a situation script to rehearse before performance \cite{driskell1994}.
 
 The work also reframes death and failure. The site does not encourage intentional feeding or fake failure. It uses the rule ``choose the fight; death is allowed; winning is intended.'' That distinction matters. It keeps agency with the learner while preserving the real objective of the game. It also separates practice failure from collapse: a failed engage that tested damage, W timing, or exit timing is a rep; walking in only to die is not.
 
@@ -219,7 +219,7 @@ Several limits are important. First, this is a single-user artifact, not a clini
 
 \subsection*{Source corpus}
 
-The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. The implementation treated this text as the current source of truth for the first public review cards. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
+The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. The implementation treated this text as the current source of truth for the first public situation notes. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
 
 \subsection*{Interface requirements}
 
