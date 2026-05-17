@@ -175,7 +175,7 @@ Champion fit affects repetition & Champion picker & Visual pick first; details a
 
 \subsection{Champion-specific situations replaced generic cards}
 
-The site organizes knowledge by situations rather than by abstract lessons. The current version makes those situations champion-specific and removes the intermediate public labels that had made the cards feel misleading. Selecting Samira now shows one-sentence prompts for stressful moments: wanting to press E because a fight feels urgent, chasing a low-health enemy into fog, pressing W because proximity feels dangerous, staying after R because the damage felt good, or trying to W a tower shot. Each prompt is followed by one combined response paragraph that explains the action, the reason it matters, and the repetition to practice. Selecting Caitlyn shifts the same practice-room idea toward next safe minion, leaving when noticed, recovering after poke, and shooting the closest safe target. This format was chosen because the user needed enough detail to recognize the exact tricky moment without reading a giant rule wall or a card taxonomy.
+The site organizes knowledge by situations rather than by abstract lessons. The current version makes those situations champion-specific and removes the intermediate public labels that had made the cards feel misleading. Selecting Samira now shows one-sentence prompts for stressful moments: wanting to press E because a fight feels urgent, not recognizing the crowd control that can stop the dash, chasing a low-health enemy into fog, pressing W because proximity feels dangerous, staying after R because the damage felt good, or trying to W a tower shot. Each prompt is followed by one combined response paragraph that explains the action, the reason it matters, and the repetition to practice. Selecting Caitlyn shifts the same practice-room idea toward next safe minion, leaving when noticed, recovering after poke, and shooting the closest safe target. This format was chosen because the user needed enough detail to recognize the exact tricky moment without reading a giant rule wall or a card taxonomy.
 
 \begin{table}[H]
 \centering
@@ -187,6 +187,7 @@ The site organizes knowledge by situations rather than by abstract lessons. The 
 Situation prompt & Combined response \\
 \midrule
 The fight feels urgent and E wants to become the first button. & Start with Q or an auto so the fight gives information before the dash commits the body. \\
+The enemy has CC that is not recognized yet. & Stay outside on Q-only, watch one danger spell, use W or sidestep for visible projectiles, and E only after the scary spell is gone. \\
 A low-health enemy runs toward fog or teammates. & Stop at the edge; low only matters when the target is also reachable and cheap to kill. \\
 W feels necessary immediately after dashing in. & Hold W for the real spell; it is a parry for visible danger, not armor against being close. \\
 R works and the excitement makes staying feel automatic. & Treat R as the reward, then leave unless the next target is already low and reachable. \\
@@ -219,7 +220,7 @@ Several limits are important. First, this is a single-user artifact, not a clini
 
 \subsection*{Source corpus}
 
-The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. The implementation treated this text as the current source of truth for the first public situation notes. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
+The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. A later May 17, 2026 prompt added a Samira crowd-control guide as a source for the page's CC-specific situation. The implementation treated these texts as the current source of truth for the public situation notes. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
 
 \subsection*{Interface requirements}
 
