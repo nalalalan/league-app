@@ -152,88 +152,75 @@ const soundProfiles = {
 };
 
 const defaultSoundScene = [
-  { kind: "thump", frequency: 42, endFrequency: 28, start: 0, length: 0.24, gain: 0.42 },
-  { kind: "tone", type: "triangle", frequency: 130.81, endFrequency: 82.41, start: 0.018, length: 0.62, gain: 0.28 },
-  { kind: "tone", type: "sine", frequency: 392, start: 0.09, length: 0.62, gain: 0.18 },
-  { kind: "noise", filter: "bandpass", start: 0.02, length: 0.86, startFrequency: 4800, endFrequency: 520, gain: 0.2 }
+  { kind: "thump", frequency: 42, endFrequency: 24, start: 0, length: 0.32, gain: 0.48 },
+  { kind: "noise", filter: "lowpass", start: 0.02, length: 0.58, startFrequency: 1400, endFrequency: 260, gain: 0.18 },
+  { kind: "noise", filter: "highpass", start: 0.08, length: 0.24, startFrequency: 5200, endFrequency: 2600, gain: 0.12 }
 ];
 
 const soundScenes = {
   samira: [
-    { kind: "thump", frequency: 58, endFrequency: 34, start: 0, length: 0.18, gain: 0.52 },
-    { kind: "noise", filter: "highpass", start: 0.015, length: 0.12, startFrequency: 7800, endFrequency: 3600, gain: 0.34, pan: -0.34 },
-    { kind: "tone", type: "sawtooth", frequency: 160, endFrequency: 86, start: 0.02, length: 0.28, gain: 0.2, pan: -0.18 },
-    { kind: "noise", filter: "highpass", start: 0.16, length: 0.14, startFrequency: 8400, endFrequency: 4200, gain: 0.3, pan: 0.34 },
-    { kind: "tone", type: "square", frequency: 740, endFrequency: 1120, start: 0.24, length: 0.16, gain: 0.1, pan: 0.18 },
-    { kind: "tone", type: "triangle", frequency: 370, endFrequency: 740, start: 0.34, length: 0.5, gain: 0.14 },
-    { kind: "noise", filter: "bandpass", start: 0.42, length: 0.44, startFrequency: 3200, endFrequency: 900, gain: 0.12 }
+    { kind: "thump", frequency: 52, endFrequency: 28, start: 0, length: 0.22, gain: 0.54 },
+    { kind: "noise", filter: "highpass", start: 0.02, length: 0.08, startFrequency: 9200, endFrequency: 3400, gain: 0.42, pan: -0.48 },
+    { kind: "noise", filter: "highpass", start: 0.12, length: 0.09, startFrequency: 9600, endFrequency: 3800, gain: 0.38, pan: 0.46 },
+    { kind: "noise", filter: "bandpass", start: 0.18, length: 0.28, startFrequency: 4800, endFrequency: 1400, gain: 0.22 },
+    { kind: "noise", filter: "highpass", start: 0.34, length: 0.14, startFrequency: 8200, endFrequency: 5200, gain: 0.18, pan: -0.2 }
   ],
   caitlyn: [
-    { kind: "tone", type: "sine", frequency: 880, endFrequency: 1480, start: 0, length: 0.18, gain: 0.08 },
-    { kind: "noise", filter: "highpass", start: 0.08, length: 0.06, startFrequency: 9000, endFrequency: 6800, gain: 0.42 },
-    { kind: "thump", frequency: 72, endFrequency: 38, start: 0.08, length: 0.16, gain: 0.6 },
-    { kind: "tone", type: "square", frequency: 1760, endFrequency: 620, start: 0.1, length: 0.08, gain: 0.08 },
-    { kind: "tone", type: "sine", frequency: 1244, endFrequency: 1865, start: 0.2, length: 0.34, gain: 0.06, pan: -0.34 },
-    { kind: "tone", type: "sine", frequency: 932, endFrequency: 622, start: 0.34, length: 0.42, gain: 0.045, pan: 0.28 }
+    { kind: "noise", filter: "highpass", start: 0, length: 0.035, startFrequency: 6400, endFrequency: 6400, gain: 0.16 },
+    { kind: "noise", filter: "highpass", start: 0.095, length: 0.045, startFrequency: 9800, endFrequency: 7400, gain: 0.62 },
+    { kind: "thump", frequency: 70, endFrequency: 30, start: 0.095, length: 0.18, gain: 0.68 },
+    { kind: "noise", filter: "bandpass", start: 0.15, length: 0.38, startFrequency: 5200, endFrequency: 680, gain: 0.16 },
+    { kind: "noise", filter: "highpass", start: 0.32, length: 0.16, startFrequency: 8600, endFrequency: 4800, gain: 0.08 }
   ],
   fizz: [
-    { kind: "tone", type: "sine", frequency: 260, endFrequency: 520, start: 0, length: 0.24, gain: 0.16, pan: -0.24 },
-    { kind: "noise", filter: "bandpass", start: 0.06, length: 0.18, startFrequency: 900, endFrequency: 2100, gain: 0.16 },
-    { kind: "tone", type: "triangle", frequency: 520, endFrequency: 980, start: 0.2, length: 0.26, gain: 0.14, pan: 0.3 },
-    { kind: "noise", filter: "bandpass", start: 0.32, length: 0.22, startFrequency: 1700, endFrequency: 4800, gain: 0.14 },
-    { kind: "tone", type: "sine", frequency: 1120, endFrequency: 760, start: 0.5, length: 0.32, gain: 0.09 },
-    { kind: "thump", frequency: 116, endFrequency: 86, start: 0.54, length: 0.18, gain: 0.16 }
+    { kind: "noise", filter: "bandpass", start: 0, length: 0.18, startFrequency: 420, endFrequency: 1800, gain: 0.22, pan: -0.24 },
+    { kind: "thump", frequency: 92, endFrequency: 58, start: 0.06, length: 0.16, gain: 0.2 },
+    { kind: "noise", filter: "bandpass", start: 0.2, length: 0.22, startFrequency: 760, endFrequency: 3200, gain: 0.24, pan: 0.32 },
+    { kind: "noise", filter: "highpass", start: 0.42, length: 0.32, startFrequency: 5200, endFrequency: 2400, gain: 0.12 },
+    { kind: "thump", frequency: 78, endFrequency: 48, start: 0.48, length: 0.18, gain: 0.14 }
   ],
   kaisa: [
-    { kind: "thump", frequency: 48, endFrequency: 30, start: 0, length: 0.34, gain: 0.48 },
-    { kind: "tone", type: "sawtooth", frequency: 92, endFrequency: 68, start: 0, length: 0.6, gain: 0.18 },
-    { kind: "tone", type: "sine", frequency: 440, endFrequency: 660, start: 0.08, length: 0.44, gain: 0.12, pan: -0.24 },
-    { kind: "tone", type: "sine", frequency: 1320, endFrequency: 1980, start: 0.2, length: 0.46, gain: 0.075, pan: 0.28 },
-    { kind: "noise", filter: "bandpass", start: 0.16, length: 0.7, startFrequency: 6200, endFrequency: 780, gain: 0.16 },
-    { kind: "tone", type: "triangle", frequency: 220, endFrequency: 330, start: 0.54, length: 0.38, gain: 0.1 }
+    { kind: "thump", frequency: 44, endFrequency: 22, start: 0, length: 0.5, gain: 0.58 },
+    { kind: "noise", filter: "bandpass", start: 0.04, length: 0.72, startFrequency: 6800, endFrequency: 520, gain: 0.26 },
+    { kind: "noise", filter: "highpass", start: 0.18, length: 0.16, startFrequency: 10400, endFrequency: 7600, gain: 0.18, pan: -0.34 },
+    { kind: "noise", filter: "highpass", start: 0.38, length: 0.16, startFrequency: 9800, endFrequency: 7200, gain: 0.16, pan: 0.34 },
+    { kind: "noise", filter: "lowpass", start: 0.62, length: 0.34, startFrequency: 900, endFrequency: 280, gain: 0.18 }
   ],
   missfortune: [
-    { kind: "noise", filter: "highpass", start: 0.02, length: 0.055, startFrequency: 7600, endFrequency: 5400, gain: 0.38, pan: -0.42 },
-    { kind: "thump", frequency: 62, endFrequency: 34, start: 0.02, length: 0.16, gain: 0.52, pan: -0.2 },
-    { kind: "noise", filter: "highpass", start: 0.18, length: 0.055, startFrequency: 7600, endFrequency: 5200, gain: 0.38, pan: 0.42 },
-    { kind: "thump", frequency: 58, endFrequency: 30, start: 0.18, length: 0.16, gain: 0.56, pan: 0.2 },
-    { kind: "tone", type: "sawtooth", frequency: 146, endFrequency: 98, start: 0.28, length: 0.44, gain: 0.16 },
-    { kind: "noise", filter: "bandpass", start: 0.32, length: 0.38, startFrequency: 2200, endFrequency: 420, gain: 0.15 }
+    { kind: "noise", filter: "highpass", start: 0.02, length: 0.045, startFrequency: 9800, endFrequency: 6200, gain: 0.56, pan: -0.52 },
+    { kind: "thump", frequency: 60, endFrequency: 28, start: 0.02, length: 0.18, gain: 0.58, pan: -0.22 },
+    { kind: "noise", filter: "highpass", start: 0.19, length: 0.045, startFrequency: 9800, endFrequency: 6200, gain: 0.56, pan: 0.52 },
+    { kind: "thump", frequency: 58, endFrequency: 26, start: 0.19, length: 0.18, gain: 0.62, pan: 0.22 },
+    { kind: "noise", filter: "bandpass", start: 0.26, length: 0.42, startFrequency: 3200, endFrequency: 420, gain: 0.18 }
   ],
   ezreal: [
-    { kind: "tone", type: "sine", frequency: 392, endFrequency: 784, start: 0, length: 0.12, gain: 0.12, pan: -0.38 },
-    { kind: "tone", type: "sine", frequency: 587, endFrequency: 1175, start: 0.12, length: 0.13, gain: 0.12, pan: 0.32 },
-    { kind: "tone", type: "sine", frequency: 784, endFrequency: 1568, start: 0.24, length: 0.15, gain: 0.11, pan: -0.2 },
-    { kind: "noise", filter: "bandpass", start: 0.08, length: 0.5, startFrequency: 5200, endFrequency: 1800, gain: 0.1 },
-    { kind: "tone", type: "triangle", frequency: 1568, endFrequency: 1046, start: 0.46, length: 0.36, gain: 0.09 },
-    { kind: "thump", frequency: 78, endFrequency: 54, start: 0.42, length: 0.18, gain: 0.22 }
+    { kind: "noise", filter: "bandpass", start: 0, length: 0.12, startFrequency: 3600, endFrequency: 8200, gain: 0.2, pan: -0.44 },
+    { kind: "noise", filter: "bandpass", start: 0.12, length: 0.12, startFrequency: 4200, endFrequency: 9200, gain: 0.2, pan: 0.38 },
+    { kind: "noise", filter: "bandpass", start: 0.25, length: 0.14, startFrequency: 5200, endFrequency: 10800, gain: 0.2, pan: -0.18 },
+    { kind: "noise", filter: "highpass", start: 0.36, length: 0.3, startFrequency: 9200, endFrequency: 3600, gain: 0.16 },
+    { kind: "thump", frequency: 72, endFrequency: 42, start: 0.42, length: 0.18, gain: 0.24 }
   ],
   jhin: [
-    { kind: "tone", type: "triangle", frequency: 196, start: 0, length: 0.16, gain: 0.16 },
-    { kind: "noise", filter: "bandpass", start: 0, length: 0.06, startFrequency: 2600, endFrequency: 1800, gain: 0.12 },
-    { kind: "tone", type: "triangle", frequency: 246.94, start: 0.22, length: 0.16, gain: 0.15 },
-    { kind: "noise", filter: "bandpass", start: 0.22, length: 0.06, startFrequency: 2600, endFrequency: 1800, gain: 0.12 },
-    { kind: "tone", type: "triangle", frequency: 293.66, start: 0.44, length: 0.16, gain: 0.14 },
-    { kind: "noise", filter: "bandpass", start: 0.44, length: 0.06, startFrequency: 2600, endFrequency: 1800, gain: 0.12 },
-    { kind: "thump", frequency: 46, endFrequency: 28, start: 0.72, length: 0.36, gain: 0.62 },
-    { kind: "tone", type: "sine", frequency: 392, endFrequency: 784, start: 0.72, length: 0.72, gain: 0.18 },
-    { kind: "noise", filter: "highpass", start: 0.72, length: 0.08, startFrequency: 6800, endFrequency: 4800, gain: 0.34 }
+    { kind: "noise", filter: "bandpass", start: 0, length: 0.04, startFrequency: 2400, endFrequency: 1800, gain: 0.16 },
+    { kind: "noise", filter: "bandpass", start: 0.22, length: 0.04, startFrequency: 2400, endFrequency: 1800, gain: 0.16 },
+    { kind: "noise", filter: "bandpass", start: 0.44, length: 0.04, startFrequency: 2400, endFrequency: 1800, gain: 0.16 },
+    { kind: "noise", filter: "highpass", start: 0.72, length: 0.075, startFrequency: 7200, endFrequency: 4800, gain: 0.58 },
+    { kind: "thump", frequency: 44, endFrequency: 20, start: 0.72, length: 0.44, gain: 0.76 },
+    { kind: "noise", filter: "lowpass", start: 0.82, length: 0.64, startFrequency: 900, endFrequency: 180, gain: 0.2 }
   ],
   ashe: [
-    { kind: "noise", filter: "highpass", start: 0, length: 0.42, startFrequency: 8400, endFrequency: 3600, gain: 0.11 },
-    { kind: "tone", type: "sine", frequency: 440, endFrequency: 880, start: 0.05, length: 0.32, gain: 0.08, pan: -0.25 },
-    { kind: "tone", type: "sine", frequency: 1760, endFrequency: 1320, start: 0.24, length: 0.52, gain: 0.095, pan: 0.25 },
-    { kind: "noise", filter: "bandpass", start: 0.36, length: 0.12, startFrequency: 7200, endFrequency: 2600, gain: 0.28 },
-    { kind: "thump", frequency: 64, endFrequency: 42, start: 0.38, length: 0.18, gain: 0.2 },
-    { kind: "tone", type: "triangle", frequency: 2093, endFrequency: 1568, start: 0.58, length: 0.46, gain: 0.06 }
+    { kind: "noise", filter: "highpass", start: 0, length: 0.42, startFrequency: 11000, endFrequency: 3600, gain: 0.16 },
+    { kind: "noise", filter: "bandpass", start: 0.18, length: 0.22, startFrequency: 7200, endFrequency: 2200, gain: 0.28 },
+    { kind: "thump", frequency: 66, endFrequency: 36, start: 0.24, length: 0.18, gain: 0.18 },
+    { kind: "noise", filter: "highpass", start: 0.42, length: 0.22, startFrequency: 12200, endFrequency: 6800, gain: 0.22, pan: -0.2 },
+    { kind: "noise", filter: "highpass", start: 0.54, length: 0.18, startFrequency: 11800, endFrequency: 6400, gain: 0.16, pan: 0.22 }
   ],
   rammus: [
     { kind: "thump", frequency: 34, endFrequency: 22, start: 0, length: 0.5, gain: 0.7 },
-    { kind: "tone", type: "square", frequency: 72, endFrequency: 54, start: 0.02, length: 0.44, gain: 0.16 },
-    { kind: "noise", filter: "lowpass", start: 0.04, length: 0.62, startFrequency: 1200, endFrequency: 260, gain: 0.22 },
+    { kind: "noise", filter: "lowpass", start: 0.04, length: 0.7, startFrequency: 1300, endFrequency: 180, gain: 0.3 },
     { kind: "thump", frequency: 46, endFrequency: 28, start: 0.36, length: 0.26, gain: 0.42 },
-    { kind: "tone", type: "triangle", frequency: 110, endFrequency: 146, start: 0.46, length: 0.36, gain: 0.12 },
-    { kind: "noise", filter: "bandpass", start: 0.62, length: 0.2, startFrequency: 900, endFrequency: 420, gain: 0.14 }
+    { kind: "noise", filter: "bandpass", start: 0.58, length: 0.3, startFrequency: 900, endFrequency: 320, gain: 0.18 },
+    { kind: "thump", frequency: 38, endFrequency: 24, start: 0.72, length: 0.22, gain: 0.3 }
   ]
 };
 
@@ -246,7 +233,6 @@ const defaultFxProfile = {
   sparkColors: ["255, 238, 174", "226, 156, 190", "100, 143, 137", "255, 250, 224"],
   sparkCount: 72,
   spread: 0.34,
-  ringScale: 1,
   sliceAngles: [18, -24, 68, -72],
   glyphs: ["crest"]
 };
@@ -261,7 +247,6 @@ const fxProfiles = {
     sparkColors: ["255, 184, 96", "239, 81, 129", "91, 196, 185", "255, 246, 214"],
     sparkCount: 92,
     spread: 0.38,
-    ringScale: 1.08,
     sliceAngles: [14, -18, 44, -48],
     glyphs: ["blade-left", "blade-right", "muzzle"]
   },
@@ -274,7 +259,6 @@ const fxProfiles = {
     sparkColors: ["255, 216, 139", "115, 207, 224", "238, 147, 188", "255, 251, 225"],
     sparkCount: 64,
     spread: 0.3,
-    ringScale: 0.94,
     sliceAngles: [0, 90, 45, -45],
     glyphs: ["crosshair", "bullet"]
   },
@@ -287,7 +271,6 @@ const fxProfiles = {
     sparkColors: ["86, 224, 232", "255, 152, 90", "190, 112, 222", "232, 255, 250"],
     sparkCount: 76,
     spread: 0.32,
-    ringScale: 0.98,
     sliceAngles: [28, -28, 78, -78],
     glyphs: ["bubble-one", "bubble-two", "wave"]
   },
@@ -300,7 +283,6 @@ const fxProfiles = {
     sparkColors: ["244, 119, 220", "116, 122, 255", "96, 234, 219", "255, 237, 252"],
     sparkCount: 88,
     spread: 0.36,
-    ringScale: 1.04,
     sliceAngles: [20, -34, 70, -64],
     glyphs: ["void-diamond", "void-wing-left", "void-wing-right"]
   },
@@ -313,7 +295,6 @@ const fxProfiles = {
     sparkColors: ["255, 187, 87", "226, 64, 92", "244, 151, 193", "255, 244, 217"],
     sparkCount: 84,
     spread: 0.36,
-    ringScale: 1,
     sliceAngles: [8, -8, 22, -22],
     glyphs: ["pistol-left", "pistol-right", "muzzle"]
   },
@@ -326,7 +307,6 @@ const fxProfiles = {
     sparkColors: ["97, 209, 255", "255, 216, 93", "124, 126, 255", "239, 251, 255"],
     sparkCount: 78,
     spread: 0.33,
-    ringScale: 0.98,
     sliceAngles: [32, -32, 58, -58],
     glyphs: ["blink-one", "blink-two", "chevron"]
   },
@@ -339,7 +319,6 @@ const fxProfiles = {
     sparkColors: ["255, 213, 134", "178, 39, 73", "238, 180, 220", "255, 250, 232"],
     sparkCount: 68,
     spread: 0.31,
-    ringScale: 1.02,
     sliceAngles: [0, 90, 180, 270],
     glyphs: ["petal-one", "petal-two", "petal-three", "petal-four"]
   },
@@ -352,7 +331,6 @@ const fxProfiles = {
     sparkColors: ["166, 236, 255", "110, 160, 255", "255, 169, 214", "247, 254, 255"],
     sparkCount: 72,
     spread: 0.34,
-    ringScale: 0.96,
     sliceAngles: [0, 180, 24, -24],
     glyphs: ["ice-arrow", "ice-shard-left", "ice-shard-right"]
   },
@@ -365,7 +343,6 @@ const fxProfiles = {
     sparkColors: ["188, 221, 86", "255, 207, 92", "101, 167, 94", "255, 249, 218"],
     sparkCount: 70,
     spread: 0.3,
-    ringScale: 0.92,
     sliceAngles: [12, -12, 78, -78],
     glyphs: ["shell", "quake", "spike-ring"]
   }
@@ -647,8 +624,8 @@ function fxCenterFor(button) {
   const buttonRect = button.getBoundingClientRect();
   const rawX = buttonRect.left + buttonRect.width / 2;
   const rawY = buttonRect.top + buttonRect.height / 2;
-  const marginX = Math.min(window.innerWidth / 2 - 12, Math.min(420, Math.max(220, window.innerWidth * 0.34)));
-  const marginY = Math.min(window.innerHeight / 2 - 12, Math.min(300, Math.max(150, window.innerHeight * 0.28)));
+  const marginX = 24;
+  const marginY = 24;
   return {
     x: clamp(rawX, marginX, window.innerWidth - marginX),
     y: clamp(rawY, marginY, window.innerHeight - marginY)
@@ -678,7 +655,6 @@ function applyFxProfileVars(element, profile) {
   element.style.setProperty("--fx-secondary", profile.secondary);
   element.style.setProperty("--fx-third", profile.third);
   element.style.setProperty("--fx-dark", profile.dark);
-  element.style.setProperty("--fx-ring-scale", profile.ringScale);
   profile.sliceAngles.forEach((angle, index) => {
     element.style.setProperty(`--fx-angle-${index + 1}`, `${angle}deg`);
   });
@@ -958,12 +934,6 @@ function spawnSelectionFx(button, profileId = "default") {
   fx.style.setProperty("--fx-y", `${centerY}px`);
   applyFxProfileVars(fx, profile);
 
-  ["left", "right", "high", "low"].forEach((name) => {
-    const slice = document.createElement("span");
-    slice.className = `fx-slice fx-slice-${name}`;
-    fx.append(slice);
-  });
-
   (profile.glyphs || defaultFxProfile.glyphs).forEach((name, index) => {
     const glyph = document.createElement("span");
     glyph.className = `fx-glyph fx-glyph-${name}`;
@@ -971,22 +941,6 @@ function spawnSelectionFx(button, profileId = "default") {
     glyph.style.setProperty("--glyph-delay", `${index * 72}ms`);
     fx.append(glyph);
   });
-
-  for (let i = 0; i < profile.sparkCount; i += 1) {
-    const spark = document.createElement("span");
-    const angle = (-Math.PI / 2) + (i / profile.sparkCount) * Math.PI * 2 + (i % 2 ? 0.08 : -0.04);
-    const spread = Math.min(270, Math.max(126, window.innerWidth * profile.spread));
-    const distance = spread * (0.45 + (i % 9) * 0.055 + Math.random() * 0.08);
-    const size = 3 + (i % 6) * 1.25;
-    spark.className = "fx-spark";
-    spark.style.setProperty("--tx", `${Math.cos(angle) * distance}px`);
-    spark.style.setProperty("--ty", `${Math.sin(angle) * distance}px`);
-    spark.style.setProperty("--size", `${size}px`);
-    spark.style.setProperty("--delay", `${(i % 9) * 18}ms`);
-    spark.style.setProperty("--rot", `${Math.round((angle * 180) / Math.PI)}deg`);
-    spark.style.setProperty("--spark-color", profile.sparkColors[i % profile.sparkColors.length]);
-    fx.append(spark);
-  }
 
   document.body.append(fx);
   fxTimer = window.setTimeout(() => fx.remove(), 2260);

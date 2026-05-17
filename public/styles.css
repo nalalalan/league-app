@@ -15,7 +15,6 @@
   --fx-secondary: 226, 156, 190;
   --fx-third: 100, 143, 137;
   --fx-dark: 45, 36, 38;
-  --fx-ring-scale: 1;
   --fx-angle-1: 18deg;
   --fx-angle-2: -24deg;
   --fx-angle-3: 68deg;
@@ -131,6 +130,7 @@ summary {
 }
 
 .page::before {
+  display: none;
   top: 24px;
   left: 50%;
   width: min(1180px, calc(100vw - 16px));
@@ -274,6 +274,7 @@ summary {
 }
 
 .selection-fx::after {
+  display: none;
   width: clamp(260px, 42vw, 640px);
   height: 2px;
   border-radius: 999px;
@@ -354,92 +355,11 @@ summary {
     conic-gradient(from 0deg, rgba(var(--fx-third), .52), transparent 40deg, rgba(var(--fx-main), .54) 92deg, transparent 140deg, rgba(var(--fx-secondary), .48), transparent 276deg);
 }
 
-.fx-ring,
-.fx-slice,
-.fx-glyph,
-.fx-spark {
+.fx-glyph {
   position: absolute;
   top: var(--fx-y);
   left: var(--fx-x);
   pointer-events: none;
-}
-
-.fx-ring {
-  width: clamp(120px, 16vw, 220px);
-  aspect-ratio: 1;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 246, 214, .88);
-  background:
-    radial-gradient(circle, transparent 0 42%, rgba(255, 244, 204, .34) 43% 45%, transparent 46%),
-    conic-gradient(from 12deg, transparent 0 16deg, rgba(var(--fx-main), .9) 26deg, transparent 42deg, rgba(var(--fx-secondary), .74) 96deg, transparent 118deg, rgba(var(--fx-third), .66) 190deg, transparent 220deg, rgba(var(--fx-main), .82) 294deg, transparent 330deg);
-  filter: drop-shadow(0 0 12px rgba(var(--fx-main), .44)) drop-shadow(0 0 28px rgba(var(--fx-secondary), .36));
-  mix-blend-mode: screen;
-  opacity: 0;
-  scale: var(--fx-ring-scale);
-  transform: translate(-50%, -50%) scale(.22) rotate(-16deg);
-}
-
-.fx-ring-one {
-  animation: fxRing 2.02s cubic-bezier(.16, .9, .18, 1) forwards;
-}
-
-.fx-ring-two {
-  width: clamp(160px, 20vw, 280px);
-  animation: fxRing 2.08s .08s cubic-bezier(.16, .9, .18, 1) forwards reverse;
-}
-
-.fx-ring-three {
-  width: clamp(96px, 13vw, 180px);
-  border-color: rgba(var(--fx-secondary), .74);
-  animation: fxRingTight 1.58s .02s cubic-bezier(.16, .9, .18, 1) forwards;
-}
-
-.fx-ring-four {
-  width: clamp(220px, 28vw, 400px);
-  border-color: rgba(var(--fx-third), .5);
-  opacity: 0;
-  animation: fxRingWide 2.04s .1s cubic-bezier(.16, .9, .18, 1) forwards;
-}
-
-.fx-slice {
-  width: clamp(160px, 22vw, 320px);
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgba(255, 247, 219, .98), rgba(var(--fx-main), .82), rgba(var(--fx-secondary), .68), transparent);
-  filter: drop-shadow(0 0 10px rgba(var(--fx-main), .72)) drop-shadow(0 0 26px rgba(var(--fx-secondary), .5));
-  opacity: 0;
-  --slice-angle: var(--fx-angle-1);
-  transform: translate(-50%, -50%) rotate(var(--slice-angle)) scaleX(.2);
-}
-
-.fx-slice-left {
-  animation: fxSlice 1.06s .04s cubic-bezier(.16, .9, .18, 1) forwards;
-}
-
-.fx-slice-right {
-  --slice-angle: var(--fx-angle-2);
-  animation: fxSlice 1.1s .12s cubic-bezier(.16, .9, .18, 1) forwards;
-}
-
-.fx-slice-high {
-  --slice-angle: var(--fx-angle-3);
-  animation: fxSliceSoft 1.18s .18s cubic-bezier(.16, .9, .18, 1) forwards;
-}
-
-.fx-slice-low {
-  --slice-angle: var(--fx-angle-4);
-  animation: fxSliceSoft 1.2s .22s cubic-bezier(.16, .9, .18, 1) forwards;
-}
-
-.fx-spark {
-  width: var(--size);
-  height: calc(var(--size) * 2.8);
-  border-radius: 999px;
-  background: rgba(var(--spark-color), .98);
-  box-shadow: 0 0 8px rgba(var(--spark-color), .68), 0 0 18px rgba(var(--spark-color), .34);
-  opacity: 0;
-  transform: translate(-50%, -50%) rotate(var(--rot)) scale(.45);
-  animation: fxSpark 1.66s var(--delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph {
@@ -448,8 +368,8 @@ summary {
   height: 160px;
   opacity: 0;
   color: rgba(var(--fx-main), .94);
-  filter: drop-shadow(0 0 12px rgba(var(--fx-main), .82)) drop-shadow(0 0 28px rgba(var(--fx-secondary), .48));
-  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px rgba(255, 252, 232, .78)) drop-shadow(0 0 18px rgba(var(--fx-main), .9)) drop-shadow(0 0 36px rgba(var(--fx-secondary), .54));
+  mix-blend-mode: normal;
   transform: translate(-50%, -50%) scale(.72) rotate(0deg);
   animation: fxGlyph 1.62s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
@@ -474,11 +394,12 @@ summary {
   border-radius: 999px;
   background: linear-gradient(90deg, transparent, rgba(255, 252, 232, .98) 18%, rgba(var(--fx-main), .96) 46%, rgba(var(--fx-secondary), .72) 72%, transparent);
   transform: translate(-50%, -50%) rotate(16deg) scaleX(.58);
+  animation: samiraBladeLeft .94s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-blade-right {
   transform: translate(-50%, -50%) rotate(-20deg) scaleX(.58);
-  animation-delay: calc(var(--glyph-delay) + 84ms);
+  animation: samiraBladeRight .94s calc(var(--glyph-delay) + 84ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-muzzle {
@@ -486,6 +407,7 @@ summary {
   height: 120px;
   clip-path: polygon(50% 0%, 60% 34%, 98% 23%, 68% 50%, 98% 77%, 60% 66%, 50% 100%, 40% 66%, 2% 77%, 32% 50%, 2% 23%, 40% 34%);
   background: radial-gradient(circle, rgba(255, 252, 232, .95), rgba(var(--fx-main), .84) 34%, rgba(var(--fx-secondary), .4) 66%, transparent 70%);
+  animation: muzzlePop .62s calc(var(--glyph-delay) + 40ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-crosshair {
@@ -496,6 +418,7 @@ summary {
   background:
     linear-gradient(90deg, transparent 0 48%, rgba(255, 252, 232, .92) 49% 51%, transparent 52%),
     linear-gradient(0deg, transparent 0 48%, rgba(var(--fx-third), .82) 49% 51%, transparent 52%);
+  animation: crosshairLock 1.08s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-bullet {
@@ -504,6 +427,7 @@ summary {
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(255, 252, 232, .98), rgba(var(--fx-main), .92), transparent);
   transform: translate(-50%, -50%) rotate(0deg) scaleX(.64);
+  animation: bulletTrace .68s calc(var(--glyph-delay) + 70ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-bubble-one,
@@ -513,13 +437,14 @@ summary {
   border: 2px solid rgba(var(--fx-main), .78);
   border-radius: 44% 56% 50% 50%;
   background: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, .72) 0 7%, transparent 8% 100%), radial-gradient(circle, rgba(var(--fx-third), .22), transparent 62%);
+  animation: bubblePop 1.12s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-bubble-two {
   width: 72px;
   height: 72px;
   transform: translate(-28%, -76%) scale(.72);
-  animation-delay: calc(var(--glyph-delay) + 90ms);
+  animation: bubblePopSmall 1.08s calc(var(--glyph-delay) + 90ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-wave {
@@ -528,6 +453,7 @@ summary {
   border-top: 4px solid rgba(var(--fx-main), .86);
   border-radius: 50% 50% 0 0;
   transform: translate(-50%, -34%) rotate(-8deg) scaleX(.64);
+  animation: waveRoll 1.2s calc(var(--glyph-delay) + 20ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-void-diamond {
@@ -535,6 +461,7 @@ summary {
   height: 140px;
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   background: linear-gradient(135deg, rgba(var(--fx-main), .95), rgba(var(--fx-secondary), .74), rgba(var(--fx-third), .52));
+  animation: voidDiamond 1.18s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-void-wing-left,
@@ -544,10 +471,12 @@ summary {
   clip-path: polygon(0% 50%, 100% 0%, 74% 50%, 100% 100%);
   background: linear-gradient(90deg, rgba(var(--fx-secondary), .72), rgba(var(--fx-third), .42), transparent);
   transform: translate(-96%, -50%) rotate(-10deg) scale(.72);
+  animation: voidWingLeft 1.02s calc(var(--glyph-delay) + 30ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-void-wing-right {
   transform: translate(-4%, -50%) rotate(190deg) scale(.72);
+  animation: voidWingRight 1.02s calc(var(--glyph-delay) + 60ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-pistol-left,
@@ -557,6 +486,7 @@ summary {
   border-radius: 6px 999px 999px 6px;
   background: linear-gradient(90deg, rgba(var(--fx-dark), .2), rgba(255, 252, 232, .9) 22%, rgba(var(--fx-main), .82) 58%, rgba(var(--fx-secondary), .6));
   transform: translate(-82%, -50%) rotate(-8deg) scale(.78);
+  animation: pistolLeft .72s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-pistol-left::after,
@@ -572,6 +502,7 @@ summary {
 
 .fx-glyph-pistol-right {
   transform: translate(-18%, -50%) rotate(188deg) scale(.78);
+  animation: pistolRight .72s calc(var(--glyph-delay) + 130ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-blink-one,
@@ -581,12 +512,14 @@ summary {
   height: 118px;
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%, 24% 50%, 50% 76%, 76% 50%, 50% 24%, 24% 50%);
   background: linear-gradient(135deg, rgba(var(--fx-main), .78), rgba(var(--fx-secondary), .72));
+  animation: blinkGlyph .84s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-blink-two {
   width: 80px;
   height: 80px;
   transform: translate(-18%, -82%) rotate(20deg) scale(.62);
+  animation: blinkGlyphSmall .84s calc(var(--glyph-delay) + 80ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-chevron {
@@ -594,6 +527,7 @@ summary {
   height: 70px;
   clip-path: polygon(0 0, 58% 0, 100% 50%, 58% 100%, 0 100%, 40% 50%);
   transform: translate(-50%, -50%) rotate(0deg) scale(.62);
+  animation: chevronDash .76s calc(var(--glyph-delay) + 120ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-petal-one,
@@ -605,11 +539,13 @@ summary {
   border-radius: 92% 8% 92% 8%;
   background: linear-gradient(180deg, rgba(var(--fx-main), .9), rgba(var(--fx-secondary), .64), transparent);
   transform: translate(-50%, -78%) rotate(0deg) scale(.62);
+  animation: petalBloom 1.32s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
-.fx-glyph-petal-two { transform: translate(-22%, -50%) rotate(90deg) scale(.62); }
-.fx-glyph-petal-three { transform: translate(-50%, -22%) rotate(180deg) scale(.62); }
-.fx-glyph-petal-four { transform: translate(-78%, -50%) rotate(270deg) scale(.62); }
+.fx-glyph-petal-one { --petal-rot: 0deg; }
+.fx-glyph-petal-two { --petal-rot: 90deg; transform: translate(-22%, -50%) rotate(90deg) scale(.62); animation-delay: calc(var(--glyph-delay) + 120ms); }
+.fx-glyph-petal-three { --petal-rot: 180deg; transform: translate(-50%, -22%) rotate(180deg) scale(.62); animation-delay: calc(var(--glyph-delay) + 240ms); }
+.fx-glyph-petal-four { --petal-rot: 270deg; transform: translate(-78%, -50%) rotate(270deg) scale(.62); animation-delay: calc(var(--glyph-delay) + 360ms); }
 
 .fx-glyph-ice-arrow {
   width: clamp(210px, 34vw, 430px);
@@ -617,6 +553,7 @@ summary {
   clip-path: polygon(0 42%, 75% 42%, 75% 18%, 100% 50%, 75% 82%, 75% 58%, 0 58%);
   background: linear-gradient(90deg, rgba(var(--fx-third), .3), rgba(255, 255, 255, .96), rgba(var(--fx-main), .9));
   transform: translate(-50%, -50%) rotate(0deg) scaleX(.66);
+  animation: iceArrow .82s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-ice-shard-left,
@@ -626,10 +563,12 @@ summary {
   clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
   background: linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(var(--fx-third), .54), transparent);
   transform: translate(-88%, -54%) rotate(-38deg) scale(.72);
+  animation: iceShardLeft 1s calc(var(--glyph-delay) + 90ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-ice-shard-right {
   transform: translate(-12%, -54%) rotate(38deg) scale(.72);
+  animation: iceShardRight 1s calc(var(--glyph-delay) + 130ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-shell {
@@ -639,6 +578,7 @@ summary {
   background:
     repeating-conic-gradient(from 0deg, rgba(var(--fx-main), .74) 0 13deg, rgba(var(--fx-third), .4) 14deg 26deg, transparent 27deg 34deg),
     radial-gradient(circle, rgba(var(--fx-secondary), .6) 0 18%, transparent 19%);
+  animation: shellRoll 1.12s var(--glyph-delay) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-quake {
@@ -647,6 +587,7 @@ summary {
   background: linear-gradient(90deg, transparent, rgba(var(--fx-main), .88), rgba(var(--fx-third), .62), transparent);
   clip-path: polygon(0 42%, 8% 62%, 17% 36%, 26% 64%, 36% 40%, 48% 68%, 58% 34%, 70% 62%, 82% 38%, 92% 58%, 100% 45%, 100% 56%, 92% 72%, 82% 52%, 70% 76%, 58% 48%, 48% 82%, 36% 54%, 26% 78%, 17% 50%, 8% 76%, 0 58%);
   transform: translate(-50%, -50%) scaleX(.7);
+  animation: quakeCrack .92s calc(var(--glyph-delay) + 100ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .fx-glyph-spike-ring {
@@ -654,6 +595,7 @@ summary {
   height: 160px;
   background: conic-gradient(from 0deg, rgba(var(--fx-main), .9) 0 10deg, transparent 11deg 30deg);
   clip-path: polygon(50% 0%, 58% 34%, 86% 14%, 66% 42%, 100% 50%, 66% 58%, 86% 86%, 58% 66%, 50% 100%, 42% 66%, 14% 86%, 34% 58%, 0% 50%, 34% 42%, 14% 14%, 42% 34%);
+  animation: spikeBurst 1.1s calc(var(--glyph-delay) + 160ms) cubic-bezier(.16, .9, .18, 1) forwards;
 }
 
 .portrait-row::-webkit-scrollbar {
@@ -773,6 +715,83 @@ summary {
 
 .portrait-button.is-flashing img {
   animation: championImageLock 1.64s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="samira"]::before {
+  background:
+    linear-gradient(42deg, transparent 0 34%, rgba(255, 252, 232, .98) 43%, rgba(var(--fx-main), .88) 47%, transparent 58%),
+    linear-gradient(-38deg, transparent 0 32%, rgba(var(--fx-secondary), .9) 42%, rgba(255, 252, 232, .86) 48%, transparent 60%);
+  animation: cardSlash .92s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="caitlyn"]::before {
+  background:
+    linear-gradient(90deg, transparent 0 47%, rgba(255, 252, 232, .96) 49% 51%, transparent 53%),
+    linear-gradient(0deg, transparent 0 47%, rgba(var(--fx-main), .9) 49% 51%, transparent 53%),
+    radial-gradient(circle at 50% 50%, transparent 0 28%, rgba(var(--fx-main), .9) 29% 31%, transparent 32% 46%, rgba(var(--fx-third), .62) 47% 49%, transparent 50%);
+  animation: cardReticle 1.04s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="fizz"]::before {
+  background:
+    radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .92) 0 5%, rgba(var(--fx-main), .54) 6% 17%, transparent 18%),
+    radial-gradient(circle at 64% 58%, rgba(255, 255, 255, .72) 0 4%, rgba(var(--fx-third), .44) 5% 15%, transparent 16%),
+    radial-gradient(circle at 48% 72%, rgba(var(--fx-secondary), .62), transparent 24%),
+    linear-gradient(150deg, transparent, rgba(var(--fx-main), .28), transparent);
+  animation: cardBubble .98s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="kaisa"]::before {
+  background:
+    linear-gradient(135deg, transparent 0 39%, rgba(255, 255, 255, .9) 47% 52%, transparent 60%),
+    linear-gradient(45deg, transparent 0 39%, rgba(var(--fx-third), .74) 47% 52%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(var(--fx-secondary), .6), transparent 26%),
+    conic-gradient(from 0deg, rgba(var(--fx-main), .64), rgba(var(--fx-secondary), .58), rgba(var(--fx-third), .44), rgba(var(--fx-main), .64));
+  clip-path: polygon(50% 0%, 88% 18%, 100% 50%, 88% 82%, 50% 100%, 12% 82%, 0% 50%, 12% 18%);
+  animation: cardVoid .98s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="missfortune"]::before {
+  background:
+    radial-gradient(circle at 28% 44%, rgba(255, 252, 232, .98) 0 8%, rgba(var(--fx-main), .86) 9% 18%, transparent 19%),
+    radial-gradient(circle at 72% 44%, rgba(255, 252, 232, .98) 0 8%, rgba(var(--fx-secondary), .78) 9% 18%, transparent 19%),
+    linear-gradient(12deg, transparent 0 40%, rgba(var(--fx-main), .78) 48%, transparent 58%),
+    linear-gradient(-12deg, transparent 0 40%, rgba(var(--fx-secondary), .72) 48%, transparent 58%);
+  animation: cardTwinShot .9s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="ezreal"]::before {
+  background:
+    linear-gradient(90deg, transparent 0 22%, rgba(var(--fx-main), .88) 36%, transparent 50%),
+    linear-gradient(90deg, transparent 0 36%, rgba(var(--fx-secondary), .78) 54%, transparent 70%),
+    repeating-linear-gradient(90deg, transparent 0 12px, rgba(255, 252, 232, .72) 13px 18px, transparent 19px 34px);
+  clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%, 30% 50%);
+  animation: cardBlink .84s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="jhin"]::before {
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(var(--fx-main), .9), transparent 23%),
+    radial-gradient(ellipse at 90% 50%, rgba(var(--fx-secondary), .76), transparent 23%),
+    radial-gradient(ellipse at 50% 90%, rgba(var(--fx-main), .74), transparent 23%),
+    radial-gradient(ellipse at 10% 50%, rgba(var(--fx-secondary), .68), transparent 23%);
+  animation: cardPetals 1.28s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="ashe"]::before {
+  background:
+    linear-gradient(90deg, rgba(var(--fx-third), .2), rgba(255, 255, 255, .98) 44%, rgba(var(--fx-main), .92) 58%, transparent 72%),
+    linear-gradient(45deg, transparent 0 42%, rgba(255, 255, 255, .76) 48% 52%, transparent 58%),
+    linear-gradient(-45deg, transparent 0 42%, rgba(var(--fx-secondary), .64) 48% 52%, transparent 58%);
+  clip-path: polygon(0 42%, 72% 42%, 72% 18%, 100% 50%, 72% 82%, 72% 58%, 0 58%);
+  animation: cardIceArrow .86s cubic-bezier(.16, .9, .18, 1);
+}
+
+.portrait-button.is-flashing[data-champion-fx="rammus"]::before {
+  background:
+    repeating-conic-gradient(from 0deg, rgba(var(--fx-main), .88) 0 12deg, rgba(var(--fx-third), .64) 13deg 24deg, transparent 25deg 34deg),
+    radial-gradient(circle, rgba(255, 252, 232, .9) 0 18%, rgba(var(--fx-secondary), .68) 19% 28%, transparent 29%);
+  animation: cardShellRoll 1.05s cubic-bezier(.16, .9, .18, 1);
 }
 
 .selected-champion,
@@ -1126,6 +1145,156 @@ h1 {
   }
 }
 
+@keyframes cardSlash {
+  0% {
+    opacity: 0;
+    transform: translateX(-120%) scaleX(.25);
+  }
+  18% {
+    opacity: 1;
+    transform: translateX(-18%) scaleX(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(124%) scaleX(1.28);
+  }
+}
+
+@keyframes cardReticle {
+  0% {
+    opacity: 0;
+    transform: scale(1.45) rotate(-8deg);
+  }
+  22% {
+    opacity: 1;
+    transform: scale(.92) rotate(0deg);
+  }
+  62% {
+    opacity: .84;
+    transform: scale(1.02) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18) rotate(0deg);
+  }
+}
+
+@keyframes cardBubble {
+  0% {
+    opacity: 0;
+    filter: blur(1px);
+    transform: scale(.42) rotate(-8deg);
+  }
+  28% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1.04) rotate(4deg);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(2px);
+    transform: scale(1.28) rotate(12deg);
+  }
+}
+
+@keyframes cardVoid {
+  0% {
+    opacity: 0;
+    transform: scale(.22) rotate(45deg);
+  }
+  24% {
+    opacity: 1;
+    transform: scale(.96) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.22) rotate(135deg);
+  }
+}
+
+@keyframes cardTwinShot {
+  0% {
+    opacity: 0;
+    transform: scale(.68);
+  }
+  14% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  34% {
+    opacity: .92;
+    transform: scale(.96);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.22);
+  }
+}
+
+@keyframes cardBlink {
+  0% {
+    opacity: 0;
+    transform: translateX(-92%) scaleX(.28);
+  }
+  20% {
+    opacity: .96;
+    transform: translateX(-18%) scaleX(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(88%) scaleX(.82);
+  }
+}
+
+@keyframes cardPetals {
+  0% {
+    opacity: 0;
+    transform: scale(.18) rotate(-24deg);
+  }
+  28% {
+    opacity: .96;
+    transform: scale(.98) rotate(12deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.28) rotate(58deg);
+  }
+}
+
+@keyframes cardIceArrow {
+  0% {
+    opacity: 0;
+    transform: translateX(-110%) scaleX(.2);
+  }
+  24% {
+    opacity: 1;
+    transform: translateX(-4%) scaleX(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(82%) scaleX(1.2);
+  }
+}
+
+@keyframes cardShellRoll {
+  0% {
+    opacity: 0;
+    transform: scale(.36) rotate(-180deg);
+  }
+  28% {
+    opacity: 1;
+    transform: scale(1.06) rotate(24deg);
+  }
+  68% {
+    opacity: .72;
+    transform: scale(.92) rotate(138deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18) rotate(260deg);
+  }
+}
+
 @keyframes reviewEnter {
   0% {
     opacity: 0;
@@ -1328,105 +1497,147 @@ h1 {
   }
 }
 
-@keyframes fxRing {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(.18) rotate(-24deg);
-  }
-  16% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(.96) rotate(18deg);
-  }
-  46% {
-    opacity: .74;
-    transform: translate(-50%, -50%) scale(1.22) rotate(74deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.64) rotate(168deg);
-  }
+@keyframes samiraBladeLeft {
+  0% { opacity: 0; transform: translate(-96%, -74%) rotate(18deg) scaleX(.12); }
+  18% { opacity: 1; transform: translate(-62%, -58%) rotate(18deg) scaleX(1.1); }
+  100% { opacity: 0; transform: translate(8%, -18%) rotate(18deg) scaleX(1.42); }
 }
 
-@keyframes fxRingTight {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(.28) rotate(30deg);
-  }
-  18% {
-    opacity: .96;
-    transform: translate(-50%, -50%) scale(1.08) rotate(-12deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(.82) rotate(-88deg);
-  }
+@keyframes samiraBladeRight {
+  0% { opacity: 0; transform: translate(4%, -76%) rotate(-22deg) scaleX(.12); }
+  18% { opacity: 1; transform: translate(-38%, -56%) rotate(-22deg) scaleX(1.06); }
+  100% { opacity: 0; transform: translate(-108%, -12%) rotate(-22deg) scaleX(1.38); }
 }
 
-@keyframes fxRingWide {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(.12) rotate(4deg);
-  }
-  14% {
-    opacity: .82;
-    transform: translate(-50%, -50%) scale(.86) rotate(28deg);
-  }
-  52% {
-    opacity: .38;
-    transform: translate(-50%, -50%) scale(1.12) rotate(82deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.42) rotate(172deg);
-  }
+@keyframes muzzlePop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.22) rotate(0deg); }
+  24% { opacity: 1; transform: translate(-50%, -50%) scale(1.18) rotate(18deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.82) rotate(56deg); }
 }
 
-@keyframes fxSlice {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(var(--slice-angle)) scaleX(.2);
-  }
-  18% {
-    opacity: .98;
-    transform: translate(-50%, -50%) rotate(var(--slice-angle)) scaleX(1.16);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(var(--slice-angle)) scaleX(1.48);
-  }
+@keyframes crosshairLock {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.55) rotate(-10deg); }
+  22% { opacity: .94; transform: translate(-50%, -50%) scale(.86) rotate(0deg); }
+  54% { opacity: .82; transform: translate(-50%, -50%) scale(.96) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.18) rotate(0deg); }
 }
 
-@keyframes fxSliceSoft {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(var(--slice-angle)) scaleX(.2);
-  }
-  18% {
-    opacity: .78;
-    transform: translate(-50%, -50%) rotate(var(--slice-angle)) scaleX(.9);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(var(--slice-angle)) scaleX(1.24);
-  }
+@keyframes bulletTrace {
+  0% { opacity: 0; transform: translate(-118%, -50%) rotate(0deg) scaleX(.08); }
+  18% { opacity: 1; transform: translate(-72%, -50%) rotate(0deg) scaleX(1.3); }
+  100% { opacity: 0; transform: translate(48%, -50%) rotate(0deg) scaleX(1.75); }
 }
 
-@keyframes fxSpark {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(var(--rot)) scale(.4);
-  }
-  18% {
-    opacity: 1;
-  }
-  74% {
-    opacity: .82;
-    transform: translate3d(calc(-50% + var(--tx)), calc(-50% + var(--ty)), 0) rotate(var(--rot)) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(calc(-50% + var(--tx)), calc(-50% + var(--ty)), 0) rotate(var(--rot)) scale(.1);
-  }
+@keyframes bubblePop {
+  0% { opacity: 0; transform: translate(-64%, -42%) scale(.22) rotate(-18deg); }
+  28% { opacity: .9; transform: translate(-52%, -58%) scale(1.04) rotate(8deg); }
+  74% { opacity: .45; transform: translate(-46%, -70%) scale(1.22) rotate(18deg); }
+  100% { opacity: 0; transform: translate(-42%, -84%) scale(1.42) rotate(28deg); }
+}
+
+@keyframes bubblePopSmall {
+  0% { opacity: 0; transform: translate(-18%, -60%) scale(.2) rotate(10deg); }
+  28% { opacity: .84; transform: translate(-28%, -76%) scale(.9) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-34%, -96%) scale(1.22) rotate(-18deg); }
+}
+
+@keyframes waveRoll {
+  0% { opacity: 0; transform: translate(-78%, -20%) rotate(-8deg) scaleX(.18); }
+  28% { opacity: .82; transform: translate(-50%, -34%) rotate(-8deg) scaleX(1.1); }
+  100% { opacity: 0; transform: translate(-22%, -38%) rotate(-8deg) scaleX(1.34); }
+}
+
+@keyframes voidDiamond {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.18) rotate(45deg); }
+  24% { opacity: .98; transform: translate(-50%, -50%) scale(1.05) rotate(0deg); }
+  70% { opacity: .5; transform: translate(-50%, -50%) scale(.9) rotate(90deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.38) rotate(180deg); }
+}
+
+@keyframes voidWingLeft {
+  0% { opacity: 0; transform: translate(-42%, -50%) rotate(-10deg) scale(.18); }
+  24% { opacity: .88; transform: translate(-96%, -50%) rotate(-10deg) scale(.92); }
+  100% { opacity: 0; transform: translate(-130%, -50%) rotate(-14deg) scale(1.12); }
+}
+
+@keyframes voidWingRight {
+  0% { opacity: 0; transform: translate(-58%, -50%) rotate(190deg) scale(.18); }
+  24% { opacity: .88; transform: translate(-4%, -50%) rotate(190deg) scale(.92); }
+  100% { opacity: 0; transform: translate(28%, -50%) rotate(194deg) scale(1.12); }
+}
+
+@keyframes pistolLeft {
+  0% { opacity: 0; transform: translate(-66%, -42%) rotate(-8deg) scale(.48); }
+  22% { opacity: 1; transform: translate(-82%, -50%) rotate(-8deg) scale(.9); }
+  46% { opacity: .8; transform: translate(-88%, -50%) rotate(-11deg) scale(.84); }
+  100% { opacity: 0; transform: translate(-98%, -50%) rotate(-14deg) scale(.72); }
+}
+
+@keyframes pistolRight {
+  0% { opacity: 0; transform: translate(-34%, -42%) rotate(188deg) scale(.48); }
+  22% { opacity: 1; transform: translate(-18%, -50%) rotate(188deg) scale(.9); }
+  46% { opacity: .8; transform: translate(-12%, -50%) rotate(191deg) scale(.84); }
+  100% { opacity: 0; transform: translate(0%, -50%) rotate(194deg) scale(.72); }
+}
+
+@keyframes blinkGlyph {
+  0% { opacity: 0; transform: translate(-86%, -50%) scale(.18) rotate(45deg); }
+  18% { opacity: .92; transform: translate(-52%, -50%) scale(.84) rotate(45deg); }
+  100% { opacity: 0; transform: translate(34%, -50%) scale(.52) rotate(45deg); }
+}
+
+@keyframes blinkGlyphSmall {
+  0% { opacity: 0; transform: translate(-80%, -82%) rotate(20deg) scale(.16); }
+  18% { opacity: .82; transform: translate(-18%, -82%) rotate(20deg) scale(.78); }
+  100% { opacity: 0; transform: translate(48%, -82%) rotate(20deg) scale(.42); }
+}
+
+@keyframes chevronDash {
+  0% { opacity: 0; transform: translate(-96%, -50%) rotate(0deg) scale(.26); }
+  22% { opacity: .95; transform: translate(-50%, -50%) rotate(0deg) scale(.84); }
+  100% { opacity: 0; transform: translate(58%, -50%) rotate(0deg) scale(.52); }
+}
+
+@keyframes petalBloom {
+  0% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--petal-rot, 0deg)) scale(.12); }
+  34% { opacity: .92; transform: translate(-50%, -50%) rotate(var(--petal-rot, 0deg)) scale(.86); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--petal-rot, 0deg)) scale(1.24); }
+}
+
+@keyframes iceArrow {
+  0% { opacity: 0; transform: translate(-116%, -50%) rotate(0deg) scaleX(.18); }
+  24% { opacity: .96; transform: translate(-50%, -50%) rotate(0deg) scaleX(1.08); }
+  100% { opacity: 0; transform: translate(42%, -50%) rotate(0deg) scaleX(1.26); }
+}
+
+@keyframes iceShardLeft {
+  0% { opacity: 0; transform: translate(-58%, -54%) rotate(-38deg) scale(.14); }
+  24% { opacity: .9; transform: translate(-88%, -54%) rotate(-38deg) scale(.82); }
+  100% { opacity: 0; transform: translate(-116%, -76%) rotate(-48deg) scale(.98); }
+}
+
+@keyframes iceShardRight {
+  0% { opacity: 0; transform: translate(-42%, -54%) rotate(38deg) scale(.14); }
+  24% { opacity: .9; transform: translate(-12%, -54%) rotate(38deg) scale(.82); }
+  100% { opacity: 0; transform: translate(16%, -76%) rotate(48deg) scale(.98); }
+}
+
+@keyframes shellRoll {
+  0% { opacity: 0; transform: translate(-84%, -50%) scale(.3) rotate(-180deg); }
+  32% { opacity: .96; transform: translate(-50%, -50%) scale(1) rotate(22deg); }
+  100% { opacity: 0; transform: translate(-18%, -50%) scale(.82) rotate(220deg); }
+}
+
+@keyframes quakeCrack {
+  0% { opacity: 0; transform: translate(-50%, -50%) scaleX(.12); }
+  22% { opacity: .9; transform: translate(-50%, -50%) scaleX(1.08); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scaleX(1.32); }
+}
+
+@keyframes spikeBurst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.16) rotate(0deg); }
+  24% { opacity: .88; transform: translate(-50%, -50%) scale(.92) rotate(48deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.28) rotate(130deg); }
 }
 
 @keyframes panelSheen {
