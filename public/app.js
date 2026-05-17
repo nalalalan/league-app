@@ -1,5 +1,376 @@
 const imageBase = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
 
+const defaultSoundProfile = {
+  duration: 1.58,
+  volume: 0.66,
+  masterPeak: 0.22,
+  masterTail: 0.14,
+  thump: { frequency: 42, endFrequency: 28, length: 0.24, gain: 0.42 },
+  noise: { start: 0.02, length: 0.86, startFrequency: 4800, endFrequency: 520, gain: 0.2 },
+  tail: { frequency: 34, center: 0.78, width: 0.52, gain: 0.018 },
+  tones: [
+    { type: "sine", frequency: 82.41, endFrequency: 41.2, start: 0, length: 0.66, gain: 0.7, attack: 0.004 },
+    { type: "triangle", frequency: 130.81, endFrequency: 82.41, start: 0.018, length: 0.62, gain: 0.38, attack: 0.006 },
+    { type: "triangle", frequency: 246.94, start: 0.05, length: 0.5, gain: 0.24, pan: -0.22 },
+    { type: "triangle", frequency: 311.13, start: 0.07, length: 0.56, gain: 0.2, pan: 0.2 },
+    { type: "triangle", frequency: 392, start: 0.09, length: 0.62, gain: 0.24 },
+    { type: "sine", frequency: 493.88, start: 0.14, length: 0.5, gain: 0.16, pan: -0.18 },
+    { type: "sine", frequency: 622.25, start: 0.17, length: 0.54, gain: 0.17, pan: 0.18 },
+    { type: "sine", frequency: 987.77, start: 0.28, length: 0.5, gain: 0.12, pan: 0.34 },
+    { type: "sine", frequency: 1479.98, start: 0.42, length: 0.58, gain: 0.075, pan: 0.12 },
+    { type: "sine", frequency: 2217.46, start: 0.66, length: 0.66, gain: 0.045, pan: -0.2 }
+  ]
+};
+
+const soundProfiles = {
+  samira: {
+    ...defaultSoundProfile,
+    noise: { start: 0.02, length: 0.9, startFrequency: 5600, endFrequency: 680, gain: 0.24 },
+    tail: { frequency: 42, center: 0.76, width: 0.5, gain: 0.02 },
+    tones: [
+      { type: "sawtooth", frequency: 92.5, endFrequency: 46.25, start: 0, length: 0.5, gain: 0.36, attack: 0.004 },
+      { type: "triangle", frequency: 185, start: 0.02, length: 0.44, gain: 0.24, pan: -0.28 },
+      { type: "triangle", frequency: 277.18, start: 0.06, length: 0.48, gain: 0.18, pan: 0.24 },
+      { type: "triangle", frequency: 370, start: 0.1, length: 0.54, gain: 0.22 },
+      { type: "sine", frequency: 740, start: 0.18, length: 0.48, gain: 0.14, pan: -0.18 },
+      { type: "sine", frequency: 1108.73, start: 0.27, length: 0.44, gain: 0.12, pan: 0.22 },
+      { type: "sine", frequency: 1661.22, start: 0.42, length: 0.56, gain: 0.075 }
+    ]
+  },
+  caitlyn: {
+    ...defaultSoundProfile,
+    duration: 1.2,
+    thump: { frequency: 68, endFrequency: 38, length: 0.18, gain: 0.52 },
+    noise: { start: 0.008, length: 0.28, startFrequency: 7200, endFrequency: 1300, gain: 0.28 },
+    tail: { frequency: 54, center: 0.42, width: 0.28, gain: 0.012 },
+    tones: [
+      { type: "square", frequency: 1244.51, endFrequency: 622.25, start: 0, length: 0.09, gain: 0.15 },
+      { type: "sine", frequency: 311.13, start: 0.025, length: 0.36, gain: 0.2 },
+      { type: "sine", frequency: 622.25, start: 0.09, length: 0.42, gain: 0.14, pan: -0.18 },
+      { type: "sine", frequency: 1244.51, start: 0.18, length: 0.48, gain: 0.09, pan: 0.18 },
+      { type: "sine", frequency: 1864.66, start: 0.32, length: 0.48, gain: 0.055 }
+    ]
+  },
+  fizz: {
+    ...defaultSoundProfile,
+    duration: 1.28,
+    thump: { frequency: 120, endFrequency: 80, length: 0.2, gain: 0.22 },
+    noise: { start: 0.02, length: 0.52, startFrequency: 1800, endFrequency: 4200, gain: 0.13 },
+    tail: { frequency: 72, center: 0.5, width: 0.38, gain: 0.014 },
+    tones: [
+      { type: "sine", frequency: 261.63, endFrequency: 392, start: 0, length: 0.28, gain: 0.22, pan: -0.28 },
+      { type: "triangle", frequency: 392, endFrequency: 587.33, start: 0.08, length: 0.3, gain: 0.18, pan: 0.28 },
+      { type: "sine", frequency: 783.99, start: 0.2, length: 0.32, gain: 0.15 },
+      { type: "sine", frequency: 987.77, start: 0.34, length: 0.38, gain: 0.11, pan: -0.16 },
+      { type: "triangle", frequency: 1318.51, start: 0.52, length: 0.36, gain: 0.08, pan: 0.16 }
+    ]
+  },
+  kaisa: {
+    ...defaultSoundProfile,
+    duration: 1.46,
+    thump: { frequency: 55, endFrequency: 38, length: 0.36, gain: 0.44 },
+    noise: { start: 0.03, length: 0.76, startFrequency: 6400, endFrequency: 900, gain: 0.17 },
+    tail: { frequency: 48, center: 0.72, width: 0.5, gain: 0.022 },
+    tones: [
+      { type: "sawtooth", frequency: 110, endFrequency: 82.41, start: 0, length: 0.5, gain: 0.28 },
+      { type: "triangle", frequency: 220, start: 0.04, length: 0.52, gain: 0.18, pan: -0.22 },
+      { type: "sine", frequency: 440, start: 0.11, length: 0.56, gain: 0.18, pan: 0.22 },
+      { type: "sine", frequency: 659.25, start: 0.22, length: 0.5, gain: 0.13 },
+      { type: "sine", frequency: 987.77, start: 0.38, length: 0.52, gain: 0.09 },
+      { type: "sine", frequency: 1975.53, start: 0.62, length: 0.48, gain: 0.05 }
+    ]
+  },
+  missfortune: {
+    ...defaultSoundProfile,
+    duration: 1.36,
+    thump: { frequency: 50, endFrequency: 30, length: 0.34, gain: 0.6 },
+    noise: { start: 0, length: 0.5, startFrequency: 3600, endFrequency: 420, gain: 0.24 },
+    tail: { frequency: 38, center: 0.56, width: 0.44, gain: 0.02 },
+    tones: [
+      { type: "sawtooth", frequency: 146.83, endFrequency: 98, start: 0, length: 0.42, gain: 0.25 },
+      { type: "triangle", frequency: 293.66, start: 0.05, length: 0.48, gain: 0.23, pan: -0.2 },
+      { type: "triangle", frequency: 440, start: 0.12, length: 0.48, gain: 0.19, pan: 0.2 },
+      { type: "sine", frequency: 587.33, start: 0.2, length: 0.48, gain: 0.12 },
+      { type: "sine", frequency: 880, start: 0.34, length: 0.5, gain: 0.08 }
+    ]
+  },
+  ezreal: {
+    ...defaultSoundProfile,
+    duration: 1.26,
+    thump: { frequency: 76, endFrequency: 52, length: 0.22, gain: 0.3 },
+    noise: { start: 0.02, length: 0.42, startFrequency: 5800, endFrequency: 1600, gain: 0.12 },
+    tail: { frequency: 62, center: 0.62, width: 0.42, gain: 0.015 },
+    tones: [
+      { type: "sine", frequency: 392, start: 0, length: 0.22, gain: 0.18, pan: -0.35 },
+      { type: "sine", frequency: 587.33, start: 0.08, length: 0.24, gain: 0.16, pan: 0.25 },
+      { type: "sine", frequency: 783.99, start: 0.16, length: 0.28, gain: 0.14, pan: -0.18 },
+      { type: "triangle", frequency: 1174.66, start: 0.28, length: 0.36, gain: 0.11, pan: 0.18 },
+      { type: "sine", frequency: 1567.98, start: 0.44, length: 0.42, gain: 0.08 }
+    ]
+  },
+  jhin: {
+    ...defaultSoundProfile,
+    duration: 1.72,
+    thump: { frequency: 48, endFrequency: 32, length: 0.42, gain: 0.5 },
+    noise: { start: 0.02, length: 0.62, startFrequency: 3200, endFrequency: 720, gain: 0.16 },
+    tail: { frequency: 44, center: 0.86, width: 0.62, gain: 0.018 },
+    tones: [
+      { type: "triangle", frequency: 196, start: 0, length: 0.32, gain: 0.22 },
+      { type: "triangle", frequency: 246.94, start: 0.16, length: 0.34, gain: 0.19 },
+      { type: "triangle", frequency: 293.66, start: 0.34, length: 0.36, gain: 0.17 },
+      { type: "sine", frequency: 392, start: 0.58, length: 0.72, gain: 0.2 },
+      { type: "sine", frequency: 784, start: 0.76, length: 0.58, gain: 0.07 }
+    ]
+  },
+  ashe: {
+    ...defaultSoundProfile,
+    duration: 1.4,
+    thump: { frequency: 64, endFrequency: 44, length: 0.26, gain: 0.28 },
+    noise: { start: 0.02, length: 0.72, startFrequency: 7600, endFrequency: 2200, gain: 0.14 },
+    tail: { frequency: 52, center: 0.68, width: 0.5, gain: 0.012 },
+    tones: [
+      { type: "sine", frequency: 523.25, start: 0, length: 0.5, gain: 0.16, pan: -0.22 },
+      { type: "sine", frequency: 783.99, start: 0.09, length: 0.56, gain: 0.16, pan: 0.22 },
+      { type: "sine", frequency: 1046.5, start: 0.18, length: 0.58, gain: 0.12 },
+      { type: "sine", frequency: 1567.98, start: 0.36, length: 0.62, gain: 0.08 },
+      { type: "sine", frequency: 2093, start: 0.6, length: 0.5, gain: 0.05 }
+    ]
+  },
+  rammus: {
+    ...defaultSoundProfile,
+    duration: 1.24,
+    thump: { frequency: 38, endFrequency: 24, length: 0.46, gain: 0.68 },
+    noise: { start: 0.02, length: 0.44, startFrequency: 1600, endFrequency: 260, gain: 0.18 },
+    tail: { frequency: 28, center: 0.52, width: 0.4, gain: 0.026 },
+    tones: [
+      { type: "square", frequency: 73.42, endFrequency: 55, start: 0, length: 0.4, gain: 0.22 },
+      { type: "triangle", frequency: 110, start: 0.04, length: 0.42, gain: 0.2 },
+      { type: "triangle", frequency: 146.83, start: 0.14, length: 0.42, gain: 0.14 },
+      { type: "sine", frequency: 220, start: 0.3, length: 0.38, gain: 0.08 }
+    ]
+  }
+};
+
+const defaultSoundScene = [
+  { kind: "thump", frequency: 42, endFrequency: 28, start: 0, length: 0.24, gain: 0.42 },
+  { kind: "tone", type: "triangle", frequency: 130.81, endFrequency: 82.41, start: 0.018, length: 0.62, gain: 0.28 },
+  { kind: "tone", type: "sine", frequency: 392, start: 0.09, length: 0.62, gain: 0.18 },
+  { kind: "noise", filter: "bandpass", start: 0.02, length: 0.86, startFrequency: 4800, endFrequency: 520, gain: 0.2 }
+];
+
+const soundScenes = {
+  samira: [
+    { kind: "thump", frequency: 58, endFrequency: 34, start: 0, length: 0.18, gain: 0.52 },
+    { kind: "noise", filter: "highpass", start: 0.015, length: 0.12, startFrequency: 7800, endFrequency: 3600, gain: 0.34, pan: -0.34 },
+    { kind: "tone", type: "sawtooth", frequency: 160, endFrequency: 86, start: 0.02, length: 0.28, gain: 0.2, pan: -0.18 },
+    { kind: "noise", filter: "highpass", start: 0.16, length: 0.14, startFrequency: 8400, endFrequency: 4200, gain: 0.3, pan: 0.34 },
+    { kind: "tone", type: "square", frequency: 740, endFrequency: 1120, start: 0.24, length: 0.16, gain: 0.1, pan: 0.18 },
+    { kind: "tone", type: "triangle", frequency: 370, endFrequency: 740, start: 0.34, length: 0.5, gain: 0.14 },
+    { kind: "noise", filter: "bandpass", start: 0.42, length: 0.44, startFrequency: 3200, endFrequency: 900, gain: 0.12 }
+  ],
+  caitlyn: [
+    { kind: "tone", type: "sine", frequency: 880, endFrequency: 1480, start: 0, length: 0.18, gain: 0.08 },
+    { kind: "noise", filter: "highpass", start: 0.08, length: 0.06, startFrequency: 9000, endFrequency: 6800, gain: 0.42 },
+    { kind: "thump", frequency: 72, endFrequency: 38, start: 0.08, length: 0.16, gain: 0.6 },
+    { kind: "tone", type: "square", frequency: 1760, endFrequency: 620, start: 0.1, length: 0.08, gain: 0.08 },
+    { kind: "tone", type: "sine", frequency: 1244, endFrequency: 1865, start: 0.2, length: 0.34, gain: 0.06, pan: -0.34 },
+    { kind: "tone", type: "sine", frequency: 932, endFrequency: 622, start: 0.34, length: 0.42, gain: 0.045, pan: 0.28 }
+  ],
+  fizz: [
+    { kind: "tone", type: "sine", frequency: 260, endFrequency: 520, start: 0, length: 0.24, gain: 0.16, pan: -0.24 },
+    { kind: "noise", filter: "bandpass", start: 0.06, length: 0.18, startFrequency: 900, endFrequency: 2100, gain: 0.16 },
+    { kind: "tone", type: "triangle", frequency: 520, endFrequency: 980, start: 0.2, length: 0.26, gain: 0.14, pan: 0.3 },
+    { kind: "noise", filter: "bandpass", start: 0.32, length: 0.22, startFrequency: 1700, endFrequency: 4800, gain: 0.14 },
+    { kind: "tone", type: "sine", frequency: 1120, endFrequency: 760, start: 0.5, length: 0.32, gain: 0.09 },
+    { kind: "thump", frequency: 116, endFrequency: 86, start: 0.54, length: 0.18, gain: 0.16 }
+  ],
+  kaisa: [
+    { kind: "thump", frequency: 48, endFrequency: 30, start: 0, length: 0.34, gain: 0.48 },
+    { kind: "tone", type: "sawtooth", frequency: 92, endFrequency: 68, start: 0, length: 0.6, gain: 0.18 },
+    { kind: "tone", type: "sine", frequency: 440, endFrequency: 660, start: 0.08, length: 0.44, gain: 0.12, pan: -0.24 },
+    { kind: "tone", type: "sine", frequency: 1320, endFrequency: 1980, start: 0.2, length: 0.46, gain: 0.075, pan: 0.28 },
+    { kind: "noise", filter: "bandpass", start: 0.16, length: 0.7, startFrequency: 6200, endFrequency: 780, gain: 0.16 },
+    { kind: "tone", type: "triangle", frequency: 220, endFrequency: 330, start: 0.54, length: 0.38, gain: 0.1 }
+  ],
+  missfortune: [
+    { kind: "noise", filter: "highpass", start: 0.02, length: 0.055, startFrequency: 7600, endFrequency: 5400, gain: 0.38, pan: -0.42 },
+    { kind: "thump", frequency: 62, endFrequency: 34, start: 0.02, length: 0.16, gain: 0.52, pan: -0.2 },
+    { kind: "noise", filter: "highpass", start: 0.18, length: 0.055, startFrequency: 7600, endFrequency: 5200, gain: 0.38, pan: 0.42 },
+    { kind: "thump", frequency: 58, endFrequency: 30, start: 0.18, length: 0.16, gain: 0.56, pan: 0.2 },
+    { kind: "tone", type: "sawtooth", frequency: 146, endFrequency: 98, start: 0.28, length: 0.44, gain: 0.16 },
+    { kind: "noise", filter: "bandpass", start: 0.32, length: 0.38, startFrequency: 2200, endFrequency: 420, gain: 0.15 }
+  ],
+  ezreal: [
+    { kind: "tone", type: "sine", frequency: 392, endFrequency: 784, start: 0, length: 0.12, gain: 0.12, pan: -0.38 },
+    { kind: "tone", type: "sine", frequency: 587, endFrequency: 1175, start: 0.12, length: 0.13, gain: 0.12, pan: 0.32 },
+    { kind: "tone", type: "sine", frequency: 784, endFrequency: 1568, start: 0.24, length: 0.15, gain: 0.11, pan: -0.2 },
+    { kind: "noise", filter: "bandpass", start: 0.08, length: 0.5, startFrequency: 5200, endFrequency: 1800, gain: 0.1 },
+    { kind: "tone", type: "triangle", frequency: 1568, endFrequency: 1046, start: 0.46, length: 0.36, gain: 0.09 },
+    { kind: "thump", frequency: 78, endFrequency: 54, start: 0.42, length: 0.18, gain: 0.22 }
+  ],
+  jhin: [
+    { kind: "tone", type: "triangle", frequency: 196, start: 0, length: 0.16, gain: 0.16 },
+    { kind: "noise", filter: "bandpass", start: 0, length: 0.06, startFrequency: 2600, endFrequency: 1800, gain: 0.12 },
+    { kind: "tone", type: "triangle", frequency: 246.94, start: 0.22, length: 0.16, gain: 0.15 },
+    { kind: "noise", filter: "bandpass", start: 0.22, length: 0.06, startFrequency: 2600, endFrequency: 1800, gain: 0.12 },
+    { kind: "tone", type: "triangle", frequency: 293.66, start: 0.44, length: 0.16, gain: 0.14 },
+    { kind: "noise", filter: "bandpass", start: 0.44, length: 0.06, startFrequency: 2600, endFrequency: 1800, gain: 0.12 },
+    { kind: "thump", frequency: 46, endFrequency: 28, start: 0.72, length: 0.36, gain: 0.62 },
+    { kind: "tone", type: "sine", frequency: 392, endFrequency: 784, start: 0.72, length: 0.72, gain: 0.18 },
+    { kind: "noise", filter: "highpass", start: 0.72, length: 0.08, startFrequency: 6800, endFrequency: 4800, gain: 0.34 }
+  ],
+  ashe: [
+    { kind: "noise", filter: "highpass", start: 0, length: 0.42, startFrequency: 8400, endFrequency: 3600, gain: 0.11 },
+    { kind: "tone", type: "sine", frequency: 440, endFrequency: 880, start: 0.05, length: 0.32, gain: 0.08, pan: -0.25 },
+    { kind: "tone", type: "sine", frequency: 1760, endFrequency: 1320, start: 0.24, length: 0.52, gain: 0.095, pan: 0.25 },
+    { kind: "noise", filter: "bandpass", start: 0.36, length: 0.12, startFrequency: 7200, endFrequency: 2600, gain: 0.28 },
+    { kind: "thump", frequency: 64, endFrequency: 42, start: 0.38, length: 0.18, gain: 0.2 },
+    { kind: "tone", type: "triangle", frequency: 2093, endFrequency: 1568, start: 0.58, length: 0.46, gain: 0.06 }
+  ],
+  rammus: [
+    { kind: "thump", frequency: 34, endFrequency: 22, start: 0, length: 0.5, gain: 0.7 },
+    { kind: "tone", type: "square", frequency: 72, endFrequency: 54, start: 0.02, length: 0.44, gain: 0.16 },
+    { kind: "noise", filter: "lowpass", start: 0.04, length: 0.62, startFrequency: 1200, endFrequency: 260, gain: 0.22 },
+    { kind: "thump", frequency: 46, endFrequency: 28, start: 0.36, length: 0.26, gain: 0.42 },
+    { kind: "tone", type: "triangle", frequency: 110, endFrequency: 146, start: 0.46, length: 0.36, gain: 0.12 },
+    { kind: "noise", filter: "bandpass", start: 0.62, length: 0.2, startFrequency: 900, endFrequency: 420, gain: 0.14 }
+  ]
+};
+
+const defaultFxProfile = {
+  id: "default",
+  main: "255, 238, 174",
+  secondary: "226, 156, 190",
+  third: "100, 143, 137",
+  dark: "45, 36, 38",
+  sparkColors: ["255, 238, 174", "226, 156, 190", "100, 143, 137", "255, 250, 224"],
+  sparkCount: 72,
+  spread: 0.34,
+  ringScale: 1,
+  sliceAngles: [18, -24, 68, -72],
+  glyphs: ["crest"]
+};
+
+const fxProfiles = {
+  samira: {
+    id: "samira",
+    main: "255, 184, 96",
+    secondary: "239, 81, 129",
+    third: "91, 196, 185",
+    dark: "54, 24, 34",
+    sparkColors: ["255, 184, 96", "239, 81, 129", "91, 196, 185", "255, 246, 214"],
+    sparkCount: 92,
+    spread: 0.38,
+    ringScale: 1.08,
+    sliceAngles: [14, -18, 44, -48],
+    glyphs: ["blade-left", "blade-right", "muzzle"]
+  },
+  caitlyn: {
+    id: "caitlyn",
+    main: "255, 216, 139",
+    secondary: "115, 207, 224",
+    third: "238, 147, 188",
+    dark: "42, 37, 62",
+    sparkColors: ["255, 216, 139", "115, 207, 224", "238, 147, 188", "255, 251, 225"],
+    sparkCount: 64,
+    spread: 0.3,
+    ringScale: 0.94,
+    sliceAngles: [0, 90, 45, -45],
+    glyphs: ["crosshair", "bullet"]
+  },
+  fizz: {
+    id: "fizz",
+    main: "86, 224, 232",
+    secondary: "255, 152, 90",
+    third: "190, 112, 222",
+    dark: "23, 48, 58",
+    sparkColors: ["86, 224, 232", "255, 152, 90", "190, 112, 222", "232, 255, 250"],
+    sparkCount: 76,
+    spread: 0.32,
+    ringScale: 0.98,
+    sliceAngles: [28, -28, 78, -78],
+    glyphs: ["bubble-one", "bubble-two", "wave"]
+  },
+  kaisa: {
+    id: "kaisa",
+    main: "244, 119, 220",
+    secondary: "116, 122, 255",
+    third: "96, 234, 219",
+    dark: "45, 28, 70",
+    sparkColors: ["244, 119, 220", "116, 122, 255", "96, 234, 219", "255, 237, 252"],
+    sparkCount: 88,
+    spread: 0.36,
+    ringScale: 1.04,
+    sliceAngles: [20, -34, 70, -64],
+    glyphs: ["void-diamond", "void-wing-left", "void-wing-right"]
+  },
+  missfortune: {
+    id: "missfortune",
+    main: "255, 187, 87",
+    secondary: "226, 64, 92",
+    third: "244, 151, 193",
+    dark: "60, 31, 28",
+    sparkColors: ["255, 187, 87", "226, 64, 92", "244, 151, 193", "255, 244, 217"],
+    sparkCount: 84,
+    spread: 0.36,
+    ringScale: 1,
+    sliceAngles: [8, -8, 22, -22],
+    glyphs: ["pistol-left", "pistol-right", "muzzle"]
+  },
+  ezreal: {
+    id: "ezreal",
+    main: "97, 209, 255",
+    secondary: "255, 216, 93",
+    third: "124, 126, 255",
+    dark: "28, 43, 70",
+    sparkColors: ["97, 209, 255", "255, 216, 93", "124, 126, 255", "239, 251, 255"],
+    sparkCount: 78,
+    spread: 0.33,
+    ringScale: 0.98,
+    sliceAngles: [32, -32, 58, -58],
+    glyphs: ["blink-one", "blink-two", "chevron"]
+  },
+  jhin: {
+    id: "jhin",
+    main: "255, 213, 134",
+    secondary: "178, 39, 73",
+    third: "238, 180, 220",
+    dark: "43, 25, 31",
+    sparkColors: ["255, 213, 134", "178, 39, 73", "238, 180, 220", "255, 250, 232"],
+    sparkCount: 68,
+    spread: 0.31,
+    ringScale: 1.02,
+    sliceAngles: [0, 90, 180, 270],
+    glyphs: ["petal-one", "petal-two", "petal-three", "petal-four"]
+  },
+  ashe: {
+    id: "ashe",
+    main: "166, 236, 255",
+    secondary: "110, 160, 255",
+    third: "255, 169, 214",
+    dark: "28, 45, 66",
+    sparkColors: ["166, 236, 255", "110, 160, 255", "255, 169, 214", "247, 254, 255"],
+    sparkCount: 72,
+    spread: 0.34,
+    ringScale: 0.96,
+    sliceAngles: [0, 180, 24, -24],
+    glyphs: ["ice-arrow", "ice-shard-left", "ice-shard-right"]
+  },
+  rammus: {
+    id: "rammus",
+    main: "188, 221, 86",
+    secondary: "255, 207, 92",
+    third: "101, 167, 94",
+    dark: "40, 58, 30",
+    sparkColors: ["188, 221, 86", "255, 207, 92", "101, 167, 94", "255, 249, 218"],
+    sparkCount: 70,
+    spread: 0.3,
+    ringScale: 0.92,
+    sliceAngles: [12, -12, 78, -78],
+    glyphs: ["shell", "quake", "spike-ring"]
+  }
+};
+
 const champions = [
   {
     id: "samira",
@@ -264,14 +635,66 @@ let currentChampionId = "";
 let swapTimer = 0;
 let settleTimer = 0;
 let audioContext;
-let fallbackAudioUrl = "";
+const fallbackAudioUrls = {};
 let burstTimer = 0;
+let fxTimer = 0;
 
-function buildFallbackSoundUrl() {
-  if (fallbackAudioUrl) return fallbackAudioUrl;
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function fxCenterFor(button) {
+  const buttonRect = button.getBoundingClientRect();
+  const rawX = buttonRect.left + buttonRect.width / 2;
+  const rawY = buttonRect.top + buttonRect.height / 2;
+  const marginX = Math.min(window.innerWidth / 2 - 12, Math.min(420, Math.max(220, window.innerWidth * 0.34)));
+  const marginY = Math.min(window.innerHeight / 2 - 12, Math.min(300, Math.max(150, window.innerHeight * 0.28)));
+  return {
+    x: clamp(rawX, marginX, window.innerWidth - marginX),
+    y: clamp(rawY, marginY, window.innerHeight - marginY)
+  };
+}
+
+function soundProfileFor(profileId = "default") {
+  return soundProfiles[profileId] || defaultSoundProfile;
+}
+
+function soundSceneFor(profileId = "default") {
+  return soundScenes[profileId] || defaultSoundScene;
+}
+
+function fxProfileFor(profileId = "default") {
+  return {
+    ...defaultFxProfile,
+    ...(fxProfiles[profileId] || {}),
+    id: (fxProfiles[profileId] || defaultFxProfile).id || profileId
+  };
+}
+
+function applyFxProfileVars(element, profile) {
+  if (!element) return;
+  element.dataset.championFx = profile.id;
+  element.style.setProperty("--fx-main", profile.main);
+  element.style.setProperty("--fx-secondary", profile.secondary);
+  element.style.setProperty("--fx-third", profile.third);
+  element.style.setProperty("--fx-dark", profile.dark);
+  element.style.setProperty("--fx-ring-scale", profile.ringScale);
+  profile.sliceAngles.forEach((angle, index) => {
+    element.style.setProperty(`--fx-angle-${index + 1}`, `${angle}deg`);
+  });
+}
+
+function buildFallbackSoundUrl(profileId = "default") {
+  if (fallbackAudioUrls[profileId]) return fallbackAudioUrls[profileId];
+
+  const profile = soundProfileFor(profileId);
+  const scene = soundSceneFor(profileId);
 
   const sampleRate = 44100;
-  const duration = 0.82;
+  const duration = Math.max(
+    profile.duration,
+    ...scene.map((event) => (event.start || 0) + (event.length || 0) + 0.12)
+  );
   const frameCount = Math.floor(sampleRate * duration);
   const dataSize = frameCount * 2;
   const buffer = new ArrayBuffer(44 + dataSize);
@@ -296,27 +719,49 @@ function buildFallbackSoundUrl() {
   writeString(36, "data");
   view.setUint32(40, dataSize, true);
 
-  const tone = (time, start, length, from, to, gain) => {
+  const toneSample = (time, tone) => {
+    const start = tone.start || 0;
+    const length = tone.length || 0.18;
+    const from = tone.frequency;
+    const to = tone.endFrequency || tone.frequency;
+    const gain = tone.gain || 0.1;
     if (time < start || time > start + length) return 0;
     const local = time - start;
     const progress = local / length;
     const sweep = from + (to - from) * progress;
     const phase = 2 * Math.PI * (from * local + 0.5 * (sweep - from) * local * progress);
     const envelope = Math.sin(Math.PI * progress) ** 0.62;
-    return Math.sin(phase) * envelope * gain;
+    const raw = tone.type === "square"
+      ? Math.sign(Math.sin(phase))
+      : tone.type === "sawtooth"
+        ? 2 * (local * sweep - Math.floor(0.5 + local * sweep))
+        : Math.sin(phase);
+    return raw * envelope * gain;
+  };
+
+  const eventSample = (time, event) => {
+    if (event.kind === "noise") {
+      const start = event.start || 0;
+      const length = event.length || 0.2;
+      if (time < start || time > start + length) return 0;
+      const progress = (time - start) / length;
+      const envelope = Math.sin(Math.PI * progress) ** 0.62;
+      const filterTone = event.filter === "lowpass" ? 0.42 : event.filter === "highpass" ? 1 : 0.72;
+      return (Math.random() * 2 - 1) * envelope * (event.gain || 0.12) * filterTone;
+    }
+    if (event.kind === "thump") {
+      return toneSample(time, { ...event, type: "sine" });
+    }
+    return toneSample(time, event);
   };
 
   for (let i = 0; i < frameCount; i += 1) {
     const time = i / sampleRate;
-    const noiseFade = Math.max(0, 1 - time / 0.36) ** 2;
+    const tail = profile.tail || defaultSoundProfile.tail;
+    const tailFade = Math.max(0, 1 - Math.abs(time - tail.center) / tail.width) ** 2;
     const sample =
-      tone(time, 0, 0.34, 96, 54, 0.48) +
-      tone(time, 0.018, 0.34, 196, 247, 0.24) +
-      tone(time, 0.07, 0.24, 392, 392, 0.22) +
-      tone(time, 0.13, 0.28, 587.33, 587.33, 0.17) +
-      tone(time, 0.18, 0.32, 880, 880, 0.13) +
-      tone(time, 0.24, 0.26, 1174.66, 1174.66, 0.08) +
-      (Math.random() * 2 - 1) * noiseFade * 0.045;
+      scene.reduce((sum, event) => sum + eventSample(time, event), 0) +
+      Math.sin(2 * Math.PI * tail.frequency * time) * tailFade * tail.gain;
     view.setInt16(44 + i * 2, Math.max(-1, Math.min(1, sample)) * 32767, true);
   }
 
@@ -324,14 +769,15 @@ function buildFallbackSoundUrl() {
   for (let i = 0; i < bytes.length; i += 0x8000) {
     binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   }
-  fallbackAudioUrl = `data:audio/wav;base64,${window.btoa(binary)}`;
-  return fallbackAudioUrl;
+  fallbackAudioUrls[profileId] = `data:audio/wav;base64,${window.btoa(binary)}`;
+  return fallbackAudioUrls[profileId];
 }
 
-function playFallbackSelectSound() {
+function playFallbackSelectSound(profileId = "default") {
   if (!window.Audio) return;
-  const audio = new window.Audio(buildFallbackSoundUrl());
-  audio.volume = 0.62;
+  const profile = soundProfileFor(profileId);
+  const audio = new window.Audio(buildFallbackSoundUrl(profileId));
+  audio.volume = profile.volume || defaultSoundProfile.volume;
   void audio.play().catch(() => {});
 }
 
@@ -365,10 +811,12 @@ function setPressedChampion(championId) {
   });
 }
 
-function playSelectSound() {
+function playSelectSound(profileId = "default") {
+  const profile = soundProfileFor(profileId);
+  const scene = soundSceneFor(profileId);
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   if (!AudioContextClass) {
-    playFallbackSelectSound();
+    playFallbackSelectSound(profileId);
     return;
   }
 
@@ -387,13 +835,15 @@ function playSelectSound() {
 
     const master = audioContext.createGain();
     master.gain.setValueAtTime(0.0001, now);
-    master.gain.exponentialRampToValueAtTime(0.17, now + 0.018);
-    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.78);
+    master.gain.exponentialRampToValueAtTime(profile.masterPeak || defaultSoundProfile.masterPeak, now + 0.014);
+    master.gain.exponentialRampToValueAtTime(profile.masterTail || defaultSoundProfile.masterTail, now + Math.min(0.52, profile.duration * 0.42));
+    master.gain.exponentialRampToValueAtTime(0.0001, now + profile.duration);
     master.connect(compressor);
 
     const playTone = (tone) => {
       const osc = audioContext.createOscillator();
       const gain = audioContext.createGain();
+      let output = gain;
       osc.type = tone.type || "triangle";
       osc.frequency.setValueAtTime(tone.frequency, now + tone.start);
       if (tone.endFrequency) {
@@ -405,54 +855,141 @@ function playSelectSound() {
       gain.gain.setValueAtTime(0.0001, now + tone.start);
       gain.gain.exponentialRampToValueAtTime(tone.gain, now + tone.start + (tone.attack || 0.018));
       gain.gain.exponentialRampToValueAtTime(0.0001, now + tone.start + tone.length);
-      osc.connect(gain).connect(master);
+      osc.connect(gain);
+      if (typeof tone.pan === "number" && audioContext.createStereoPanner) {
+        const panner = audioContext.createStereoPanner();
+        panner.pan.setValueAtTime(tone.pan, now + tone.start);
+        output.connect(panner);
+        output = panner;
+      }
+      output.connect(master);
       osc.start(now + tone.start);
       osc.stop(now + tone.start + tone.length + 0.04);
     };
 
-    [
-      { type: "sine", frequency: 96, endFrequency: 54, start: 0, length: 0.34, gain: 0.52, attack: 0.006 },
-      { type: "triangle", frequency: 196, endFrequency: 246.94, start: 0.018, length: 0.34, gain: 0.28 },
-      { type: "triangle", frequency: 392, start: 0.07, length: 0.24, gain: 0.27 },
-      { type: "sine", frequency: 587.33, start: 0.13, length: 0.28, gain: 0.2 },
-      { type: "sine", frequency: 880, start: 0.18, length: 0.32, gain: 0.16 },
-      { type: "triangle", frequency: 1174.66, start: 0.24, length: 0.26, gain: 0.1 }
-    ].forEach(playTone);
+    const playNoise = (event) => {
+      const noiseBuffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * event.length), audioContext.sampleRate);
+      const noiseData = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < noiseData.length; i += 1) {
+        const progress = i / noiseData.length;
+        const fade = Math.sin(Math.PI * progress) ** 0.7;
+        noiseData[i] = (Math.random() * 2 - 1) * fade;
+      }
+      const noise = audioContext.createBufferSource();
+      const noiseFilter = audioContext.createBiquadFilter();
+      const noiseGain = audioContext.createGain();
+      let output = noiseGain;
+      noise.buffer = noiseBuffer;
+      noiseFilter.type = event.filter || "bandpass";
+      noiseFilter.frequency.setValueAtTime(event.startFrequency || 4800, now + event.start);
+      noiseFilter.frequency.exponentialRampToValueAtTime(event.endFrequency || 520, now + event.start + event.length);
+      noiseFilter.Q.setValueAtTime(event.q || 0.78, now);
+      noiseGain.gain.setValueAtTime(0.0001, now + event.start);
+      noiseGain.gain.exponentialRampToValueAtTime(event.gain || 0.12, now + event.start + 0.018);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + event.start + event.length);
+      noise.connect(noiseFilter).connect(noiseGain);
+      if (typeof event.pan === "number" && audioContext.createStereoPanner) {
+        const panner = audioContext.createStereoPanner();
+        panner.pan.setValueAtTime(event.pan, now + event.start);
+        output.connect(panner);
+        output = panner;
+      }
+      output.connect(master);
+      noise.start(now + event.start);
+      noise.stop(now + event.start + event.length + 0.04);
+    };
 
-    const noiseBuffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * 0.32), audioContext.sampleRate);
-    const noiseData = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < noiseData.length; i += 1) {
-      const fade = 1 - i / noiseData.length;
-      noiseData[i] = (Math.random() * 2 - 1) * fade * fade;
-    }
-    const noise = audioContext.createBufferSource();
-    const noiseFilter = audioContext.createBiquadFilter();
-    const noiseGain = audioContext.createGain();
-    noise.buffer = noiseBuffer;
-    noiseFilter.type = "bandpass";
-    noiseFilter.frequency.setValueAtTime(2600, now + 0.02);
-    noiseFilter.frequency.exponentialRampToValueAtTime(840, now + 0.32);
-    noiseFilter.Q.setValueAtTime(0.72, now);
-    noiseGain.gain.setValueAtTime(0.0001, now + 0.02);
-    noiseGain.gain.exponentialRampToValueAtTime(0.12, now + 0.055);
-    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.34);
-    noise.connect(noiseFilter).connect(noiseGain).connect(master);
-    noise.start(now + 0.02);
-    noise.stop(now + 0.38);
+    const playThump = (event) => {
+      playTone({
+        type: "sine",
+        frequency: event.frequency,
+        endFrequency: event.endFrequency,
+        start: event.start || 0,
+        length: event.length,
+        gain: event.gain,
+        attack: 0.01,
+        pan: event.pan
+      });
+    };
+
+    scene.forEach((event) => {
+      if (event.kind === "noise") {
+        playNoise(event);
+      } else if (event.kind === "thump") {
+        playThump(event);
+      } else {
+        playTone(event);
+      }
+    });
   } catch {
-    playFallbackSelectSound();
+    playFallbackSelectSound(profileId);
   }
 }
 
-function playSelectionBurst() {
+function playSelectionBurst(button, profileId = "default") {
   if (motionQuery.matches || !page) return;
+  const profile = fxProfileFor(profileId);
+  applyFxProfileVars(page, profile);
+  if (button) {
+    const center = fxCenterFor(button);
+    page.style.setProperty("--burst-x", `${center.x}px`);
+    page.style.setProperty("--burst-y", `${center.y}px`);
+  }
   window.clearTimeout(burstTimer);
   page.classList.remove("is-bursting");
   void page.offsetWidth;
   page.classList.add("is-bursting");
   burstTimer = window.setTimeout(() => {
     page.classList.remove("is-bursting");
-  }, 1240);
+  }, 2080);
+}
+
+function spawnSelectionFx(button, profileId = "default") {
+  if (motionQuery.matches || !page || !button) return;
+  const profile = fxProfileFor(profileId);
+  window.clearTimeout(fxTimer);
+  document.querySelectorAll(".selection-fx").forEach((node) => node.remove());
+
+  const { x: centerX, y: centerY } = fxCenterFor(button);
+  const fx = document.createElement("div");
+  fx.className = "selection-fx";
+  fx.setAttribute("aria-hidden", "true");
+  fx.style.setProperty("--fx-x", `${centerX}px`);
+  fx.style.setProperty("--fx-y", `${centerY}px`);
+  applyFxProfileVars(fx, profile);
+
+  ["left", "right", "high", "low"].forEach((name) => {
+    const slice = document.createElement("span");
+    slice.className = `fx-slice fx-slice-${name}`;
+    fx.append(slice);
+  });
+
+  (profile.glyphs || defaultFxProfile.glyphs).forEach((name, index) => {
+    const glyph = document.createElement("span");
+    glyph.className = `fx-glyph fx-glyph-${name}`;
+    glyph.style.setProperty("--glyph-index", index);
+    glyph.style.setProperty("--glyph-delay", `${index * 72}ms`);
+    fx.append(glyph);
+  });
+
+  for (let i = 0; i < profile.sparkCount; i += 1) {
+    const spark = document.createElement("span");
+    const angle = (-Math.PI / 2) + (i / profile.sparkCount) * Math.PI * 2 + (i % 2 ? 0.08 : -0.04);
+    const spread = Math.min(270, Math.max(126, window.innerWidth * profile.spread));
+    const distance = spread * (0.45 + (i % 9) * 0.055 + Math.random() * 0.08);
+    const size = 3 + (i % 6) * 1.25;
+    spark.className = "fx-spark";
+    spark.style.setProperty("--tx", `${Math.cos(angle) * distance}px`);
+    spark.style.setProperty("--ty", `${Math.sin(angle) * distance}px`);
+    spark.style.setProperty("--size", `${size}px`);
+    spark.style.setProperty("--delay", `${(i % 9) * 18}ms`);
+    spark.style.setProperty("--rot", `${Math.round((angle * 180) / Math.PI)}deg`);
+    spark.style.setProperty("--spark-color", profile.sparkColors[i % profile.sparkColors.length]);
+    fx.append(spark);
+  }
+
+  document.body.append(fx);
+  fxTimer = window.setTimeout(() => fx.remove(), 2260);
 }
 
 function animateChampionSwap(champion) {
@@ -487,6 +1024,7 @@ function animateChampionSwap(champion) {
 
 function renderChampion(championId, options = {}) {
   const champion = champions.find((item) => item.id === championId) || champions[0];
+  applyFxProfileVars(page, fxProfileFor(champion.id));
   setPressedChampion(champion.id);
 
   if (!options.animate || !currentChampionId || champion.id === currentChampionId) {
@@ -504,6 +1042,7 @@ function renderPicker() {
     button.className = "portrait-button";
     button.type = "button";
     button.dataset.champion = champion.id;
+    applyFxProfileVars(button, fxProfileFor(champion.id));
     button.setAttribute("aria-label", `${champion.name}, ${champion.skin}`);
     button.setAttribute("aria-pressed", String(index === 0));
     const img = document.createElement("img");
@@ -531,9 +1070,10 @@ function renderPicker() {
       button.classList.remove("is-flashing");
       void button.offsetWidth;
       button.classList.add("is-flashing");
-      playSelectSound();
-      playSelectionBurst();
-      window.setTimeout(() => button.classList.remove("is-flashing"), 1280);
+      playSelectSound(champion.id);
+      playSelectionBurst(button, champion.id);
+      spawnSelectionFx(button, champion.id);
+      window.setTimeout(() => button.classList.remove("is-flashing"), 2080);
       renderChampion(champion.id, { animate: true });
     });
     return button;
