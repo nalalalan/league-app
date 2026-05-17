@@ -101,6 +101,7 @@ summary {
 
 .portrait-button {
   position: relative;
+  isolation: isolate;
   aspect-ratio: 4 / 5;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -109,6 +110,32 @@ summary {
   background: var(--paper);
   box-shadow: var(--shadow);
   cursor: pointer;
+  transform: translateZ(0);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, filter .18s ease;
+  will-change: transform;
+}
+
+.portrait-button::before,
+.portrait-button::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+}
+
+.portrait-button::before {
+  z-index: 2;
+  background: linear-gradient(112deg, transparent 0 36%, rgba(255, 245, 210, .72) 45%, rgba(236, 159, 191, .42) 50%, transparent 61% 100%);
+  opacity: 0;
+  transform: translateX(-120%);
+}
+
+.portrait-button::after {
+  z-index: 3;
+  border: 1px solid rgba(255, 210, 116, .1);
+  box-shadow: inset 0 0 0 1px rgba(255, 246, 214, .16), inset 0 -24px 32px rgba(61, 33, 48, .22);
+  opacity: .55;
 }
 
 .portrait-button img {
@@ -116,12 +143,55 @@ summary {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(.92) contrast(.98);
+  filter: saturate(.96) contrast(.99);
+  transform: scale(1.01);
+  transition: transform .22s ease, filter .22s ease;
+}
+
+.portrait-button:hover,
+.portrait-button:focus-visible {
+  border-color: rgba(202, 151, 65, .72);
+  box-shadow: 0 16px 26px rgba(63, 45, 34, .14), 0 0 0 3px rgba(236, 159, 191, .18), 0 0 28px rgba(219, 165, 76, .25);
+  filter: saturate(1.05);
+  transform: translateY(-4px) scale(1.035);
+}
+
+.portrait-button:hover::before,
+.portrait-button:focus-visible::before,
+.portrait-button[aria-pressed="true"]::before {
+  opacity: 1;
+  transform: translateX(120%);
+  transition: transform .68s cubic-bezier(.2, .8, .2, 1), opacity .18s ease;
+}
+
+.portrait-button:hover img,
+.portrait-button:focus-visible img {
+  filter: saturate(1.08) contrast(1.03);
+  transform: scale(1.075);
+}
+
+.portrait-button:active {
+  transform: translateY(-1px) scale(1.015);
 }
 
 .portrait-button[aria-pressed="true"] {
-  border-color: rgba(74, 60, 85, .78);
-  outline: 3px solid rgba(138, 115, 141, .18);
+  border-color: rgba(207, 154, 61, .86);
+  outline: 3px solid rgba(231, 157, 188, .23);
+  box-shadow: 0 17px 28px rgba(70, 48, 36, .16), 0 0 0 1px rgba(255, 231, 156, .36), 0 0 30px rgba(220, 165, 74, .28);
+}
+
+.portrait-button[aria-pressed="true"]::after {
+  border-color: rgba(255, 218, 132, .54);
+  box-shadow: inset 0 0 0 1px rgba(255, 250, 224, .42), inset 0 -25px 34px rgba(72, 39, 54, .2), 0 0 26px rgba(236, 159, 191, .28);
+  opacity: 1;
+}
+
+.portrait-button.is-flashing {
+  animation: championSelect .62s cubic-bezier(.2, .9, .15, 1);
+}
+
+.portrait-button.is-flashing::after {
+  animation: championRing .62s cubic-bezier(.2, .9, .15, 1);
 }
 
 .selected-champion {
@@ -210,7 +280,7 @@ h1 {
   padding: 16px 18px;
 }
 
-.situation-sentence {
+.situation-heading {
   max-width: 68ch;
   margin: 0;
   color: #2f2925;
@@ -293,6 +363,30 @@ h1 {
   border: 0;
 }
 
+@keyframes championSelect {
+  0% {
+    transform: translateY(-2px) scale(1.02);
+  }
+  38% {
+    transform: translateY(-7px) scale(1.075);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes championRing {
+  0% {
+    box-shadow: inset 0 0 0 1px rgba(255, 250, 224, .42), 0 0 0 0 rgba(236, 159, 191, .46), 0 0 0 0 rgba(219, 165, 76, .28);
+  }
+  46% {
+    box-shadow: inset 0 0 0 1px rgba(255, 250, 224, .5), 0 0 0 7px rgba(236, 159, 191, .2), 0 0 34px 6px rgba(219, 165, 76, .36);
+  }
+  100% {
+    box-shadow: inset 0 0 0 1px rgba(255, 250, 224, .42), 0 0 0 14px rgba(236, 159, 191, 0), 0 0 20px 0 rgba(219, 165, 76, 0);
+  }
+}
+
 @media (max-width: 900px) {
   .portrait-row {
     display: flex;
@@ -344,5 +438,24 @@ h1 {
   .note {
     grid-template-columns: 1fr;
     gap: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait-button,
+  .portrait-button img,
+  .portrait-button::before {
+    transition: none;
+  }
+
+  .portrait-button:hover,
+  .portrait-button:focus-visible,
+  .portrait-button.is-flashing {
+    animation: none;
+    transform: none;
+  }
+
+  .portrait-button.is-flashing::after {
+    animation: none;
   }
 }

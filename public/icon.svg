@@ -1,38 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="league">
   <defs>
-    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#2b211d" flood-opacity=".16"/>
-      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#fffaf4" flood-opacity=".55"/>
+    <filter id="d" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="6" flood-color="#2b211d" flood-opacity=".16"/>
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#fffaf4" flood-opacity=".5"/>
     </filter>
-    <radialGradient id="shell" cx="36%" cy="28%" r="82%">
-      <stop offset="0" stop-color="#fffdf7"/>
-      <stop offset=".6" stop-color="#f3e7d8"/>
-      <stop offset="1" stop-color="#dec9b6"/>
-    </radialGradient>
-    <linearGradient id="lane" x1="25" y1="18" x2="103" y2="112">
-      <stop stop-color="#6f8692"/>
-      <stop offset=".56" stop-color="#7f6d8e"/>
-      <stop offset="1" stop-color="#8f6a58"/>
+    <linearGradient id="cream" x1="22" y1="18" x2="106" y2="112">
+      <stop stop-color="#fff8ef"/>
+      <stop offset="1" stop-color="#e6d8c8"/>
     </linearGradient>
-    <linearGradient id="gold" x1="30" y1="24" x2="100" y2="102">
-      <stop stop-color="#efc868"/>
-      <stop offset=".58" stop-color="#bd8337"/>
-      <stop offset="1" stop-color="#6d4522"/>
+    <linearGradient id="gold" x1="30" y1="18" x2="104" y2="110">
+      <stop stop-color="#f3d77a"/>
+      <stop offset=".5" stop-color="#cf9b47"/>
+      <stop offset="1" stop-color="#8d5a2d"/>
     </linearGradient>
-    <linearGradient id="rose" x1="28" y1="20" x2="96" y2="106">
-      <stop stop-color="#d5a4aa"/>
-      <stop offset=".56" stop-color="#af7587"/>
-      <stop offset="1" stop-color="#70506b"/>
+    <linearGradient id="rose" x1="24" y1="28" x2="104" y2="110">
+      <stop stop-color="#e4a8b2"/>
+      <stop offset=".55" stop-color="#c28b98"/>
+      <stop offset="1" stop-color="#76678d"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="20" y1="20" x2="104" y2="112">
+      <stop stop-color="#9cb9af"/>
+      <stop offset=".56" stop-color="#6b928a"/>
+      <stop offset="1" stop-color="#527d83"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="24" y1="20" x2="108" y2="112">
+      <stop stop-color="#9fb1cc"/>
+      <stop offset=".58" stop-color="#6d86aa"/>
+      <stop offset="1" stop-color="#5d72ad"/>
     </linearGradient>
   </defs>
-  <circle cx="64" cy="64" r="55" fill="url(#shell)"/>
-  <g filter="url(#shadow)">
-    <rect x="26" y="27" width="76" height="76" rx="18" fill="#fffaf2"/>
-    <path d="M38 84c19-3 38-20 52-42" fill="none" stroke="url(#lane)" stroke-width="9" stroke-linecap="round"/>
-    <path d="M38 44c18 3 35 17 51 42" fill="none" stroke="url(#rose)" stroke-width="8" stroke-linecap="round" opacity=".88"/>
-    <path d="M64 35v58" fill="none" stroke="#2d2426" stroke-width="7" stroke-linecap="round" opacity=".72"/>
-    <circle cx="64" cy="64" r="10" fill="url(#gold)"/>
-    <circle cx="38" cy="84" r="6" fill="#698c86"/>
-    <circle cx="90" cy="42" r="6" fill="#7d6b8b"/>
+  <g filter="url(#d)">
+    <rect x="23" y="23" width="82" height="82" rx="19" fill="url(#cream)"/>
+    <path d="M39 85c-8-17-5-36 8-49 6-6 14-10 23-12" fill="none" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M85 28c14 9 22 25 20 43-1 12-7 23-16 31" fill="none" stroke="url(#rose)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M49 29h19v49h29v20H49Z" fill="#5b412b" opacity=".16"/>
+    <path d="M45 25h19v49h29v20H45Z" fill="url(#gold)"/>
+    <path d="M64 25h18v14H64Z" fill="#f8df8e"/>
+    <path d="M63 74h30v20H63Z" fill="#a56b34" opacity=".38"/>
+    <circle cx="38" cy="86" r="5.5" fill="url(#blue)"/>
+    <circle cx="89" cy="101" r="5.5" fill="url(#teal)"/>
   </g>
 </svg>
