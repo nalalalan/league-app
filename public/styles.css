@@ -79,7 +79,7 @@ summary {
 }
 
 .page {
-  width: min(1180px, calc(100vw - 30px));
+  width: min(880px, calc(100vw - 30px));
   margin: 0 auto;
   padding: 20px 0 54px;
 }
@@ -164,7 +164,7 @@ h1 {
 }
 
 #champion-note {
-  max-width: 860px;
+  max-width: 68ch;
   margin: 0;
   color: var(--muted);
   font-size: 15px;
@@ -211,6 +211,7 @@ h1 {
 }
 
 .situation-sentence {
+  max-width: 68ch;
   margin: 0;
   color: #2f2925;
   font-size: clamp(16px, 1.6vw, 19px);
@@ -219,6 +220,7 @@ h1 {
 }
 
 .situation-response {
+  max-width: 74ch;
   margin: 0;
   color: #4b4039;
   font-size: 15px;
