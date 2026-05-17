@@ -1,0 +1,8 @@
+*.log
+*.aux
+*.bcf
+*.blg
+*.out
+*.run.xml
+_verification/
+_local*.log
