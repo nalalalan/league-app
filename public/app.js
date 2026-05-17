@@ -26,6 +26,10 @@ const champions = [
         response: "After dashing in, being close can feel scary enough that your hands spend W immediately. Hold it. W is for the actual thing that would stop you: Lux Q, Ashe R, a hook, a bind, or another visible projectile. It is a parry, not armor; using it early often means the real danger hits after the circle ends."
       },
       {
+        title: "You are near a team fight, R is not ready, and waiting there starts costing HP.",
+        response: "If you do not have S yet, standing near the group is not preparation; it is leaking health while your hands wait for permission to ult. Move to the edge first. Build style from safety with Q, auto, and one real W block if a projectile is coming. Do not E just to finish the style bar unless the target is already losing, reachable, and the scary CC is gone. The pre-ult job is edge, poke, breathe, check S; only when S exists and the fight is already committed do you enter for R."
+      },
+      {
         title: "R lands, damage happens, and staying suddenly feels safer than leaving.",
         response: "When R lands and damage numbers happen, the successful moment can make the middle of the fight feel safer than it is. Treat R as the reward, not a promise to keep fighting. After R, leave unless the next target is already low and reachable. If someone dies, check E first, then decide whether another dash is actually safe."
       },
@@ -249,6 +253,7 @@ const championNote = document.querySelector("#champion-note");
 const situationsSection = document.querySelector(".situations");
 const situationCount = document.querySelector("#situation-count");
 const situationList = document.querySelector("#situation-list");
+const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 let currentChampionId = "";
@@ -256,6 +261,7 @@ let swapTimer = 0;
 let settleTimer = 0;
 let audioContext;
 let fallbackAudioUrl = "";
+let burstTimer = 0;
 
 function buildFallbackSoundUrl() {
   if (fallbackAudioUrl) return fallbackAudioUrl;
@@ -434,6 +440,17 @@ function playSelectSound() {
   }
 }
 
+function playSelectionBurst() {
+  if (motionQuery.matches || !page) return;
+  window.clearTimeout(burstTimer);
+  page.classList.remove("is-bursting");
+  void page.offsetWidth;
+  page.classList.add("is-bursting");
+  burstTimer = window.setTimeout(() => {
+    page.classList.remove("is-bursting");
+  }, 1240);
+}
+
 function animateChampionSwap(champion) {
   window.clearTimeout(swapTimer);
   window.clearTimeout(settleTimer);
@@ -511,7 +528,8 @@ function renderPicker() {
       void button.offsetWidth;
       button.classList.add("is-flashing");
       playSelectSound();
-      window.setTimeout(() => button.classList.remove("is-flashing"), 1080);
+      playSelectionBurst();
+      window.setTimeout(() => button.classList.remove("is-flashing"), 1280);
       renderChampion(champion.id, { animate: true });
     });
     return button;
