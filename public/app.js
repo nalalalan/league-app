@@ -9,67 +9,44 @@ const champions = [
     note: "Samira can mash in, but she cannot always leave. Her escape is killing, resetting, lifestealing, blocking the real spell, or using Flash.",
     situations: [
       {
-        title: "before pressing E",
-        trigger: "You feel the urge to dash because something is happening.",
-        do: "Q first. Auto if safe. Check the HP ratio. E only when the target is already losing, reachable, and not protected.",
-        avoid: "E as anxiety relief. E into full-health people. E because R exists.",
-        drill: "Say: Q creates the opening; E commits to the opening."
+        situation: "You want to press E because the fight suddenly feels urgent, but you do not yet know if the target is actually killable or protected.",
+        response: "Start with Q or an auto from safety so the fight gives information before you commit. E is for a target that is already losing, reachable, and not hiding behind fresh CC or teammates; if the only reason to dash is panic, keep E unused and make the next safe action."
       },
       {
-        title: "low target in fog",
-        trigger: "Someone is low and running into fog, river, tri-brush, or behind teammates.",
-        do: "Stop at the edge. Q if visible. Enter only if low plus reachable plus escape/reset is realistic.",
-        avoid: "Treating low HP as permission. E into unknown bodies. Following into places where the camera and brain lose the fight.",
-        drill: "Say: low is not enough; low plus reachable."
+        situation: "An enemy looks killable because their health bar is low, but you have not compared their HP to yours or checked whether they are a tank.",
+        response: "Use the ratio check before your hands decide for you. Squishy targets become reasonable when they are below roughly half your HP or already trapped by your team; tanks and drain champions need to be much lower because they can still survive the first burst and punish the dash."
       },
       {
-        title: "W timing",
-        trigger: "Lux Q, Ashe arrow, hook, bind, stun projectile, or another clear flying danger is coming.",
-        do: "Hold W until the scary thing actually appears. Use W as parry/nope, then keep fighting or leave.",
-        avoid: "W immediately after E just because danger feels near. W as armor. W against tower shots.",
-        drill: "Before the fight, name one spell W is saving you from."
+        situation: "A low-health enemy runs toward fog, river, tri-brush, or teammates, and your brain reads the low HP bar as permission to chase.",
+        response: "Stop at the edge and Q only if they are still visible. The useful question is not whether they are low; it is whether they are low, reachable, and cheap to kill. Fog, tower, tanks, and missing enemies turn the chase into a trap."
       },
       {
-        title: "after R works",
-        trigger: "R hits, damage lands, the fight gets exciting, and your hands want to stay.",
-        do: "Leave unless the next kill is obvious. If someone dies, check E, then decide again.",
-        avoid: "Standing in the middle because the ult felt good. Chasing the second kill into protected space.",
-        drill: "Say: R is reward, not a contract to keep fighting."
+        situation: "You dash in and immediately want to press W because being close to enemies feels dangerous.",
+        response: "Hold W for the actual spell that would stop you, such as Lux Q, Ashe R, a hook, a bind, or another visible projectile. W is a parry, not armor; using it early makes the real danger hit after the circle ends."
       },
       {
-        title: "after a takedown",
-        trigger: "Someone dies and E comes back.",
-        do: "Check the next target: low, reachable, not a tank, not under tower, not behind fresh CC. Dash again only if the check passes.",
-        avoid: "Reading reset as automatic go. Reset means permission to check, not permission to int.",
-        drill: "Say: kill one, check E."
+        situation: "Your ult works, damage numbers happen, and the excitement makes you stay in the middle after the safe part of the fight is already over.",
+        response: "Treat R as the reward, not a promise to keep fighting. After R, leave unless the next target is already low and reachable; if someone dies, check E first, then decide whether another dash is actually safe."
       },
       {
-        title: "early ADC attacks first",
-        trigger: "The enemy ADC hits you at level 1 or 2 and your body says duel now.",
-        do: "Step back first. Q from range. Auto only if safe. Let them walk into your minion wave before you consider E.",
-        avoid: "Instant duel because they touched you. Committing before minions and HP ratio are on your side.",
-        drill: "Back step, Q, breathe, then decide."
+        situation: "Someone dies, E resets, and the reset makes it feel like the game is telling you to dash again immediately.",
+        response: "A reset only gives you a new check. Look for the next low squishy on the edge of the fight; do not spend the reset into a tank, tower, fog, or fresh crowd control just because the button came back."
       },
       {
-        title: "chased by Nasus or Swain",
-        trigger: "A bruiser, tank, or drain champion is walking you down.",
-        do: "Run first. Q only with real space. Exhaust or Flash if needed. Make them spend time crossing bad space.",
-        avoid: "Turning to die fast. E into them unless they are basically dead.",
-        drill: "Die slow, not fast."
+        situation: "The enemy ADC hits you first at level 1 or 2 and your body wants to instantly prove you are not scared.",
+        response: "Step back before answering. Use Q from range, let your minions punish their chase, and only add autos or E if their health and position become clearly bad for them."
       },
       {
-        title: "took damage and panicked",
-        trigger: "One hit lands and it feels like proof that the enemy knows everything.",
-        do: "Treat damage as information. Step back, keep camera stable, keep playing the next action.",
-        avoid: "Reading damage as judgment or enemy competence. Giving the whole fight away because HP moved.",
-        drill: "Say: one hit is not the game."
+        situation: "Nasus, Swain, Volibear, or another sticky champion is chasing you and turning around feels like the only way to regain control.",
+        response: "Run first and make them waste time. Q only when there is space, use Exhaust or Flash if needed, and do not E into them unless they are basically dead; a slow expensive death is better than an instant free one."
       },
       {
-        title: "tower range",
-        trigger: "You are fighting near a tower or chasing under it.",
-        do: "Move your feet out first. If a champion projectile is flying, W that. If tower is shooting, walk out.",
-        avoid: "W-ing tower shots. Staying because the target is low.",
-        drill: "Say: tower equals feet; projectile equals W."
+        situation: "You take one hit and it feels like proof that the enemy knows what they are doing and the fight is already doomed.",
+        response: "Treat the hit as information, not judgment. Step back, keep the camera stable, and choose the next action; one hit does not mean they are good, and it does not mean you have to collapse."
+      },
+      {
+        situation: "You chase a low enemy under tower and your hands reach for W even though the tower shot is not something Samira can parry.",
+        response: "Separate champion danger from tower danger. If a projectile or CC spell is flying, W can block it; if tower is shooting, the answer is feet, not W. Walk out of the tower's shooting area before the low-health bait turns into your death."
       }
     ]
   },
@@ -81,39 +58,28 @@ const champions = [
     note: "Caitlyn is the comfort sniper pick: range, space, sustain, and leaving when noticed.",
     situations: [
       {
-        title: "lane feels like judgment",
-        trigger: "The enemy laner feels like a person judging you instead of a moving game object.",
-        do: "Return to next safe minion. Keep XP. Take safe CS. Let the lane be a farming room.",
-        avoid: "Trying to prove you can beat them. Trading because they seem confident.",
-        drill: "Say: lane, survive, XP, next safe minion."
+        situation: "The enemy laner walks forward and your brain starts treating them like a person judging you instead of a moving object in lane.",
+        response: "Shrink the task to lane, XP, and next safe minion. You do not have to beat the person; you only have to keep Caitlyn unavailable, collect what is safe, and let range do the work."
       },
       {
-        title: "enemy notices you",
-        trigger: "They turn toward you, walk at you, or hold engage range.",
-        do: "Leave early. Keep champion near center. Use range, trap space, E backward if needed.",
-        avoid: "Standing still to finish one greedy auto. Chasing after you have been noticed.",
-        drill: "Say: if they notice me, I leave."
+        situation: "You want one more minion or auto, but the enemy has turned toward you and your body has not admitted you have been noticed yet.",
+        response: "Leave early, not perfectly. Keep the champion near the center of the camera, use small clicks near Caitlyn, and give up the greedy hit before the enemy gets a real engage angle."
       },
       {
-        title: "poked low",
-        trigger: "You take damage and feel like lane is ruined.",
-        do: "Back up, lifesteal when safe, collect the wave, and stop treating the lane as doomed.",
-        avoid: "Panic recall after one bad trade. Taking another trade to fix the first one.",
-        drill: "Say: sustain means I can keep farming."
+        situation: "You take poke in lane and it feels like the entire lane is ruined even though you still have wave, XP, and sustain available.",
+        response: "Back up and let Bloodthirster/Fleet-style comfort do its job when it is safe. The purpose of sustain is psychological as much as statistical: it keeps one bad trade from becoming panic recall or a revenge trade."
       },
       {
-        title: "midgame uncertainty",
-        trigger: "Lane ends and you do not know where to stand.",
-        do: "Stand behind bodies. Shoot the closest safe target. Hit towers when ahead; guard towers and collect waves when behind.",
-        avoid: "Walking forward for a perfect target. Chasing into fog for a low enemy.",
-        drill: "Say: closest safe target."
+        situation: "Lane ends and you do not know where Caitlyn is supposed to stand once people start grouping and moving through fog.",
+        response: "Stand behind bodies and shoot the closest safe target. When ahead, hit towers from range; when behind, guard towers and collect waves. The target does not need to be perfect, only safe enough to keep shooting."
       },
       {
-        title: "team fight starts",
-        trigger: "Everyone is moving and you feel late or scared.",
-        do: "Join from far away. Auto what is safe. Ult only when it is a clean finish or safe pressure.",
-        avoid: "Holding all damage because the fight is confusing. Walking into the fight to feel useful.",
-        drill: "Shoot from where Caitlyn is hard to touch."
+        situation: "A fight starts far away and you feel late, so walking forward starts to feel like the only way to be useful.",
+        response: "Join from outside the fight first. Auto what is safe, ult only when it is a clean finish or safe pressure, and do not walk into danger just to prove you are participating."
+      },
+      {
+        situation: "A low enemy leaves the fight and your sniper fantasy wants the satisfying finish even though the path goes through fog or enemy bodies.",
+        response: "Use range, traps, or ult if the finish is clean; otherwise let the low target go. Caitlyn feels good when she is unavailable, not when she turns a safe game into a chase."
       }
     ]
   },
@@ -125,25 +91,20 @@ const champions = [
     note: "Fizz is the reference loop because every button has a body job and a clean exit shape.",
     situations: [
       {
-        title: "looking for a kill",
-        trigger: "A squishy target is isolated or already losing.",
-        do: "R marks the plan. Q enters. W/auto finishes damage. E dodges or exits.",
-        avoid: "Going in before the target is killable. Using E so early that there is no exit.",
-        drill: "Say the loop before the fight: mark, enter, stab, leave."
+        situation: "A squishy target looks punishable, but you are not sure whether the Fizz feeling is real kill pressure or just wanting the combo.",
+        response: "Make the loop explicit before you enter: R marks, Q enters, W and autos finish, E dodges or exits. If the target is not isolated, already losing, or likely to die quickly, the clean Fizz shape is not actually there yet."
       },
       {
-        title: "after E",
-        trigger: "You used E and now the fight is still going.",
-        do: "Respect that the safety button is gone. Finish only if the target dies quickly.",
-        avoid: "Thinking untargetable once means untouchable forever.",
-        drill: "After E, ask: am I leaving or killing?"
+        situation: "You used E, the fun untargetable moment is over, and now the fight is still happening around you.",
+        response: "Respect that the safety button is gone. Finish only if the target dies quickly; otherwise move out instead of pretending one dodge made you untouchable for the whole fight."
       },
       {
-        title: "translating to Samira",
-        trigger: "Samira feels worse because she cannot leave like Fizz.",
-        do: "Keep the useful lesson: clean button jobs. Translate exit into W, reset, lifesteal, Flash, or not entering.",
-        avoid: "Expecting Samira E to be Fizz E.",
-        drill: "Say: Samira earns the entry with Q."
+        situation: "Samira feels worse because you want every champion to have Fizz's clean jump-in, dodge, and leave pattern.",
+        response: "Keep the useful lesson without copying the escape fantasy. Samira exits through not entering too early, holding W for the real spell, killing for reset, lifestealing through a won fight, or using Flash."
+      },
+      {
+        situation: "You are comparing champions and the real question is whether their buttons give you the same clear body map as Fizz.",
+        response: "Use Fizz as a reference, not a requirement. The useful standard is whether every button has a job your hands understand; the champion does not need to be Fizz, but it does need a loop you want to repeat."
       }
     ]
   },
@@ -155,18 +116,16 @@ const champions = [
     note: "The K-pop assassin idea is appealing, but visual irritation breaks repetition.",
     situations: [
       {
-        title: "first test game",
-        trigger: "You want a sexy assassin ADC but the walk animation might bother you.",
-        do: "Play one low-pressure bot game and judge body feel before judging strength.",
-        avoid: "Forcing a champion your eyes hate because the idea sounds right.",
-        drill: "Ask: do I want ten more reps?"
+        situation: "The idea of Kai'Sa sounds right because she could be a sexy assassin ADC, but the walk animation or body feel may make repeated games annoying.",
+        response: "Test her in a low-pressure bot game before treating her as a real candidate. Strength on paper matters less than whether your eyes and hands want ten more reps."
       },
       {
-        title: "going in",
-        trigger: "The enemy is low and Kai'Sa can follow.",
-        do: "Check whether the target is isolated and whether team pressure is already there.",
-        avoid: "Using the assassin fantasy as permission to dive protected targets.",
-        drill: "Say: isolated first, fantasy second."
+        situation: "A low enemy is marked or reachable and the assassin fantasy makes following them look obvious.",
+        response: "Check isolation and team pressure first. Kai'Sa can follow, but the fantasy does not make a protected target cheap; enter when the enemy is separated or already controlled, not just because the button reaches."
+      },
+      {
+        situation: "You are tempted to force Kai'Sa because she matches the idea of what you want, even though actually piloting her feels wrong.",
+        response: "Treat that mismatch as data. A champion can be conceptually perfect and still be a bad practice tool if the animation, posture, or reward loop makes you avoid games."
       }
     ]
   },
@@ -178,25 +137,20 @@ const champions = [
     note: "Miss Fortune can make farming and damage feel easy, but she does not solve the escape/chaos loop.",
     situations: [
       {
-        title: "easy lane damage",
-        trigger: "The wave is stable and Q/poke is available.",
-        do: "Use the simple damage. Farm cleanly. Let easy buttons lower threat.",
-        avoid: "Thinking easy poke means you can stand anywhere.",
-        drill: "One safe Q, then back to minions."
+        situation: "The wave is calm and Miss Fortune Q feels easy, so you start relaxing your spacing because damage is happening without much effort.",
+        response: "Use the easy damage, then return to safe lane shape. Simple poke lowers threat only if it does not turn into standing anywhere or walking forward after the bounce."
       },
       {
-        title: "ult angle",
-        trigger: "Enemies are grouped or already controlled.",
-        do: "Ult from safety when the fight is already shaped for it.",
-        avoid: "Walking forward to make R happen. Ulting because you are bored.",
-        drill: "Ask: can they stop me right now?"
+        situation: "Enemies are grouped and your ult could be huge, but you would have to walk into danger to make the angle look perfect.",
+        response: "Ult from safety when the fight is already shaped for it by allies, terrain, or enemy commitment. If you have to step into the fight to make R happen, the ult is probably asking you to solve the wrong problem."
       },
       {
-        title: "chase temptation",
-        trigger: "A low target is leaving and your movement speed feels good.",
-        do: "Stop at fog or protection. Use range; do not become the engage.",
-        avoid: "Playing her like Samira or Fizz.",
-        drill: "Say: damage from safety."
+        situation: "A low target is leaving and your movement speed makes the chase feel safer than it really is.",
+        response: "Stop at fog, tower, or protection. Miss Fortune can punish from range, but she is not Samira or Fizz; if chasing makes you become the engage, let the target go."
+      },
+      {
+        situation: "Miss Fortune feels easy and sexy enough to play, but the fight still lacks the dash-reset chaos that made Samira appealing.",
+        response: "Use her when the rep is clean farming, easy damage, or lower-stress bot practice. Do not expect her to satisfy the same reward loop as a champion built around entering and resetting."
       }
     ]
   },
@@ -208,18 +162,16 @@ const champions = [
     note: "Ezreal has the satisfying QQQ rhythm, but the champion fantasy may not reward enough reps.",
     situations: [
       {
-        title: "Q rhythm",
-        trigger: "You want button spam without hard commitment.",
-        do: "Use Q as a safe test button and a way to stay engaged from range.",
-        avoid: "Turning Q spam into random forward movement.",
-        drill: "Q, move, Q, move."
+        situation: "You want button spam without hard commitment, and Ezreal Q gives your hands something safe to do while the fight stays uncertain.",
+        response: "Use Q as a test button and movement rhythm: Q, move, Q, move. The lesson is safe repetition under pressure, not randomly drifting forward because the button is available."
       },
       {
-        title: "fantasy mismatch",
-        trigger: "The kit feels good but the character does not make you want games.",
-        do: "Keep the lesson for other champs: a repeatable safe button lowers panic.",
-        avoid: "Forcing the pick just because the mechanic is useful.",
-        drill: "Ask: useful lesson or actual main?"
+        situation: "The kit feels mechanically useful, but the character fantasy does not make you want to queue more games.",
+        response: "Keep the mechanic as a lesson for other champions. A repeatable safe button can lower panic, but a useful lesson is not automatically a main."
+      },
+      {
+        situation: "You miss several Qs and the spam loop starts feeling like proof that you are bad instead of a low-cost way to stay engaged.",
+        response: "Keep moving and keep the miss cheap. Ezreal Q is good practice because one miss does not have to commit your body; the next Q is another rep, not a verdict."
       }
     ]
   },
@@ -231,18 +183,12 @@ const champions = [
     note: "Jhin is a comparison pick, not a forced solution.",
     situations: [
       {
-        title: "style attraction",
-        trigger: "The presentation feels clean but the body fantasy is not enough.",
-        do: "Use the comparison to clarify what is missing: reward, safety, sexiness, or chaos.",
-        avoid: "Confusing aesthetic respect with actual practice appetite.",
-        drill: "Name what the pick gives and what it does not."
+        situation: "Jhin looks clean and stylish, but you are not sure that liking his presentation means you actually want to practice him.",
+        response: "Use the comparison to name what is missing: reward, safety, sexiness, chaos, or a button loop your hands want. Respecting a champion's style is different from wanting hundreds of reps."
       },
       {
-        title: "slow fight rhythm",
-        trigger: "You are waiting on shots or reload timing.",
-        do: "Treat him as pacing practice if you choose him.",
-        avoid: "Expecting Samira-style mash reward.",
-        drill: "Shot, step, reset hands."
+        situation: "His slower shot rhythm makes you wait, count, and reset hands when what you wanted was Samira-style mashing.",
+        response: "Treat him as pacing practice only if that is the goal for the day. If the goal is dopamine, dash, and reset, forcing Jhin turns style into friction."
       }
     ]
   },
@@ -254,18 +200,16 @@ const champions = [
     note: "Ashe felt boring and ult pressure felt unrewarding, so she should not be forced as a main.",
     situations: [
       {
-        title: "ult pressure",
-        trigger: "R is available and the map feels like a test.",
-        do: "Use it only as a simple utility rep if you are practicing calm decisions.",
-        avoid: "Letting one missed arrow define the whole game.",
-        drill: "One clear arrow target, no drama."
+        situation: "Ashe R is available and the map starts feeling like a test you are about to fail.",
+        response: "Use the arrow only when you have one clear target or a simple utility rep. A missed arrow is not the whole game, and forcing the shot because the button is glowing makes the ult feel worse."
       },
       {
-        title: "boring lane",
-        trigger: "The kit feels too quiet to create reward.",
-        do: "Take the data and switch. Boredom matters because reps need reward.",
-        avoid: "Punishing yourself with a champion that makes you stop playing.",
-        drill: "Ask: am I learning or just tolerating?"
+        situation: "The kit is clear and safe on paper, but playing her feels too quiet to create reward.",
+        response: "Take that seriously and switch when needed. Boredom matters because reps need reward; calm utility is useful only if calm utility is actually what you want to practice."
+      },
+      {
+        situation: "You are tempted to pick Ashe because she seems responsible, even though responsibility is not the same as a playable learning loop.",
+        response: "Use her for slows, spacing, and simple decisions when that is the specific rep. Do not turn practice into punishment by picking the champion your nervous system least wants to repeat."
       }
     ]
   },
@@ -277,11 +221,12 @@ const champions = [
     note: "Rammus felt physically boring and irritating. That matters.",
     situations: [
       {
-        title: "low reward pick",
-        trigger: "A champion is simple but your body dislikes playing it.",
-        do: "Respect the boredom signal and use a different practice room.",
-        avoid: "Choosing simplicity if it kills repetition.",
-        drill: "Say: simple is not the same as playable."
+        situation: "A champion is simple on paper, but playing it makes your body bored or irritated enough that you stop wanting reps.",
+        response: "Respect the boredom signal. Simplicity is not the same as playable; if the champion kills repetition, it is not the right practice room for this system."
+      },
+      {
+        situation: "You think choosing the simple tank should lower pressure, but the lack of button reward makes the whole game feel physically flat.",
+        response: "Do not force the pick to prove discipline. Use the negative fit as information about what the practice room needs: clear body feel, enough reward, and a loop you actually want to repeat."
       }
     ]
   }
@@ -297,17 +242,16 @@ const situationList = document.querySelector("#situation-list");
 function situationCard(item) {
   const article = document.createElement("article");
   article.className = "situation-card";
-  article.innerHTML = `
-    <div class="situation-title">
-      <h3>${item.title}</h3>
-      <p>${item.trigger}</p>
-    </div>
-    <dl class="situation-detail">
-      <div class="detail-row"><dt>do</dt><dd>${item.do}</dd></div>
-      <div class="detail-row"><dt>avoid</dt><dd>${item.avoid}</dd></div>
-      <div class="detail-row"><dt>drill</dt><dd>${item.drill}</dd></div>
-    </dl>
-  `;
+
+  const situation = document.createElement("p");
+  situation.className = "situation-sentence";
+  situation.textContent = item.situation;
+
+  const response = document.createElement("p");
+  response.className = "situation-response";
+  response.textContent = item.response;
+
+  article.append(situation, response);
   return article;
 }
 
@@ -319,7 +263,7 @@ function renderChampion(championId) {
   championName.textContent = champion.name;
   championFocus.textContent = champion.focus;
   championNote.textContent = champion.note;
-  situationCount.textContent = `${champion.situations.length} notes`;
+  situationCount.textContent = `${champion.situations.length} situations`;
   situationList.replaceChildren(...champion.situations.map(situationCard));
 }
 

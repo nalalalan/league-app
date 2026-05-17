@@ -175,23 +175,23 @@ Champion fit affects repetition & Champion picker & Visual pick first; details a
 
 \subsection{Champion-specific situations replaced generic cards}
 
-The site organizes knowledge by situations rather than by abstract lessons. The current version makes those situations champion-specific: selecting Samira shows entries such as before pressing E, W timing, after R works, after a takedown, early ADC attacks, tower range, and damage panic. Selecting Caitlyn shifts the same practice-room idea toward next safe minion, staying unavailable, sustain after poke, and shooting the closest safe target. This format was chosen because it gives enough detail to review while avoiding the generic labels and motivational fragments that had made the first version feel unusable.
+The site organizes knowledge by situations rather than by abstract lessons. The current version makes those situations champion-specific and removes the intermediate public labels that had made the cards feel misleading. Selecting Samira now shows one-sentence prompts for stressful moments: wanting to press E because a fight feels urgent, chasing a low-health enemy into fog, pressing W because proximity feels dangerous, staying after R because the damage felt good, or trying to W a tower shot. Each prompt is followed by one combined response paragraph that explains the action, the reason it matters, and the repetition to practice. Selecting Caitlyn shifts the same practice-room idea toward next safe minion, leaving when noticed, recovering after poke, and shooting the closest safe target. This format was chosen because the user needed enough detail to recognize the exact tricky moment without reading a giant rule wall or a card taxonomy.
 
 \begin{table}[H]
 \centering
-\caption{Example Samira situations imported into the public page.}
+\caption{Example Samira situations imported into the public page after label removal.}
 {\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{p{0.20\linewidth}p{0.24\linewidth}p{0.24\linewidth}p{0.17\linewidth}}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{p{0.42\linewidth}p{0.44\linewidth}}
 \toprule
-Trigger & Do & Avoid & Drill \\
+Situation prompt & Combined response \\
 \midrule
-Before pressing E & Q first; check ratio and reachability & E as anxiety relief & Q creates; E commits \\
-Low target in fog & Stop at edge; Q if visible & E into unknown bodies & Low plus reachable \\
-W timing & Hold W for the real projectile & W as armor or tower block & Name one danger spell \\
-After R works & Leave unless next kill is obvious & Stay from excitement & R is reward \\
-After takedown & Check E and next target & Automatic reset dash & Kill one, check E \\
-Damage panic & Step back and continue & Read damage as judgment & One hit is not the game \\
+The fight feels urgent and E wants to become the first button. & Start with Q or an auto so the fight gives information before the dash commits the body. \\
+A low-health enemy runs toward fog or teammates. & Stop at the edge; low only matters when the target is also reachable and cheap to kill. \\
+W feels necessary immediately after dashing in. & Hold W for the real spell; it is a parry for visible danger, not armor against being close. \\
+R works and the excitement makes staying feel automatic. & Treat R as the reward, then leave unless the next target is already low and reachable. \\
+E resets after a takedown. & Read the reset as a new check, not an instruction to dash into tank, tower, fog, or fresh crowd control. \\
+One hit lands and feels like proof that the enemy is competent. & Treat damage as information, step back, stabilize the camera, and choose the next action. \\
 \bottomrule
 \end{tabular}
 }
@@ -227,11 +227,11 @@ The page was constrained by user instructions gathered during planning: one page
 
 \subsection*{Rule extraction}
 
-Rules were extracted by finding repeated gameplay or mindset triggers in the source corpus and translating each into a short action rule. The extraction favored operational phrases over explanatory prose. For example, the Samira section became ``Q first; earn the E,'' ``W is parry, not armor,'' and ``R is reward, not start.'' The death section became ``choose the fight; death is allowed; winning is intended.'' The bot-practice section became the practice ladder and the current-mode cue.
+Rules were extracted by finding repeated gameplay or mindset triggers in the source corpus and translating each into a one-sentence situation prompt plus one combined response paragraph. The extraction favored recognition over slogan compression: the prompt had to name the exact stressful moment, and the response had to combine action, reason, and practice rep without separate ``do,'' ``avoid,'' or ``drill'' labels. For example, the Samira section retained the underlying rules ``Q first; earn the E,'' ``W is parry, not armor,'' and ``R is reward, not start,'' but the public card now starts from the situation that makes the rule necessary. The death section retained ``choose the fight; death is allowed; winning is intended.'' The bot-practice section retained the practice ladder and the current-mode cue.
 
 \subsection*{Public artifact implementation}
 
-The website is a static AO Labs app. The first implementation uses hand-authored HTML and CSS, with the public log embedded in the page rather than stored behind a private authentication boundary. Future versions can add a server-backed public note writer if persistent browser-independent editing becomes necessary. The current version avoids a fake local-only note form because non-persistent controls would misrepresent the public record.
+The website is served by a small Node application on Railway. It serves the hand-authored page and paper artifacts from the public directory and exposes \texttt{/api/logs} for public note reads and writes. On Railway, persistent storage is provided through the configured volume path, and writes are gated by \texttt{LEAGUE\_WRITE\_TOKEN}. This keeps public notes browser-independent without adding a fake local-only note form or claiming Riot API integration that is not present in version 1.
 
 \backmattersection{Acknowledgements}
 
@@ -243,7 +243,7 @@ No external funding supported this work.
 
 \backmattersection{Author contributions}
 
-Alan N. Pham supplied the practice corpus, product constraints, and acceptance criteria. The manuscript and static site were assembled from those source materials in the AO Labs workspace.
+Alan N. Pham supplied the practice corpus, product constraints, and acceptance criteria. The manuscript and site were assembled from those source materials in the AO Labs workspace.
 
 \backmattersection{Competing interests}
 
@@ -251,11 +251,11 @@ The author owns and operates AO Labs. The site is a personal public artifact and
 
 \backmattersection{Data availability}
 
-The first public data source is the League practice arc supplied in the implementation thread and the static public log embedded at \href{https://league.aolabs.io}{league.aolabs.io}. Raw game screenshots were not included in this first version.
+The first public data source is the League practice arc supplied in the implementation thread and the public log exposed through \href{https://league.aolabs.io}{league.aolabs.io}. Raw game screenshots were not included in this first version.
 
 \backmattersection{Code availability}
 
-The implementation is intended for the \texttt{nalalalan/league-app} repository, with the public static artifacts served at \href{https://league.aolabs.io}{league.aolabs.io}.
+The implementation is intended for the \texttt{nalalalan/league-app} repository, with the public site, PDF, manuscript source, and log API served at \href{https://league.aolabs.io}{league.aolabs.io}.
 
 \backmattersection{Additional information}
 
