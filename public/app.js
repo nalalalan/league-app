@@ -255,6 +255,75 @@ let currentChampionId = "";
 let swapTimer = 0;
 let settleTimer = 0;
 let audioContext;
+let fallbackAudioUrl = "";
+
+function buildFallbackSoundUrl() {
+  if (fallbackAudioUrl) return fallbackAudioUrl;
+
+  const sampleRate = 44100;
+  const duration = 0.82;
+  const frameCount = Math.floor(sampleRate * duration);
+  const dataSize = frameCount * 2;
+  const buffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(buffer);
+  const bytes = new Uint8Array(buffer);
+
+  const writeString = (offset, text) => {
+    for (let i = 0; i < text.length; i += 1) view.setUint8(offset + i, text.charCodeAt(i));
+  };
+
+  writeString(0, "RIFF");
+  view.setUint32(4, 36 + dataSize, true);
+  writeString(8, "WAVE");
+  writeString(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeString(36, "data");
+  view.setUint32(40, dataSize, true);
+
+  const tone = (time, start, length, from, to, gain) => {
+    if (time < start || time > start + length) return 0;
+    const local = time - start;
+    const progress = local / length;
+    const sweep = from + (to - from) * progress;
+    const phase = 2 * Math.PI * (from * local + 0.5 * (sweep - from) * local * progress);
+    const envelope = Math.sin(Math.PI * progress) ** 0.62;
+    return Math.sin(phase) * envelope * gain;
+  };
+
+  for (let i = 0; i < frameCount; i += 1) {
+    const time = i / sampleRate;
+    const noiseFade = Math.max(0, 1 - time / 0.36) ** 2;
+    const sample =
+      tone(time, 0, 0.34, 96, 54, 0.48) +
+      tone(time, 0.018, 0.34, 196, 247, 0.24) +
+      tone(time, 0.07, 0.24, 392, 392, 0.22) +
+      tone(time, 0.13, 0.28, 587.33, 587.33, 0.17) +
+      tone(time, 0.18, 0.32, 880, 880, 0.13) +
+      tone(time, 0.24, 0.26, 1174.66, 1174.66, 0.08) +
+      (Math.random() * 2 - 1) * noiseFade * 0.045;
+    view.setInt16(44 + i * 2, Math.max(-1, Math.min(1, sample)) * 32767, true);
+  }
+
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  fallbackAudioUrl = `data:audio/wav;base64,${window.btoa(binary)}`;
+  return fallbackAudioUrl;
+}
+
+function playFallbackSelectSound() {
+  if (!window.Audio) return;
+  const audio = new window.Audio(buildFallbackSoundUrl());
+  audio.volume = 0.62;
+  void audio.play().catch(() => {});
+}
 
 function situationCard(item) {
   const article = document.createElement("article");
@@ -287,38 +356,81 @@ function setPressedChampion(championId) {
 }
 
 function playSelectSound() {
-  const Audio = window.AudioContext || window.webkitAudioContext;
-  if (!Audio) return;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    playFallbackSelectSound();
+    return;
+  }
 
   try {
-    audioContext ||= new Audio();
+    audioContext ||= new AudioContextClass();
     if (audioContext.state === "suspended") audioContext.resume();
 
     const now = audioContext.currentTime;
+    const compressor = audioContext.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-18, now);
+    compressor.knee.setValueAtTime(18, now);
+    compressor.ratio.setValueAtTime(6, now);
+    compressor.attack.setValueAtTime(0.004, now);
+    compressor.release.setValueAtTime(0.16, now);
+    compressor.connect(audioContext.destination);
+
     const master = audioContext.createGain();
     master.gain.setValueAtTime(0.0001, now);
-    master.gain.exponentialRampToValueAtTime(0.14, now + 0.018);
-    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
-    master.connect(audioContext.destination);
+    master.gain.exponentialRampToValueAtTime(0.17, now + 0.018);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.78);
+    master.connect(compressor);
 
-    [
-      { frequency: 392, start: 0, length: 0.12, gain: 0.32 },
-      { frequency: 587.33, start: 0.045, length: 0.16, gain: 0.24 },
-      { frequency: 880, start: 0.105, length: 0.2, gain: 0.18 }
-    ].forEach((tone) => {
+    const playTone = (tone) => {
       const osc = audioContext.createOscillator();
       const gain = audioContext.createGain();
-      osc.type = "triangle";
+      osc.type = tone.type || "triangle";
       osc.frequency.setValueAtTime(tone.frequency, now + tone.start);
+      if (tone.endFrequency) {
+        osc.frequency.exponentialRampToValueAtTime(tone.endFrequency, now + tone.start + tone.length);
+      }
+      if (tone.detune) {
+        osc.detune.setValueAtTime(tone.detune, now + tone.start);
+      }
       gain.gain.setValueAtTime(0.0001, now + tone.start);
-      gain.gain.exponentialRampToValueAtTime(tone.gain, now + tone.start + 0.018);
+      gain.gain.exponentialRampToValueAtTime(tone.gain, now + tone.start + (tone.attack || 0.018));
       gain.gain.exponentialRampToValueAtTime(0.0001, now + tone.start + tone.length);
       osc.connect(gain).connect(master);
       osc.start(now + tone.start);
       osc.stop(now + tone.start + tone.length + 0.04);
-    });
+    };
+
+    [
+      { type: "sine", frequency: 96, endFrequency: 54, start: 0, length: 0.34, gain: 0.52, attack: 0.006 },
+      { type: "triangle", frequency: 196, endFrequency: 246.94, start: 0.018, length: 0.34, gain: 0.28 },
+      { type: "triangle", frequency: 392, start: 0.07, length: 0.24, gain: 0.27 },
+      { type: "sine", frequency: 587.33, start: 0.13, length: 0.28, gain: 0.2 },
+      { type: "sine", frequency: 880, start: 0.18, length: 0.32, gain: 0.16 },
+      { type: "triangle", frequency: 1174.66, start: 0.24, length: 0.26, gain: 0.1 }
+    ].forEach(playTone);
+
+    const noiseBuffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * 0.32), audioContext.sampleRate);
+    const noiseData = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < noiseData.length; i += 1) {
+      const fade = 1 - i / noiseData.length;
+      noiseData[i] = (Math.random() * 2 - 1) * fade * fade;
+    }
+    const noise = audioContext.createBufferSource();
+    const noiseFilter = audioContext.createBiquadFilter();
+    const noiseGain = audioContext.createGain();
+    noise.buffer = noiseBuffer;
+    noiseFilter.type = "bandpass";
+    noiseFilter.frequency.setValueAtTime(2600, now + 0.02);
+    noiseFilter.frequency.exponentialRampToValueAtTime(840, now + 0.32);
+    noiseFilter.Q.setValueAtTime(0.72, now);
+    noiseGain.gain.setValueAtTime(0.0001, now + 0.02);
+    noiseGain.gain.exponentialRampToValueAtTime(0.12, now + 0.055);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.34);
+    noise.connect(noiseFilter).connect(noiseGain).connect(master);
+    noise.start(now + 0.02);
+    noise.stop(now + 0.38);
   } catch {
-    // Selection still works if audio is unavailable.
+    playFallbackSelectSound();
   }
 }
 
@@ -399,7 +511,7 @@ function renderPicker() {
       void button.offsetWidth;
       button.classList.add("is-flashing");
       playSelectSound();
-      window.setTimeout(() => button.classList.remove("is-flashing"), 820);
+      window.setTimeout(() => button.classList.remove("is-flashing"), 1080);
       renderChampion(champion.id, { animate: true });
     });
     return button;
