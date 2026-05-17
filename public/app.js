@@ -242,11 +242,19 @@ const champions = [
 ];
 
 const championPicker = document.querySelector("#champion-picker");
+const championPanel = document.querySelector("#champion-panel");
 const championName = document.querySelector("#champion-name");
 const championFocus = document.querySelector("#champion-focus");
 const championNote = document.querySelector("#champion-note");
+const situationsSection = document.querySelector(".situations");
 const situationCount = document.querySelector("#situation-count");
 const situationList = document.querySelector("#situation-list");
+const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+let currentChampionId = "";
+let swapTimer = 0;
+let settleTimer = 0;
+let audioContext;
 
 function situationCard(item) {
   const article = document.createElement("article");
@@ -264,16 +272,97 @@ function situationCard(item) {
   return article;
 }
 
-function renderChampion(championId) {
-  const champion = champions.find((item) => item.id === championId) || champions[0];
-  document.querySelectorAll(".portrait-button").forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.champion === champion.id));
-  });
+function writeChampion(champion) {
   championName.textContent = champion.name;
   championFocus.textContent = champion.focus;
   championNote.textContent = champion.note;
   situationCount.textContent = `${champion.situations.length} situations`;
   situationList.replaceChildren(...champion.situations.map(situationCard));
+}
+
+function setPressedChampion(championId) {
+  document.querySelectorAll(".portrait-button").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.champion === championId));
+  });
+}
+
+function playSelectSound() {
+  const Audio = window.AudioContext || window.webkitAudioContext;
+  if (!Audio) return;
+
+  try {
+    audioContext ||= new Audio();
+    if (audioContext.state === "suspended") audioContext.resume();
+
+    const now = audioContext.currentTime;
+    const master = audioContext.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.14, now + 0.018);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+    master.connect(audioContext.destination);
+
+    [
+      { frequency: 392, start: 0, length: 0.12, gain: 0.32 },
+      { frequency: 587.33, start: 0.045, length: 0.16, gain: 0.24 },
+      { frequency: 880, start: 0.105, length: 0.2, gain: 0.18 }
+    ].forEach((tone) => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(tone.frequency, now + tone.start);
+      gain.gain.setValueAtTime(0.0001, now + tone.start);
+      gain.gain.exponentialRampToValueAtTime(tone.gain, now + tone.start + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + tone.start + tone.length);
+      osc.connect(gain).connect(master);
+      osc.start(now + tone.start);
+      osc.stop(now + tone.start + tone.length + 0.04);
+    });
+  } catch {
+    // Selection still works if audio is unavailable.
+  }
+}
+
+function animateChampionSwap(champion) {
+  window.clearTimeout(swapTimer);
+  window.clearTimeout(settleTimer);
+
+  const panels = [championPanel, situationsSection];
+  panels.forEach((panel) => {
+    panel.setAttribute("aria-busy", "true");
+    panel.classList.remove("is-entering");
+    panel.classList.add("is-leaving");
+  });
+
+  const delay = motionQuery.matches ? 0 : 170;
+  swapTimer = window.setTimeout(() => {
+    writeChampion(champion);
+    currentChampionId = champion.id;
+
+    void championPanel.offsetWidth;
+    panels.forEach((panel) => {
+      panel.classList.remove("is-leaving");
+      panel.classList.add("is-entering");
+    });
+    settleTimer = window.setTimeout(() => {
+      panels.forEach((panel) => {
+        panel.classList.remove("is-entering", "is-leaving");
+        panel.removeAttribute("aria-busy");
+      });
+    }, motionQuery.matches ? 0 : 560);
+  }, delay);
+}
+
+function renderChampion(championId, options = {}) {
+  const champion = champions.find((item) => item.id === championId) || champions[0];
+  setPressedChampion(champion.id);
+
+  if (!options.animate || !currentChampionId || champion.id === currentChampionId) {
+    writeChampion(champion);
+    currentChampionId = champion.id;
+    return;
+  }
+
+  animateChampionSwap(champion);
 }
 
 function renderPicker() {
@@ -290,12 +379,28 @@ function renderPicker() {
     img.loading = "eager";
     img.decoding = "async";
     button.append(img);
+    button.addEventListener("pointermove", (event) => {
+      const rect = button.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+      button.style.setProperty("--rx", `${(-y * 7).toFixed(2)}deg`);
+      button.style.setProperty("--ry", `${(x * 9).toFixed(2)}deg`);
+      button.style.setProperty("--mx", `${((x + 0.5) * 100).toFixed(1)}%`);
+      button.style.setProperty("--my", `${((y + 0.5) * 100).toFixed(1)}%`);
+    });
+    button.addEventListener("pointerleave", () => {
+      button.style.setProperty("--rx", "0deg");
+      button.style.setProperty("--ry", "0deg");
+      button.style.setProperty("--mx", "50%");
+      button.style.setProperty("--my", "42%");
+    });
     button.addEventListener("click", () => {
       button.classList.remove("is-flashing");
       void button.offsetWidth;
       button.classList.add("is-flashing");
-      window.setTimeout(() => button.classList.remove("is-flashing"), 620);
-      renderChampion(champion.id);
+      playSelectSound();
+      window.setTimeout(() => button.classList.remove("is-flashing"), 820);
+      renderChampion(champion.id, { animate: true });
     });
     return button;
   }));
@@ -345,5 +450,5 @@ async function hydratePublicNotes() {
 }
 
 renderPicker();
-renderChampion("samira");
+renderChampion("samira", { animate: false });
 hydratePublicNotes();

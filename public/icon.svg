@@ -1,43 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="league">
   <defs>
-    <filter id="d" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="10" stdDeviation="6" flood-color="#2b211d" flood-opacity=".16"/>
-      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#fffaf4" flood-opacity=".5"/>
+    <filter id="shadow" x="-32%" y="-32%" width="164%" height="164%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#2b211d" flood-opacity=".18"/>
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#fffaf4" flood-opacity=".55"/>
     </filter>
-    <linearGradient id="cream" x1="22" y1="18" x2="106" y2="112">
-      <stop stop-color="#fff8ef"/>
-      <stop offset="1" stop-color="#e6d8c8"/>
+    <radialGradient id="orb" cx="42%" cy="32%" r="70%">
+      <stop stop-color="#f7c8d3"/>
+      <stop offset=".36" stop-color="#8fb7b2"/>
+      <stop offset=".72" stop-color="#6d86aa"/>
+      <stop offset="1" stop-color="#3a415f"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="34" y1="18" x2="96" y2="108">
+      <stop stop-color="#f6dfa0"/>
+      <stop offset=".33" stop-color="#d6a14a"/>
+      <stop offset=".72" stop-color="#b67a34"/>
+      <stop offset="1" stop-color="#7e512b"/>
     </linearGradient>
-    <linearGradient id="gold" x1="30" y1="18" x2="104" y2="110">
-      <stop stop-color="#f3d77a"/>
-      <stop offset=".5" stop-color="#cf9b47"/>
-      <stop offset="1" stop-color="#8d5a2d"/>
+    <linearGradient id="goldEdge" x1="36" y1="22" x2="88" y2="106">
+      <stop stop-color="#fff4c8"/>
+      <stop offset=".54" stop-color="#c9913f"/>
+      <stop offset="1" stop-color="#67401f"/>
     </linearGradient>
-    <linearGradient id="rose" x1="24" y1="28" x2="104" y2="110">
+    <linearGradient id="pinkRing" x1="24" y1="20" x2="112" y2="108">
       <stop stop-color="#e4a8b2"/>
-      <stop offset=".55" stop-color="#c28b98"/>
+      <stop offset=".5" stop-color="#c28b98"/>
       <stop offset="1" stop-color="#76678d"/>
     </linearGradient>
-    <linearGradient id="teal" x1="20" y1="20" x2="104" y2="112">
-      <stop stop-color="#9cb9af"/>
-      <stop offset=".56" stop-color="#6b928a"/>
+    <linearGradient id="tealWave" x1="32" y1="32" x2="94" y2="92">
+      <stop stop-color="#c6ddd4"/>
+      <stop offset=".5" stop-color="#6b928a"/>
       <stop offset="1" stop-color="#527d83"/>
     </linearGradient>
-    <linearGradient id="blue" x1="24" y1="20" x2="108" y2="112">
-      <stop stop-color="#9fb1cc"/>
-      <stop offset=".58" stop-color="#6d86aa"/>
-      <stop offset="1" stop-color="#5d72ad"/>
-    </linearGradient>
   </defs>
-  <g filter="url(#d)">
-    <rect x="23" y="23" width="82" height="82" rx="19" fill="url(#cream)"/>
-    <path d="M39 85c-8-17-5-36 8-49 6-6 14-10 23-12" fill="none" stroke="url(#teal)" stroke-width="7" stroke-linecap="round"/>
-    <path d="M85 28c14 9 22 25 20 43-1 12-7 23-16 31" fill="none" stroke="url(#rose)" stroke-width="7" stroke-linecap="round"/>
-    <path d="M49 29h19v49h29v20H49Z" fill="#5b412b" opacity=".16"/>
-    <path d="M45 25h19v49h29v20H45Z" fill="url(#gold)"/>
-    <path d="M64 25h18v14H64Z" fill="#f8df8e"/>
-    <path d="M63 74h30v20H63Z" fill="#a56b34" opacity=".38"/>
-    <circle cx="38" cy="86" r="5.5" fill="url(#blue)"/>
-    <circle cx="89" cy="101" r="5.5" fill="url(#teal)"/>
+  <g filter="url(#shadow)">
+    <circle cx="70" cy="64" r="39" fill="url(#orb)" stroke="url(#pinkRing)" stroke-width="7"/>
+    <path d="M40 78c17 2 30-6 42-22 6-8 13-12 22-11" fill="none" stroke="url(#tealWave)" stroke-width="6" stroke-linecap="round" opacity=".72"/>
+    <path d="M46 24h29l-7 9v45h31l-6 24H41l8-11V38l-9-9Z" fill="#4d3626" opacity=".3"/>
+    <path d="M42 20h29l-7 9v45h31l-6 24H37l8-11V34l-9-9Z" fill="url(#goldEdge)"/>
+    <path d="M50 27h14l-5 7v48h25l-2 9H47l6-8V34l-6-6Z" fill="url(#gold)"/>
+    <path d="M42 20h29l-7 9v45h31l-2 8H57V31H46Z" fill="#fff5c7" opacity=".34"/>
+    <path d="M46 30h9v52l-7 9h-6l7-10V38Z" fill="#fffaf0" opacity=".68"/>
+    <path d="M60 87h30l-3 8H51Z" fill="#6e4525" opacity=".25"/>
   </g>
 </svg>
