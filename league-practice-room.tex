@@ -1,0 +1,266 @@
+\pdfminorversion=7
+\documentclass[12pt,letterpaper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+
+\usepackage[
+    style=science,
+    backend=biber,
+    sorting=none,
+    articletitle=true,
+    url=false,
+    doi=false,
+    eprint=false,
+    isbn=false
+]{biblatex}
+\addbibresource{references.bib}
+\AtEveryBibitem{\clearlist{language}}
+
+\usepackage{newtxtext,newtxmath}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[margin=0.92in,top=0.82in,bottom=0.95in,headsep=18pt,footskip=24pt]{geometry}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{afterpage}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage[section]{placeins}
+\usepackage{flafter}
+\usepackage[table]{xcolor}
+
+\definecolor{ClayLine}{HTML}{EEDBDD}
+\definecolor{SumiInk}{HTML}{2D2426}
+\definecolor{DustyTaupe}{HTML}{866A6D}
+
+\usepackage[hidelinks]{hyperref}
+\usepackage[switch]{lineno}
+
+\color{SumiInk}
+\setstretch{1.45}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.42em}
+\setlength{\textfloatsep}{8pt plus 1pt minus 1pt}
+\setlength{\floatsep}{7pt plus 1pt minus 1pt}
+\setlength{\intextsep}{7pt plus 1pt minus 1pt}
+\setlength{\abovecaptionskip}{5pt}
+\setlength{\belowcaptionskip}{2pt}
+\setlength{\tabcolsep}{9pt}
+\renewcommand{\arraystretch}{1.14}
+\captionsetup{justification=raggedright,singlelinecheck=false}
+\setlist[itemize]{leftmargin=1.3em,itemsep=0.18em,topsep=0.25em}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.8}
+\setlength{\headheight}{24pt}
+\emergencystretch=2em
+\raggedbottom
+
+\titleformat{\section}
+  {\Large\sffamily\bfseries\color{SumiInk}}
+  {\thesection}
+  {0.6em}
+  {}
+  [\vspace{0.25em}\color{ClayLine}\titlerule]
+\titleformat{\subsection}
+  {\large\sffamily\bfseries\color{SumiInk}}
+  {\thesubsection}
+  {0.55em}
+  {}
+\titleformat{\subsubsection}
+  {\normalsize\sffamily\bfseries\color{SumiInk}}
+  {}
+  {0em}
+  {}
+\titlespacing*{\section}{0pt}{1.3ex plus 0.4ex minus 0.2ex}{0.7ex}
+\titlespacing*{\subsection}{0pt}{1.15ex plus 0.2ex minus 0.2ex}{0.45ex}
+\titlespacing*{\subsubsection}{0pt}{0.9ex plus 0.15ex minus 0.1ex}{0.25ex}
+
+\pretocmd{\subsubsection}{\needspace{4\baselineskip}}{}{}
+\pretocmd{\subsection}{\needspace{5\baselineskip}}{}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\sffamily\color{SumiInk} Low-threat game learning}
+\fancyhead[R]{\footnotesize\sffamily\color{DustyTaupe}\nouppercase{\leftmark}}
+\fancyfoot[C]{\footnotesize\sffamily\thepage}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{ClayLine}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+\makeatletter
+\def\fps@figure{tbp}
+\def\fps@table{tbp}
+\makeatother
+\newcommand{\backmattersection}[1]{\section*{#1}\markboth{#1}{}}
+
+\begin{document}
+\linenumbers
+\thispagestyle{empty}
+
+\begin{center}
+    \vspace*{-0.6em}
+
+    {\fontsize{20}{22}\selectfont\bfseries\color{SumiInk}
+    A low-threat practice-room interface for neurodivergent game learning\par}
+
+    \vspace{0.95em}
+
+    {\normalsize\color{SumiInk}
+    Alan N. Pham$^{1,*}$\par}
+
+    \vspace{0.38em}
+
+    {\small\color{DustyTaupe}
+    $^{1}$AO Labs\\
+    $^{*}$Correspondence: \href{https://aolabs.io}{aolabs.io}\par}
+\end{center}
+
+\vspace{0.35em}
+\noindent\textbf{Fast multiplayer games can convert practice into threat when social judgment, sensory load, ambiguous damage, and repeated failure are experienced as one continuous demand. This manuscript reports a single-user design study of \href{https://league.aolabs.io}{league.aolabs.io}, a public review room for League of Legends practice. The system does not claim clinical efficacy, population generality, or competitive optimization. It translates a user-provided learning arc into a low-threat review surface: compact situation rules, champion-fit cards, public notes, and a downloadable record. The strongest contribution is a design pattern rather than a gameplay result: make the next repetition easier to start by reducing the visible decision set to one champion, one mode, a few rules, and one next rep. The interface treats bots as a practice room, human games as performance, death-with-intent as a valid rep, and short review cards as mental practice. This bounded case suggests how personal learning software can support high-repetition play without becoming another source of evaluation pressure.}
+
+\newpage
+\pagestyle{fancy}
+
+\section{Introduction}
+
+Expert performance depends on repeated, structured practice, but practice is only useful when the learner can remain in the task long enough for repetitions to accumulate \cite{ericsson1993}. In competitive games, especially player-versus-player games, the immediate source of failure is not only mechanical difficulty. The learner must also manage uncertainty, sensory load, social interpretation, and the felt cost of visible mistakes. Anxiety can impair attentional control \cite{eysenck2007}; cognitive load can interfere with learning when too many elements must be processed at once \cite{sweller1988}. A player who is trying to learn a champion, lane, camera, item build, opponent behavior, teammate expectations, and self-regulation at the same time may experience the game as a judgment environment rather than a practice environment.
+
+The system described here began from a simple transfer from music practice: keep the task playable, choose one thing, trust repetitions, and let improvement compound. The same principle was applied to League of Legends. The first rule was not to win lane or outplay an opponent; it was to farm and survive. That rule later compressed into the phrase ``next safe minion.'' As the practice record grew, the problem became less about collecting more advice and more about making advice reviewable without overwhelming the player before queueing.
+
+\href{https://league.aolabs.io}{league.aolabs.io} is a public AO Labs page built for that purpose. It is not a Riot Games product, a general League guide, a ranking system, or a coaching dashboard. It is a single-page review room that turns one user's League learning arc into compact rules for pre-game mental rehearsal. The design is source-bounded: it uses the user's supplied chat arc and later public notes as its corpus, and it avoids claims that would require clinical, population-scale, or competitive outcome evidence.
+
+\section{Results}
+
+\subsection{A long learning arc was reduced to a small review surface}
+
+The seed corpus contained a long narrative account of League practice. The arc included lane fear, camera stability, sensory control, champion feel, bot practice, death tolerance, public yapping as pressure regulation, and champion-specific rules for Samira, Caitlyn, and Fizz. The design result was not a long visible essay. The site exposes a small pre-game review tray: active champion, current mode, three rule cards, one danger cue, one reset line, and one next rep.
+
+This reduction is the main interface result. It makes the review surface compatible with the user's stated constraint: the page should be pretty, clean, non-poster-like, and not overwhelming. The long record remains useful as paper and log context, but the first screen does not ask the user to reread the whole history before playing.
+
+\begin{table}[H]
+\centering
+\caption{Compression of the source arc into pre-game review units.}
+{\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{p{0.24\linewidth}p{0.30\linewidth}p{0.30\linewidth}}
+\toprule
+Source burden & Review unit & First-screen example \\
+\midrule
+Enemy lane feels like judgment & One safe action & Q first; next safe minion \\
+Damage triggers panic & Reset line & Damage is information \\
+Samira has many buttons & Button hierarchy & Q test, E commit, W parry, R reward \\
+Low targets bait chase & Situation rule & Low plus reachable, not low plus fog \\
+Deaths feel like failure & Practice frame & Choose the fight; death is allowed \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Situation cards preserved action without overexplaining}
+
+The site organizes knowledge by situations rather than by abstract lessons. Six initial cards are used: low target in fog, chased by Nasus or Swain, W timing, early ADC attack, after R works, and damage panic. Each card has the same four fields: do, avoid, drill, and the title trigger. This format was chosen because it keeps the card operational without turning it into a tutorial paragraph.
+
+\begin{table}[H]
+\centering
+\caption{Initial situation rules imported into the public page.}
+{\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{p{0.20\linewidth}p{0.24\linewidth}p{0.24\linewidth}p{0.17\linewidth}}
+\toprule
+Trigger & Do & Avoid & Drill \\
+\midrule
+Low target in fog & Stop at the edge; Q if visible & E into unknown bodies & Low plus reachable \\
+Chased by Nasus or Swain & Run first; Q with space & Turning to die fast & Die slow \\
+W timing & Wait for the projectile & W as armor & Name one danger \\
+Early ADC attack & Step back, Q, auto if safe & Instant duel & Use minion damage \\
+After R works & Leave or check E & Stay from excitement & Kill one, check E \\
+Damage panic & Take the hit, step back & Read damage as judgment & One hit is not the game \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Champion fit was treated as a practice constraint}
+
+The champion library is not organized as a tier list. It records fit: reward loop, panic trap, and one rule. Samira is currently the active focus because she provides a high-reward dash-reset-R loop, but she also creates the central panic trap of using E as an anxiety button. Caitlyn remains a comfort pick because range, sustain, and the sniper fantasy reduce threat. Fizz remains a reference champion because his button shape makes the desired loop clear: mark, enter, stab, dodge, leave.
+
+The same logic applies to other champions. Kai'Sa is not treated as automatically correct because the user reported that walk animation and visual feel affect willingness to repeat games. Ezreal's Q rhythm is useful, even if the character fantasy is wrong. Rammus is retained as a negative fit example because mechanically simple choices can still be poor practice tools if they make the body feel bored or irritated.
+
+\subsection{The public log made mindset part of the artifact}
+
+The public log starts with three source entries: the seed arc import, the practice-room frame, and the current Samira law. This is intentionally public. The design choice is that thoughts, panic notes, and mindset rules are not private by default; they are part of the learning artifact. The only excluded material is unrelated sensitive information such as credentials, access tokens, or private third-party identifiers.
+
+\section{Discussion}
+
+The case suggests that the useful interface for some high-repetition learners is not more instruction but better compression. A long learning conversation can contain many correct rules while still being hard to use before a game. The review room converts that record into a small number of visible decisions. That is consistent with cognitive-load theory: reducing simultaneous elements can make practice more tractable \cite{sweller1988}. It is also compatible with mental practice research, because the page gives the user a short pre-game script to rehearse before performance \cite{driskell1994}.
+
+The work also reframes death and failure. The site does not encourage intentional feeding or fake failure. It uses the rule ``choose the fight; death is allowed; winning is intended.'' That distinction matters. It keeps agency with the learner while preserving the real objective of the game. It also separates practice failure from collapse: a failed engage that tested damage, W timing, or exit timing is a rep; walking in only to die is not.
+
+Several limits are important. First, this is a single-user artifact, not a clinical intervention. The user self-described ADHD/autism traits and supplied a practice narrative, but the site does not diagnose, treat, or generalize to neurodivergent players as a class. Second, the current evidence is artifact-level: source text, distilled rules, a rendered page, and the paper itself. It does not include a controlled comparison, a ranked outcome, or a match-history dataset. Third, the system deliberately avoids Riot API import in version 1. That keeps the artifact focused on review and self-regulation rather than turning it into a stat tracker.
+
+\section{Materials and Methods}
+
+\subsection*{Source corpus}
+
+The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. The implementation treated this text as the current source of truth for the first public review cards. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
+
+\subsection*{Interface requirements}
+
+The page was constrained by user instructions gathered during planning: one page only, clean and pretty, same AO Labs vibe, no poster hero, no dense dashboard, no redundant helper labels, no overexplaining, public notes by default, and one quiet paper strip. The page therefore uses the shared AO Labs header, warm off-white palette, dark ink text, 8 px cards, restrained borders and shadows, compact fragments, and one visible PDF action.
+
+\subsection*{Rule extraction}
+
+Rules were extracted by finding repeated gameplay or mindset triggers in the source corpus and translating each into a short action rule. The extraction favored operational phrases over explanatory prose. For example, the Samira section became ``Q first; earn the E,'' ``W is parry, not armor,'' and ``R is reward, not start.'' The death section became ``choose the fight; death is allowed; winning is intended.'' The bot-practice section became the practice ladder and the current-mode cue.
+
+\subsection*{Public artifact implementation}
+
+The website is a static AO Labs app. The first implementation uses hand-authored HTML and CSS, with the public log embedded in the page rather than stored behind a private authentication boundary. Future versions can add a server-backed public note writer if persistent browser-independent editing becomes necessary. The current version avoids a fake local-only note form because non-persistent controls would misrepresent the public record.
+
+\backmattersection{Acknowledgements}
+
+The source learning arc was supplied by Alan Pham during the implementation conversation. Riot Games was not involved in the design, writing, or deployment of this artifact.
+
+\backmattersection{Funding}
+
+No external funding supported this work.
+
+\backmattersection{Author contributions}
+
+Alan N. Pham supplied the practice corpus, product constraints, and acceptance criteria. The manuscript and static site were assembled from those source materials in the AO Labs workspace.
+
+\backmattersection{Competing interests}
+
+The author owns and operates AO Labs. The site is a personal public artifact and is not endorsed by Riot Games.
+
+\backmattersection{Data availability}
+
+The first public data source is the League practice arc supplied in the implementation thread and the static public log embedded at \href{https://league.aolabs.io}{league.aolabs.io}. Raw game screenshots were not included in this first version.
+
+\backmattersection{Code availability}
+
+The implementation is intended for the \texttt{nalalalan/league-app} repository, with the public static artifacts served at \href{https://league.aolabs.io}{league.aolabs.io}.
+
+\backmattersection{Additional information}
+
+league.aolabs.io is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, League of Legends, and associated properties are trademarks or registered trademarks of Riot Games, Inc.
+
+\printbibliography[title={References}]
+
+\end{document}

@@ -1,0 +1,15 @@
+{
+  "name": "league",
+  "short_name": "league",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf8f2",
+  "theme_color": "#eee7dd",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

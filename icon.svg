@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="league">
+  <defs>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#2b211d" flood-opacity=".16"/>
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#fffaf4" flood-opacity=".55"/>
+    </filter>
+    <radialGradient id="shell" cx="36%" cy="28%" r="82%">
+      <stop offset="0" stop-color="#fffdf7"/>
+      <stop offset=".6" stop-color="#f3e7d8"/>
+      <stop offset="1" stop-color="#dec9b6"/>
+    </radialGradient>
+    <linearGradient id="lane" x1="25" y1="18" x2="103" y2="112">
+      <stop stop-color="#6f8692"/>
+      <stop offset=".56" stop-color="#7f6d8e"/>
+      <stop offset="1" stop-color="#8f6a58"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="30" y1="24" x2="100" y2="102">
+      <stop stop-color="#efc868"/>
+      <stop offset=".58" stop-color="#bd8337"/>
+      <stop offset="1" stop-color="#6d4522"/>
+    </linearGradient>
+    <linearGradient id="rose" x1="28" y1="20" x2="96" y2="106">
+      <stop stop-color="#d5a4aa"/>
+      <stop offset=".56" stop-color="#af7587"/>
+      <stop offset="1" stop-color="#70506b"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="55" fill="url(#shell)"/>
+  <g filter="url(#shadow)">
+    <rect x="26" y="27" width="76" height="76" rx="18" fill="#fffaf2"/>
+    <path d="M38 84c19-3 38-20 52-42" fill="none" stroke="url(#lane)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M38 44c18 3 35 17 51 42" fill="none" stroke="url(#rose)" stroke-width="8" stroke-linecap="round" opacity=".88"/>
+    <path d="M64 35v58" fill="none" stroke="#2d2426" stroke-width="7" stroke-linecap="round" opacity=".72"/>
+    <circle cx="64" cy="64" r="10" fill="url(#gold)"/>
+    <circle cx="38" cy="84" r="6" fill="#698c86"/>
+    <circle cx="90" cy="42" r="6" fill="#7d6b8b"/>
+  </g>
+</svg>
