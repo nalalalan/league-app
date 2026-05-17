@@ -1,10 +1,10 @@
 const imageBase = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
 
 const defaultSoundProfile = {
-  duration: 2.2,
-  volume: 0.92,
-  masterPeak: 0.58,
-  masterTail: 0.24,
+  duration: 2.8,
+  volume: 0.88,
+  masterPeak: 0.42,
+  masterTail: 0.18,
   thump: { frequency: 42, endFrequency: 28, length: 0.24, gain: 0.42 },
   noise: { start: 0.02, length: 0.86, startFrequency: 4800, endFrequency: 520, gain: 0.2 },
   tail: { frequency: 34, center: 0.78, width: 0.52, gain: 0.018 },
@@ -152,85 +152,86 @@ const soundProfiles = {
 };
 
 const defaultSoundScene = [
-  { kind: "thump", frequency: 38, endFrequency: 18, start: 0, length: 0.64, gain: 1.08 },
-  { kind: "noise", filter: "lowpass", start: 0.02, length: 1.18, startFrequency: 2400, endFrequency: 130, gain: 0.38, q: 0.42 },
-  { kind: "noise", filter: "highpass", start: 0.05, length: 0.26, startFrequency: 12800, endFrequency: 4200, gain: 0.36 },
-  { kind: "thump", frequency: 72, endFrequency: 26, start: 0.28, length: 0.34, gain: 0.42 }
+  { kind: "drum", frequency: 36, endFrequency: 18, start: 0, length: 0.72, gain: 0.9 },
+  { kind: "brass", notes: [55, 82.41, 110], start: 0.08, length: 1.08, gain: 0.28 },
+  { kind: "choir", notes: [164.81, 246.94, 329.63], start: 0.24, length: 1.5, gain: 0.14 },
+  { kind: "noise", filter: "lowpass", start: 0.04, length: 1.3, startFrequency: 1800, endFrequency: 120, gain: 0.2, q: 0.4 },
+  { kind: "bell", notes: [987.77, 1479.98], start: 0.58, length: 1.08, gain: 0.1 }
 ];
 
 const soundScenes = {
   samira: [
-    { kind: "thump", frequency: 44, endFrequency: 18, start: 0, length: 0.7, gain: 1.12 },
-    { kind: "noise", filter: "highpass", start: 0.02, length: 0.12, startFrequency: 14800, endFrequency: 4200, gain: 0.74, pan: -0.68 },
-    { kind: "noise", filter: "highpass", start: 0.13, length: 0.12, startFrequency: 14200, endFrequency: 3800, gain: 0.7, pan: 0.66 },
-    { kind: "thump", frequency: 92, endFrequency: 32, start: 0.2, length: 0.34, gain: 0.72 },
-    { kind: "noise", filter: "bandpass", start: 0.26, length: 0.92, startFrequency: 5600, endFrequency: 280, gain: 0.42 },
-    { kind: "noise", filter: "highpass", start: 0.54, length: 0.22, startFrequency: 12200, endFrequency: 7600, gain: 0.32, pan: -0.24 }
+    { kind: "drum", frequency: 43, endFrequency: 18, start: 0, length: 0.72, gain: 1.04 },
+    { kind: "noise", filter: "highpass", start: 0.04, length: 0.16, startFrequency: 14800, endFrequency: 3200, gain: 0.36, pan: -0.74 },
+    { kind: "noise", filter: "highpass", start: 0.18, length: 0.16, startFrequency: 14200, endFrequency: 3000, gain: 0.34, pan: 0.7 },
+    { kind: "brass", notes: [73.42, 110, 146.83], start: 0.1, length: 1.1, gain: 0.3, pan: -0.08 },
+    { kind: "string", notes: [220, 277.18, 370], start: 0.34, length: 0.95, gain: 0.16, pan: 0.18 },
+    { kind: "hit", frequency: 112, endFrequency: 36, start: 0.62, length: 0.34, gain: 0.62 }
   ],
   caitlyn: [
-    { kind: "noise", filter: "highpass", start: 0, length: 0.08, startFrequency: 8200, endFrequency: 6200, gain: 0.28 },
-    { kind: "thump", frequency: 36, endFrequency: 18, start: 0.06, length: 0.64, gain: 0.72 },
-    { kind: "noise", filter: "highpass", start: 0.2, length: 0.05, startFrequency: 16400, endFrequency: 8400, gain: 0.95 },
-    { kind: "thump", frequency: 86, endFrequency: 28, start: 0.2, length: 0.3, gain: 1.0 },
-    { kind: "noise", filter: "bandpass", start: 0.25, length: 1.08, startFrequency: 7200, endFrequency: 260, gain: 0.34, q: 0.55 },
-    { kind: "noise", filter: "highpass", start: 0.62, length: 0.18, startFrequency: 9800, endFrequency: 5800, gain: 0.18, pan: 0.48 }
+    { kind: "noise", filter: "lowpass", start: 0, length: 0.8, startFrequency: 900, endFrequency: 110, gain: 0.22 },
+    { kind: "bell", notes: [1244.51, 1864.66], start: 0.06, length: 1.15, gain: 0.12 },
+    { kind: "hit", frequency: 92, endFrequency: 32, start: 0.28, length: 0.22, gain: 0.72 },
+    { kind: "drum", frequency: 34, endFrequency: 16, start: 0.3, length: 0.7, gain: 0.58 },
+    { kind: "brass", notes: [46.25, 69.3, 92.5], start: 0.38, length: 1.22, gain: 0.24 },
+    { kind: "noise", filter: "highpass", start: 0.32, length: 0.08, startFrequency: 16400, endFrequency: 8200, gain: 0.58, pan: 0.34 }
   ],
   fizz: [
-    { kind: "noise", filter: "lowpass", start: 0, length: 0.92, startFrequency: 620, endFrequency: 120, gain: 0.48, pan: -0.2 },
-    { kind: "thump", frequency: 66, endFrequency: 24, start: 0.04, length: 0.56, gain: 0.84 },
-    { kind: "noise", filter: "bandpass", start: 0.12, length: 0.42, startFrequency: 520, endFrequency: 3600, gain: 0.38, q: 1.1 },
-    { kind: "noise", filter: "bandpass", start: 0.44, length: 0.42, startFrequency: 740, endFrequency: 4200, gain: 0.4, pan: 0.34, q: 1.1 },
-    { kind: "thump", frequency: 96, endFrequency: 38, start: 0.62, length: 0.26, gain: 0.44 },
-    { kind: "noise", filter: "highpass", start: 0.72, length: 0.52, startFrequency: 7600, endFrequency: 2600, gain: 0.22 }
+    { kind: "water", start: 0, length: 1.25, gain: 0.4, pan: -0.12 },
+    { kind: "drum", frequency: 66, endFrequency: 24, start: 0.05, length: 0.48, gain: 0.56 },
+    { kind: "bell", notes: [392, 587.33, 783.99], start: 0.14, length: 0.8, gain: 0.12, pan: 0.18 },
+    { kind: "water", start: 0.48, length: 1.0, gain: 0.32, pan: 0.34 },
+    { kind: "string", notes: [261.63, 392, 523.25], start: 0.58, length: 0.95, gain: 0.13 },
+    { kind: "noise", filter: "highpass", start: 0.88, length: 0.38, startFrequency: 7600, endFrequency: 2600, gain: 0.18 }
   ],
   kaisa: [
-    { kind: "thump", frequency: 32, endFrequency: 14, start: 0, length: 0.92, gain: 1.18 },
-    { kind: "noise", filter: "bandpass", start: 0.03, length: 1.34, startFrequency: 9000, endFrequency: 180, gain: 0.48, q: 0.34 },
-    { kind: "noise", filter: "highpass", start: 0.2, length: 0.24, startFrequency: 14800, endFrequency: 8200, gain: 0.32, pan: -0.42 },
-    { kind: "noise", filter: "highpass", start: 0.42, length: 0.24, startFrequency: 14200, endFrequency: 7800, gain: 0.3, pan: 0.42 },
-    { kind: "thump", frequency: 70, endFrequency: 24, start: 0.52, length: 0.34, gain: 0.48 },
-    { kind: "noise", filter: "lowpass", start: 0.88, length: 0.68, startFrequency: 1100, endFrequency: 120, gain: 0.26 }
+    { kind: "choir", notes: [55, 82.41, 164.81], start: 0, length: 1.62, gain: 0.22 },
+    { kind: "pulse", notes: [110, 220, 440], start: 0.08, length: 1.22, gain: 0.22, pan: -0.18 },
+    { kind: "noise", filter: "bandpass", start: 0.18, length: 1.15, startFrequency: 9200, endFrequency: 180, gain: 0.28, q: 0.34 },
+    { kind: "brass", notes: [65.41, 98, 130.81], start: 0.42, length: 1.06, gain: 0.22 },
+    { kind: "hit", frequency: 78, endFrequency: 22, start: 0.72, length: 0.42, gain: 0.5 },
+    { kind: "string", notes: [329.63, 493.88, 987.77], start: 0.9, length: 0.95, gain: 0.11, pan: 0.24 }
   ],
   missfortune: [
-    { kind: "thump", frequency: 40, endFrequency: 18, start: 0, length: 0.72, gain: 1.02 },
-    { kind: "noise", filter: "highpass", start: 0.04, length: 0.06, startFrequency: 15600, endFrequency: 6200, gain: 0.92, pan: -0.62 },
-    { kind: "thump", frequency: 92, endFrequency: 32, start: 0.04, length: 0.28, gain: 0.72, pan: -0.24 },
-    { kind: "noise", filter: "highpass", start: 0.24, length: 0.06, startFrequency: 15600, endFrequency: 6200, gain: 0.92, pan: 0.62 },
-    { kind: "thump", frequency: 88, endFrequency: 30, start: 0.24, length: 0.28, gain: 0.76, pan: 0.24 },
-    { kind: "noise", filter: "bandpass", start: 0.34, length: 1.02, startFrequency: 3600, endFrequency: 160, gain: 0.4 }
+    { kind: "drum", frequency: 40, endFrequency: 18, start: 0, length: 0.78, gain: 0.86 },
+    { kind: "brass", notes: [65.41, 98, 130.81, 196], start: 0.04, length: 1.18, gain: 0.3 },
+    { kind: "noise", filter: "highpass", start: 0.18, length: 0.08, startFrequency: 15600, endFrequency: 6200, gain: 0.48, pan: -0.62 },
+    { kind: "hit", frequency: 98, endFrequency: 30, start: 0.18, length: 0.26, gain: 0.56, pan: -0.24 },
+    { kind: "noise", filter: "highpass", start: 0.38, length: 0.08, startFrequency: 15600, endFrequency: 6200, gain: 0.5, pan: 0.62 },
+    { kind: "hit", frequency: 92, endFrequency: 28, start: 0.38, length: 0.28, gain: 0.58, pan: 0.24 },
+    { kind: "string", notes: [293.66, 440, 587.33], start: 0.56, length: 1.04, gain: 0.13 }
   ],
   ezreal: [
-    { kind: "thump", frequency: 46, endFrequency: 22, start: 0, length: 0.52, gain: 0.7 },
-    { kind: "noise", filter: "bandpass", start: 0.02, length: 0.18, startFrequency: 4200, endFrequency: 12800, gain: 0.34, pan: -0.48 },
-    { kind: "noise", filter: "bandpass", start: 0.18, length: 0.18, startFrequency: 5200, endFrequency: 13600, gain: 0.34, pan: 0.44 },
-    { kind: "noise", filter: "bandpass", start: 0.34, length: 0.22, startFrequency: 6600, endFrequency: 14800, gain: 0.36 },
-    { kind: "thump", frequency: 82, endFrequency: 28, start: 0.52, length: 0.34, gain: 0.72 },
-    { kind: "noise", filter: "highpass", start: 0.58, length: 0.78, startFrequency: 11000, endFrequency: 2600, gain: 0.28 }
+    { kind: "spark", notes: [392, 587.33, 783.99], start: 0, length: 0.62, gain: 0.16, pan: -0.42 },
+    { kind: "spark", notes: [523.25, 783.99, 1174.66], start: 0.18, length: 0.68, gain: 0.15, pan: 0.42 },
+    { kind: "string", notes: [196, 293.66, 392], start: 0.32, length: 1.0, gain: 0.14 },
+    { kind: "hit", frequency: 84, endFrequency: 30, start: 0.5, length: 0.3, gain: 0.46 },
+    { kind: "drum", frequency: 46, endFrequency: 22, start: 0.54, length: 0.5, gain: 0.42 },
+    { kind: "noise", filter: "bandpass", start: 0.64, length: 0.82, startFrequency: 11200, endFrequency: 2200, gain: 0.18 }
   ],
   jhin: [
-    { kind: "thump", frequency: 34, endFrequency: 16, start: 0, length: 0.78, gain: 0.84 },
-    { kind: "noise", filter: "bandpass", start: 0.02, length: 0.05, startFrequency: 2400, endFrequency: 1200, gain: 0.26, pan: -0.32 },
-    { kind: "noise", filter: "bandpass", start: 0.28, length: 0.05, startFrequency: 2400, endFrequency: 1200, gain: 0.28, pan: 0.32 },
-    { kind: "noise", filter: "bandpass", start: 0.54, length: 0.05, startFrequency: 2400, endFrequency: 1200, gain: 0.3 },
-    { kind: "noise", filter: "highpass", start: 0.86, length: 0.08, startFrequency: 12800, endFrequency: 5200, gain: 1.0 },
-    { kind: "thump", frequency: 52, endFrequency: 14, start: 0.86, length: 0.78, gain: 1.16 },
-    { kind: "noise", filter: "lowpass", start: 0.96, length: 1.28, startFrequency: 1400, endFrequency: 90, gain: 0.34 }
+    { kind: "string", notes: [196], start: 0, length: 0.52, gain: 0.18 },
+    { kind: "string", notes: [246.94], start: 0.24, length: 0.54, gain: 0.17 },
+    { kind: "string", notes: [293.66], start: 0.5, length: 0.56, gain: 0.16 },
+    { kind: "bell", notes: [392, 783.99], start: 0.8, length: 1.1, gain: 0.14 },
+    { kind: "hit", frequency: 58, endFrequency: 14, start: 0.82, length: 0.82, gain: 0.86 },
+    { kind: "brass", notes: [49, 73.42, 98], start: 0.92, length: 1.1, gain: 0.28 },
+    { kind: "choir", notes: [146.83, 220, 293.66], start: 1.06, length: 1.2, gain: 0.12 }
   ],
   ashe: [
-    { kind: "noise", filter: "highpass", start: 0, length: 0.7, startFrequency: 14800, endFrequency: 2600, gain: 0.28 },
-    { kind: "thump", frequency: 38, endFrequency: 18, start: 0.05, length: 0.62, gain: 0.72 },
-    { kind: "noise", filter: "bandpass", start: 0.28, length: 0.28, startFrequency: 8200, endFrequency: 2200, gain: 0.44 },
-    { kind: "thump", frequency: 72, endFrequency: 28, start: 0.32, length: 0.32, gain: 0.48 },
-    { kind: "noise", filter: "highpass", start: 0.58, length: 0.34, startFrequency: 15000, endFrequency: 7600, gain: 0.42, pan: -0.28 },
-    { kind: "noise", filter: "highpass", start: 0.72, length: 0.34, startFrequency: 14400, endFrequency: 7200, gain: 0.36, pan: 0.28 }
+    { kind: "string", notes: [261.63, 392, 523.25], start: 0, length: 1.12, gain: 0.16, pan: -0.2 },
+    { kind: "bell", notes: [1046.5, 1567.98, 2093], start: 0.12, length: 1.18, gain: 0.12, pan: 0.2 },
+    { kind: "noise", filter: "highpass", start: 0.16, length: 0.72, startFrequency: 14800, endFrequency: 3200, gain: 0.18 },
+    { kind: "hit", frequency: 72, endFrequency: 28, start: 0.46, length: 0.28, gain: 0.38 },
+    { kind: "choir", notes: [174.61, 261.63, 349.23], start: 0.62, length: 1.18, gain: 0.11 }
   ],
   rammus: [
-    { kind: "thump", frequency: 28, endFrequency: 12, start: 0, length: 1.08, gain: 1.22 },
-    { kind: "noise", filter: "lowpass", start: 0.02, length: 1.28, startFrequency: 1700, endFrequency: 80, gain: 0.52, q: 0.35 },
-    { kind: "thump", frequency: 52, endFrequency: 20, start: 0.34, length: 0.42, gain: 0.74 },
-    { kind: "noise", filter: "bandpass", start: 0.48, length: 0.44, startFrequency: 900, endFrequency: 220, gain: 0.34 },
-    { kind: "thump", frequency: 42, endFrequency: 16, start: 0.78, length: 0.42, gain: 0.58 },
-    { kind: "noise", filter: "lowpass", start: 0.92, length: 0.78, startFrequency: 720, endFrequency: 100, gain: 0.28 }
+    { kind: "roll", frequency: 30, endFrequency: 12, start: 0, length: 1.52, gain: 0.86 },
+    { kind: "drum", frequency: 28, endFrequency: 12, start: 0.02, length: 0.92, gain: 0.92 },
+    { kind: "noise", filter: "lowpass", start: 0.08, length: 1.38, startFrequency: 1600, endFrequency: 80, gain: 0.36, q: 0.35 },
+    { kind: "hit", frequency: 52, endFrequency: 18, start: 0.5, length: 0.42, gain: 0.58 },
+    { kind: "hit", frequency: 42, endFrequency: 14, start: 0.92, length: 0.42, gain: 0.46 },
+    { kind: "brass", notes: [36.71, 55, 73.42], start: 0.86, length: 1.05, gain: 0.22 }
   ]
 };
 
@@ -726,7 +727,7 @@ function buildFallbackSoundUrl(profileId = "default") {
   };
 
   const eventSample = (time, event) => {
-    if (event.kind === "noise") {
+    if (event.kind === "noise" || event.kind === "water") {
       const start = event.start || 0;
       const length = event.length || 0.2;
       if (time < start || time > start + length) return 0;
@@ -735,8 +736,21 @@ function buildFallbackSoundUrl(profileId = "default") {
       const filterTone = event.filter === "lowpass" ? 0.42 : event.filter === "highpass" ? 1 : 0.72;
       return (Math.random() * 2 - 1) * envelope * (event.gain || 0.12) * filterTone;
     }
-    if (event.kind === "thump") {
+    if (event.kind === "thump" || event.kind === "drum" || event.kind === "hit" || event.kind === "roll") {
       return toneSample(time, { ...event, type: "sine" });
+    }
+    if (event.notes) {
+      return event.notes.reduce((sum, frequency, index) => {
+        const offset = index * 0.025;
+        return sum + toneSample(time, {
+          ...event,
+          start: (event.start || 0) + offset,
+          length: Math.max(0.08, (event.length || 0.4) - offset),
+          frequency,
+          gain: (event.gain || 0.1) / Math.max(1.6, event.notes.length),
+          type: event.kind === "spark" ? "square" : event.kind === "brass" || event.kind === "pulse" ? "sawtooth" : "sine"
+        });
+      }, 0);
     }
     return toneSample(time, event);
   };
@@ -823,6 +837,21 @@ function playSelectSound(profileId = "default") {
     compressor.release.setValueAtTime(0.28, now);
     compressor.connect(audioContext.destination);
 
+    const reverb = audioContext.createConvolver();
+    const impulseLength = Math.floor(audioContext.sampleRate * 1.7);
+    const impulse = audioContext.createBuffer(2, impulseLength, audioContext.sampleRate);
+    for (let channel = 0; channel < impulse.numberOfChannels; channel += 1) {
+      const data = impulse.getChannelData(channel);
+      for (let i = 0; i < impulseLength; i += 1) {
+        const progress = i / impulseLength;
+        data[i] = (Math.random() * 2 - 1) * ((1 - progress) ** 2.4) * 0.58;
+      }
+    }
+    reverb.buffer = impulse;
+    const reverbGain = audioContext.createGain();
+    reverbGain.gain.setValueAtTime(0.18, now);
+    reverb.connect(reverbGain).connect(compressor);
+
     const master = audioContext.createGain();
     master.gain.setValueAtTime(0.0001, now);
     master.gain.exponentialRampToValueAtTime(profile.masterPeak || defaultSoundProfile.masterPeak, now + 0.014);
@@ -830,63 +859,77 @@ function playSelectSound(profileId = "default") {
     master.gain.exponentialRampToValueAtTime(0.0001, now + sceneDuration);
     master.connect(compressor);
 
+    const connectOutput = (node, event = {}) => {
+      let output = node;
+      if (typeof event.pan === "number" && audioContext.createStereoPanner) {
+        const panner = audioContext.createStereoPanner();
+        panner.pan.setValueAtTime(event.pan, now + (event.start || 0));
+        output.connect(panner);
+        output = panner;
+      }
+      output.connect(master);
+      if (event.wet !== 0) output.connect(reverb);
+    };
+
     const playTone = (tone) => {
       const osc = audioContext.createOscillator();
       const gain = audioContext.createGain();
       let output = gain;
       osc.type = tone.type || "triangle";
-      osc.frequency.setValueAtTime(tone.frequency, now + tone.start);
+      const start = tone.start || 0;
+      const length = Math.max(0.03, tone.length || 0.3);
+      osc.frequency.setValueAtTime(tone.frequency, now + start);
       if (tone.endFrequency) {
-        osc.frequency.exponentialRampToValueAtTime(tone.endFrequency, now + tone.start + tone.length);
+        osc.frequency.exponentialRampToValueAtTime(tone.endFrequency, now + start + length);
       }
       if (tone.detune) {
-        osc.detune.setValueAtTime(tone.detune, now + tone.start);
+        osc.detune.setValueAtTime(tone.detune, now + start);
       }
-      gain.gain.setValueAtTime(0.0001, now + tone.start);
-      gain.gain.exponentialRampToValueAtTime(tone.gain, now + tone.start + (tone.attack || 0.018));
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + tone.start + tone.length);
+      gain.gain.setValueAtTime(0.0001, now + start);
+      gain.gain.exponentialRampToValueAtTime(tone.gain || 0.12, now + start + (tone.attack || 0.018));
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
       osc.connect(gain);
-      if (typeof tone.pan === "number" && audioContext.createStereoPanner) {
-        const panner = audioContext.createStereoPanner();
-        panner.pan.setValueAtTime(tone.pan, now + tone.start);
-        output.connect(panner);
-        output = panner;
+      if (tone.filter) {
+        const filter = audioContext.createBiquadFilter();
+        filter.type = tone.filter;
+        filter.frequency.setValueAtTime(tone.startFrequency || tone.filterFrequency || 1800, now + start);
+        if (tone.endFrequencyFilter || tone.endFilterFrequency) {
+          filter.frequency.exponentialRampToValueAtTime(tone.endFrequencyFilter || tone.endFilterFrequency, now + start + length);
+        }
+        filter.Q.setValueAtTime(tone.q || 0.8, now + start);
+        gain.connect(filter);
+        output = filter;
       }
-      output.connect(master);
-      osc.start(now + tone.start);
-      osc.stop(now + tone.start + tone.length + 0.04);
+      connectOutput(output, tone);
+      osc.start(now + start);
+      osc.stop(now + start + length + 0.06);
     };
 
     const playNoise = (event) => {
-      const noiseBuffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * event.length), audioContext.sampleRate);
+      const length = Math.max(0.03, event.length || 0.24);
+      const start = event.start || 0;
+      const noiseBuffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * length), audioContext.sampleRate);
       const noiseData = noiseBuffer.getChannelData(0);
       for (let i = 0; i < noiseData.length; i += 1) {
         const progress = i / noiseData.length;
-        const fade = Math.sin(Math.PI * progress) ** 0.7;
+        const fade = Math.sin(Math.PI * progress) ** (event.curve || 0.7);
         noiseData[i] = (Math.random() * 2 - 1) * fade;
       }
       const noise = audioContext.createBufferSource();
       const noiseFilter = audioContext.createBiquadFilter();
       const noiseGain = audioContext.createGain();
-      let output = noiseGain;
       noise.buffer = noiseBuffer;
       noiseFilter.type = event.filter || "bandpass";
-      noiseFilter.frequency.setValueAtTime(event.startFrequency || 4800, now + event.start);
-      noiseFilter.frequency.exponentialRampToValueAtTime(event.endFrequency || 520, now + event.start + event.length);
-      noiseFilter.Q.setValueAtTime(event.q || 0.78, now);
-      noiseGain.gain.setValueAtTime(0.0001, now + event.start);
-      noiseGain.gain.exponentialRampToValueAtTime(event.gain || 0.12, now + event.start + 0.018);
-      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + event.start + event.length);
+      noiseFilter.frequency.setValueAtTime(event.startFrequency || 4800, now + start);
+      noiseFilter.frequency.exponentialRampToValueAtTime(event.endFrequency || 520, now + start + length);
+      noiseFilter.Q.setValueAtTime(event.q || 0.78, now + start);
+      noiseGain.gain.setValueAtTime(0.0001, now + start);
+      noiseGain.gain.exponentialRampToValueAtTime(event.gain || 0.12, now + start + 0.018);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
       noise.connect(noiseFilter).connect(noiseGain);
-      if (typeof event.pan === "number" && audioContext.createStereoPanner) {
-        const panner = audioContext.createStereoPanner();
-        panner.pan.setValueAtTime(event.pan, now + event.start);
-        output.connect(panner);
-        output = panner;
-      }
-      output.connect(master);
-      noise.start(now + event.start);
-      noise.stop(now + event.start + event.length + 0.04);
+      connectOutput(noiseGain, event);
+      noise.start(now + start);
+      noise.stop(now + start + length + 0.05);
     };
 
     const playThump = (event) => {
@@ -902,13 +945,127 @@ function playSelectSound(profileId = "default") {
       });
     };
 
+    const playChord = (event, instrument = "string") => {
+      const notes = event.notes || [event.frequency || 220];
+      const gain = event.gain || 0.14;
+      const settings = {
+        brass: { type: "sawtooth", attack: 0.06, filter: "lowpass", startFrequency: 950, endFilterFrequency: 2400, q: 0.55, wet: 1 },
+        string: { type: "triangle", attack: 0.05, filter: "lowpass", startFrequency: 1700, endFilterFrequency: 900, q: 0.72, wet: 1 },
+        choir: { type: "sine", attack: 0.18, filter: "lowpass", startFrequency: 1150, endFilterFrequency: 720, q: 0.48, wet: 1 },
+        bell: { type: "sine", attack: 0.006, filter: "highpass", startFrequency: 520, endFilterFrequency: 780, q: 0.38, wet: 1 },
+        spark: { type: "square", attack: 0.008, filter: "bandpass", startFrequency: 3600, endFilterFrequency: 6200, q: 1.4, wet: 1 },
+        pulse: { type: "sawtooth", attack: 0.02, filter: "bandpass", startFrequency: 760, endFilterFrequency: 2100, q: 1.1, wet: 1 }
+      }[instrument];
+      notes.forEach((note, index) => {
+        const offset = index * 0.035;
+        playTone({
+          ...settings,
+          frequency: note,
+          start: (event.start || 0) + offset,
+          length: Math.max(0.12, (event.length || 0.7) - offset),
+          gain: gain / Math.max(1.55, notes.length),
+          pan: typeof event.pan === "number" ? event.pan : ((index - (notes.length - 1) / 2) * 0.16),
+          detune: (index - (notes.length - 1) / 2) * 4
+        });
+      });
+    };
+
+    const playHit = (event) => {
+      playThump(event);
+      playNoise({
+        ...event,
+        start: (event.start || 0) + 0.012,
+        length: Math.min(0.16, event.length || 0.18),
+        filter: "highpass",
+        startFrequency: 9400,
+        endFrequency: 2600,
+        gain: (event.gain || 0.4) * 0.38,
+        wet: 0
+      });
+    };
+
+    const playDrum = (event) => {
+      playThump(event);
+      playNoise({
+        ...event,
+        start: (event.start || 0) + 0.02,
+        length: Math.min(0.32, event.length || 0.3),
+        filter: "lowpass",
+        startFrequency: 1200,
+        endFrequency: 90,
+        gain: (event.gain || 0.42) * 0.28,
+        q: 0.42,
+        wet: 0
+      });
+    };
+
+    const playWater = (event) => {
+      playNoise({
+        ...event,
+        filter: "bandpass",
+        startFrequency: 480,
+        endFrequency: 4200,
+        q: 1.5,
+        wet: 1
+      });
+      playTone({
+        type: "sine",
+        frequency: 220,
+        endFrequency: 587.33,
+        start: (event.start || 0) + 0.08,
+        length: Math.min(0.52, event.length || 0.7),
+        gain: (event.gain || 0.2) * 0.28,
+        pan: event.pan || 0.22,
+        wet: 1
+      });
+    };
+
+    const playRoll = (event) => {
+      const pulses = 6;
+      for (let index = 0; index < pulses; index += 1) {
+        const progress = index / (pulses - 1);
+        playHit({
+          ...event,
+          start: (event.start || 0) + progress * (event.length || 1.2) * 0.72,
+          length: 0.2,
+          frequency: (event.frequency || 34) + index * 3,
+          endFrequency: (event.endFrequency || 14) + index,
+          gain: (event.gain || 0.5) * (0.38 + progress * 0.18),
+          pan: Math.sin(index * 1.7) * 0.22
+        });
+      }
+    };
+
     scene.forEach((event) => {
-      if (event.kind === "noise") {
-        playNoise(event);
-      } else if (event.kind === "thump") {
-        playThump(event);
-      } else {
-        playTone(event);
+      switch (event.kind) {
+        case "noise":
+          playNoise(event);
+          break;
+        case "thump":
+          playThump(event);
+          break;
+        case "drum":
+          playDrum(event);
+          break;
+        case "hit":
+          playHit(event);
+          break;
+        case "brass":
+        case "string":
+        case "choir":
+        case "bell":
+        case "spark":
+        case "pulse":
+          playChord(event, event.kind);
+          break;
+        case "water":
+          playWater(event);
+          break;
+        case "roll":
+          playRoll(event);
+          break;
+        default:
+          playTone(event);
       }
     });
   } catch {
@@ -941,11 +1098,21 @@ function spawnSelectionFx(button, profileId = "default") {
   document.querySelectorAll(".selection-fx").forEach((node) => node.remove());
 
   const { x: centerX, y: centerY } = fxCenterFor(button);
+  const stageWidth = Math.min(520, Math.max(284, window.innerWidth - 36));
+  const stageHeight = Math.min(430, Math.max(280, window.innerHeight - 170));
+  const stageX = clamp(centerX, stageWidth / 2 + 18, window.innerWidth - stageWidth / 2 - 18);
+  const stageY = clamp(centerY, stageHeight / 2 + 18, window.innerHeight - stageHeight / 2 - 18);
+  const localX = clamp(centerX - stageX + stageWidth / 2, 72, stageWidth - 72);
+  const localY = clamp(centerY - stageY + stageHeight / 2, 72, stageHeight - 72);
   const fx = document.createElement("div");
   fx.className = "selection-fx";
   fx.setAttribute("aria-hidden", "true");
-  fx.style.setProperty("--fx-x", `${centerX}px`);
-  fx.style.setProperty("--fx-y", `${centerY}px`);
+  fx.style.setProperty("--fx-stage-x", `${stageX}px`);
+  fx.style.setProperty("--fx-stage-y", `${stageY}px`);
+  fx.style.setProperty("--fx-stage-width", `${stageWidth}px`);
+  fx.style.setProperty("--fx-stage-height", `${stageHeight}px`);
+  fx.style.setProperty("--fx-x", `${localX}px`);
+  fx.style.setProperty("--fx-y", `${localY}px`);
   const image = button.querySelector("img")?.currentSrc || button.querySelector("img")?.src || "";
   if (image) fx.style.setProperty("--fx-image", `url("${image.replaceAll('"', "%22")}")`);
   applyFxProfileVars(fx, profile);
