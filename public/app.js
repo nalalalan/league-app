@@ -686,6 +686,8 @@ const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
+const visualFxVersion = "20260518-world-vfx8";
+let vfx3dModulePromise;
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -890,6 +892,24 @@ function applyFxProfileVars(element, profile) {
   profile.sliceAngles.forEach((angle, index) => {
     element.style.setProperty(`--fx-angle-${index + 1}`, `${angle}deg`);
   });
+}
+
+function effectPixelRatioFor() {
+  return 1;
+}
+
+function loadVfx3dModule() {
+  if (motionQuery.matches || !("WebGLRenderingContext" in window)) return Promise.resolve(null);
+  vfx3dModulePromise ||= import(`/vfx3d.js?v=${visualFxVersion}`).catch(() => null);
+  return vfx3dModulePromise;
+}
+
+function primeCinematicAssets() {
+  champions.forEach((champion) => {
+    const image = cinematicImageFor(champion.id);
+    if (image?.decode) void image.decode().catch(() => {});
+  });
+  void loadVfx3dModule();
 }
 
 function buildFallbackSoundUrl(profileId = "default") {
@@ -1505,6 +1525,190 @@ function playCinematicAccent(profileId = "default") {
   }
 }
 
+function playChampionFoley(profileId = "default") {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+
+  try {
+    audioContext ||= new AudioContextClass();
+    if (audioContext.state === "suspended") audioContext.resume();
+    const now = audioContext.currentTime + 0.006;
+
+    const compressor = audioContext.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-20, now);
+    compressor.knee.setValueAtTime(20, now);
+    compressor.ratio.setValueAtTime(4.6, now);
+    compressor.attack.setValueAtTime(0.003, now);
+    compressor.release.setValueAtTime(0.2, now);
+    compressor.connect(audioContext.destination);
+
+    const master = audioContext.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.58, now + 0.02);
+    master.gain.exponentialRampToValueAtTime(0.32, now + 0.9);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+    master.connect(compressor);
+
+    const wet = audioContext.createGain();
+    wet.gain.setValueAtTime(0.13, now);
+    const delay = audioContext.createDelay(0.7);
+    const feedback = audioContext.createGain();
+    delay.delayTime.setValueAtTime(0.075, now);
+    feedback.gain.setValueAtTime(0.18, now);
+    delay.connect(feedback).connect(delay);
+    delay.connect(wet).connect(compressor);
+
+    const connect = (node, pan = 0, send = 0.24) => {
+      let output = node;
+      if (audioContext.createStereoPanner) {
+        const panner = audioContext.createStereoPanner();
+        panner.pan.setValueAtTime(pan, now);
+        output.connect(panner);
+        output = panner;
+      }
+      output.connect(master);
+      if (send > 0) {
+        const sendGain = audioContext.createGain();
+        sendGain.gain.setValueAtTime(send, now);
+        output.connect(sendGain).connect(delay);
+      }
+    };
+
+    const tone = ({ start = 0, length = 0.24, frequency = 440, endFrequency, gain = 0.12, type = "sine", pan = 0, attack = 0.01, filter, q = 0.8, send = 0.22 }) => {
+      const osc = audioContext.createOscillator();
+      const amp = audioContext.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(frequency, now + start);
+      if (endFrequency) osc.frequency.exponentialRampToValueAtTime(Math.max(12, endFrequency), now + start + length);
+      amp.gain.setValueAtTime(0.0001, now + start);
+      amp.gain.exponentialRampToValueAtTime(gain, now + start + attack);
+      amp.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+      let output = amp;
+      osc.connect(amp);
+      if (filter) {
+        const biquad = audioContext.createBiquadFilter();
+        biquad.type = filter.type || "bandpass";
+        biquad.frequency.setValueAtTime(filter.start || filter.frequency || 1200, now + start);
+        if (filter.end) biquad.frequency.exponentialRampToValueAtTime(Math.max(40, filter.end), now + start + length);
+        biquad.Q.setValueAtTime(filter.q || q, now + start);
+        amp.connect(biquad);
+        output = biquad;
+      }
+      connect(output, pan, send);
+      osc.start(now + start);
+      osc.stop(now + start + length + 0.04);
+    };
+
+    const texture = ({ start = 0, length = 0.28, gain = 0.12, pan = 0, filter = "bandpass", from = 1200, to = 400, q = 0.9, color = "air", send = 0.22, curve = 1.5 }) => {
+      const frames = Math.max(1, Math.floor(audioContext.sampleRate * length));
+      const buffer = audioContext.createBuffer(1, frames, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let index = 0; index < frames; index += 1) {
+        const p = index / frames;
+        const attack = Math.min(1, p / 0.055);
+        const release = (1 - p) ** curve;
+        const water = color === "water" ? Math.sin(p * 95) * 0.14 + Math.sin(p * p * 1500) * 0.09 : 0;
+        const ice = color === "ice" ? Math.sin(p * 520) * 0.12 + Math.sign(Math.sin(p * 130)) * 0.035 : 0;
+        const stone = color === "stone" ? Math.sign(Math.sin(p * 190)) * 0.08 : 0;
+        const metal = color === "metal" ? Math.sin(p * 260) * 0.08 : 0;
+        data[index] = ((Math.random() * 2 - 1) + water + ice + stone + metal) * attack * release;
+      }
+      const source = audioContext.createBufferSource();
+      const biquad = audioContext.createBiquadFilter();
+      const amp = audioContext.createGain();
+      source.buffer = buffer;
+      biquad.type = filter;
+      biquad.frequency.setValueAtTime(from, now + start);
+      biquad.frequency.exponentialRampToValueAtTime(Math.max(40, to), now + start + length);
+      biquad.Q.setValueAtTime(q, now + start);
+      amp.gain.setValueAtTime(0.0001, now + start);
+      amp.gain.exponentialRampToValueAtTime(gain, now + start + 0.018);
+      amp.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+      source.connect(biquad).connect(amp);
+      connect(amp, pan, send);
+      source.start(now + start);
+      source.stop(now + start + length + 0.04);
+    };
+
+    const impact = (start, frequency, gain, pan = 0, color = "air") => {
+      tone({ start, length: 0.5, frequency, endFrequency: Math.max(18, frequency * 0.38), gain, type: "sine", pan, attack: 0.012, send: 0.12 });
+      texture({ start: start + 0.012, length: 0.18, gain: gain * 0.45, pan, filter: "highpass", from: color === "stone" ? 1800 : 8400, to: color === "water" ? 880 : 1800, q: 0.9, color, send: 0.12, curve: 2.4 });
+    };
+
+    const bubble = (start, pan, size = 1) => {
+      texture({ start, length: 0.16 * size, gain: 0.08 * size, pan, filter: "bandpass", from: 480 + size * 300, to: 2400 + size * 700, q: 1.8, color: "water", send: 0.32, curve: 1.2 });
+      tone({ start: start + 0.018, length: 0.13 * size, frequency: 520 + size * 420, endFrequency: 980 + size * 760, gain: 0.03 * size, type: "sine", pan, attack: 0.006, send: 0.36 });
+    };
+
+    const metalSlash = (start, pan, reverse = false) => {
+      texture({ start, length: 0.18, gain: 0.16, pan, filter: "highpass", from: reverse ? 5200 : 2400, to: reverse ? 1700 : 8400, q: 1.1, color: "metal", send: 0.2, curve: 1.7 });
+      tone({ start: start + 0.01, length: 0.22, frequency: reverse ? 740 : 980, endFrequency: reverse ? 220 : 1540, gain: 0.05, type: "triangle", pan, attack: 0.004, filter: { type: "bandpass", start: 1800, end: 4200, q: 1.6 }, send: 0.28 });
+    };
+
+    if (profileId === "fizz") {
+      texture({ start: 0, length: 2.2, gain: 0.2, pan: -0.08, filter: "lowpass", from: 620, to: 74, q: 0.62, color: "water", send: 0.34, curve: 1.05 });
+      impact(0.22, 38, 0.22, -0.14, "water");
+      impact(0.54, 48, 0.18, 0.24, "water");
+      [0.06, 0.16, 0.31, 0.43, 0.61, 0.74, 0.88, 1.03, 1.18].forEach((start, index) => {
+        bubble(start, -0.35 + (index % 5) * 0.17, 0.65 + (index % 3) * 0.28);
+      });
+      texture({ start: 0.66, length: 0.64, gain: 0.13, pan: 0.16, filter: "highpass", from: 6800, to: 1200, q: 1.2, color: "water", send: 0.24, curve: 2.1 });
+    } else if (profileId === "samira") {
+      [0.08, 0.2, 0.36, 0.54].forEach((start, index) => metalSlash(start, index % 2 ? 0.42 : -0.42, index % 2 === 0));
+      impact(0.74, 52, 0.26, 0.02, "metal");
+      texture({ start: 0.78, length: 0.52, gain: 0.11, pan: 0, filter: "bandpass", from: 6200, to: 880, q: 1.1, color: "metal", send: 0.22 });
+    } else if (profileId === "caitlyn") {
+      [0.05, 0.18, 0.31].forEach((start, index) => tone({ start, length: 0.2, frequency: 980 + index * 220, endFrequency: 620 + index * 120, gain: 0.035, type: "sine", pan: -0.18 + index * 0.18, filter: { type: "bandpass", start: 1600 + index * 600, end: 2800 + index * 500, q: 2.2 }, send: 0.36 }));
+      texture({ start: 0.38, length: 0.12, gain: 0.28, pan: 0.18, filter: "highpass", from: 13200, to: 3400, q: 2.6, color: "metal", send: 0.08, curve: 2.9 });
+      impact(0.4, 72, 0.22, 0.08, "metal");
+      tone({ start: 0.62, length: 0.32, frequency: 1400, endFrequency: 740, gain: 0.032, type: "triangle", pan: -0.36, filter: { type: "bandpass", start: 3000, end: 1200, q: 2 }, send: 0.34 });
+    } else if (profileId === "kaisa") {
+      tone({ start: 0, length: 1.4, frequency: 64, endFrequency: 42, gain: 0.18, type: "sine", pan: 0, send: 0.28 });
+      [0.08, 0.32, 0.56, 0.88].forEach((start, index) => {
+        tone({ start, length: 0.42, frequency: 220 + index * 110, endFrequency: 330 + index * 150, gain: 0.045, type: "sawtooth", pan: index % 2 ? 0.24 : -0.24, filter: { type: "bandpass", start: 680, end: 5400, q: 1.8 }, send: 0.32 });
+        texture({ start: start + 0.05, length: 0.28, gain: 0.09, pan: index % 2 ? 0.24 : -0.24, filter: "bandpass", from: 6400, to: 900, q: 1.3, color: "air", send: 0.22, curve: 1.8 });
+      });
+    } else if (profileId === "missfortune") {
+      [0.22, 0.42].forEach((start, index) => {
+        impact(start, index ? 58 : 64, 0.26, index ? 0.44 : -0.44, "metal");
+        texture({ start: start + 0.03, length: 0.24, gain: 0.16, pan: index ? 0.55 : -0.55, filter: "highpass", from: 11200, to: 1900, q: 1.2, color: "metal", send: 0.1, curve: 2.4 });
+      });
+      [0.58, 0.72, 0.86].forEach((start, index) => tone({ start, length: 0.22, frequency: 1180 + index * 160, endFrequency: 620 + index * 80, gain: 0.032, type: "triangle", pan: -0.32 + index * 0.32, filter: { type: "bandpass", start: 3200, end: 1400, q: 2.4 }, send: 0.28 }));
+      texture({ start: 0.5, length: 0.8, gain: 0.09, pan: 0, filter: "lowpass", from: 1600, to: 170, q: 0.5, color: "air", send: 0.3 });
+    } else if (profileId === "ezreal") {
+      [0.04, 0.18, 0.34, 0.56].forEach((start, index) => {
+        tone({ start, length: 0.28, frequency: 520 + index * 170, endFrequency: 980 + index * 220, gain: 0.046, type: "sine", pan: -0.34 + index * 0.22, filter: { type: "bandpass", start: 1800, end: 6800, q: 1.5 }, send: 0.36 });
+      });
+      texture({ start: 0.24, length: 0.74, gain: 0.13, pan: 0.1, filter: "bandpass", from: 8800, to: 1100, q: 0.95, color: "air", send: 0.32, curve: 1.35 });
+      impact(0.74, 66, 0.2, 0.18, "air");
+    } else if (profileId === "jhin") {
+      [0.08, 0.26, 0.44, 0.7].forEach((start, index) => {
+        tone({ start, length: index === 3 ? 0.72 : 0.22, frequency: 196 + index * 49, endFrequency: index === 3 ? 98 : 160 + index * 36, gain: index === 3 ? 0.1 : 0.045, type: "triangle", pan: -0.18 + index * 0.12, filter: { type: "bandpass", start: 420 + index * 260, end: 980 + index * 320, q: 1.2 }, send: 0.44 });
+        if (index < 3) texture({ start: start + 0.016, length: 0.11, gain: 0.052, pan: -0.18 + index * 0.12, filter: "highpass", from: 4800, to: 1900, q: 2, color: "metal", send: 0.18, curve: 2.2 });
+      });
+      impact(0.88, 42, 0.28, 0, "metal");
+    } else if (profileId === "ashe") {
+      texture({ start: 0.08, length: 1.05, gain: 0.18, pan: -0.12, filter: "highpass", from: 11200, to: 1600, q: 0.75, color: "ice", send: 0.34, curve: 1.15 });
+      [0.32, 0.52, 0.76].forEach((start, index) => {
+        tone({ start, length: 0.34, frequency: 880 + index * 420, endFrequency: 520 + index * 240, gain: 0.04, type: "sine", pan: -0.24 + index * 0.2, filter: { type: "bandpass", start: 4200, end: 1600, q: 2.8 }, send: 0.42 });
+        texture({ start: start + 0.04, length: 0.3, gain: 0.07, pan: -0.24 + index * 0.2, filter: "bandpass", from: 7600, to: 2200, q: 1.8, color: "ice", send: 0.24, curve: 1.8 });
+      });
+      impact(0.82, 58, 0.18, 0.14, "ice");
+    } else if (profileId === "rammus") {
+      texture({ start: 0.0, length: 1.65, gain: 0.18, pan: 0, filter: "lowpass", from: 720, to: 80, q: 0.58, color: "stone", send: 0.16, curve: 1.0 });
+      [0.1, 0.32, 0.56, 0.82, 1.06].forEach((start, index) => {
+        impact(start, 32 + index * 3, 0.2 - index * 0.018, index % 2 ? 0.18 : -0.16, "stone");
+        texture({ start: start + 0.045, length: 0.32, gain: 0.08, pan: index % 2 ? 0.28 : -0.24, filter: "bandpass", from: 940 + index * 160, to: 180, q: 0.8, color: "stone", send: 0.18, curve: 1.55 });
+      });
+    } else {
+      impact(0.2, 48, 0.18, 0, "air");
+      texture({ start: 0.05, length: 0.9, gain: 0.12, pan: 0, filter: "bandpass", from: 5600, to: 420, q: 0.8, color: "air", send: 0.24 });
+    }
+  } catch {
+    // Foley is an enhancement; music and the base accent layer still play.
+  }
+}
+
 function playSelectSound(profileId = "default") {
   const stingerUrl = stingerUrls[profileId];
   if (!stingerUrl || !window.Audio) {
@@ -1528,6 +1732,7 @@ function playSelectSound(profileId = "default") {
       });
     }
     playCinematicAccent(profileId);
+    playChampionFoley(profileId);
   } catch {
     playSynthSelectSound(profileId);
   }
@@ -2291,15 +2496,15 @@ function drawMaterialVeil(ctx, width, height, t, profile, stage, alpha) {
   ctx.globalCompositeOperation = "screen";
 
   if (material === "water") {
-    for (let i = 0; i < 18; i += 1) {
+    for (let i = 0; i < 9; i += 1) {
       const y = height * (0.52 + i * 0.03) + Math.sin(t * 18 + i) * (8 + i * 0.6);
-      const waveAlpha = alpha * (0.08 + i * 0.01);
+      const waveAlpha = alpha * (0.045 + i * 0.006);
       drawCurveStreak(ctx, [
         [-width * 0.12, y],
         [width * (0.22 + sweep * 0.08), y - height * 0.04],
         [width * 0.72, y + height * 0.035],
         [width * 1.12, y - height * 0.02]
-      ], 1.2 + i * 0.18, i % 2 ? "rgba(232,255,253,.5)" : `rgba(${profile.main}, .42)`, waveAlpha, 10);
+      ], 1.2 + i * 0.16, i % 2 ? "rgba(232,255,253,.42)" : `rgba(${profile.main}, .34)`, waveAlpha, 10);
     }
   } else if (material === "scope") {
     const cx = width * 0.5;
@@ -2446,14 +2651,14 @@ function drawFizzActionCue(ctx, width, height, t, profile, stage, alpha) {
     drawSoftParticle(ctx, x, y, r * (1.2 + breach), i % 2 ? "rgba(226,255,250,.84)" : `rgba(${profile.main}, .72)`, alpha * (0.12 + breach * 0.24 + bite * 0.12), 16);
   }
 
-  for (let i = 0; i < 16; i += 1) {
-    const yy = waterline + Math.sin(t * 9 + i) * height * 0.018 + i * height * 0.012;
+  for (let i = 0; i < 8; i += 1) {
+    const yy = waterline + Math.sin(t * 9 + i) * height * 0.018 + i * height * 0.018;
     drawCurveStreak(ctx, [
       [-width * 0.12, yy],
       [width * (0.18 + swell * 0.14), yy - height * (0.035 + breach * 0.025)],
       [width * 0.7, yy + height * 0.03],
       [width * 1.14, yy - height * 0.018]
-    ], 2 + i * 0.32 + breach * 5.2, i % 2 ? "rgba(222,255,252,.86)" : `rgba(${profile.main}, .72)`, alpha * (0.18 + breach * 0.22 + bite * 0.08), 20);
+    ], 2 + i * 0.24 + breach * 3.4, i % 2 ? "rgba(222,255,252,.72)" : `rgba(${profile.main}, .58)`, alpha * (0.085 + breach * 0.16 + bite * 0.06), 18);
   }
 
   drawCurveStreak(ctx, [
@@ -2474,14 +2679,14 @@ function drawFizzActionCue(ctx, width, height, t, profile, stage, alpha) {
 
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = alpha * (0.48 + breach * 0.3 + bite * 0.14);
-  ctx.filter = `blur(${1.1 - Math.min(1, breach + bite) * 0.45}px) saturate(1.22) contrast(1.14)`;
+  ctx.globalAlpha = alpha * (0.22 + breach * 0.18 + bite * 0.1);
+  ctx.filter = `blur(${1.8 - Math.min(1, breach + bite) * 0.52}px) saturate(1.18) contrast(1.08)`;
   ctx.translate(cx - width * 0.02, waterline + height * (0.02 - breach * 0.08));
   ctx.rotate(-0.18 - breach * 0.08);
   const sharkBody = ctx.createLinearGradient(-width * 0.28, -height * 0.08, width * 0.33, height * 0.1);
-  sharkBody.addColorStop(0, "rgba(0, 7, 12, .95)");
-  sharkBody.addColorStop(0.48, "rgba(6, 42, 50, .9)");
-  sharkBody.addColorStop(1, "rgba(0, 8, 14, .92)");
+  sharkBody.addColorStop(0, "rgba(0, 7, 12, .72)");
+  sharkBody.addColorStop(0.48, "rgba(6, 42, 50, .58)");
+  sharkBody.addColorStop(1, "rgba(0, 8, 14, .66)");
   ctx.fillStyle = sharkBody;
   ctx.beginPath();
   ctx.moveTo(width * 0.42, -height * 0.01);
@@ -2865,18 +3070,19 @@ function drawCinematicFilmFinish(ctx, width, height, t, profile, stage) {
   ctx.fillStyle = matte;
   ctx.fillRect(0, 0, width, height);
   ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = alpha * (0.05 + impact * 0.11);
-  for (let index = 0; index < 18; index += 1) {
-    const y = height * ((seededUnit(index, 4.2) + t * 0.18) % 1);
-    const line = ctx.createLinearGradient(0, y, width, y);
+  ctx.globalAlpha = alpha * (0.035 + impact * 0.045);
+  for (let index = 0; index < 4; index += 1) {
+    const y = height * (0.24 + index * 0.16 + Math.sin(t * 2.4 + index) * 0.024);
+    const line = ctx.createLinearGradient(width * 0.16, y, width * 0.84, y);
     line.addColorStop(0, `rgba(${profile.main}, 0)`);
-    line.addColorStop(0.48, `rgba(255, 252, 232, ${0.58})`);
+    line.addColorStop(0.46, `rgba(255, 252, 232, ${0.42})`);
+    line.addColorStop(0.54, `rgba(${profile.secondary}, ${0.24})`);
     line.addColorStop(1, `rgba(${profile.secondary}, 0)`);
     ctx.fillStyle = line;
-    ctx.fillRect(0, y, width, 1 + seededUnit(index, 7.3) * 1.6);
+    ctx.fillRect(width * 0.08, y, width * 0.84, 1.2 + seededUnit(index, 7.3));
   }
   if (impact > 0) {
-    ctx.globalAlpha = impact * 0.18;
+    ctx.globalAlpha = impact * 0.08;
     ctx.fillStyle = "rgba(255,252,232,.72)";
     ctx.fillRect(0, 0, width, height);
   }
@@ -3703,43 +3909,100 @@ function spawnSelectionFx(button, profileId = "default") {
   window.clearTimeout(fxTimer);
   document.querySelectorAll(".selection-fx").forEach((node) => {
     if (node._raf) cancelAnimationFrame(node._raf);
+    if (node._threeDispose) node._threeDispose();
     node.remove();
   });
 
   const fx = document.createElement("div");
-  const shaderCanvas = document.createElement("canvas");
+  const threeCanvas = document.createElement("canvas");
   const canvas = document.createElement("canvas");
   const image = cinematicImageFor(profile.id, button.querySelector("img"));
   fx.className = "selection-fx ultimate-scene";
   fx.dataset.championFx = profile.id;
   fx.setAttribute("aria-hidden", "true");
-  shaderCanvas.className = "fx-shader-canvas";
+  threeCanvas.className = "fx-three-canvas";
   canvas.className = "fx-2d-canvas";
   applyFxProfileVars(fx, profile);
-  fx.append(shaderCanvas, canvas);
+  fx.append(threeCanvas, canvas);
   document.body.append(fx);
 
-  const shaderState = createUltimateShaderState(shaderCanvas);
-  const context = canvas.getContext("2d");
+  const context = canvas.getContext("2d", { alpha: true, desynchronized: true });
   const startedAt = performance.now();
   const duration = visualDurations[profile.id] || 3800;
+  let lastFrameAt = startedAt;
+  let frameCount = 0;
+  let frameTotal = 0;
+  let frameMax = 0;
+  let slowFrames = 0;
+  let last2dDrawAt = -Infinity;
+  let stageWidth = Math.ceil(window.innerWidth);
+  let stageHeight = Math.ceil(window.innerHeight);
+  let stageDpr = effectPixelRatioFor();
+  let threeScene;
+  const updateStageSize = () => {
+    stageWidth = Math.ceil(window.innerWidth);
+    stageHeight = Math.ceil(window.innerHeight);
+    stageDpr = effectPixelRatioFor();
+  };
+  window.addEventListener("resize", updateStageSize, { passive: true });
+  void loadVfx3dModule().then((module) => {
+    if (!module || !fx.isConnected) return;
+    threeScene = module.createChampionVfx3D({
+      canvas: threeCanvas,
+      championId: profile.id,
+      profile,
+      duration
+    });
+    fx._threeDispose = () => {
+      threeScene?.dispose();
+      threeScene = undefined;
+    };
+  });
   const render = (now) => {
-    const dpr = 2;
-    const stageRect = fx.getBoundingClientRect();
-    const width = Math.ceil(stageRect.width || window.innerWidth);
-    const height = Math.ceil(stageRect.height || window.innerHeight);
+    const width = stageWidth;
+    const height = stageHeight;
+    const dpr = stageDpr;
     const pixelWidth = Math.round(width * dpr);
     const pixelHeight = Math.round(height * dpr);
     const elapsed = now - startedAt;
-    renderUltimateShader(shaderState, profile, width, height, elapsed, duration, dpr);
+    const frameDelta = now - lastFrameAt;
+    lastFrameAt = now;
+    if (frameCount > 0) {
+      frameTotal += frameDelta;
+      frameMax = Math.max(frameMax, frameDelta);
+      if (frameDelta > 24) slowFrames += 1;
+      window.__leagueVfxStats = {
+        champion: profile.id,
+        frameCount,
+        avgMs: Math.round((frameTotal / frameCount) * 10) / 10,
+        maxMs: Math.round(frameMax * 10) / 10,
+        slowFrames,
+        dpr,
+        width,
+        height,
+        three: Boolean(threeScene)
+      };
+      fx.dataset.frameStats = JSON.stringify(window.__leagueVfxStats);
+    }
+    frameCount += 1;
+    if (threeScene) {
+      threeScene.resize(width, height, dpr);
+      threeScene.render(elapsed, duration);
+    }
     if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
       canvas.width = pixelWidth;
       canvas.height = pixelHeight;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = "high";
+      last2dDrawAt = -Infinity;
     }
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    drawUltimateFrame(context, profile, image, pixelWidth, pixelHeight, elapsed, duration);
+    if (elapsed - last2dDrawAt >= 180 || elapsed < 80 || elapsed > duration - 120) {
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      drawUltimateFrame(context, profile, image, pixelWidth, pixelHeight, elapsed, duration);
+      last2dDrawAt = elapsed;
+    }
     if (elapsed < duration + 60) {
       fx._raf = requestAnimationFrame(render);
     }
@@ -3747,6 +4010,8 @@ function spawnSelectionFx(button, profileId = "default") {
   fx._raf = requestAnimationFrame(render);
   fxTimer = window.setTimeout(() => {
     if (fx._raf) cancelAnimationFrame(fx._raf);
+    window.removeEventListener("resize", updateStageSize);
+    if (fx._threeDispose) fx._threeDispose();
     fx.remove();
   }, duration + 220);
 }
@@ -3831,7 +4096,6 @@ function renderPicker() {
       void button.offsetWidth;
       button.classList.add("is-flashing");
       playSelectSound(champion.id);
-      playSelectionBurst(button, champion.id);
       spawnSelectionFx(button, champion.id);
       window.setTimeout(() => button.classList.remove("is-flashing"), 2080);
       renderChampion(champion.id, { animate: true });
@@ -3886,3 +4150,10 @@ async function hydratePublicNotes() {
 renderPicker();
 renderChampion("samira", { animate: false });
 hydratePublicNotes();
+if (!motionQuery.matches) {
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(primeCinematicAssets, { timeout: 1600 });
+  } else {
+    window.setTimeout(primeCinematicAssets, 650);
+  }
+}
