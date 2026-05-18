@@ -685,7 +685,7 @@ const fallbackAudioUrls = {};
 const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
-const stingerVersion = "20260518-cinematic44";
+const stingerVersion = "20260518-cinematic45";
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -2809,7 +2809,7 @@ function spawnSelectionFx(button, profileId = "default") {
   const startedAt = performance.now();
   const duration = visualDurations[profile.id] || 3800;
   const render = (now) => {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = 2;
     const stageRect = fx.getBoundingClientRect();
     const width = Math.ceil(stageRect.width || window.innerWidth);
     const height = Math.ceil(stageRect.height || window.innerHeight);
