@@ -685,7 +685,7 @@ const fallbackAudioUrls = {};
 const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
-const stingerVersion = "20260518-cinematic47";
+const stingerVersion = "20260518-cinematic48";
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -2214,39 +2214,35 @@ function drawArtworkDepthPanels(ctx, image, width, height, t, profile, stage, al
   const sweep = easeInOutSine(smoothstep(0.04, 0.9, t));
   const baseZoom = stage.zoomStart + (stage.zoomEnd - stage.zoomStart) * sweep;
   ctx.save();
-  for (let index = 0; index < 4; index += 1) {
-    const side = index % 2 ? 1 : -1;
-    const center = width * (0.18 + index * 0.22 + Math.sin(t * 2.4 + index) * 0.018);
-    const panelWidth = width * (0.16 + index * 0.018);
-    const drift = width * (sweep - 0.5) * (0.08 + index * 0.016) * side;
-    const topSkew = height * (0.08 + seededUnit(index, 8.4) * 0.08) * side;
+  const side = Math.sin(t * Math.PI * 1.7) > 0 ? 1 : -1;
+  drawFocusedImage(ctx, image, width, height, {
+    alpha: alpha * 0.09,
+    composite: "screen",
+    filter: "blur(1.4px) saturate(1.82) contrast(1.26) brightness(1.02)",
+    focusX: stage.focusX,
+    focusY: stage.focusY,
+    scale: baseZoom + 0.055,
+    xOffset: width * (stage.panX * sweep + side * 0.018 * (1 - sweep)),
+    yOffset: height * (stage.panY * sweep - 0.01 * Math.sin(t * Math.PI)),
+    rotation: stage.roll * 1.2
+  });
+
+  ctx.globalCompositeOperation = "screen";
+  for (let index = 0; index < 5; index += 1) {
+    const p = (sweep + index * 0.19) % 1;
+    const x = width * (-0.12 + p * 1.24);
+    const angle = -0.34 + stage.roll * 1.8 + Math.sin(t * 2.6 + index) * 0.04;
+    const band = ctx.createLinearGradient(x - width * 0.18, height * 0.16, x + width * 0.18, height * 0.86);
+    band.addColorStop(0, `rgba(${profile.main}, 0)`);
+    band.addColorStop(0.46, `rgba(255, 252, 232, ${0.075 * alpha * (1 - index * 0.08)})`);
+    band.addColorStop(0.54, `rgba(${profile.secondary}, ${0.055 * alpha})`);
+    band.addColorStop(1, `rgba(${profile.third}, 0)`);
     ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(center - panelWidth * 0.55 + drift + topSkew * 0.25, height * -0.06);
-    ctx.lineTo(center + panelWidth * 0.5 + drift + topSkew, height * -0.06);
-    ctx.lineTo(center + panelWidth * 0.58 + drift - topSkew * 0.3, height * 1.06);
-    ctx.lineTo(center - panelWidth * 0.48 + drift - topSkew, height * 1.06);
-    ctx.closePath();
-    ctx.clip();
-    drawFocusedImage(ctx, image, width, height, {
-      alpha: alpha * (0.045 + index * 0.012),
-      composite: "screen",
-      filter: "blur(.6px) saturate(1.72) contrast(1.18) brightness(.96)",
-      focusX: stage.focusX,
-      focusY: stage.focusY,
-      scale: baseZoom + 0.04 + index * 0.018,
-      xOffset: width * (stage.panX * sweep + side * 0.024 * (1 - sweep)),
-      yOffset: height * (stage.panY * sweep + Math.sin(t * 2.8 + index) * 0.012),
-      rotation: stage.roll * (0.7 + index * 0.12)
-    });
-    const edge = ctx.createLinearGradient(center - panelWidth, 0, center + panelWidth, height);
-    edge.addColorStop(0, `rgba(${profile.main}, 0)`);
-    edge.addColorStop(0.5, `rgba(255, 252, 232, ${0.045 * alpha})`);
-    edge.addColorStop(1, `rgba(${profile.secondary}, 0)`);
-    ctx.globalCompositeOperation = "screen";
-    ctx.fillStyle = edge;
-    ctx.globalAlpha = alpha * 0.38;
-    ctx.fillRect(center - panelWidth + drift, 0, panelWidth * 2, height);
+    ctx.translate(x, height * 0.5);
+    ctx.rotate(angle);
+    ctx.fillStyle = band;
+    ctx.filter = `blur(${1.6 + index * 0.45}px)`;
+    ctx.fillRect(-width * 0.19, -height * 0.72, width * (0.04 + index * 0.007), height * 1.44);
     ctx.restore();
   }
   ctx.restore();
@@ -2260,9 +2256,9 @@ function drawImpactArtEcho(ctx, image, width, height, t, profile, stage, alpha) 
     const side = index % 2 ? 1 : -1;
     const offset = easeOutQuint(pulse) * width * 0.024 * side;
     drawFocusedImage(ctx, image, width, height, {
-      alpha: alpha * pulse * 0.14,
+      alpha: alpha * pulse * 0.075,
       composite: "screen",
-      filter: "blur(2.4px) saturate(2.05) contrast(1.24) brightness(1.15)",
+      filter: "blur(3.2px) saturate(1.9) contrast(1.24) brightness(1.08)",
       focusX: stage.focusX,
       focusY: stage.focusY,
       scale: stage.zoomEnd + pulse * 0.08,
@@ -2450,7 +2446,7 @@ function drawSourceArtCinematicStage(ctx, image, width, height, t, profile) {
     rotation: stage.roll * 0.35
   });
   drawFocusedImage(ctx, image, width, height, {
-    alpha: alpha * 0.68,
+    alpha: alpha * 0.76,
     filter: "blur(.2px) saturate(1.38) contrast(1.18) brightness(.74)",
     focusX: stage.focusX,
     focusY: stage.focusY,
@@ -3246,6 +3242,7 @@ function spawnSelectionFx(button, profileId = "default") {
   const canvas = document.createElement("canvas");
   const image = cinematicImageFor(profile.id, button.querySelector("img"));
   fx.className = "selection-fx ultimate-scene";
+  fx.dataset.championFx = profile.id;
   fx.setAttribute("aria-hidden", "true");
   shaderCanvas.className = "fx-shader-canvas";
   canvas.className = "fx-2d-canvas";
