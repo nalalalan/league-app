@@ -685,7 +685,7 @@ const fallbackAudioUrls = {};
 const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
-const stingerVersion = "20260518-cinematic48";
+const stingerVersion = "20260518-cinematic53";
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -1403,7 +1403,7 @@ function playCinematicAccent(profileId = "default") {
   const accents = {
     samira: { low: 42, crack: 5200, swell: 0.62, hits: [0.18, 0.52, 0.86], texture: "metal", pan: [-0.48, 0.42, 0] },
     caitlyn: { low: 38, crack: 7800, swell: 0.34, hits: [0.16, 0.74], texture: "rifle", pan: [0.18, -0.06] },
-    fizz: { low: 34, crack: 1200, swell: 0.86, hits: [0.08, 0.48], texture: "water", pan: [-0.24, 0.12] },
+    fizz: { low: 30, crack: 1350, swell: 1.04, hits: [0.06, 0.34, 0.54], texture: "water", pan: [-0.32, 0.08, 0.24] },
     kaisa: { low: 36, crack: 6400, swell: 0.72, hits: [0.12, 0.62, 1.02], texture: "void", pan: [-0.18, 0.18, 0] },
     missfortune: { low: 40, crack: 6900, swell: 0.42, hits: [0.2, 0.42], texture: "guns", pan: [-0.44, 0.44] },
     ezreal: { low: 46, crack: 8200, swell: 0.58, hits: [0.16, 0.72], texture: "arcane", pan: [-0.32, 0.26] },
@@ -1462,7 +1462,7 @@ function playCinematicAccent(profileId = "default") {
         const attack = Math.min(1, progress / 0.08);
         const release = (1 - progress) ** curve;
         const texture =
-          accent.texture === "water" ? Math.sin(progress * 60) * 0.2 :
+          accent.texture === "water" ? Math.sin(progress * 86) * 0.12 + Math.sin(progress * progress * 940) * 0.08 :
           accent.texture === "stone" ? Math.sign(Math.sin(progress * 220)) * 0.1 :
           accent.texture === "ice" ? Math.sin(progress * 420) * 0.1 :
           0;
@@ -1486,6 +1486,12 @@ function playCinematicAccent(profileId = "default") {
     };
 
     playNoise(0.02, 1.28, accent.swell * 0.18, accent.texture === "water" || accent.texture === "stone" ? "lowpass" : "bandpass", accent.crack, accent.texture === "ice" ? 2600 : 180, 0, 1.6);
+    if (accent.texture === "water") {
+      playNoise(0.0, 1.75, 0.16, "lowpass", 860, 74, -0.1, 1.08);
+      playNoise(0.22, 0.58, 0.34, "bandpass", 520, 3600, 0.08, 1.46);
+      playNoise(0.42, 0.34, 0.26, "highpass", 6200, 1300, 0.22, 2.2);
+      playSub(0.38, 0.68, 0.34, 28);
+    }
     accent.hits.forEach((start, index) => {
       const pan = accent.pan[index] || 0;
       playSub(start, 0.42, 0.24, accent.low + index * 4);
@@ -1964,7 +1970,7 @@ void main() {
   vec2 p = (uv - 0.5) * vec2(u_resolution.x / u_resolution.y, 1.0);
   float fade = smoothstep(0.0, 0.05, u_progress) * (1.0 - smoothstep(0.9, 1.0, u_progress));
   vec3 col = baseField(p, fade);
-  col += particleField(p, fade, 1.0) * 0.38;
+  col += particleField(p, fade, 1.0) * 0.08;
   if (u_scene == 1) col += samiraFx(p, fade);
   else if (u_scene == 2) col += caitlynFx(p, fade);
   else if (u_scene == 3) col += fizzFx(p, fade);
@@ -2234,8 +2240,8 @@ function drawArtworkDepthPanels(ctx, image, width, height, t, profile, stage, al
     const angle = -0.34 + stage.roll * 1.8 + Math.sin(t * 2.6 + index) * 0.04;
     const band = ctx.createLinearGradient(x - width * 0.18, height * 0.16, x + width * 0.18, height * 0.86);
     band.addColorStop(0, `rgba(${profile.main}, 0)`);
-    band.addColorStop(0.46, `rgba(255, 252, 232, ${0.075 * alpha * (1 - index * 0.08)})`);
-    band.addColorStop(0.54, `rgba(${profile.secondary}, ${0.055 * alpha})`);
+    band.addColorStop(0.46, `rgba(255, 252, 232, ${0.038 * alpha * (1 - index * 0.08)})`);
+    band.addColorStop(0.54, `rgba(${profile.secondary}, ${0.028 * alpha})`);
     band.addColorStop(1, `rgba(${profile.third}, 0)`);
     ctx.save();
     ctx.translate(x, height * 0.5);
@@ -2382,6 +2388,468 @@ function drawMaterialVeil(ctx, width, height, t, profile, stage, alpha) {
   }
 
   ctx.restore();
+}
+
+function drawSoftParticle(ctx, x, y, radius, color, alpha, blur = 12) {
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = alpha;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = blur;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawFizzActionCue(ctx, width, height, t, profile, stage, alpha) {
+  const swell = easeOutCubic(smoothstep(0.04, 0.6, t));
+  const breach = beatPulse(t, 0.34, 0.14);
+  const bite = beatPulse(t, 0.54, 0.12);
+  const waterline = height * (0.58 - swell * 0.05 + Math.sin(t * 7) * 0.006);
+  const cx = width * (0.5 + stage.panX * 0.6 + Math.sin(t * 4.4) * 0.025);
+  const cy = height * (0.68 - swell * 0.16);
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  const depth = ctx.createLinearGradient(0, waterline - height * 0.18, 0, height);
+  depth.addColorStop(0, `rgba(${profile.main}, 0)`);
+  depth.addColorStop(0.42, `rgba(${profile.main}, ${0.08 * alpha})`);
+  depth.addColorStop(0.62, `rgba(${profile.dark}, ${0.32 * alpha})`);
+  depth.addColorStop(1, `rgba(3, 13, 20, ${0.6 * alpha})`);
+  ctx.fillStyle = depth;
+  ctx.fillRect(0, waterline - height * 0.18, width, height);
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  const surface = ctx.createLinearGradient(0, waterline - height * 0.08, 0, waterline + height * 0.22);
+  surface.addColorStop(0, `rgba(${profile.main}, 0)`);
+  surface.addColorStop(0.18, "rgba(156,236,238,.48)");
+  surface.addColorStop(0.46, `rgba(${profile.main}, .44)`);
+  surface.addColorStop(0.76, "rgba(8,35,42,.4)");
+  surface.addColorStop(1, `rgba(${profile.main}, 0)`);
+  ctx.save();
+  ctx.filter = "blur(5px)";
+  ctx.fillStyle = surface;
+  ctx.globalAlpha = alpha * (1.1 + breach * 0.9);
+  ctx.fillRect(0, waterline - height * 0.08, width, height * 0.32);
+  ctx.restore();
+
+  ctx.globalCompositeOperation = "screen";
+  for (let i = 0; i < 22; i += 1) {
+    const p = (t * (0.55 + i * 0.012) + seededUnit(i, 14.4)) % 1;
+    const y = waterline + height * (0.04 + seededUnit(i, 2.2) * 0.28) - p * height * 0.16;
+    const x = width * (0.08 + seededUnit(i, 7.9) * 0.84) + Math.sin(t * 5 + i) * width * 0.018;
+    const r = Math.max(2, Math.min(width, height) * (0.002 + seededUnit(i, 5.1) * 0.004));
+    drawSoftParticle(ctx, x, y, r * (1.2 + breach), i % 2 ? "rgba(226,255,250,.84)" : `rgba(${profile.main}, .72)`, alpha * (0.12 + breach * 0.24 + bite * 0.12), 16);
+  }
+
+  for (let i = 0; i < 16; i += 1) {
+    const yy = waterline + Math.sin(t * 9 + i) * height * 0.018 + i * height * 0.012;
+    drawCurveStreak(ctx, [
+      [-width * 0.12, yy],
+      [width * (0.18 + swell * 0.14), yy - height * (0.035 + breach * 0.025)],
+      [width * 0.7, yy + height * 0.03],
+      [width * 1.14, yy - height * 0.018]
+    ], 2 + i * 0.32 + breach * 5.2, i % 2 ? "rgba(222,255,252,.86)" : `rgba(${profile.main}, .72)`, alpha * (0.18 + breach * 0.22 + bite * 0.08), 20);
+  }
+
+  drawCurveStreak(ctx, [
+    [width * 0.1, waterline + height * 0.1],
+    [cx - width * 0.23, waterline - height * (0.1 + breach * 0.04)],
+    [cx + width * 0.18, waterline - height * (0.12 + breach * 0.08)],
+    [width * 0.94, waterline + height * 0.06]
+  ], Math.max(10, width * 0.011 + breach * 16), "rgba(226,255,252,.74)", alpha * (0.28 + breach * 0.56), 34);
+
+  ctx.globalCompositeOperation = "multiply";
+  ctx.globalAlpha = alpha * (0.3 + breach * 0.2);
+  ctx.filter = "blur(22px)";
+  ctx.fillStyle = "rgba(0,12,18,.82)";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + height * 0.05, width * (0.24 + breach * 0.06), height * (0.075 + breach * 0.02), -0.18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = alpha * (0.48 + breach * 0.3 + bite * 0.14);
+  ctx.filter = `blur(${1.1 - Math.min(1, breach + bite) * 0.45}px) saturate(1.22) contrast(1.14)`;
+  ctx.translate(cx - width * 0.02, waterline + height * (0.02 - breach * 0.08));
+  ctx.rotate(-0.18 - breach * 0.08);
+  const sharkBody = ctx.createLinearGradient(-width * 0.28, -height * 0.08, width * 0.33, height * 0.1);
+  sharkBody.addColorStop(0, "rgba(0, 7, 12, .95)");
+  sharkBody.addColorStop(0.48, "rgba(6, 42, 50, .9)");
+  sharkBody.addColorStop(1, "rgba(0, 8, 14, .92)");
+  ctx.fillStyle = sharkBody;
+  ctx.beginPath();
+  ctx.moveTo(width * 0.42, -height * 0.01);
+  ctx.bezierCurveTo(width * 0.22, -height * 0.15, -width * 0.2, -height * 0.14, -width * 0.39, -height * 0.05);
+  ctx.bezierCurveTo(-width * 0.54, height * 0.035, -width * 0.4, height * 0.14, -width * 0.1, height * 0.12);
+  ctx.bezierCurveTo(width * 0.2, height * 0.11, width * 0.36, height * 0.055, width * 0.42, -height * 0.01);
+  ctx.fill();
+  ctx.fillStyle = "rgba(2,12,18,.9)";
+  ctx.beginPath();
+  ctx.moveTo(-width * 0.24, -height * 0.09);
+  ctx.lineTo(-width * 0.42, -height * 0.24);
+  ctx.lineTo(-width * 0.32, -height * 0.04);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = alpha * (0.34 + bite * 0.38);
+  ctx.strokeStyle = "rgba(232,255,250,.82)";
+  ctx.lineWidth = Math.max(1.5, width * 0.002);
+  ctx.beginPath();
+  ctx.moveTo(width * 0.12, height * 0.05);
+  ctx.quadraticCurveTo(width * 0.23, height * 0.1, width * 0.32, -height * 0.005);
+  ctx.stroke();
+  for (let i = 0; i < 10; i += 1) {
+    const tx = width * (0.12 + i * 0.02);
+    const ty = height * (0.04 + Math.sin(i) * 0.008);
+    ctx.beginPath();
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx + width * 0.007, ty + height * 0.026);
+    ctx.lineTo(tx - width * 0.006, ty + height * 0.024);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(232,255,250,.76)";
+    ctx.fill();
+  }
+  ctx.restore();
+
+  if (breach || bite) {
+    drawRadialGlow(ctx, cx, cy, Math.min(width, height) * (0.22 + breach * 0.22), [
+      [0, `rgba(226,255,252,${0.7 * (breach + bite)})`],
+      [0.3, `rgba(${profile.main},${0.24 * (breach + bite)})`],
+      [1, `rgba(${profile.main},0)`]
+    ], alpha * 1.25);
+  }
+
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  const surge = smoothstep(0.08, 0.5, t) * (1 - smoothstep(0.82, 0.98, t));
+  const spearX = width * (0.22 + surge * 0.18);
+  const spearY = waterline - height * (0.16 + breach * 0.05);
+  ctx.translate(spearX, spearY);
+  ctx.rotate(-0.34 + Math.sin(t * 5) * 0.035);
+  drawStreak(ctx, -width * 0.18, 0, width * 0.16, -height * 0.1, Math.max(4, width * 0.005), "rgba(232,255,250,.84)", alpha * surge * 0.55, 24);
+  [-1, 0, 1].forEach((tooth) => {
+    const offset = tooth * width * 0.028;
+    drawStreak(ctx, width * 0.16, -height * 0.1, width * (0.22 + Math.abs(tooth) * 0.02), -height * (0.16 + Math.abs(tooth) * 0.02) + offset * 0.08, Math.max(2.2, width * 0.0028), `rgba(${profile.secondary}, .66)`, alpha * surge * 0.5, 18);
+  });
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = alpha * (0.24 + breach * 0.34);
+  ctx.fillStyle = "rgba(235,255,252,.86)";
+  for (let i = 0; i < 18; i += 1) {
+    const a = -Math.PI * 0.92 + i * 0.11;
+    const distance = Math.min(width, height) * (0.08 + seededUnit(i, 5.4) * 0.26) * (0.5 + breach + bite * 0.4);
+    const sx = cx + Math.cos(a) * distance;
+    const sy = waterline + Math.sin(a) * distance * 0.5;
+    ctx.beginPath();
+    ctx.ellipse(sx, sy, 2 + seededUnit(i, 8.2) * 5, 1.5 + seededUnit(i, 9.1) * 4, a, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawCaitlynActionCue(ctx, width, height, t, profile, stage, alpha) {
+  const lock = smoothstep(0.04, 0.46, t);
+  const shot = smoothstep(0.36, 0.52, t) * (1 - smoothstep(0.68, 0.92, t));
+  const recoil = beatPulse(t, 0.42, 0.09);
+  const cx = width * (0.5 + stage.panX * 0.5);
+  const cy = height * (0.48 + stage.panY * 0.4);
+  const r = Math.min(width, height) * (0.16 + lock * 0.08);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.lineCap = "round";
+  for (let i = 0; i < 6; i += 1) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((i % 2 ? 1 : -1) * (0.015 + recoil * 0.018));
+    ctx.globalAlpha = alpha * lock * (0.36 - i * 0.035);
+    ctx.strokeStyle = i % 2 ? `rgba(${profile.third}, .72)` : "rgba(255,250,226,.88)";
+    ctx.lineWidth = Math.max(1.2, width * 0.0015 + i * 0.28);
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowBlur = 14 + i * 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * (0.8 + i * 0.24), -Math.PI * (0.9 - i * 0.025), Math.PI * (0.9 - i * 0.025));
+    ctx.stroke();
+    ctx.restore();
+  }
+  for (let tick = 0; tick < 32; tick += 1) {
+    const angle = (tick / 32) * Math.PI * 2;
+    const long = tick % 8 === 0;
+    const inner = r * (1.18 + (long ? 0.02 : 0.08));
+    const outer = r * (1.34 + (long ? 0.18 : 0.1));
+    ctx.globalAlpha = alpha * lock * (long ? 0.42 : 0.18);
+    ctx.strokeStyle = long ? "rgba(255,250,226,.92)" : `rgba(${profile.main}, .55)`;
+    ctx.lineWidth = long ? Math.max(1.5, width * 0.0018) : 1;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
+    ctx.lineTo(cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer);
+    ctx.stroke();
+  }
+  const muzzleX = width * (-0.2 + shot * 0.62);
+  const muzzleY = height * (0.18 + recoil * 0.02);
+  drawStreak(ctx, muzzleX, muzzleY, cx, cy, Math.max(5, width * 0.006), "rgba(255,252,232,.98)", alpha * (0.28 + shot * 0.86), 26);
+  drawStreak(ctx, muzzleX - width * 0.16, muzzleY + height * 0.02, cx + width * 0.02, cy, Math.max(14, width * 0.013), `rgba(${profile.main}, .36)`, alpha * shot * 0.74, 44);
+  drawStreak(ctx, cx - r * 1.8, cy, cx + r * 1.8, cy, Math.max(1.5, width * 0.0014), "rgba(255,252,232,.7)", alpha * lock * 0.48, 16);
+  drawStreak(ctx, cx, cy - r * 1.8, cx, cy + r * 1.8, Math.max(1.5, width * 0.0014), `rgba(${profile.third}, .52)`, alpha * lock * 0.42, 16);
+  drawRadialGlow(ctx, cx, cy, r * (0.8 + shot), [
+    [0, "rgba(255,252,232,.86)"],
+    [0.22, `rgba(${profile.third},.38)`],
+    [1, `rgba(${profile.third},0)`]
+  ], alpha * (0.32 + shot));
+  ctx.restore();
+}
+
+function drawSamiraActionCue(ctx, width, height, t, profile, stage, alpha) {
+  const spin = easeInOutSine(smoothstep(0.02, 0.88, t));
+  const cx = width * (0.48 + stage.panX * 0.42);
+  const cy = height * (0.52 + stage.panY * 0.28);
+  const radius = Math.min(width, height) * (0.19 + spin * 0.11);
+  const ultBeat = smoothstep(0.42, 0.68, t) * (1 - smoothstep(0.86, 0.98, t));
+
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let ring = 0; ring < 3; ring += 1) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(spin * Math.PI * (2.1 + ring * 0.18) + ring * 1.1);
+    ctx.globalAlpha = alpha * (0.18 + ultBeat * 0.16 - ring * 0.035);
+    ctx.strokeStyle = ring % 2 ? `rgba(${profile.secondary}, .92)` : `rgba(${profile.main}, .9)`;
+    ctx.lineWidth = Math.max(2.2, width * (0.0025 + ring * 0.0008));
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowBlur = 24 + ring * 8;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, radius * (1.1 + ring * 0.25), radius * (0.34 + ring * 0.04), 0, -Math.PI * 0.08, Math.PI * (1.16 + ultBeat * 0.34));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  stage.impacts.forEach((beat, index) => {
+    const hit = beatPulse(t, beat, 0.085);
+    if (!hit) return;
+    const angle = -0.9 + index * 0.42;
+    const sx = cx + Math.cos(angle + Math.PI) * radius * 0.54;
+    const sy = cy + Math.sin(angle + Math.PI) * radius * 0.32;
+    const ex = cx + Math.cos(angle) * width * (0.34 + hit * 0.08);
+    const ey = cy + Math.sin(angle) * height * (0.24 + hit * 0.05);
+    drawCurveStreak(ctx, [
+      [sx, sy],
+      [cx + Math.cos(angle) * radius * 0.18, cy - height * (0.08 + hit * 0.03)],
+      [ex, ey]
+    ], Math.max(5, width * 0.005) + hit * 16, index % 2 ? `rgba(${profile.secondary}, .9)` : "rgba(255,246,220,.92)", alpha * hit * 1.02, 36);
+    drawStreak(ctx, sx, sy, sx - Math.cos(angle) * width * 0.22, sy - Math.sin(angle) * height * 0.18, Math.max(3, width * 0.0035), "rgba(255,246,220,.86)", alpha * hit * 0.55, 24);
+    drawRadialGlow(ctx, sx, sy, Math.min(width, height) * (0.09 + hit * 0.08), [
+      [0, "rgba(255,246,220,.86)"],
+      [0.3, `rgba(${profile.main},.42)`],
+      [1, `rgba(${profile.secondary},0)`]
+    ], alpha * hit * 0.86);
+  });
+
+  [[-1, 0.16], [1, 0.34], [-1, 0.58]].forEach(([side, beat], index) => {
+    const flash = beatPulse(t, beat, 0.075);
+    const mx = cx + side * radius * (0.85 + index * 0.08);
+    const my = cy - radius * (0.12 - index * 0.04);
+    const tx = mx + side * width * 0.28;
+    const ty = my - height * (0.08 + index * 0.025);
+    drawStreak(ctx, mx, my, tx, ty, Math.max(4, width * 0.004), index % 2 ? `rgba(${profile.third}, .72)` : "rgba(255,244,210,.88)", alpha * (0.18 + flash * 0.74), 28);
+    if (flash) {
+      drawRadialGlow(ctx, mx, my, Math.min(width, height) * (0.1 + flash * 0.1), [
+        [0, "rgba(255,244,210,.98)"],
+        [0.22, `rgba(${profile.secondary},.54)`],
+        [1, `rgba(${profile.main},0)`]
+      ], alpha * flash);
+    }
+  });
+
+  if (ultBeat) {
+    for (let i = 0; i < 18; i += 1) {
+      const a = spin * Math.PI * 5 + i * 0.38;
+      const inner = radius * (0.38 + seededUnit(i, 3.8) * 0.18);
+      const outer = radius * (1.24 + seededUnit(i, 7.2) * 0.48);
+      drawStreak(
+        ctx,
+        cx + Math.cos(a) * inner,
+        cy + Math.sin(a) * inner * 0.52,
+        cx + Math.cos(a) * outer,
+        cy + Math.sin(a) * outer * 0.52,
+        1.5 + seededUnit(i, 5.3) * 3.8,
+        i % 3 ? `rgba(${profile.main}, .62)` : `rgba(${profile.third}, .56)`,
+        alpha * ultBeat * (0.12 + seededUnit(i, 8.6) * 0.22),
+        18
+      );
+    }
+  }
+  ctx.restore();
+}
+
+function drawEzrealActionCue(ctx, width, height, t, profile, stage, alpha) {
+  const travel = smoothstep(0.04, 0.82, t);
+  const start = { x: width * -0.08, y: height * 0.84 };
+  const end = { x: width * 1.04, y: height * 0.12 };
+  const x = start.x + (end.x - start.x) * travel;
+  const y = start.y + (end.y - start.y) * travel;
+  drawStreak(ctx, start.x, start.y, x, y, Math.max(9, width * 0.012), `rgba(${profile.main}, .42)`, alpha * 0.72, 42);
+  drawStreak(ctx, start.x + width * 0.08, start.y - height * 0.04, x, y, Math.max(4, width * 0.005), `rgba(${profile.secondary}, .68)`, alpha * 0.62, 26);
+  drawStreak(ctx, x - width * 0.16, y + height * 0.1, x + width * 0.06, y - height * 0.03, Math.max(5, width * 0.007), "rgba(255,252,232,.96)", alpha * 0.88, 30);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let i = 0; i < 8; i += 1) {
+    const p = Math.max(0, travel - i * 0.035);
+    const rx = start.x + (end.x - start.x) * p + Math.sin(t * 9 + i) * width * 0.015;
+    const ry = start.y + (end.y - start.y) * p + Math.cos(t * 7 + i) * height * 0.012;
+    ctx.save();
+    ctx.translate(rx, ry);
+    ctx.rotate(-0.72 + t * 3 + i * 0.42);
+    ctx.globalAlpha = alpha * (0.14 + (8 - i) * 0.025);
+    ctx.strokeStyle = i % 2 ? `rgba(${profile.secondary}, .82)` : `rgba(${profile.main}, .8)`;
+    ctx.lineWidth = Math.max(1.5, width * 0.0016);
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    ctx.moveTo(0, -height * 0.018);
+    ctx.lineTo(width * 0.026, 0);
+    ctx.lineTo(0, height * 0.018);
+    ctx.lineTo(-width * 0.026, 0);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+  drawRadialGlow(ctx, x, y, Math.min(width, height) * 0.18, [
+    [0, "rgba(255,252,232,.92)"],
+    [0.26, `rgba(${profile.main},.48)`],
+    [1, `rgba(${profile.secondary},0)`]
+  ], alpha);
+}
+
+function drawChampionActionCues(ctx, width, height, t, profile, stage, alpha) {
+  if (profile.id === "fizz") drawFizzActionCue(ctx, width, height, t, profile, stage, alpha);
+  else if (profile.id === "caitlyn") drawCaitlynActionCue(ctx, width, height, t, profile, stage, alpha);
+  else if (profile.id === "samira") drawSamiraActionCue(ctx, width, height, t, profile, stage, alpha);
+  else if (profile.id === "ezreal") drawEzrealActionCue(ctx, width, height, t, profile, stage, alpha);
+  else if (profile.id === "ashe") {
+    const travel = smoothstep(0.04, 0.76, t);
+    const x = width * (-0.08 + travel * 1.16);
+    const y = height * (0.34 - travel * 0.18);
+    drawStreak(ctx, width * -0.14, height * 0.42, x, y, Math.max(11, width * 0.013), `rgba(${profile.main}, .42)`, alpha * 0.72, 40);
+    drawStreak(ctx, width * -0.08, height * 0.38, x + width * 0.04, y - height * 0.01, Math.max(5, width * 0.006), "rgba(236,252,255,.95)", alpha * 0.92, 30);
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.translate(x, y);
+    ctx.rotate(-0.08);
+    ctx.globalAlpha = alpha * 0.9;
+    ctx.shadowColor = "rgba(236,252,255,.8)";
+    ctx.shadowBlur = 24;
+    ctx.fillStyle = "rgba(236,252,255,.92)";
+    ctx.beginPath();
+    ctx.moveTo(width * 0.12, 0);
+    ctx.lineTo(-width * 0.06, -height * 0.05);
+    ctx.lineTo(-width * 0.025, 0);
+    ctx.lineTo(-width * 0.06, height * 0.05);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    for (let i = 0; i < 12; i += 1) {
+      drawStreak(ctx, x - width * 0.02, y, x - width * (0.1 + i * 0.026), y + height * ((i % 2 ? 1 : -1) * (0.025 + i * 0.008)), 1.5 + i * 0.22, i % 2 ? "rgba(255,255,255,.7)" : `rgba(${profile.main}, .5)`, alpha * (0.18 + i * 0.006), 14);
+    }
+  } else if (profile.id === "missfortune") {
+    [[0.32, -1], [0.68, 1]].forEach(([ratio, side], index) => {
+      const hit = beatPulse(t, index ? 0.42 : 0.2, 0.09);
+      const x = width * ratio;
+      const y = height * 0.66;
+      drawStreak(ctx, x, y, width * (ratio + side * 0.54), height * 0.2, Math.max(12, width * 0.014), index ? `rgba(${profile.secondary}, .44)` : `rgba(${profile.main}, .48)`, alpha * (0.26 + hit * 0.58), 42);
+      drawStreak(ctx, x, y, width * (ratio + side * 0.48), height * 0.24, Math.max(4, width * 0.0048), "rgba(255,246,210,.9)", alpha * (0.34 + hit * 0.74), 24);
+      for (let i = 0; i < 7; i += 1) {
+        const spread = (i - 3) * 0.025;
+        drawStreak(ctx, x, y, width * (ratio + side * (0.32 + i * 0.035)), height * (0.26 + spread), 1.4 + hit * 3, i % 2 ? `rgba(${profile.secondary}, .52)` : `rgba(${profile.main}, .56)`, alpha * (0.1 + hit * 0.16), 14);
+      }
+      drawRadialGlow(ctx, x, y, Math.min(width, height) * (0.16 + hit * 0.14), [
+        [0, "rgba(255,236,180,.82)"],
+        [0.36, `rgba(${profile.main},.34)`],
+        [1, `rgba(${profile.main},0)`]
+      ], alpha * (0.32 + hit));
+    });
+  } else if (profile.id === "kaisa") {
+    const pulse = stageImpactPulse(t, stage, 0.1);
+    const cx = width * 0.5;
+    const cy = height * 0.5;
+    drawRadialGlow(ctx, cx, cy, Math.min(width, height) * (0.24 + pulse * 0.12), [
+      [0, `rgba(${profile.third},.38)`],
+      [0.34, `rgba(${profile.main},.22)`],
+      [1, `rgba(${profile.secondary},0)`]
+    ], alpha * (0.5 + pulse * 0.28));
+    for (let i = 0; i < 8; i += 1) {
+      const angle = -1.1 + i * 0.32 + t * 0.95;
+      drawCurveStreak(ctx, [
+        [cx, cy],
+        [cx + Math.cos(angle) * width * 0.16, cy + Math.sin(angle) * height * 0.12],
+        [cx + Math.cos(angle) * width * 0.42, cy + Math.sin(angle) * height * 0.34]
+      ], 3.2 + pulse * 7, i % 2 ? `rgba(${profile.third}, .72)` : `rgba(${profile.secondary}, .66)`, alpha * (0.18 + pulse * 0.13), 30);
+    }
+  } else if (profile.id === "jhin") {
+    const cue = beatPulse(t, 0.46, 0.18);
+    const cx = width * 0.5;
+    const top = height * 0.04;
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    for (let i = 0; i < 4; i += 1) {
+      const targetX = width * (0.28 + i * 0.15);
+      const beam = ctx.createLinearGradient(cx, top, targetX, height * 0.74);
+      beam.addColorStop(0, `rgba(255,239,196,${0.18 * alpha})`);
+      beam.addColorStop(0.62, `rgba(${profile.secondary},${0.09 * alpha})`);
+      beam.addColorStop(1, "rgba(255,239,196,0)");
+      ctx.fillStyle = beam;
+      ctx.beginPath();
+      ctx.moveTo(cx - width * 0.018, top);
+      ctx.lineTo(targetX + width * (0.07 + cue * 0.04), height * 0.8);
+      ctx.lineTo(targetX - width * (0.07 + cue * 0.04), height * 0.8);
+      ctx.closePath();
+      ctx.fill();
+    }
+    for (let i = 0; i < 4; i += 1) {
+      ctx.save();
+      ctx.translate(cx, height * 0.5);
+      ctx.rotate(i * Math.PI * 0.5 + t * 0.9);
+      ctx.globalAlpha = alpha * (0.18 + cue * 0.24);
+      ctx.fillStyle = i === 3 ? "rgba(255,239,196,.74)" : `rgba(${profile.secondary}, .56)`;
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur = 22;
+      ctx.beginPath();
+      ctx.ellipse(0, -Math.min(width, height) * 0.18, Math.min(width, height) * (0.045 + cue * 0.012), Math.min(width, height) * (0.18 + cue * 0.05), 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    drawStreak(ctx, width * 0.08, height * 0.52, width * 0.92, height * 0.52, Math.max(5, width * 0.005), "rgba(255,239,196,.9)", alpha * cue, 28);
+    ctx.restore();
+  } else if (profile.id === "rammus") {
+    const p = smoothstep(0.05, 0.82, t);
+    const cx = width * (-0.12 + p * 1.18);
+    const cy = height * 0.72;
+    const hit = stageImpactPulse(t, stage, 0.08);
+    for (let i = 0; i < 6; i += 1) {
+      drawArcRibbon(ctx, cx, cy, Math.min(width, height) * (0.08 + i * 0.06 + hit * 0.06), Math.PI * 0.04, Math.PI * 1.14, 3.4 - i * 0.2, i % 2 ? `rgba(${profile.secondary}, .58)` : `rgba(${profile.third}, .5)`, alpha * (0.22 - i * 0.016));
+    }
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = alpha * 0.78;
+    const shell = ctx.createRadialGradient(cx - width * 0.025, cy - height * 0.04, 0, cx, cy, Math.min(width, height) * 0.16);
+    shell.addColorStop(0, "rgba(255,244,150,.95)");
+    shell.addColorStop(0.45, `rgba(${profile.main},.86)`);
+    shell.addColorStop(1, `rgba(${profile.dark},.95)`);
+    ctx.fillStyle = shell;
+    ctx.shadowColor = `rgba(${profile.secondary},.42)`;
+    ctx.shadowBlur = 26;
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.min(width, height) * (0.08 + hit * 0.02), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
 }
 
 function drawCinematicFilmFinish(ctx, width, height, t, profile, stage) {
@@ -3217,6 +3685,7 @@ function drawUltimateFrame(ctx, profile, image, width, height, elapsed, duration
   drawChampionSignatureScene(ctx, profile, width, height, t);
   drawSourceArtCinematicStage(ctx, image, width, height, t, profile);
   drawCinematicLensPass(ctx, width, height, t, profile);
+  drawChampionActionCues(ctx, width, height, t, profile, cinematicStageFor(profile.id), sceneEnvelope(t, 0.94));
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
   ctx.fillStyle = `rgba(12, 8, 10, ${0.1 * (1 - sceneEnvelope(t, 0.92))})`;
