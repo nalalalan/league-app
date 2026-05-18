@@ -374,7 +374,7 @@ const champions = [
     name: "Samira",
     skin: "Soul Fighter Samira",
     image: `${imageBase}/Samira_30.jpg`,
-    focus: "Q first. E only after the opening exists.",
+    focus: "Recording review is the current queue plan.",
     note: "Samira can mash in, but she cannot always leave. Her escape is killing, resetting, lifestealing, blocking the real spell, or using Flash.",
     situations: [
       {
@@ -670,13 +670,13 @@ const recordingReview = {
   captured: "May 18, 2026, 5:46-5:57 PM ET",
   totalDuration: "5:57",
   totalRecordings: 13,
-  reviewBasis: "Newer recordings count more as current form; older clips stay as baseline leak history.",
+  reviewBasis: "Recording review is ordered as a queue plan with one feedback note per file.",
   mainFeedback: {
-    title: "Samira: exit first, cash out second",
-    focus: "Newest clips count most: keep naming the exit before E, then stop the fight as soon as the map payoff is available.",
-    rule: "If the first win creates wave, tower, dragon, Baron, nexus, or recall, take it before another duel.",
-    nextRep: "Next queue cue: exit, win, leave.",
-    whyTrust: "It weights the newest attempts most and targets the part that still costs games after the damage is already good."
+    title: "Samira: kill, crash, reset",
+    focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
+    rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
+    nextRep: "Queue cue: kill -> payout -> reset.",
+    whyTrust: "This is Diamond-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
   },
   detectedChampions: [
     {
@@ -685,12 +685,12 @@ const recordingReview = {
       confidence: "high",
       recordings: 13,
       evidence: "Replay side list names Samira on Alan's team; sampled clips center the Soul Fighter Samira model and nameplate.",
-      improvementTitle: "Do not spend E without the walk-out",
-      improvement: "The damage is already there. The Diamond habit is refusing the second fight unless the exit, enemy CC, and objective payoff are already known."
+      improvementTitle: "Convert the first win",
+      improvement: "The damage is already there. The Diamond habit is turning the first kill into XP, tempo, structure damage, objective setup, or a clean reset before another fight."
     }
   ],
   recordings: [
-    { title: "highlight 01", duration: "0:06", kind: "highlight", champion: "Samira", feedbackTitle: "E only after the exit exists", feedback: "Hold E until the target is lethal or a reset, Flash, teammate cover, or clean walk-out path is already visible.", src: "/recordings/16-10_NA1-5563247854_01.webm", poster: "/recordings/posters/16-10-na1-5563247854-01.jpg" },
+    { title: "highlight 01", duration: "0:06", kind: "highlight", champion: "Samira", feedbackTitle: "Ask for the payout first", feedback: "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end.", src: "/recordings/16-10_NA1-5563247854_01.webm", poster: "/recordings/posters/16-10-na1-5563247854-01.jpg" },
     { title: "highlight 02", duration: "0:17", kind: "highlight", champion: "Samira", feedbackTitle: "Name the CC before going in", feedback: "Before E/R, identify the one spell that cancels the play; enter only after it is spent, blocked by W, or aimed elsewhere.", src: "/recordings/16-10_NA1-5563247854_02.webm", poster: "/recordings/posters/16-10-na1-5563247854-02.jpg" },
     { title: "highlight 03", duration: "0:12", kind: "highlight", champion: "Samira", feedbackTitle: "Stop chasing at fog", feedback: "A low target past vision is not free; shove the wave or take plate unless the next enemy position is known.", src: "/recordings/16-10_NA1-5563247854_03.webm", poster: "/recordings/posters/16-10-na1-5563247854-03.jpg" },
     { title: "highlight 04", duration: "0:16", kind: "highlight", champion: "Samira", feedbackTitle: "Turn bot kills into tempo", feedback: "After the first kill or forced recall, crash wave first, then choose plate, dragon move, reset, or support roam.", src: "/recordings/16-10_NA1-5563247854_04.webm", poster: "/recordings/posters/16-10-na1-5563247854-04.jpg" },
@@ -1302,7 +1302,7 @@ function recordingMainCard(review) {
 
   const focus = document.createElement("p");
   focus.className = "recording-main-focus";
-  focus.textContent = item.focus || "Review the newest recordings and choose one repeatable in-game rule.";
+  focus.textContent = item.focus || "Review the recordings and choose one repeatable in-game rule.";
 
   const rule = document.createElement("p");
   rule.className = "recording-main-rule";
@@ -1310,7 +1310,7 @@ function recordingMainCard(review) {
 
   const why = document.createElement("p");
   why.className = "recording-main-why";
-  why.textContent = trustLine(item.whyTrust || review.reviewBasis);
+  why.textContent = trustLine(item.whyTrust);
 
   const nextRep = document.createElement("p");
   nextRep.className = "recording-main-rep";
@@ -1341,8 +1341,7 @@ function recordingCard(item) {
   title.textContent = item.title;
 
   const detail = document.createElement("p");
-  const phase = item.reviewPhase ? `${item.reviewPhase} · ` : "";
-  detail.textContent = `${item.champion} · ${phase}${item.kind} · ${item.duration}`;
+  detail.textContent = `${item.champion} · ${item.kind} · ${item.duration}`;
 
   const feedbackTitle = document.createElement("p");
   feedbackTitle.className = "recording-card-feedback-title";

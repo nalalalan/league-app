@@ -16,7 +16,7 @@ const manifestPath = path.join(recordingRoot, "recordings.json");
 const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Documents\\League of Legends\\Highlights";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-18-recording-feedback-v5";
+const analysisVersion = "2026-05-18-recording-feedback-v6";
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -169,19 +169,19 @@ function fallbackFeedback(file, duration, context = {}) {
     return {
       champion: "Samira",
       confidence: "medium",
-      feedbackTitle: "Current form: cash out cleaner",
-      feedback: "The later full-game read counts most: keep the exit rule, then leave won fights through tower, dragon, Baron, nexus, or recall.",
-      whyTrust: "This is worth trying because the full-game scoreline shows damage is already present; the remaining climb value is keeping shutdown gold and tempo after wins.",
+      feedbackTitle: "16/10 means conversion gap",
+      feedback: "The full-game read says damage is enough; the Diamond rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
+      whyTrust: "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
       focusTag: "overstay control",
-      evidence: `Fallback weights this ${context.reviewPhase || "current form"} recording as the freshest replay evidence.`,
+      evidence: "Fallback uses match-level Samira read from sampled replay frames and side-list evidence.",
       analysisSource: "fallback"
     };
   }
   const samiraFallbacks = [
     {
-      feedbackTitle: "E only after the exit exists",
-      feedback: "Hold E until the target is lethal or a reset, Flash, teammate cover, or clean walk-out path is already visible.",
-      whyTrust: "Samira has no real disengage after E; this rule protects the one button that turns winning damage into a death when the exit is missing.",
+      feedbackTitle: "Ask for the payout first",
+      feedback: "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end.",
+      whyTrust: "Diamond ADCs climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
       focusTag: "commit timing"
     },
     {
@@ -215,38 +215,38 @@ function fallbackFeedback(file, duration, context = {}) {
       focusTag: "reset discipline"
     },
     {
-      feedbackTitle: "Implementation: protect the gold",
-      feedback: "This is where the new rule starts to matter: after a tower or multi-kill, leave with the shutdown value instead of retesting the fight.",
+      feedbackTitle: "Protect the shutdown",
+      feedback: "After a tower or multi-kill, leave with the shutdown value instead of retesting the fight.",
       whyTrust: "This is worth practicing because it does not ask for less carry pressure; it keeps the carry gold from being handed back.",
       focusTag: "cash-out timing"
     },
     {
-      feedbackTitle: "Implementation: count before helping",
-      feedback: "Treat this as a feedback-rep clip: if a teammate dies nearby, count visible enemies before spending E to rescue a fight.",
+      feedbackTitle: "Count before helping",
+      feedback: "If a teammate dies nearby, count visible enemies before spending E to rescue a fight.",
       whyTrust: "Counting visible enemies gives anxiety a concrete check; if the numbers are bad, skipping the rescue is discipline, not fear.",
       focusTag: "safe gold"
     },
     {
-      feedbackTitle: "Implementation: leave after the wave",
-      feedback: "Catching side farm is fine; the improvement rep is leaving toward teammates unless mid has priority or three enemies are visible.",
+      feedbackTitle: "Leave after the wave",
+      feedback: "Catching side farm is fine; leave toward teammates unless mid has priority or three enemies are visible.",
       whyTrust: "This turns side farm into safe income instead of isolation, which is the difference between carrying with gold and dying with gold.",
       focusTag: "late entry"
     },
     {
-      feedbackTitle: "Implementation: objective before duel",
+      feedbackTitle: "Objective before duel",
       feedback: "When an enemy catches a wave, pressure the objective first; take the duel only with ult, summoner info, and a walk-out.",
       whyTrust: "Objectives force the enemy to answer on your terms; random duels make the game hinge on mechanics under uncertainty.",
       focusTag: "exit planning"
     },
     {
-      feedbackTitle: "Current form: edge before choke",
-      feedback: "This later clip counts more: hold the edge until enemy CC is used so Samira stays the finisher instead of the target.",
-      whyTrust: "This is a current-form adjustment: it preserves the aggression while removing the single easiest way enemies stop Samira.",
+      feedbackTitle: "Second in at chokes",
+      feedback: "Hold the edge until enemy CC is used so Samira stays the finisher instead of the target.",
+      whyTrust: "This preserves the aggression while removing the single easiest way enemies stop Samira.",
       focusTag: "objective conversion"
     },
     {
-      feedbackTitle: "Current form: hit the structure",
-      feedback: "At inhib or nexus, the feedback is already partly working; the next Diamond rep is ending as soon as the structure is available.",
+      feedbackTitle: "Hit the structure",
+      feedback: "At inhib or nexus, the Diamond rep is ending as soon as the structure is available.",
       whyTrust: "This is reliable because structures are guaranteed progress; extra fighting after the base is open adds variance without adding win condition.",
       focusTag: "overstay control"
     }
@@ -257,7 +257,7 @@ function fallbackFeedback(file, duration, context = {}) {
     confidence: "medium",
     ...fallback,
     whyTrust: fallback.whyTrust || "This rule is tied to the repeated recording pattern, not a vague style preference.",
-    evidence: `Fallback weights this ${context.reviewPhase || "baseline"} recording by capture order; later clips count more as current form.`,
+    evidence: "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
     analysisSource: "fallback"
   };
 }
@@ -292,7 +292,7 @@ async function analyzeRecording({ file, duration, framePaths, sequenceLabel, rev
   const prompt = [
     "Analyze these League of Legends replay frames from one recording for Alan, currently around Silver 4 and trying to climb toward Diamond.",
     "The player champion is usually the champion the replay camera follows most. Use the side list/nameplate when visible. If uncertain, say low confidence.",
-    "Capture order matters. Later recordings probably show Alan trying to implement earlier feedback and should count more as current form; older recordings are baseline leak history.",
+    "Use capture order internally to distinguish earlier leak evidence from later implementation attempts, but do not mention recency weighting in visible output.",
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
     "Give exactly one improvement for this recording. Keep it direct, narrow, and playable in the next queue. Do not give generic encouragement.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
@@ -345,11 +345,11 @@ async function analyzeRecording({ file, duration, framePaths, sequenceLabel, rev
 
 async function summarizeRecordings(recordings, detectedChampions) {
   const fallback = {
-    title: "Samira: exit first, cash out second",
-    focus: "Newest clips count most: keep naming the exit before E, then stop the fight as soon as the map payoff is available.",
-    rule: "If the first win creates wave, tower, dragon, Baron, nexus, or recall, take it before another duel.",
-    nextRep: "Next queue cue: exit, win, leave.",
-    whyTrust: "It weights the newest attempts most and targets the part that still costs games after the damage is already good."
+    title: "Samira: kill, crash, reset",
+    focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
+    rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
+    nextRep: "Queue cue: kill -> payout -> reset.",
+    whyTrust: "This is Diamond-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
   };
   if (!process.env.OPENAI_API_KEY || !recordings.length) return fallback;
   const notes = recordings.map((item, index) => (
@@ -358,9 +358,9 @@ async function summarizeRecordings(recordings, detectedChampions) {
   const prompt = [
     "Given these League recording feedback notes, produce one simple focus for Alan's next queue.",
     "He is around Silver 4 and wants Diamond. Keep the summary narrow enough to remember while playing.",
-    "Weight implementation and current-form recordings more than baseline recordings. Older clips diagnose the leak; newer clips show what he is currently trying and what remains after that improvement.",
+    "Use capture order internally to distinguish earlier leak evidence from implementation attempts. Do not mention recency weighting in visible output.",
     "If the newer clips show an earlier rule being attempted, choose the next simple constraint that preserves the improvement instead of repeating only the old leak.",
-    "Do not summarize everything. Choose the single improvement with the highest climb value from the freshest evidence.",
+    "Do not summarize everything. Choose the single improvement with the highest climb value from the recordings.",
     "Include whyTrust: one concrete reason Alan should trust and try this focus even if skeptical or anxious.",
     "Avoid phrases like 'you should'. Return only JSON:",
     '{"title":"short title","focus":"one sentence","rule":"one in-game rule","nextRep":"one tiny queue cue","whyTrust":"one concrete reason to trust the focus"}',
@@ -525,7 +525,7 @@ async function main() {
     captured: capturedRange(sourceStats),
     totalDuration: mmss(totalSeconds),
     totalRecordings: recordings.length,
-    reviewBasis: "Recordings are sorted by source modified time. Baseline clips show the original leak; implementation and current-form clips are weighted more because they likely show the feedback being attempted.",
+    reviewBasis: "Recording review is ordered as a queue plan with one feedback note per file.",
     mainFeedback,
     detectedChampions,
     recordings
