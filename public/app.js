@@ -685,7 +685,7 @@ const fallbackAudioUrls = {};
 const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
-const stingerVersion = "20260518-cinematic46";
+const stingerVersion = "20260518-cinematic47";
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -3200,19 +3200,8 @@ function drawRammusScene(ctx, width, height, t, profile) {
   ctx.restore();
 }
 
-function drawUltimateFrame(ctx, profile, image, width, height, elapsed, duration) {
+function drawChampionSignatureScene(ctx, profile, width, height, t) {
   const profileId = profile.id;
-  const t = clamp(elapsed / duration, 0, 1);
-  ctx.clearRect(0, 0, width, height);
-  drawCinematicBackdrop(ctx, width, height, t, profile);
-  drawSourceArtCinematicStage(ctx, image, width, height, t, profile);
-  drawCinematicLensPass(ctx, width, height, t, profile);
-  ctx.save();
-  ctx.globalCompositeOperation = "source-over";
-  ctx.fillStyle = `rgba(12, 8, 10, ${0.1 * (1 - sceneEnvelope(t, 0.92))})`;
-  ctx.fillRect(0, 0, width, height);
-  ctx.restore();
-
   if (profileId === "fizz") drawSharkScene(ctx, width, height, t, profile);
   else if (profileId === "caitlyn") drawCaitlynScene(ctx, width, height, t, profile);
   else if (profileId === "ezreal") drawEzrealScene(ctx, width, height, t, profile);
@@ -3223,6 +3212,20 @@ function drawUltimateFrame(ctx, profile, image, width, height, elapsed, duration
   else if (profileId === "ashe") drawAsheScene(ctx, width, height, t, profile);
   else if (profileId === "rammus") drawRammusScene(ctx, width, height, t, profile);
   else drawEzrealScene(ctx, width, height, t, profile);
+}
+
+function drawUltimateFrame(ctx, profile, image, width, height, elapsed, duration) {
+  const t = clamp(elapsed / duration, 0, 1);
+  ctx.clearRect(0, 0, width, height);
+  drawCinematicBackdrop(ctx, width, height, t, profile);
+  drawChampionSignatureScene(ctx, profile, width, height, t);
+  drawSourceArtCinematicStage(ctx, image, width, height, t, profile);
+  drawCinematicLensPass(ctx, width, height, t, profile);
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = `rgba(12, 8, 10, ${0.1 * (1 - sceneEnvelope(t, 0.92))})`;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
 
   drawCameraShudder(ctx, width, height, t, profile);
   drawVignette(ctx, width, height, 0.42);
