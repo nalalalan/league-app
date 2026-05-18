@@ -686,8 +686,9 @@ const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx8";
+const visualFxVersion = "20260518-world-vfx9";
 let vfx3dModulePromise;
+let vfx3dWarmPromise;
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -910,6 +911,33 @@ function primeCinematicAssets() {
     if (image?.decode) void image.decode().catch(() => {});
   });
   void loadVfx3dModule();
+  void warmVfx3dRenderer();
+}
+
+function warmVfx3dRenderer(championId = "fizz") {
+  if (motionQuery.matches || !("WebGLRenderingContext" in window)) return Promise.resolve();
+  vfx3dWarmPromise ||= loadVfx3dModule().then((module) => {
+    if (!module) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = 16;
+    canvas.height = 16;
+    canvas.style.cssText = "position:fixed;left:-40px;top:-40px;width:16px;height:16px;opacity:0;pointer-events:none;";
+    document.body.append(canvas);
+    const champion = championById(championId);
+    const profile = fxProfileFor(champion.id);
+    const scene = module.createChampionVfx3D({
+      canvas,
+      championId: champion.id,
+      profile,
+      duration: 900
+    });
+    scene.resize(16, 16, 1);
+    scene.render(0, 900);
+    scene.render(33, 900);
+    scene.dispose();
+    canvas.remove();
+  }).catch(() => {});
+  return vfx3dWarmPromise;
 }
 
 function buildFallbackSoundUrl(profileId = "default") {
@@ -1535,26 +1563,26 @@ function playChampionFoley(profileId = "default") {
     const now = audioContext.currentTime + 0.006;
 
     const compressor = audioContext.createDynamicsCompressor();
-    compressor.threshold.setValueAtTime(-20, now);
-    compressor.knee.setValueAtTime(20, now);
-    compressor.ratio.setValueAtTime(4.6, now);
+    compressor.threshold.setValueAtTime(-22, now);
+    compressor.knee.setValueAtTime(24, now);
+    compressor.ratio.setValueAtTime(3.4, now);
     compressor.attack.setValueAtTime(0.003, now);
     compressor.release.setValueAtTime(0.2, now);
     compressor.connect(audioContext.destination);
 
     const master = audioContext.createGain();
     master.gain.setValueAtTime(0.0001, now);
-    master.gain.exponentialRampToValueAtTime(0.58, now + 0.02);
-    master.gain.exponentialRampToValueAtTime(0.32, now + 0.9);
-    master.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+    master.gain.exponentialRampToValueAtTime(0.5, now + 0.045);
+    master.gain.exponentialRampToValueAtTime(0.38, now + 1.15);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 3.35);
     master.connect(compressor);
 
     const wet = audioContext.createGain();
-    wet.gain.setValueAtTime(0.13, now);
+    wet.gain.setValueAtTime(0.18, now);
     const delay = audioContext.createDelay(0.7);
     const feedback = audioContext.createGain();
-    delay.delayTime.setValueAtTime(0.075, now);
-    feedback.gain.setValueAtTime(0.18, now);
+    delay.delayTime.setValueAtTime(0.115, now);
+    feedback.gain.setValueAtTime(0.24, now);
     delay.connect(feedback).connect(delay);
     delay.connect(wet).connect(compressor);
 
@@ -1603,15 +1631,19 @@ function playChampionFoley(profileId = "default") {
       const frames = Math.max(1, Math.floor(audioContext.sampleRate * length));
       const buffer = audioContext.createBuffer(1, frames, audioContext.sampleRate);
       const data = buffer.getChannelData(0);
+      let smoothed = 0;
+      let drift = 0;
       for (let index = 0; index < frames; index += 1) {
         const p = index / frames;
         const attack = Math.min(1, p / 0.055);
         const release = (1 - p) ** curve;
+        smoothed = smoothed * 0.78 + (Math.random() * 2 - 1) * 0.22;
+        drift = drift * 0.995 + (Math.random() * 2 - 1) * 0.005;
         const water = color === "water" ? Math.sin(p * 95) * 0.14 + Math.sin(p * p * 1500) * 0.09 : 0;
         const ice = color === "ice" ? Math.sin(p * 520) * 0.12 + Math.sign(Math.sin(p * 130)) * 0.035 : 0;
         const stone = color === "stone" ? Math.sign(Math.sin(p * 190)) * 0.08 : 0;
         const metal = color === "metal" ? Math.sin(p * 260) * 0.08 : 0;
-        data[index] = ((Math.random() * 2 - 1) + water + ice + stone + metal) * attack * release;
+        data[index] = (smoothed + drift + water + ice + stone + metal) * attack * release;
       }
       const source = audioContext.createBufferSource();
       const biquad = audioContext.createBiquadFilter();
@@ -1645,60 +1677,89 @@ function playChampionFoley(profileId = "default") {
       tone({ start: start + 0.01, length: 0.22, frequency: reverse ? 740 : 980, endFrequency: reverse ? 220 : 1540, gain: 0.05, type: "triangle", pan, attack: 0.004, filter: { type: "bandpass", start: 1800, end: 4200, q: 1.6 }, send: 0.28 });
     };
 
-    if (profileId === "fizz") {
-      texture({ start: 0, length: 2.2, gain: 0.2, pan: -0.08, filter: "lowpass", from: 620, to: 74, q: 0.62, color: "water", send: 0.34, curve: 1.05 });
-      impact(0.22, 38, 0.22, -0.14, "water");
-      impact(0.54, 48, 0.18, 0.24, "water");
-      [0.06, 0.16, 0.31, 0.43, 0.61, 0.74, 0.88, 1.03, 1.18].forEach((start, index) => {
-        bubble(start, -0.35 + (index % 5) * 0.17, 0.65 + (index % 3) * 0.28);
+    const gesture = ({ start = 0, length = 0.9, color = "air", pan = 0, noiseGain = 0.1, toneGain = 0.04, from = 1800, to = 260, frequency = 220, endFrequency = 180, send = 0.32 }) => {
+      texture({ start, length, gain: noiseGain, pan, filter: color === "water" || color === "stone" ? "lowpass" : "bandpass", from, to, q: 0.72, color, send, curve: 1.08 });
+      tone({ start: start + length * 0.08, length: length * 0.72, frequency, endFrequency, gain: toneGain, type: color === "ice" ? "sine" : "triangle", pan, attack: 0.035, filter: { type: "bandpass", start: from * 0.42, end: Math.max(90, to * 1.4), q: 1.1 }, send: send + 0.08 });
+    };
+
+    const sparkleCloud = (start, count, color, baseFrequency, panStart = -0.24, panStep = 0.16) => {
+      Array.from({ length: count }).forEach((_, index) => {
+        const offset = start + index * 0.09;
+        tone({
+          start: offset,
+          length: 0.36,
+          frequency: baseFrequency + index * 86,
+          endFrequency: baseFrequency * 1.45 + index * 112,
+          gain: 0.018 + index * 0.002,
+          type: "sine",
+          pan: panStart + index * panStep,
+          attack: 0.018,
+          filter: { type: "bandpass", start: baseFrequency * 1.8, end: baseFrequency * 2.8, q: 1.6 },
+          send: 0.46
+        });
+        texture({ start: offset + 0.02, length: 0.34, gain: 0.025, pan: panStart + index * panStep, filter: "bandpass", from: baseFrequency * 2.2, to: baseFrequency * 0.9, q: 1.2, color, send: 0.34, curve: 1.55 });
       });
-      texture({ start: 0.66, length: 0.64, gain: 0.13, pan: 0.16, filter: "highpass", from: 6800, to: 1200, q: 1.2, color: "water", send: 0.24, curve: 2.1 });
+    };
+
+    if (profileId === "fizz") {
+      gesture({ start: 0, length: 2.72, color: "water", pan: -0.08, noiseGain: 0.24, toneGain: 0.035, from: 720, to: 64, frequency: 92, endFrequency: 38, send: 0.42 });
+      gesture({ start: 0.24, length: 1.25, color: "water", pan: 0.18, noiseGain: 0.14, toneGain: 0.02, from: 360, to: 2600, frequency: 210, endFrequency: 460, send: 0.5 });
+      [0.08, 0.17, 0.3, 0.44, 0.62, 0.78, 0.96, 1.18, 1.42, 1.68].forEach((start, index) => {
+        bubble(start, -0.42 + (index % 6) * 0.16, 0.55 + (index % 4) * 0.22);
+      });
+      texture({ start: 0.58, length: 1.08, gain: 0.16, pan: 0.12, filter: "highpass", from: 7200, to: 900, q: 0.9, color: "water", send: 0.3, curve: 1.9 });
+      tone({ start: 0.34, length: 1.45, frequency: 42, endFrequency: 27, gain: 0.16, type: "sine", pan: -0.02, attack: 0.06, send: 0.24 });
     } else if (profileId === "samira") {
-      [0.08, 0.2, 0.36, 0.54].forEach((start, index) => metalSlash(start, index % 2 ? 0.42 : -0.42, index % 2 === 0));
-      impact(0.74, 52, 0.26, 0.02, "metal");
-      texture({ start: 0.78, length: 0.52, gain: 0.11, pan: 0, filter: "bandpass", from: 6200, to: 880, q: 1.1, color: "metal", send: 0.22 });
+      gesture({ start: 0, length: 1.55, color: "metal", pan: 0, noiseGain: 0.12, toneGain: 0.04, from: 4200, to: 520, frequency: 180, endFrequency: 132, send: 0.34 });
+      [0.1, 0.27, 0.48, 0.72].forEach((start, index) => metalSlash(start, index % 2 ? 0.44 : -0.44, index % 2 === 0));
+      impact(0.92, 48, 0.18, 0.02, "metal");
+      texture({ start: 0.98, length: 0.9, gain: 0.09, pan: 0, filter: "bandpass", from: 5600, to: 700, q: 0.9, color: "metal", send: 0.36 });
     } else if (profileId === "caitlyn") {
-      [0.05, 0.18, 0.31].forEach((start, index) => tone({ start, length: 0.2, frequency: 980 + index * 220, endFrequency: 620 + index * 120, gain: 0.035, type: "sine", pan: -0.18 + index * 0.18, filter: { type: "bandpass", start: 1600 + index * 600, end: 2800 + index * 500, q: 2.2 }, send: 0.36 }));
-      texture({ start: 0.38, length: 0.12, gain: 0.28, pan: 0.18, filter: "highpass", from: 13200, to: 3400, q: 2.6, color: "metal", send: 0.08, curve: 2.9 });
-      impact(0.4, 72, 0.22, 0.08, "metal");
-      tone({ start: 0.62, length: 0.32, frequency: 1400, endFrequency: 740, gain: 0.032, type: "triangle", pan: -0.36, filter: { type: "bandpass", start: 3000, end: 1200, q: 2 }, send: 0.34 });
+      gesture({ start: 0.02, length: 1.18, color: "metal", pan: -0.08, noiseGain: 0.08, toneGain: 0.036, from: 900, to: 3600, frequency: 164, endFrequency: 246, send: 0.42 });
+      sparkleCloud(0.12, 4, "metal", 920, -0.24, 0.16);
+      texture({ start: 0.54, length: 0.22, gain: 0.18, pan: 0.18, filter: "highpass", from: 9800, to: 1800, q: 1.4, color: "metal", send: 0.18, curve: 2.0 });
+      impact(0.56, 58, 0.18, 0.1, "metal");
+      gesture({ start: 0.74, length: 0.86, color: "air", pan: -0.28, noiseGain: 0.065, toneGain: 0.022, from: 2200, to: 320, frequency: 510, endFrequency: 210, send: 0.44 });
     } else if (profileId === "kaisa") {
-      tone({ start: 0, length: 1.4, frequency: 64, endFrequency: 42, gain: 0.18, type: "sine", pan: 0, send: 0.28 });
-      [0.08, 0.32, 0.56, 0.88].forEach((start, index) => {
+      gesture({ start: 0, length: 2.1, color: "air", pan: 0, noiseGain: 0.11, toneGain: 0.055, from: 520, to: 6200, frequency: 64, endFrequency: 42, send: 0.42 });
+      [0.12, 0.38, 0.68, 1.02].forEach((start, index) => {
         tone({ start, length: 0.42, frequency: 220 + index * 110, endFrequency: 330 + index * 150, gain: 0.045, type: "sawtooth", pan: index % 2 ? 0.24 : -0.24, filter: { type: "bandpass", start: 680, end: 5400, q: 1.8 }, send: 0.32 });
-        texture({ start: start + 0.05, length: 0.28, gain: 0.09, pan: index % 2 ? 0.24 : -0.24, filter: "bandpass", from: 6400, to: 900, q: 1.3, color: "air", send: 0.22, curve: 1.8 });
+        texture({ start: start + 0.05, length: 0.44, gain: 0.08, pan: index % 2 ? 0.24 : -0.24, filter: "bandpass", from: 6400, to: 900, q: 1.0, color: "air", send: 0.32, curve: 1.45 });
       });
     } else if (profileId === "missfortune") {
-      [0.22, 0.42].forEach((start, index) => {
-        impact(start, index ? 58 : 64, 0.26, index ? 0.44 : -0.44, "metal");
-        texture({ start: start + 0.03, length: 0.24, gain: 0.16, pan: index ? 0.55 : -0.55, filter: "highpass", from: 11200, to: 1900, q: 1.2, color: "metal", send: 0.1, curve: 2.4 });
+      gesture({ start: 0.06, length: 1.65, color: "air", pan: 0, noiseGain: 0.1, toneGain: 0.03, from: 1800, to: 150, frequency: 86, endFrequency: 46, send: 0.38 });
+      [0.26, 0.5].forEach((start, index) => {
+        impact(start, index ? 54 : 62, 0.18, index ? 0.46 : -0.46, "metal");
+        texture({ start: start + 0.04, length: 0.42, gain: 0.11, pan: index ? 0.55 : -0.55, filter: "highpass", from: 10400, to: 1500, q: 0.9, color: "metal", send: 0.18, curve: 1.9 });
       });
-      [0.58, 0.72, 0.86].forEach((start, index) => tone({ start, length: 0.22, frequency: 1180 + index * 160, endFrequency: 620 + index * 80, gain: 0.032, type: "triangle", pan: -0.32 + index * 0.32, filter: { type: "bandpass", start: 3200, end: 1400, q: 2.4 }, send: 0.28 }));
-      texture({ start: 0.5, length: 0.8, gain: 0.09, pan: 0, filter: "lowpass", from: 1600, to: 170, q: 0.5, color: "air", send: 0.3 });
+      sparkleCloud(0.7, 3, "metal", 980, -0.26, 0.26);
+      texture({ start: 0.54, length: 1.1, gain: 0.1, pan: 0, filter: "lowpass", from: 1500, to: 140, q: 0.46, color: "air", send: 0.36 });
     } else if (profileId === "ezreal") {
-      [0.04, 0.18, 0.34, 0.56].forEach((start, index) => {
+      gesture({ start: 0, length: 1.7, color: "air", pan: 0.04, noiseGain: 0.1, toneGain: 0.04, from: 740, to: 7200, frequency: 180, endFrequency: 520, send: 0.48 });
+      [0.08, 0.26, 0.48, 0.76].forEach((start, index) => {
         tone({ start, length: 0.28, frequency: 520 + index * 170, endFrequency: 980 + index * 220, gain: 0.046, type: "sine", pan: -0.34 + index * 0.22, filter: { type: "bandpass", start: 1800, end: 6800, q: 1.5 }, send: 0.36 });
       });
-      texture({ start: 0.24, length: 0.74, gain: 0.13, pan: 0.1, filter: "bandpass", from: 8800, to: 1100, q: 0.95, color: "air", send: 0.32, curve: 1.35 });
-      impact(0.74, 66, 0.2, 0.18, "air");
+      texture({ start: 0.34, length: 0.96, gain: 0.11, pan: 0.1, filter: "bandpass", from: 8800, to: 1100, q: 0.8, color: "air", send: 0.42, curve: 1.22 });
+      impact(0.92, 54, 0.14, 0.18, "air");
     } else if (profileId === "jhin") {
-      [0.08, 0.26, 0.44, 0.7].forEach((start, index) => {
-        tone({ start, length: index === 3 ? 0.72 : 0.22, frequency: 196 + index * 49, endFrequency: index === 3 ? 98 : 160 + index * 36, gain: index === 3 ? 0.1 : 0.045, type: "triangle", pan: -0.18 + index * 0.12, filter: { type: "bandpass", start: 420 + index * 260, end: 980 + index * 320, q: 1.2 }, send: 0.44 });
-        if (index < 3) texture({ start: start + 0.016, length: 0.11, gain: 0.052, pan: -0.18 + index * 0.12, filter: "highpass", from: 4800, to: 1900, q: 2, color: "metal", send: 0.18, curve: 2.2 });
+      gesture({ start: 0, length: 1.5, color: "metal", pan: 0, noiseGain: 0.075, toneGain: 0.045, from: 480, to: 1800, frequency: 146, endFrequency: 98, send: 0.52 });
+      [0.12, 0.36, 0.62, 0.96].forEach((start, index) => {
+        tone({ start, length: index === 3 ? 0.82 : 0.32, frequency: 196 + index * 49, endFrequency: index === 3 ? 98 : 160 + index * 36, gain: index === 3 ? 0.085 : 0.034, type: "triangle", pan: -0.18 + index * 0.12, filter: { type: "bandpass", start: 420 + index * 260, end: 980 + index * 320, q: 1.0 }, send: 0.5 });
+        if (index < 3) texture({ start: start + 0.03, length: 0.18, gain: 0.032, pan: -0.18 + index * 0.12, filter: "highpass", from: 3800, to: 1500, q: 1.4, color: "metal", send: 0.24, curve: 1.8 });
       });
-      impact(0.88, 42, 0.28, 0, "metal");
+      impact(1.1, 38, 0.18, 0, "metal");
     } else if (profileId === "ashe") {
-      texture({ start: 0.08, length: 1.05, gain: 0.18, pan: -0.12, filter: "highpass", from: 11200, to: 1600, q: 0.75, color: "ice", send: 0.34, curve: 1.15 });
-      [0.32, 0.52, 0.76].forEach((start, index) => {
+      gesture({ start: 0.04, length: 1.75, color: "ice", pan: -0.1, noiseGain: 0.14, toneGain: 0.04, from: 10800, to: 920, frequency: 320, endFrequency: 210, send: 0.5 });
+      [0.34, 0.62, 0.94].forEach((start, index) => {
         tone({ start, length: 0.34, frequency: 880 + index * 420, endFrequency: 520 + index * 240, gain: 0.04, type: "sine", pan: -0.24 + index * 0.2, filter: { type: "bandpass", start: 4200, end: 1600, q: 2.8 }, send: 0.42 });
-        texture({ start: start + 0.04, length: 0.3, gain: 0.07, pan: -0.24 + index * 0.2, filter: "bandpass", from: 7600, to: 2200, q: 1.8, color: "ice", send: 0.24, curve: 1.8 });
+        texture({ start: start + 0.04, length: 0.42, gain: 0.06, pan: -0.24 + index * 0.2, filter: "bandpass", from: 7600, to: 2200, q: 1.4, color: "ice", send: 0.34, curve: 1.45 });
       });
-      impact(0.82, 58, 0.18, 0.14, "ice");
+      impact(1.0, 48, 0.13, 0.14, "ice");
     } else if (profileId === "rammus") {
-      texture({ start: 0.0, length: 1.65, gain: 0.18, pan: 0, filter: "lowpass", from: 720, to: 80, q: 0.58, color: "stone", send: 0.16, curve: 1.0 });
-      [0.1, 0.32, 0.56, 0.82, 1.06].forEach((start, index) => {
-        impact(start, 32 + index * 3, 0.2 - index * 0.018, index % 2 ? 0.18 : -0.16, "stone");
-        texture({ start: start + 0.045, length: 0.32, gain: 0.08, pan: index % 2 ? 0.28 : -0.24, filter: "bandpass", from: 940 + index * 160, to: 180, q: 0.8, color: "stone", send: 0.18, curve: 1.55 });
+      gesture({ start: 0, length: 2.42, color: "stone", pan: 0, noiseGain: 0.2, toneGain: 0.052, from: 760, to: 62, frequency: 42, endFrequency: 28, send: 0.22 });
+      [0.16, 0.42, 0.72, 1.06, 1.44].forEach((start, index) => {
+        impact(start, 30 + index * 3, 0.16 - index * 0.012, index % 2 ? 0.18 : -0.16, "stone");
+        texture({ start: start + 0.045, length: 0.44, gain: 0.07, pan: index % 2 ? 0.28 : -0.24, filter: "bandpass", from: 940 + index * 160, to: 150, q: 0.65, color: "stone", send: 0.22, curve: 1.32 });
       });
     } else {
       impact(0.2, 48, 0.18, 0, "air");
@@ -1731,7 +1792,6 @@ function playSelectSound(profileId = "default") {
         playSynthSelectSound(profileId);
       });
     }
-    playCinematicAccent(profileId);
     playChampionFoley(profileId);
   } catch {
     playSynthSelectSound(profileId);
@@ -4090,6 +4150,12 @@ function renderPicker() {
       button.style.setProperty("--ry", "0deg");
       button.style.setProperty("--mx", "50%");
       button.style.setProperty("--my", "42%");
+    });
+    button.addEventListener("pointerenter", () => {
+      void warmVfx3dRenderer(champion.id);
+    });
+    button.addEventListener("focus", () => {
+      void warmVfx3dRenderer(champion.id);
     });
     button.addEventListener("click", () => {
       button.classList.remove("is-flashing");
