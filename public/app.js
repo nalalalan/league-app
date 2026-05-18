@@ -743,15 +743,15 @@ const stingerUrls = Object.fromEntries(champions.map((champion) => [
 ]));
 
 const visualDurations = {
-  samira: 1180,
-  caitlyn: 1080,
-  fizz: 980,
-  kaisa: 1220,
-  missfortune: 1120,
-  ezreal: 1160,
-  jhin: 1300,
-  ashe: 1120,
-  rammus: 1240
+  samira: 760,
+  caitlyn: 720,
+  fizz: 700,
+  kaisa: 800,
+  missfortune: 760,
+  ezreal: 760,
+  jhin: 860,
+  ashe: 740,
+  rammus: 820
 };
 
 const shaderSceneIds = {
@@ -4929,7 +4929,7 @@ function spawnSelectionFx(button, profileId = "default") {
       context.imageSmoothingQuality = "high";
       last2dDrawAt = -Infinity;
     }
-    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 180;
+    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 90;
     const twoDFrameInterval = width > 900 ? 58 : 44;
     const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= twoDFrameInterval;
     if (needsFirst2dDraw || needs2dDraw || elapsed > duration - 140) {
@@ -4948,7 +4948,7 @@ function spawnSelectionFx(button, profileId = "default") {
     window.removeEventListener("resize", updateStageSize);
     if (fx._threeDispose) fx._threeDispose();
     fx.remove();
-  }, duration + 220);
+  }, duration + 90);
 }
 
 function animateChampionSwap(champion) {

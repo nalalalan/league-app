@@ -268,7 +268,7 @@ summary {
   mix-blend-mode: screen;
   -webkit-mask-image: radial-gradient(ellipse at 50% 52%, #000 0 44%, rgba(0,0,0,.78) 56%, transparent 84%);
   mask-image: radial-gradient(ellipse at 50% 52%, #000 0 44%, rgba(0,0,0,.78) 56%, transparent 84%);
-  animation: ultimateStageIn 1.02s cubic-bezier(.16, .9, .18, 1) both;
+  animation: ultimateStageIn .82s cubic-bezier(.16, .9, .18, 1) both;
   will-change: opacity, transform, filter;
 }
 
