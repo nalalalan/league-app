@@ -33,9 +33,17 @@ Run:
 npm run sync:recordings
 ```
 
-The sync copies recordings into `public/recordings/`, extracts poster frames, and writes `public/recordings/recordings.json`. The page loads that manifest so new recordings can appear without editing `app.js`.
+The sync copies small recordings into `public/recordings/`, compresses large recordings into deployable `.mp4` files, extracts poster frames, and writes `public/recordings/recordings.json`. The page loads that manifest so new recordings can appear without editing `app.js`.
 
-Recording order is source-modified-time order. The sync preserves that order for analysis, but the public page stays focused on one queue plan plus one feedback item per recording. Each generated feedback item also carries a `whyTrust` rationale so the page explains why the rule is worth trying.
+Recording order is source-modified-time order. The sync preserves that order for analysis, but the public page stays focused on one queue plan plus one feedback item per recording. Each feedback item carries a `whyTrust` rationale plus a collapsed full read with pattern, Diamond rule, queue rep, visible evidence, nuance, and review limit.
+
+Run:
+
+```bash
+npm run publish:recordings
+```
+
+The publish command skips work when the source folder has not changed. When new recordings exist, it syncs them, commits `public/recordings`, pushes `main`, and starts a Railway deploy.
 
 ## Paper
 
