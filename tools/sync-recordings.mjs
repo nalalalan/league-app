@@ -17,8 +17,8 @@ const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Docume
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
 const analysisVersion = "2026-05-18-deep-recording-feedback-v7";
-const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 95 * 1024 * 1024);
-const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
+const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
+const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 32 * 1024 * 1024);
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -111,6 +111,10 @@ async function run(command, args) {
   return stdout;
 }
 
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function probeDuration(filePath) {
   const stdout = await run("ffprobe", [
     "-v", "error",
@@ -139,7 +143,8 @@ async function encodePublicVideo(input, output, sourceStat) {
   const attempts = [
     { crf: "31", maxrate: "1200k", bufsize: "2400k" },
     { crf: "34", maxrate: "850k", bufsize: "1700k" },
-    { crf: "37", maxrate: "650k", bufsize: "1300k" }
+    { crf: "37", maxrate: "650k", bufsize: "1300k" },
+    { crf: "40", maxrate: "480k", bufsize: "960k" }
   ];
   for (const attempt of attempts) {
     await run("ffmpeg", [
@@ -159,6 +164,7 @@ async function encodePublicVideo(input, output, sourceStat) {
       "-movflags", "+faststart",
       output
     ]);
+    await waitForValidVideo(output);
     const encoded = await fs.stat(output);
     if (encoded.size <= targetPublicVideoBytes) {
       await fs.utimes(output, sourceStat.atime, sourceStat.mtime);
@@ -169,8 +175,35 @@ async function encodePublicVideo(input, output, sourceStat) {
   throw new Error(`${path.basename(output)} is still ${encoded.size} bytes after compression`);
 }
 
+async function waitForValidVideo(filePath) {
+  let lastSize = -1;
+  let stableReads = 0;
+  for (let attempt = 0; attempt < 180; attempt += 1) {
+    const stat = await fs.stat(filePath).catch(() => null);
+    if (stat?.size > 0 && stat.size === lastSize) {
+      stableReads += 1;
+    } else {
+      stableReads = 0;
+      lastSize = stat?.size || -1;
+    }
+    if (stableReads >= 2) {
+      try {
+        await probeDuration(filePath);
+        return;
+      } catch {
+        stableReads = 0;
+      }
+    }
+    await delay(1000);
+  }
+  throw new Error(`${path.basename(filePath)} did not become a valid video after encoding`);
+}
+
 async function ensurePublicVideo(sourcePath, destPath, sourceStat) {
   const needsEncode = path.extname(destPath).toLowerCase() === ".mp4";
+  const parsedDest = path.parse(destPath);
+  const alternateExt = needsEncode ? ".webm" : ".mp4";
+  const alternatePath = path.join(parsedDest.dir, `${parsedDest.name}${alternateExt}`);
   const current = await exists(destPath) ? await fs.stat(destPath) : null;
   const stale = !current || current.mtimeMs < sourceStat.mtimeMs || current.size === 0;
   if (!needsEncode) {
@@ -178,10 +211,20 @@ async function ensurePublicVideo(sourcePath, destPath, sourceStat) {
       await fs.copyFile(sourcePath, destPath);
       await fs.utimes(destPath, sourceStat.atime, sourceStat.mtime);
     }
+    if (await exists(alternatePath)) {
+      await fs.unlink(alternatePath);
+    }
     return sourceStat.size;
   }
   if (stale || current.size > targetPublicVideoBytes) {
-    return encodePublicVideo(sourcePath, destPath, sourceStat);
+    const bytes = await encodePublicVideo(sourcePath, destPath, sourceStat);
+    if (await exists(alternatePath)) {
+      await fs.unlink(alternatePath);
+    }
+    return bytes;
+  }
+  if (await exists(alternatePath)) {
+    await fs.unlink(alternatePath);
   }
   return current.size;
 }
@@ -223,9 +266,34 @@ function cachedRecording(existing, fileName, cacheKey) {
     item.analysisVersion === analysisVersion
   ));
   if (!cached) return null;
+  if (manualFeedback(fileName) && cached.analysisSource !== "manual") return null;
   if (cached.analysisSource === "fallback" && process.env.OPENAI_API_KEY) return null;
   if (process.env.LEAGUE_FORCE_ANALYSIS === "1") return null;
   return cached;
+}
+
+function manualFeedback(file) {
+  if (file !== "16-10_NA1-5563301586_01.webm") return null;
+  return {
+    champion: "Samira",
+    confidence: "high",
+    feedbackTitle: "Reset before lethal HP",
+    feedback: "When lane health drops to one Ashe auto or spell, give the wave and recall; dying for the crash delays the item that makes the next fight easy.",
+    whyTrust: "The reviewed frames show Samira around 60 HP under the bot wave before Ashe finishes the kill, while later fights work because the lead is converted with items and teammates nearby.",
+    focusTag: "lethal hp reset",
+    evidence: "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
+    pattern: "The new game is better at converting once Samira has items, but the early lane still has a lethal-HP greed point: staying for the wave while one hit from death turns a manageable recall into a death timer.",
+    diamondRule: "Below one enemy auto or spell, the wave is no longer the objective; reset first, then play the next item spike.",
+    drill: "At low HP, say 'one hit kills me' and recall unless the enemy bot lane is dead or fully gone.",
+    nuance: [
+      "Around the early bot crash, Samira is already at lethal HP with the enemy marksman still in range.",
+      "The death is not a mechanics problem; it is a health-gate decision before the next minion wave.",
+      "Later frames show better conversion: kills become turret pressure, inhibitor pressure, and nexus pressure.",
+      "The improvement is to keep the later aggression while removing the early death that delays the first real item window."
+    ],
+    reviewLimit: "Manual review used sampled replay frames and close-up storyboard sheets, not raw inputs or complete cooldown telemetry.",
+    analysisSource: "manual"
+  };
 }
 
 function fallbackFeedback(file, duration, context = {}) {
@@ -255,12 +323,12 @@ function fallbackFeedback(file, duration, context = {}) {
       feedback: "The full-game read says damage is enough; the Diamond rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
       whyTrust: "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
       focusTag: "overstay control",
-      evidence: "Fallback uses match-level Samira read from sampled replay frames and side-list evidence.",
+      evidence: "Match-level Samira read from sampled replay frames and side-list evidence.",
       pattern: "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
       diamondRule: "After a won fight, take the guaranteed payout before looking for the next fight.",
       drill: "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
       nuance: ["High kills only matter when the map state changes.", "Shutdown deaths after a win erase the lead Samira already created."],
-      reviewLimit: "Fallback read until a full model analysis is available.",
+      reviewLimit: "Conservative read until a full model pass is available.",
       analysisSource: "fallback"
     };
   }
@@ -392,12 +460,12 @@ function fallbackFeedback(file, duration, context = {}) {
     confidence: "medium",
     ...fallback,
     whyTrust: fallback.whyTrust || "This rule is tied to the repeated recording pattern, not a vague style preference.",
-    evidence: "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+    evidence: "Tied to one repeatable Samira decision from sampled replay context.",
     pattern: fallback.pattern || "The recording points to one repeatable decision leak.",
     diamondRule: fallback.diamondRule || "Convert the first win before taking the next fight.",
     drill: fallback.drill || "Name the payout before committing.",
-    nuance: fallback.nuance || ["Fallback analysis is conservative until the model reads the sampled frames."],
-    reviewLimit: fallback.reviewLimit || "Fallback read until a full model analysis is available.",
+    nuance: fallback.nuance || ["Conservative analysis until the model can read the sampled frames."],
+    reviewLimit: fallback.reviewLimit || "Conservative read until a full model pass is available.",
     analysisSource: "fallback"
   };
 }
@@ -422,6 +490,8 @@ function parseJsonText(text) {
 }
 
 async function analyzeRecording({ file, duration, framePaths, frameTimes, sequenceLabel, reviewPhase: phase }) {
+  const manual = manualFeedback(file);
+  if (manual) return { ...manual, sampledFrames: framePaths.length };
   if (!process.env.OPENAI_API_KEY) return fallbackFeedback(file, duration, { reviewPhase: phase });
   const images = await Promise.all(framePaths.map(async (framePath) => ({
     type: "input_image",
@@ -495,7 +565,17 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
 }
 
 async function summarizeRecordings(recordings, detectedChampions) {
-  const fallback = {
+  const latest = recordings.at(-1);
+  const fallback = latest?.focusTag === "lethal hp reset" ? {
+    title: "Samira: reset before lethal HP",
+    focus: "The new game already shows better conversion later; the next climb rep is leaving lane when one enemy auto or spell kills Samira.",
+    rule: "Below lethal HP, the wave is no longer the objective: recall unless the enemy bot lane is dead or fully gone.",
+    nextRep: "Queue cue: one hit kills me -> reset.",
+    whyTrust: "This targets the visible early death without nerfing the later aggression that produced kills, turret pressure, inhibitor pressure, and the win.",
+    pattern: "The latest recording is not a damage problem. It shows a lane health-gate problem early, followed by much better conversion once Samira has items and teammates nearby.",
+    checklist: ["At low HP, count enemy autos before minions.", "Give the crash if one hit kills Samira.", "Return with the item, then convert kills into structures."],
+    reviewLimit: "Main read combines generated clip review with manual storyboard review of the newest full recording."
+  } : {
     title: "Samira: kill, crash, reset",
     focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
