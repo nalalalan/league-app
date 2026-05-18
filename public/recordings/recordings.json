@@ -1,24 +1,35 @@
 {
-  "generatedAt": "2026-05-18T23:04:42.829Z",
+  "generatedAt": "2026-05-18T23:28:18.463Z",
   "source": "League of Legends Highlights folder",
-  "match": "NA1-5563247854",
-  "captured": "May 18, 2026, 5:46 PM-5:57 PM ET",
-  "totalDuration": "5:58",
-  "totalRecordings": 13,
+  "match": "2 matches",
+  "matches": [
+    "NA1-5563247854",
+    "NA1-5563301586"
+  ],
+  "captured": "May 18, 2026, 5:46 PM-7:15 PM ET",
+  "totalDuration": "14:44",
+  "totalRecordings": 14,
   "reviewBasis": "Recording review is ordered as a queue plan with one feedback note per file.",
   "mainFeedback": {
     "title": "Samira: kill, crash, reset",
     "focus": "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
     "rule": "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     "nextRep": "Queue cue: kill -> payout -> reset.",
-    "whyTrust": "This is Diamond-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
+    "whyTrust": "This is Diamond-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives.",
+    "pattern": "Across the recordings, the climb value is not finding more damage. It is ending the first winning moment through a map payout before the fight becomes coin-flip again.",
+    "checklist": [
+      "Name the payout before the commit.",
+      "Crash or reset after the first win.",
+      "Take the second fight only with numbers, CC, and exit known."
+    ],
+    "reviewLimit": "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
   },
   "detectedChampions": [
     {
       "id": "samira",
       "name": "Samira",
       "confidence": "medium",
-      "recordings": 13,
+      "recordings": 14,
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
       "improvementTitle": "Ask for the payout first",
       "improvement": "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end."
@@ -27,6 +38,7 @@
   "recordings": [
     {
       "file": "16-10_NA1-5563247854_01.webm",
+      "publicFile": "16-10_NA1-5563247854_01.webm",
       "cacheKey": "3160861:1779140818548",
       "fingerprint": "0fcdc167a1fb",
       "title": "highlight 01",
@@ -41,13 +53,23 @@
       "whyTrust": "Diamond ADCs climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
       "focusTag": "commit timing",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "The fight needs a planned map payout before the commit.",
+      "diamondRule": "Commit only when the win has an immediate conversion path.",
+      "drill": "Name the payout before pressing the engage button.",
+      "nuance": [
+        "A good-looking kill is still low value if the wave or objective stays unchanged."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 5,
+      "publicVideoBytes": 3160861,
       "src": "/recordings/16-10_NA1-5563247854_01.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-01.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_02.webm",
+      "publicFile": "16-10_NA1-5563247854_02.webm",
       "cacheKey": "9279734:1779140858260",
       "fingerprint": "5e0dc3eea3cf",
       "title": "highlight 02",
@@ -62,13 +84,23 @@
       "whyTrust": "This is the highest-value check because one untracked stun, root, knock-up, or hook turns Samira's whole reset plan off.",
       "focusTag": "reset discipline",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "The dangerous moment is entering before the enemy's fight-stopping spell is accounted for.",
+      "diamondRule": "No full commit until the one spell that stops Samira is gone or aimed elsewhere.",
+      "drill": "Name one enemy CC spell before every fight.",
+      "nuance": [
+        "The check is not passive; it preserves aggression by waiting for the real opening."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 8,
+      "publicVideoBytes": 9279734,
       "src": "/recordings/16-10_NA1-5563247854_02.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-02.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_03.webm",
+      "publicFile": "16-10_NA1-5563247854_03.webm",
       "cacheKey": "6517189:1779140879640",
       "fingerprint": "fe42164fa4f2",
       "title": "highlight 03",
@@ -83,13 +115,23 @@
       "whyTrust": "The rule is trustworthy because fog removes the information Samira needs to decide whether the next E is a reset or a bait.",
       "focusTag": "chase discipline",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "Chasing past fog turns a won trade into an information gamble.",
+      "diamondRule": "Stop at fog unless the next enemy positions are known.",
+      "drill": "When the target leaves vision, look at wave and objective before moving forward.",
+      "nuance": [
+        "Fog is not just darkness; it removes reset and exit information."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 8,
+      "publicVideoBytes": 6517189,
       "src": "/recordings/16-10_NA1-5563247854_03.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-03.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_04.webm",
+      "publicFile": "16-10_NA1-5563247854_04.webm",
       "cacheKey": "8174947:1779140946108",
       "fingerprint": "c41b0bbd1cc7",
       "title": "highlight 04",
@@ -104,13 +146,23 @@
       "whyTrust": "This is how a won lane becomes rank progress: the enemy loses minions and map space even if no second kill happens.",
       "focusTag": "objective conversion",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "Lane wins need to become minion loss, plate pressure, or objective tempo.",
+      "diamondRule": "Crash before chasing the second reward.",
+      "drill": "After a bot kill, touch the wave before looking for another fight.",
+      "nuance": [
+        "The crash makes the next play safer because the enemy loses time answering the wave."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 8,
+      "publicVideoBytes": 8174947,
       "src": "/recordings/16-10_NA1-5563247854_04.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-04.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_05.webm",
+      "publicFile": "16-10_NA1-5563247854_05.webm",
       "cacheKey": "20921882:1779141010241",
       "fingerprint": "f3fa09804fd4",
       "title": "highlight 05",
@@ -125,13 +177,23 @@
       "whyTrust": "This lowers anxiety without lowering aggression because edge play gathers real cooldown evidence before the all-in.",
       "focusTag": "crowd-control tracking",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "The edge of the fight gives Samira information without spending the dash.",
+      "diamondRule": "Fight the first second from range, then enter after the enemy spends tools.",
+      "drill": "Q-auto once before committing unless the target is already isolated and lethal.",
+      "nuance": [
+        "This is still aggressive because it prepares the reset instead of canceling the fight."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 12,
+      "publicVideoBytes": 20921882,
       "src": "/recordings/16-10_NA1-5563247854_05.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-05.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_06.webm",
+      "publicFile": "16-10_NA1-5563247854_06.webm",
       "cacheKey": "411224:1779141017999",
       "fingerprint": "8d7738d3e45a",
       "title": "highlight 06",
@@ -146,20 +208,30 @@
       "whyTrust": "The advice is low-confidence on gameplay and high-confidence on review quality because a one-second clip hides the decision that caused the outcome.",
       "focusTag": "recording context",
       "evidence": "The recording is shorter than three seconds.",
+      "pattern": "The clip is too short to show the decision before the result.",
+      "diamondRule": "Record the trigger, the fight, and the exit so the review can judge the decision instead of the scoreboard.",
+      "drill": "Capture five seconds before and after the next fight.",
+      "nuance": [
+        "The visible result is not enough evidence for a confident gameplay diagnosis."
+      ],
+      "reviewLimit": "Low gameplay confidence because the recording lacks pre-fight context.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 1,
+      "publicVideoBytes": 411224,
       "src": "/recordings/16-10_NA1-5563247854_06.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-06.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_07.webm",
+      "publicFile": "16-10_NA1-5563247854_07.webm",
       "cacheKey": "6604807:1779141052332",
       "fingerprint": "f11dbb09db36",
       "title": "highlight 07",
       "duration": "0:13",
       "durationSeconds": 13.184,
       "kind": "highlight",
-      "reviewPhase": "implementation",
+      "reviewPhase": "baseline",
       "champion": "Samira",
       "confidence": "medium",
       "feedbackTitle": "Protect the shutdown",
@@ -167,13 +239,23 @@
       "whyTrust": "This is worth practicing because it does not ask for less carry pressure; it keeps the carry gold from being handed back.",
       "focusTag": "cash-out timing",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "The risk shifts after Samira has gold; the next death is more expensive than the next kill is valuable.",
+      "diamondRule": "Protect shutdown gold after the first payout.",
+      "drill": "Recall after the payout unless an objective is already free.",
+      "nuance": [
+        "This preserves carry pressure by making the next item arrive sooner."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 8,
+      "publicVideoBytes": 6604807,
       "src": "/recordings/16-10_NA1-5563247854_07.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-07.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_08.webm",
+      "publicFile": "16-10_NA1-5563247854_08.webm",
       "cacheKey": "8294186:1779141088858",
       "fingerprint": "c62a3f294f0f",
       "title": "highlight 08",
@@ -188,13 +270,23 @@
       "whyTrust": "Counting visible enemies gives anxiety a concrete check; if the numbers are bad, skipping the rescue is discipline, not fear.",
       "focusTag": "safe gold",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "Rescue instincts can drag Samira into a fight that is already numerically lost.",
+      "diamondRule": "Count visible enemies before answering a teammate death.",
+      "drill": "Say the number count before using E toward a fight.",
+      "nuance": [
+        "Skipping the rescue can be the correct carry decision when the fight is already gone."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 8,
+      "publicVideoBytes": 8294186,
       "src": "/recordings/16-10_NA1-5563247854_08.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-08.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_09.webm",
+      "publicFile": "16-10_NA1-5563247854_09.webm",
       "cacheKey": "13307772:1779141144305",
       "fingerprint": "d86abc149f56",
       "title": "highlight 09",
@@ -209,13 +301,23 @@
       "whyTrust": "This turns side farm into safe income instead of isolation, which is the difference between carrying with gold and dying with gold.",
       "focusTag": "late entry",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "Side farm is useful until it isolates the fed carry from the next map play.",
+      "diamondRule": "Catch the wave, then leave unless the enemy positions are visible.",
+      "drill": "Take the wave and immediately path back through safe vision.",
+      "nuance": [
+        "Gold only helps if the next movement keeps the map connected."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 8,
+      "publicVideoBytes": 13307772,
       "src": "/recordings/16-10_NA1-5563247854_09.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-09.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_10.webm",
+      "publicFile": "16-10_NA1-5563247854_10.webm",
       "cacheKey": "5487740:1779141178570",
       "fingerprint": "df9023a6671e",
       "title": "highlight 10",
@@ -230,20 +332,30 @@
       "whyTrust": "Objectives force the enemy to answer on your terms; random duels make the game hinge on mechanics under uncertainty.",
       "focusTag": "exit planning",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "A side duel can distract from the objective that would make the enemy respond.",
+      "diamondRule": "Objective pressure before isolated duels.",
+      "drill": "Ping or path to the objective before matching the side target.",
+      "nuance": [
+        "Making the enemy answer the map lowers the need for perfect mechanics."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 5,
+      "publicVideoBytes": 5487740,
       "src": "/recordings/16-10_NA1-5563247854_10.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-10.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_11.webm",
+      "publicFile": "16-10_NA1-5563247854_11.webm",
       "cacheKey": "5961013:1779141211993",
       "fingerprint": "9a9422b2a634",
       "title": "highlight 11",
       "duration": "0:12",
       "durationSeconds": 12.373,
       "kind": "highlight",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "medium",
       "feedbackTitle": "Second in at chokes",
@@ -251,13 +363,23 @@
       "whyTrust": "This preserves the aggression while removing the single easiest way enemies stop Samira.",
       "focusTag": "objective conversion",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "Chokes punish the first champion in; Samira gets more value as the second entry.",
+      "diamondRule": "Second in at jungle walls unless the enemy CC is already gone.",
+      "drill": "Pause at the choke edge and enter after the first cooldown exchange.",
+      "nuance": [
+        "The pause is a setup for resets, not hesitation."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 8,
+      "publicVideoBytes": 5961013,
       "src": "/recordings/16-10_NA1-5563247854_11.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-11.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_12.webm",
+      "publicFile": "16-10_NA1-5563247854_12.webm",
       "cacheKey": "26496245:1779141285719",
       "fingerprint": "9f3cacd8408c",
       "title": "highlight 12",
@@ -272,19 +394,29 @@
       "whyTrust": "This is reliable because structures are guaranteed progress; extra fighting after the base is open adds variance without adding win condition.",
       "focusTag": "overstay control",
       "evidence": "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+      "pattern": "Base fights become lower value once the structure is open.",
+      "diamondRule": "Hit the structure as soon as the fight is won.",
+      "drill": "After a base kill, move the cursor to the structure first.",
+      "nuance": [
+        "The structure is the lowest-variance way to convert the lead."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 12,
+      "publicVideoBytes": 26496245,
       "src": "/recordings/16-10_NA1-5563247854_12.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-12.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_13.webm",
+      "publicFile": "16-10_NA1-5563247854_13.webm",
       "cacheKey": "55606684:1779141430041",
       "fingerprint": "25f0ca758247",
-      "title": "full game 8x",
+      "title": "full review 01",
       "duration": "2:09",
       "durationSeconds": 129.397,
-      "kind": "full 8x",
+      "kind": "full review",
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "medium",
@@ -293,10 +425,52 @@
       "whyTrust": "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
       "focusTag": "overstay control",
       "evidence": "Fallback uses match-level Samira read from sampled replay frames and side-list evidence.",
+      "pattern": "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
+      "diamondRule": "After a won fight, take the guaranteed payout before looking for the next fight.",
+      "drill": "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
+      "nuance": [
+        "High kills only matter when the map state changes.",
+        "Shutdown deaths after a win erase the lead Samira already created."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-18-recording-feedback-v6",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 18,
+      "publicVideoBytes": 55606684,
       "src": "/recordings/16-10_NA1-5563247854_13.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-13.jpg"
+    },
+    {
+      "file": "16-10_NA1-5563301586_01.webm",
+      "publicFile": "16-10_NA1-5563301586_01.mp4",
+      "cacheKey": "269700985:1779146149301",
+      "fingerprint": "4313d27b9fc5",
+      "title": "full review 02",
+      "duration": "8:47",
+      "durationSeconds": 526.912,
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "medium",
+      "feedbackTitle": "16/10 means conversion gap",
+      "feedback": "The full-game read says damage is enough; the Diamond rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
+      "whyTrust": "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
+      "focusTag": "overstay control",
+      "evidence": "Fallback uses match-level Samira read from sampled replay frames and side-list evidence.",
+      "pattern": "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
+      "diamondRule": "After a won fight, take the guaranteed payout before looking for the next fight.",
+      "drill": "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
+      "nuance": [
+        "High kills only matter when the map state changes.",
+        "Shutdown deaths after a win erase the lead Samira already created."
+      ],
+      "reviewLimit": "Fallback read until a full model analysis is available.",
+      "analysisSource": "fallback",
+      "analysisVersion": "2026-05-18-deep-recording-feedback-v7",
+      "sampledFrames": 24,
+      "publicVideoBytes": 49162636,
+      "src": "/recordings/16-10_NA1-5563301586_01.mp4",
+      "poster": "/recordings/posters/16-10-na1-5563301586-01.jpg"
     }
   ]
 }

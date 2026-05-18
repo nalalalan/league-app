@@ -16,7 +16,9 @@ const manifestPath = path.join(recordingRoot, "recordings.json");
 const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Documents\\League of Legends\\Highlights";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-18-recording-feedback-v6";
+const analysisVersion = "2026-05-18-deep-recording-feedback-v7";
+const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 95 * 1024 * 1024);
+const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -37,6 +39,11 @@ function toPosixPath(value) {
 
 function publicPath(absolutePath) {
   return `/${toPosixPath(path.relative(publicRoot, absolutePath))}`;
+}
+
+function publicRecordingName(name, stat) {
+  const parsed = path.parse(name);
+  return stat.size > largeRecordingBytes ? `${parsed.name}.mp4` : name;
 }
 
 function mmss(seconds) {
@@ -127,6 +134,76 @@ async function extractFrame(input, output, second, width = 640) {
   ]);
 }
 
+async function encodePublicVideo(input, output, sourceStat) {
+  await fs.mkdir(path.dirname(output), { recursive: true });
+  const attempts = [
+    { crf: "31", maxrate: "1200k", bufsize: "2400k" },
+    { crf: "34", maxrate: "850k", bufsize: "1700k" },
+    { crf: "37", maxrate: "650k", bufsize: "1300k" }
+  ];
+  for (const attempt of attempts) {
+    await run("ffmpeg", [
+      "-y",
+      "-v", "error",
+      "-i", input,
+      "-map", "0:v:0",
+      "-map", "0:a?",
+      "-c:v", "libx264",
+      "-preset", "veryfast",
+      "-crf", attempt.crf,
+      "-maxrate", attempt.maxrate,
+      "-bufsize", attempt.bufsize,
+      "-vf", "scale=1280:-2",
+      "-c:a", "aac",
+      "-b:a", "64k",
+      "-movflags", "+faststart",
+      output
+    ]);
+    const encoded = await fs.stat(output);
+    if (encoded.size <= targetPublicVideoBytes) {
+      await fs.utimes(output, sourceStat.atime, sourceStat.mtime);
+      return encoded.size;
+    }
+  }
+  const encoded = await fs.stat(output);
+  throw new Error(`${path.basename(output)} is still ${encoded.size} bytes after compression`);
+}
+
+async function ensurePublicVideo(sourcePath, destPath, sourceStat) {
+  const needsEncode = path.extname(destPath).toLowerCase() === ".mp4";
+  const current = await exists(destPath) ? await fs.stat(destPath) : null;
+  const stale = !current || current.mtimeMs < sourceStat.mtimeMs || current.size === 0;
+  if (!needsEncode) {
+    if (!current || current.size !== sourceStat.size) {
+      await fs.copyFile(sourcePath, destPath);
+      await fs.utimes(destPath, sourceStat.atime, sourceStat.mtime);
+    }
+    return sourceStat.size;
+  }
+  if (stale || current.size > targetPublicVideoBytes) {
+    return encodePublicVideo(sourcePath, destPath, sourceStat);
+  }
+  return current.size;
+}
+
+function sampleTimesFor(duration) {
+  if (duration < 3) return [Math.max(0.2, duration * 0.5)];
+  const count = duration > 240 ? 24 : duration > 90 ? 18 : duration > 35 ? 12 : duration > 12 ? 8 : 5;
+  const start = Math.min(Math.max(0.3, duration * 0.04), 4);
+  const end = Math.max(start + 0.2, duration - Math.min(Math.max(0.3, duration * 0.04), 4));
+  if (count === 1) return [duration * 0.5];
+  return Array.from({ length: count }, (_, index) => start + ((end - start) * index) / (count - 1))
+    .map((time) => Math.max(0.2, Math.min(duration - 0.2, time)));
+}
+
+function cleanList(value, maxItems = 5) {
+  const values = Array.isArray(value) ? value : String(value || "").split(/\n+|;\s*/);
+  return values
+    .map((item) => clean(String(item).replace(/^[-*\d.]+\s*/, "")))
+    .filter(Boolean)
+    .slice(0, maxItems);
+}
+
 async function readExistingManifest() {
   try {
     return JSON.parse(await fs.readFile(manifestPath, "utf8"));
@@ -162,6 +239,11 @@ function fallbackFeedback(file, duration, context = {}) {
       whyTrust: "The advice is low-confidence on gameplay and high-confidence on review quality because a one-second clip hides the decision that caused the outcome.",
       focusTag: "recording context",
       evidence: "The recording is shorter than three seconds.",
+      pattern: "The clip is too short to show the decision before the result.",
+      diamondRule: "Record the trigger, the fight, and the exit so the review can judge the decision instead of the scoreboard.",
+      drill: "Capture five seconds before and after the next fight.",
+      nuance: ["The visible result is not enough evidence for a confident gameplay diagnosis."],
+      reviewLimit: "Low gameplay confidence because the recording lacks pre-fight context.",
       analysisSource: "fallback"
     };
   }
@@ -174,6 +256,11 @@ function fallbackFeedback(file, duration, context = {}) {
       whyTrust: "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
       focusTag: "overstay control",
       evidence: "Fallback uses match-level Samira read from sampled replay frames and side-list evidence.",
+      pattern: "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
+      diamondRule: "After a won fight, take the guaranteed payout before looking for the next fight.",
+      drill: "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
+      nuance: ["High kills only matter when the map state changes.", "Shutdown deaths after a win erase the lead Samira already created."],
+      reviewLimit: "Fallback read until a full model analysis is available.",
       analysisSource: "fallback"
     };
   }
@@ -182,72 +269,120 @@ function fallbackFeedback(file, duration, context = {}) {
       feedbackTitle: "Ask for the payout first",
       feedback: "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end.",
       whyTrust: "Diamond ADCs climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
+      pattern: "The fight needs a planned map payout before the commit.",
+      diamondRule: "Commit only when the win has an immediate conversion path.",
+      drill: "Name the payout before pressing the engage button.",
+      nuance: ["A good-looking kill is still low value if the wave or objective stays unchanged."],
       focusTag: "commit timing"
     },
     {
       feedbackTitle: "Name the CC before going in",
       feedback: "Before E/R, identify the one spell that cancels the play; enter only after it is spent, blocked by W, or aimed elsewhere.",
       whyTrust: "This is the highest-value check because one untracked stun, root, knock-up, or hook turns Samira's whole reset plan off.",
+      pattern: "The dangerous moment is entering before the enemy's fight-stopping spell is accounted for.",
+      diamondRule: "No full commit until the one spell that stops Samira is gone or aimed elsewhere.",
+      drill: "Name one enemy CC spell before every fight.",
+      nuance: ["The check is not passive; it preserves aggression by waiting for the real opening."],
       focusTag: "reset discipline"
     },
     {
       feedbackTitle: "Stop chasing at fog",
       feedback: "A low target past vision is not free; shove the wave or take plate unless the next enemy position is known.",
       whyTrust: "The rule is trustworthy because fog removes the information Samira needs to decide whether the next E is a reset or a bait.",
+      pattern: "Chasing past fog turns a won trade into an information gamble.",
+      diamondRule: "Stop at fog unless the next enemy positions are known.",
+      drill: "When the target leaves vision, look at wave and objective before moving forward.",
+      nuance: ["Fog is not just darkness; it removes reset and exit information."],
       focusTag: "chase discipline"
     },
     {
       feedbackTitle: "Turn bot kills into tempo",
       feedback: "After the first kill or forced recall, crash wave first, then choose plate, dragon move, reset, or support roam.",
       whyTrust: "This is how a won lane becomes rank progress: the enemy loses minions and map space even if no second kill happens.",
+      pattern: "Lane wins need to become minion loss, plate pressure, or objective tempo.",
+      diamondRule: "Crash before chasing the second reward.",
+      drill: "After a bot kill, touch the wave before looking for another fight.",
+      nuance: ["The crash makes the next play safer because the enemy loses time answering the wave."],
       focusTag: "objective conversion"
     },
     {
       feedbackTitle: "Fight from the edge first",
       feedback: "Let Q, autos, and W collect cooldowns before entering; Samira should clean the fight, not start it blind.",
       whyTrust: "This lowers anxiety without lowering aggression because edge play gathers real cooldown evidence before the all-in.",
+      pattern: "The edge of the fight gives Samira information without spending the dash.",
+      diamondRule: "Fight the first second from range, then enter after the enemy spends tools.",
+      drill: "Q-auto once before committing unless the target is already isolated and lethal.",
+      nuance: ["This is still aggressive because it prepares the reset instead of canceling the fight."],
       focusTag: "crowd-control tracking"
     },
     {
       feedbackTitle: "Do not review one-second clips",
       feedback: "This moment needs pre-fight context; future highlight capture should include the decision before the kill screen.",
       whyTrust: "The feedback is about evidence quality, not blame; better clips make the review less guessy and easier to trust.",
+      pattern: "The recording starts after the important decision.",
+      diamondRule: "Review needs the setup, not only the outcome.",
+      drill: "Use longer highlight capture for the next fight.",
+      nuance: ["The missing seconds may contain the cooldown or positioning mistake."],
       focusTag: "reset discipline"
     },
     {
       feedbackTitle: "Protect the shutdown",
       feedback: "After a tower or multi-kill, leave with the shutdown value instead of retesting the fight.",
       whyTrust: "This is worth practicing because it does not ask for less carry pressure; it keeps the carry gold from being handed back.",
+      pattern: "The risk shifts after Samira has gold; the next death is more expensive than the next kill is valuable.",
+      diamondRule: "Protect shutdown gold after the first payout.",
+      drill: "Recall after the payout unless an objective is already free.",
+      nuance: ["This preserves carry pressure by making the next item arrive sooner."],
       focusTag: "cash-out timing"
     },
     {
       feedbackTitle: "Count before helping",
       feedback: "If a teammate dies nearby, count visible enemies before spending E to rescue a fight.",
       whyTrust: "Counting visible enemies gives anxiety a concrete check; if the numbers are bad, skipping the rescue is discipline, not fear.",
+      pattern: "Rescue instincts can drag Samira into a fight that is already numerically lost.",
+      diamondRule: "Count visible enemies before answering a teammate death.",
+      drill: "Say the number count before using E toward a fight.",
+      nuance: ["Skipping the rescue can be the correct carry decision when the fight is already gone."],
       focusTag: "safe gold"
     },
     {
       feedbackTitle: "Leave after the wave",
       feedback: "Catching side farm is fine; leave toward teammates unless mid has priority or three enemies are visible.",
       whyTrust: "This turns side farm into safe income instead of isolation, which is the difference between carrying with gold and dying with gold.",
+      pattern: "Side farm is useful until it isolates the fed carry from the next map play.",
+      diamondRule: "Catch the wave, then leave unless the enemy positions are visible.",
+      drill: "Take the wave and immediately path back through safe vision.",
+      nuance: ["Gold only helps if the next movement keeps the map connected."],
       focusTag: "late entry"
     },
     {
       feedbackTitle: "Objective before duel",
       feedback: "When an enemy catches a wave, pressure the objective first; take the duel only with ult, summoner info, and a walk-out.",
       whyTrust: "Objectives force the enemy to answer on your terms; random duels make the game hinge on mechanics under uncertainty.",
+      pattern: "A side duel can distract from the objective that would make the enemy respond.",
+      diamondRule: "Objective pressure before isolated duels.",
+      drill: "Ping or path to the objective before matching the side target.",
+      nuance: ["Making the enemy answer the map lowers the need for perfect mechanics."],
       focusTag: "exit planning"
     },
     {
       feedbackTitle: "Second in at chokes",
       feedback: "Hold the edge until enemy CC is used so Samira stays the finisher instead of the target.",
       whyTrust: "This preserves the aggression while removing the single easiest way enemies stop Samira.",
+      pattern: "Chokes punish the first champion in; Samira gets more value as the second entry.",
+      diamondRule: "Second in at jungle walls unless the enemy CC is already gone.",
+      drill: "Pause at the choke edge and enter after the first cooldown exchange.",
+      nuance: ["The pause is a setup for resets, not hesitation."],
       focusTag: "objective conversion"
     },
     {
       feedbackTitle: "Hit the structure",
       feedback: "At inhib or nexus, the Diamond rep is ending as soon as the structure is available.",
       whyTrust: "This is reliable because structures are guaranteed progress; extra fighting after the base is open adds variance without adding win condition.",
+      pattern: "Base fights become lower value once the structure is open.",
+      diamondRule: "Hit the structure as soon as the fight is won.",
+      drill: "After a base kill, move the cursor to the structure first.",
+      nuance: ["The structure is the lowest-variance way to convert the lead."],
       focusTag: "overstay control"
     }
   ];
@@ -258,6 +393,11 @@ function fallbackFeedback(file, duration, context = {}) {
     ...fallback,
     whyTrust: fallback.whyTrust || "This rule is tied to the repeated recording pattern, not a vague style preference.",
     evidence: "Fallback ties this recording to one repeatable Samira decision from sampled replay context.",
+    pattern: fallback.pattern || "The recording points to one repeatable decision leak.",
+    diamondRule: fallback.diamondRule || "Convert the first win before taking the next fight.",
+    drill: fallback.drill || "Name the payout before committing.",
+    nuance: fallback.nuance || ["Fallback analysis is conservative until the model reads the sampled frames."],
+    reviewLimit: fallback.reviewLimit || "Fallback read until a full model analysis is available.",
     analysisSource: "fallback"
   };
 }
@@ -281,26 +421,31 @@ function parseJsonText(text) {
   return JSON.parse(match[0]);
 }
 
-async function analyzeRecording({ file, duration, framePaths, sequenceLabel, reviewPhase: phase }) {
+async function analyzeRecording({ file, duration, framePaths, frameTimes, sequenceLabel, reviewPhase: phase }) {
   if (!process.env.OPENAI_API_KEY) return fallbackFeedback(file, duration, { reviewPhase: phase });
   const images = await Promise.all(framePaths.map(async (framePath) => ({
     type: "input_image",
     image_url: `data:image/jpeg;base64,${(await fs.readFile(framePath)).toString("base64")}`,
-    detail: "low"
+    detail: "high"
   })));
+  const frameList = frameTimes.map((time, index) => `${index + 1}:${mmss(time)}`).join(", ");
 
   const prompt = [
-    "Analyze these League of Legends replay frames from one recording for Alan, currently around Silver 4 and trying to climb toward Diamond.",
-    "The player champion is usually the champion the replay camera follows most. Use the side list/nameplate when visible. If uncertain, say low confidence.",
+    "Analyze these League of Legends replay frames extremely carefully for Alan, currently around Silver 4 and trying to climb toward Diamond.",
+    "Images are chronological sampled frames from the recording. Read them in order and use every visible clue: followed champion, team list/nameplate, health bars, minimap shape when visible, wave state, structure/objective context, fight numbers, target selection, spacing, fog, recalls, base state, and obvious crowd-control or cooldown evidence.",
+    "The player champion is usually the champion the replay camera follows most. Use the side list/nameplate when visible. If uncertain, say low confidence and state the limit.",
     "Use capture order internally to distinguish earlier leak evidence from later implementation attempts, but do not mention recency weighting in visible output.",
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
-    "Give exactly one improvement for this recording. Keep it direct, narrow, and playable in the next queue. Do not give generic encouragement.",
+    `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
+    "Give exactly one highest-value improvement for this recording, plus a fuller read of the nuance behind it. The top advice must stay direct, narrow, and playable in the next queue.",
+    "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty.",
+    "Prioritize Diamond-relevant habits: wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "Visible page copy should be concise and operational. Avoid phrases like 'you should' or broad coaching.",
     "Return only JSON with this shape:",
-    '{"champion":"Samira","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis"}',
-    `Recording file: ${file}. Duration: ${mmss(duration)}.`
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would matter in Diamond","drill":"one next-game repetition","nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
+    `Recording file: ${file}.`
   ].join("\n");
 
   try {
@@ -313,7 +458,7 @@ async function analyzeRecording({ file, duration, framePaths, sequenceLabel, rev
       body: JSON.stringify({
         model,
         store: false,
-        max_output_tokens: 700,
+        max_output_tokens: 1400,
         input: [
           {
             role: "user",
@@ -335,6 +480,12 @@ async function analyzeRecording({ file, duration, framePaths, sequenceLabel, rev
       whyTrust: clean(parsed.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
       focusTag: clean(parsed.focusTag, "review"),
       evidence: clean(parsed.evidence, "Generated from sampled replay frames."),
+      pattern: clean(parsed.pattern, "The recording points to one repeatable decision pattern."),
+      diamondRule: clean(parsed.diamondRule, "Convert the first winning moment before taking the next fight."),
+      drill: clean(parsed.drill, "Name the payout before committing."),
+      nuance: cleanList(parsed.nuance, 5),
+      reviewLimit: clean(parsed.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
+      sampledFrames: framePaths.length,
       analysisSource: "openai"
     };
   } catch (error) {
@@ -349,21 +500,24 @@ async function summarizeRecordings(recordings, detectedChampions) {
     focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     nextRep: "Queue cue: kill -> payout -> reset.",
-    whyTrust: "This is Diamond-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
+    whyTrust: "This is Diamond-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives.",
+    pattern: "Across the recordings, the climb value is not finding more damage. It is ending the first winning moment through a map payout before the fight becomes coin-flip again.",
+    checklist: ["Name the payout before the commit.", "Crash or reset after the first win.", "Take the second fight only with numbers, CC, and exit known."],
+    reviewLimit: "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
   };
   if (!process.env.OPENAI_API_KEY || !recordings.length) return fallback;
   const notes = recordings.map((item, index) => (
-    `${index + 1}. ${item.title} [${item.reviewPhase || "baseline"}] (${item.champion}, ${item.duration}): ${item.feedbackTitle} - ${item.feedback}`
+    `${index + 1}. ${item.title} [${item.reviewPhase || "baseline"}] (${item.champion}, ${item.duration}): ${item.feedbackTitle} - ${item.feedback}. Pattern: ${item.pattern || ""} Rule: ${item.diamondRule || ""}`
   )).join("\n");
   const prompt = [
-    "Given these League recording feedback notes, produce one simple focus for Alan's next queue.",
+    "Given these deeply analyzed League recording feedback notes, produce one simple focus for Alan's next queue.",
     "He is around Silver 4 and wants Diamond. Keep the summary narrow enough to remember while playing.",
     "Use capture order internally to distinguish earlier leak evidence from implementation attempts. Do not mention recency weighting in visible output.",
     "If the newer clips show an earlier rule being attempted, choose the next simple constraint that preserves the improvement instead of repeating only the old leak.",
-    "Do not summarize everything. Choose the single improvement with the highest climb value from the recordings.",
+    "Do not summarize everything. Choose the single improvement with the highest climb value from the recordings and explain the evidence behind it.",
     "Include whyTrust: one concrete reason Alan should trust and try this focus even if skeptical or anxious.",
     "Avoid phrases like 'you should'. Return only JSON:",
-    '{"title":"short title","focus":"one sentence","rule":"one in-game rule","nextRep":"one tiny queue cue","whyTrust":"one concrete reason to trust the focus"}',
+    '{"title":"short title","focus":"one sentence","rule":"one in-game rule","nextRep":"one tiny queue cue","whyTrust":"one concrete reason to trust the focus","pattern":"fuller read of the cross-recording pattern","checklist":["3 tiny checks for the next queue"],"reviewLimit":"short limit of the evidence"}',
     `Detected champions: ${detectedChampions.map((item) => item.name).join(", ") || "unknown"}.`,
     notes
   ].join("\n");
@@ -389,7 +543,10 @@ async function summarizeRecordings(recordings, detectedChampions) {
       focus: clean(parsed.focus, fallback.focus),
       rule: clean(parsed.rule, fallback.rule),
       nextRep: clean(parsed.nextRep, fallback.nextRep),
-      whyTrust: clean(parsed.whyTrust, fallback.whyTrust)
+      whyTrust: clean(parsed.whyTrust, fallback.whyTrust),
+      pattern: clean(parsed.pattern, fallback.pattern),
+      checklist: cleanList(parsed.checklist, 3),
+      reviewLimit: clean(parsed.reviewLimit, fallback.reviewLimit)
     };
   } catch (error) {
     console.warn(`Summary fallback: ${error.message}`);
@@ -449,6 +606,8 @@ async function main() {
   const sourceStats = [];
   const recordings = [];
   let totalSeconds = 0;
+  let highlightCount = 0;
+  let fullGameCount = 0;
 
   for (let index = 0; index < sourceEntries.length; index += 1) {
     const entry = sourceEntries[index];
@@ -457,17 +616,13 @@ async function main() {
     const sequenceLabel = `${index + 1} of ${sourceEntries.length}`;
     sourceStats.push(stat);
     const slug = slugify(name);
-    const destPath = path.join(recordingRoot, name);
+    const destName = publicRecordingName(name, stat);
+    const destPath = path.join(recordingRoot, destName);
     const posterPath = path.join(posterRoot, `${slug}.jpg`);
     const cacheKey = cacheKeyFor(stat);
     const cached = cachedRecording(existing, name, cacheKey);
 
-    const destNeedsCopy = !(await exists(destPath)) || (await fs.stat(destPath)).size !== stat.size;
-    if (destNeedsCopy) {
-      await fs.copyFile(sourcePath, destPath);
-      await fs.utimes(destPath, stat.atime, stat.mtime);
-    }
-
+    const publicVideoBytes = await ensurePublicVideo(sourcePath, destPath, stat);
     const duration = await probeDuration(sourcePath);
     totalSeconds += duration;
     if (!(await exists(posterPath)) || !cached) {
@@ -478,28 +633,30 @@ async function main() {
     if (!analysis) {
       const frameDir = path.join(analysisRoot, slug);
       await fs.mkdir(frameDir, { recursive: true });
-      const sampleTimes = duration < 3
-        ? [Math.max(0.2, duration * 0.5)]
-        : [duration * 0.22, duration * 0.52, duration * 0.82];
+      const sampleTimes = sampleTimesFor(duration);
       const framePaths = [];
       for (let sampleIndex = 0; sampleIndex < sampleTimes.length; sampleIndex += 1) {
         const framePath = path.join(frameDir, `frame-${sampleIndex + 1}.jpg`);
-        await extractFrame(sourcePath, framePath, sampleTimes[sampleIndex], 640);
+        await extractFrame(sourcePath, framePath, sampleTimes[sampleIndex], duration > 90 ? 960 : 1024);
         framePaths.push(framePath);
       }
-      analysis = await analyzeRecording({ file: name, duration, framePaths, sequenceLabel, reviewPhase: phase });
+      analysis = await analyzeRecording({ file: name, duration, framePaths, frameTimes: sampleTimes, sequenceLabel, reviewPhase: phase });
     }
 
-    const shortTitle = index === sourceEntries.length - 1 && duration > 90 ? "full game 8x" : `highlight ${String(index + 1).padStart(2, "0")}`;
+    const isFullReview = duration > 90;
+    const shortTitle = isFullReview
+      ? `full review ${String(++fullGameCount).padStart(2, "0")}`
+      : `highlight ${String(++highlightCount).padStart(2, "0")}`;
     const fingerprint = crypto.createHash("sha1").update(`${name}:${cacheKey}`).digest("hex").slice(0, 12);
     recordings.push({
       file: name,
+      publicFile: destName,
       cacheKey,
       fingerprint,
       title: shortTitle,
       duration: mmss(duration),
       durationSeconds: Math.round(duration * 1000) / 1000,
-      kind: shortTitle === "full game 8x" ? "full 8x" : "highlight",
+      kind: isFullReview ? "full review" : "highlight",
       reviewPhase: phase,
       champion: clean(analysis.champion, "Unknown"),
       confidence: clean(analysis.confidence, "low"),
@@ -508,8 +665,15 @@ async function main() {
       whyTrust: clean(analysis.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
       focusTag: clean(analysis.focusTag, "review"),
       evidence: clean(analysis.evidence, "Generated from sampled replay frames."),
+      pattern: clean(analysis.pattern, "The recording points to one repeatable decision pattern."),
+      diamondRule: clean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
+      drill: clean(analysis.drill, "Name the payout before committing."),
+      nuance: cleanList(analysis.nuance, 5),
+      reviewLimit: clean(analysis.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
       analysisSource: analysis.analysisSource || "cache",
       analysisVersion,
+      sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : sampleTimesFor(duration).length),
+      publicVideoBytes,
       src: publicPath(destPath),
       poster: publicPath(posterPath)
     });
@@ -518,10 +682,12 @@ async function main() {
 
   const detectedChampions = aggregateChampions(recordings);
   const mainFeedback = await summarizeRecordings(recordings, detectedChampions);
+  const matches = [...new Set(recordings.map((item) => item.file.match(/NA1-\d+/)?.[0]).filter(Boolean))];
   const manifest = {
     generatedAt: new Date().toISOString(),
     source: "League of Legends Highlights folder",
-    match: recordings[0]?.file.match(/NA1-\d+/)?.[0] || "latest",
+    match: matches.length === 1 ? matches[0] : `${matches.length} matches`,
+    matches,
     captured: capturedRange(sourceStats),
     totalDuration: mmss(totalSeconds),
     totalRecordings: recordings.length,

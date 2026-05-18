@@ -1458,7 +1458,9 @@ h1 {
 
 .recording-main-rule,
 .recording-main-rep,
-.recording-main-why {
+.recording-main-why,
+.recording-main-pattern,
+.recording-main-limit {
   margin: 0;
   color: #4b4039;
   font-size: 15px;
@@ -1489,6 +1491,23 @@ h1 {
 .recording-main-why,
 .recording-card-why {
   color: #5f534a !important;
+}
+
+.recording-main-checklist {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 18px;
+  color: #3d352f;
+  font-size: 14px;
+  font-weight: 720;
+  line-height: 1.35;
+}
+
+.recording-main-limit {
+  color: var(--muted) !important;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .recording-evidence {
@@ -1524,6 +1543,47 @@ h1 {
   display: grid;
   gap: 3px;
   padding: 10px 12px 12px;
+}
+
+.recording-deep {
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+
+.recording-deep summary {
+  cursor: pointer;
+  color: #3d352f;
+  font-size: 13px;
+  font-weight: 820;
+}
+
+.recording-deep-row {
+  display: grid;
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.recording-deep-row strong {
+  color: #342d28;
+  font-size: 12px;
+  font-weight: 860;
+}
+
+.recording-deep-row p,
+.recording-deep-row li {
+  margin: 0;
+  color: #50463f;
+  font-size: 13px;
+  font-weight: 570;
+  line-height: 1.45;
+}
+
+.recording-deep-row ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
 }
 
 .selected-champion.is-leaving,

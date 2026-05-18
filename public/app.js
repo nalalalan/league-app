@@ -1280,6 +1280,10 @@ function trustLine(value) {
   return /^why\b/i.test(text) ? text : `Why trust this: ${text}`;
 }
 
+function hasText(value) {
+  return String(value || "").trim().length > 0;
+}
+
 function writeChampion(champion) {
   championName.textContent = champion.name;
   championFocus.textContent = champion.focus;
@@ -1316,11 +1320,78 @@ function recordingMainCard(review) {
   nextRep.className = "recording-main-rep";
   nextRep.textContent = item.nextRep || "";
 
+  const pattern = document.createElement("p");
+  pattern.className = "recording-main-pattern";
+  pattern.textContent = item.pattern || "";
+
+  const checklist = document.createElement("ul");
+  checklist.className = "recording-main-checklist";
+  for (const check of item.checklist || []) {
+    const li = document.createElement("li");
+    li.textContent = check;
+    checklist.append(li);
+  }
+
+  const limit = document.createElement("p");
+  limit.className = "recording-main-limit";
+  limit.textContent = item.reviewLimit || "";
+
   article.append(title, focus);
   if (rule.textContent) article.append(rule);
   if (why.textContent) article.append(why);
   if (nextRep.textContent) article.append(nextRep);
+  if (pattern.textContent) article.append(pattern);
+  if (checklist.children.length) article.append(checklist);
+  if (limit.textContent) article.append(limit);
   return article;
+}
+
+function recordingDeepDetails(item) {
+  const hasNuance = Array.isArray(item.nuance) && item.nuance.length > 0;
+  const rows = [
+    ["Pattern", item.pattern],
+    ["Diamond rule", item.diamondRule],
+    ["Queue rep", item.drill],
+    ["Evidence", item.evidence],
+    ["Limit", item.reviewLimit]
+  ].filter(([, value]) => hasText(value));
+
+  if (!hasNuance && rows.length === 0) return null;
+
+  const details = document.createElement("details");
+  details.className = "recording-deep";
+
+  const summary = document.createElement("summary");
+  summary.textContent = "full read";
+  details.append(summary);
+
+  for (const [label, value] of rows) {
+    const block = document.createElement("div");
+    block.className = "recording-deep-row";
+    const strong = document.createElement("strong");
+    strong.textContent = label;
+    const p = document.createElement("p");
+    p.textContent = value;
+    block.append(strong, p);
+    details.append(block);
+  }
+
+  if (hasNuance) {
+    const block = document.createElement("div");
+    block.className = "recording-deep-row";
+    const strong = document.createElement("strong");
+    strong.textContent = "Nuance";
+    const list = document.createElement("ul");
+    for (const point of item.nuance) {
+      const li = document.createElement("li");
+      li.textContent = point;
+      list.append(li);
+    }
+    block.append(strong, list);
+    details.append(block);
+  }
+
+  return details;
 }
 
 function recordingCard(item) {
@@ -1357,6 +1428,8 @@ function recordingCard(item) {
 
   meta.append(title, detail, feedbackTitle, feedback);
   if (why.textContent) meta.append(why);
+  const deep = recordingDeepDetails(item);
+  if (deep) meta.append(deep);
   article.append(video, meta);
   return article;
 }
