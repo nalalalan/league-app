@@ -730,7 +730,7 @@ const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx20";
+const visualFxVersion = "20260518-world-vfx21";
 let vfx3dModulePromise;
 const vfx3dWarmPromises = {};
 let vfx2dWarmPromise;
@@ -4836,7 +4836,7 @@ function spawnSelectionFx(button, profileId = "default") {
   const canvas = document.createElement("canvas");
   fx.className = "selection-fx ultimate-scene";
   fx.dataset.championFx = profile.id;
-  fx.dataset.vfxTier = "panel-atmosphere-vfx20";
+  fx.dataset.vfxTier = "panel-atmosphere-vfx21";
   fx.setAttribute("aria-hidden", "true");
   shaderCanvas.className = "fx-shader-canvas";
   threeCanvas.className = "fx-three-canvas";
