@@ -686,7 +686,7 @@ const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx11";
+const visualFxVersion = "20260518-world-vfx12";
 let vfx3dModulePromise;
 let vfx3dWarmPromise;
 let vfx2dWarmPromise;
@@ -3976,8 +3976,8 @@ function warmCinematicCanvases() {
   if (motionQuery.matches || vfx2dWarmPromise) return vfx2dWarmPromise || Promise.resolve();
   vfx2dWarmPromise = Promise.resolve().then(async () => {
     const canvas = document.createElement("canvas");
-    canvas.width = 640;
-    canvas.height = 360;
+    canvas.width = Math.max(390, Math.min(1280, Math.ceil(window.innerWidth || 960)));
+    canvas.height = Math.max(360, Math.min(844, Math.ceil(window.innerHeight || 540)));
     const context = canvas.getContext("2d", { alpha: true });
     if (!context) return;
     context.imageSmoothingEnabled = true;
@@ -3986,7 +3986,9 @@ function warmCinematicCanvases() {
       const image = cinematicImageFor(champion.id);
       if (image?.decode) await image.decode().catch(() => {});
       const duration = visualDurations[champion.id] || 3800;
-      drawUltimateFrame(context, fxProfileFor(champion.id), image, canvas.width, canvas.height, duration * 0.38, duration);
+      const profile = fxProfileFor(champion.id);
+      drawUltimateFrame(context, profile, image, canvas.width, canvas.height, duration * 0.03, duration);
+      drawUltimateFrame(context, profile, image, canvas.width, canvas.height, duration * 0.38, duration);
       await new Promise((resolve) => requestAnimationFrame(resolve));
     }
   }).catch(() => {});
