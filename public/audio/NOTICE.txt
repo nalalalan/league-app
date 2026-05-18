@@ -6,14 +6,14 @@ The public app includes only the short champion clips in public/audio/.
 No Riot audio is used. No Spotify, YouTube, or streaming extraction is used.
 
 Current champion mapping:
-Samira: Red Velvet - Rainbow Halo, chorus-entry cut, start 50.0s, length 3.2s.
-Caitlyn: NewJeans - Cookie, opening vocal cut, start 0.0s, length 5.6s.
-Fizz: Le Van Khoa - Festival, big opening only before quiet section, start 0.0s, length 3.25s.
-Kai'Sa: ILLIT - Jellyous, beginning through first hook word, start 0.0s, length 5.2s.
-Miss Fortune: aespa - Life's Too Short, opening guitar ostinato, start 0.0s, length 5.05s.
-Ezreal: Rogers: The Musical - I Want You, opening with longer final ring, start 0.0s, length 6.8s.
-Jhin: Le Van Khoa - Hymn to Freedom, beginning two-note/orchestral-hit cut, start 0.0s, length 9.0s.
-Ashe: ILLIT - Not Cute Anymore, named phrase with tail, start 36.3s, length 4.85s.
-Rammus: Le Van Khoa - Introduction, loud phrase cut, start 5.0s, length 7.0s.
+Samira: Red Velvet - Rainbow Halo, very beginning after silence with extended tail, start 0.36s, length 6.64s.
+Caitlyn: NewJeans - Cookie, opening vocal after initial quiet, start 1.05s, length 4.75s.
+Fizz: Le Van Khoa - Festival, opening after initial quiet through energy drop, start 0.52s, length 3.08s.
+Kai'Sa: ILLIT - Jellyous, longer intro ending before the boy lyric, start 0.0s, length 6.55s.
+Miss Fortune: aespa - Life's Too Short, opening guitar ostinato before vocal start, start 0.0s, length 5.48s.
+Ezreal: Rogers: The Musical - I Want You, opening ring without two tiny end notes, start 0.0s, length 6.08s.
+Jhin: Le Van Khoa - Hymn to Freedom, cello/orchestra hit until following silence, start 10.62s, length 2.75s.
+Ashe: ILLIT - Not Cute Anymore, named phrase with fade-in before lyric and longer fade-out, start 36.12s, length 5.03s.
+Rammus: Le Van Khoa - Introduction, loud phrase with one more second, start 5.0s, length 8.0s.
 
 Files are faded and normalized for web playback.
