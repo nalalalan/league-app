@@ -685,9 +685,9 @@ const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx15";
+const visualFxVersion = "20260518-world-vfx18";
 let vfx3dModulePromise;
-let vfx3dWarmPromise;
+const vfx3dWarmPromises = {};
 let vfx2dWarmPromise;
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
@@ -882,7 +882,9 @@ function applyFxProfileVars(element, profile) {
 }
 
 function effectPixelRatioFor() {
-  return 1;
+  const maxDimension = Math.max(window.innerWidth || 1, window.innerHeight || 1);
+  if (maxDimension <= 900) return 1;
+  return Math.max(0.46, 660 / maxDimension);
 }
 
 function loadVfx3dModule() {
@@ -893,39 +895,37 @@ function loadVfx3dModule() {
 
 function primeCinematicAssets() {
   void loadVfx3dModule();
-  void warmVfx3dRenderer();
-  void warmCinematicCanvases();
 }
 
-function warmVfx3dRenderer() {
+function warmVfx3dRenderer(championId = currentChampionId || champions[0]?.id) {
   if (motionQuery.matches || !("WebGLRenderingContext" in window)) return Promise.resolve();
-  vfx3dWarmPromise ||= loadVfx3dModule().then(async (module) => {
+  const champion = championById(championId);
+  if (!champion?.id) return Promise.resolve();
+  if (vfx3dWarmPromises[champion.id]) return vfx3dWarmPromises[champion.id];
+  vfx3dWarmPromises[champion.id] = loadVfx3dModule().then(async (module) => {
     if (!module) return;
-    const warmWidth = Math.max(390, Math.min(720, Math.ceil(window.innerWidth || 960)));
-    const warmHeight = Math.max(360, Math.min(540, Math.ceil(window.innerHeight || 540)));
+    const warmWidth = Math.max(320, Math.min(480, Math.ceil((window.innerWidth || 960) * 0.42)));
+    const warmHeight = Math.max(260, Math.min(360, Math.ceil((window.innerHeight || 540) * 0.42)));
     const warmRatio = effectPixelRatioFor();
     const canvas = document.createElement("canvas");
     canvas.width = warmWidth;
     canvas.height = warmHeight;
     canvas.style.cssText = `position:fixed;left:-${warmWidth + 80}px;top:-${warmHeight + 80}px;width:${warmWidth}px;height:${warmHeight}px;opacity:0;pointer-events:none;`;
     document.body.append(canvas);
-    for (const champion of champions) {
-      const profile = fxProfileFor(champion.id);
-      const scene = module.createChampionVfx3D({
-        canvas,
-        championId: champion.id,
-        profile,
-        duration: 900
-      });
-      scene.resize(warmWidth, warmHeight, warmRatio);
-      scene.render(0, 900);
-      scene.render(150, 900);
-      scene.dispose();
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-    }
+    const profile = fxProfileFor(champion.id);
+    const scene = module.createChampionVfx3D({
+      canvas,
+      championId: champion.id,
+      profile,
+      duration: 720
+    });
+    scene.resize(warmWidth, warmHeight, warmRatio);
+    scene.render(0, 720);
+    scene.render(180, 720);
+    scene.dispose();
     canvas.remove();
   }).catch(() => {});
-  return vfx3dWarmPromise;
+  return vfx3dWarmPromises[champion.id];
 }
 
 function buildFallbackSoundUrl(profileId = "default") {
@@ -1765,6 +1765,139 @@ function playChampionFoley(profileId = "default") {
   }
 }
 
+function playPremiumMaterialFoley(profileId = "default") {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+
+  try {
+    audioContext ||= new AudioContextClass();
+    if (audioContext.state === "suspended") audioContext.resume();
+    const now = audioContext.currentTime + 0.012;
+    const stage = cinematicStageFor(profileId);
+    const profile = soundProfileFor(profileId);
+
+    const compressor = audioContext.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-24, now);
+    compressor.knee.setValueAtTime(18, now);
+    compressor.ratio.setValueAtTime(2.6, now);
+    compressor.attack.setValueAtTime(0.006, now);
+    compressor.release.setValueAtTime(0.24, now);
+    compressor.connect(audioContext.destination);
+
+    const master = audioContext.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(Math.min(0.36, (profile.masterPeak || 0.42) * 0.68), now + 0.06);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 3.15);
+    master.connect(compressor);
+
+    const connect = (node, pan = 0) => {
+      let output = node;
+      if (audioContext.createStereoPanner) {
+        const panner = audioContext.createStereoPanner();
+        panner.pan.setValueAtTime(pan, now);
+        output.connect(panner);
+        output = panner;
+      }
+      output.connect(master);
+    };
+
+    const tone = ({ start = 0, length = 0.5, frequency = 160, endFrequency, gain = 0.05, type = "sine", pan = 0, attack = 0.035 }) => {
+      const osc = audioContext.createOscillator();
+      const amp = audioContext.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(frequency, now + start);
+      if (endFrequency) osc.frequency.exponentialRampToValueAtTime(Math.max(16, endFrequency), now + start + length);
+      amp.gain.setValueAtTime(0.0001, now + start);
+      amp.gain.exponentialRampToValueAtTime(gain, now + start + Math.max(0.018, attack));
+      amp.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+      osc.connect(amp);
+      connect(amp, pan);
+      osc.start(now + start);
+      osc.stop(now + start + length + 0.04);
+    };
+
+    const texture = ({ start = 0, length = 0.7, gain = 0.08, pan = 0, filter = "bandpass", from = 1200, to = 260, q = 0.7, color = "air", curve = 1.3 }) => {
+      const frames = Math.max(1, Math.floor(audioContext.sampleRate * Math.max(0.18, length)));
+      const buffer = audioContext.createBuffer(1, frames, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      let smoothed = 0;
+      for (let index = 0; index < frames; index += 1) {
+        const p = index / frames;
+        const attack = Math.min(1, p / 0.065);
+        const release = (1 - p) ** curve;
+        smoothed = smoothed * 0.84 + (Math.random() * 2 - 1) * 0.16;
+        const water = color === "water" ? Math.sin(p * 90) * 0.13 + Math.sin(p * p * 1800) * 0.07 : 0;
+        const glass = color === "glass" ? Math.sin(p * 480) * 0.06 : 0;
+        const frost = color === "ice" ? Math.sin(p * 760) * 0.075 : 0;
+        const grit = color === "stone" ? Math.sign(Math.sin(p * 160)) * 0.055 : 0;
+        data[index] = (smoothed + water + glass + frost + grit) * attack * release;
+      }
+      const source = audioContext.createBufferSource();
+      const biquad = audioContext.createBiquadFilter();
+      const amp = audioContext.createGain();
+      source.buffer = buffer;
+      biquad.type = filter;
+      biquad.frequency.setValueAtTime(Math.max(40, from), now + start);
+      biquad.frequency.exponentialRampToValueAtTime(Math.max(40, to), now + start + length);
+      biquad.Q.setValueAtTime(q, now + start);
+      amp.gain.setValueAtTime(0.0001, now + start);
+      amp.gain.exponentialRampToValueAtTime(gain, now + start + 0.05);
+      amp.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+      source.connect(biquad).connect(amp);
+      connect(amp, pan);
+      source.start(now + start);
+      source.stop(now + start + length + 0.04);
+    };
+
+    if (stage.material === "water") {
+      texture({ start: 0, length: 2.25, gain: 0.2, pan: -0.08, filter: "lowpass", from: 720, to: 86, q: 0.45, color: "water", curve: 0.95 });
+      texture({ start: 0.18, length: 0.82, gain: 0.17, pan: 0.18, filter: "bandpass", from: 460, to: 4300, q: 0.9, color: "water", curve: 1.15 });
+      texture({ start: 0.48, length: 0.42, gain: 0.18, pan: 0.28, filter: "highpass", from: 6200, to: 1300, q: 0.72, color: "water", curve: 1.9 });
+      tone({ start: 0.34, length: 1.2, frequency: 46, endFrequency: 24, gain: 0.11, type: "sine", pan: -0.02, attack: 0.06 });
+      [0.1, 0.19, 0.31, 0.46, 0.66, 0.9, 1.18].forEach((start, index) => {
+        texture({ start, length: 0.28 + index * 0.018, gain: 0.038, pan: -0.42 + index * 0.14, filter: "bandpass", from: 620 + index * 120, to: 2200 + index * 260, q: 1.35, color: "water", curve: 1.05 });
+      });
+    } else if (stage.material === "scope") {
+      texture({ start: 0.02, length: 0.9, gain: 0.07, pan: -0.08, filter: "bandpass", from: 720, to: 3600, q: 1.1, color: "glass", curve: 1.2 });
+      tone({ start: 0.08, length: 0.72, frequency: 196, endFrequency: 294, gain: 0.04, type: "triangle", pan: -0.14 });
+      texture({ start: 0.38, length: 0.22, gain: 0.2, pan: 0.26, filter: "highpass", from: 8200, to: 1400, q: 0.84, color: "glass", curve: 2.3 });
+      tone({ start: 0.42, length: 0.42, frequency: 62, endFrequency: 22, gain: 0.1, type: "sine", pan: 0.08 });
+    } else if (stage.material === "blade") {
+      [0.08, 0.24, 0.44, 0.68].forEach((start, index) => {
+        texture({ start, length: 0.42, gain: 0.088, pan: index % 2 ? 0.42 : -0.42, filter: "bandpass", from: index % 2 ? 5200 : 1600, to: index % 2 ? 900 : 6200, q: 0.88, color: "metal", curve: 1.25 });
+      });
+      tone({ start: 0.58, length: 0.66, frequency: 54, endFrequency: 20, gain: 0.1, type: "sine" });
+    } else if (stage.material === "void") {
+      texture({ start: 0, length: 1.8, gain: 0.12, pan: 0, filter: "bandpass", from: 420, to: 5200, q: 0.46, color: "air", curve: 0.9 });
+      [0.2, 0.48, 0.82].forEach((start, index) => {
+        tone({ start, length: 0.72, frequency: 68 + index * 18, endFrequency: 34, gain: 0.072, type: "sawtooth", pan: -0.2 + index * 0.2, attack: 0.05 });
+      });
+    } else if (stage.material === "gunfire") {
+      [0.18, 0.38].forEach((start, index) => {
+        texture({ start, length: 0.34, gain: 0.15, pan: index ? 0.48 : -0.48, filter: "bandpass", from: 5200, to: 520, q: 0.72, color: "metal", curve: 1.8 });
+        tone({ start, length: 0.46, frequency: index ? 58 : 64, endFrequency: 20, gain: 0.09, type: "sine", pan: index ? 0.32 : -0.32 });
+      });
+      texture({ start: 0.48, length: 1.1, gain: 0.085, pan: 0, filter: "lowpass", from: 1200, to: 160, q: 0.45, color: "air", curve: 1.05 });
+    } else if (stage.material === "arcane") {
+      texture({ start: 0.04, length: 1.4, gain: 0.1, pan: 0.08, filter: "bandpass", from: 900, to: 8800, q: 0.8, color: "glass", curve: 1.1 });
+      [0.08, 0.26, 0.48, 0.78].forEach((start, index) => {
+        tone({ start, length: 0.36, frequency: 520 + index * 180, endFrequency: 940 + index * 230, gain: 0.036, type: "sine", pan: -0.36 + index * 0.22 });
+      });
+    } else if (stage.material === "stage") {
+      texture({ start: 0, length: 1.6, gain: 0.08, pan: 0, filter: "bandpass", from: 520, to: 1800, q: 0.74, color: "air", curve: 1.0 });
+      [0.12, 0.42, 0.78, 1.08].forEach((start, index) => tone({ start, length: index === 3 ? 0.82 : 0.38, frequency: 196 + index * 49, endFrequency: index === 3 ? 98 : 160 + index * 34, gain: index === 3 ? 0.068 : 0.035, type: "triangle", pan: -0.14 + index * 0.09 }));
+    } else if (stage.material === "ice") {
+      texture({ start: 0.04, length: 1.3, gain: 0.11, pan: -0.08, filter: "bandpass", from: 9200, to: 820, q: 1.2, color: "ice", curve: 1.2 });
+      [0.32, 0.62, 0.94].forEach((start, index) => tone({ start, length: 0.48, frequency: 880 + index * 330, endFrequency: 520 + index * 160, gain: 0.038, type: "sine", pan: -0.2 + index * 0.2 }));
+    } else if (stage.material === "quake") {
+      texture({ start: 0, length: 2.2, gain: 0.17, pan: 0, filter: "lowpass", from: 760, to: 54, q: 0.38, color: "stone", curve: 0.9 });
+      [0.16, 0.42, 0.76, 1.12].forEach((start, index) => tone({ start, length: 0.64, frequency: 34 + index * 4, endFrequency: 16, gain: 0.09, type: "sine", pan: index % 2 ? 0.18 : -0.18, attack: 0.045 }));
+    }
+  } catch {
+    // Visual-synced foley should never block the music or selection sound.
+  }
+}
+
 function playSelectSound(profileId = "default") {
   const stingerUrl = stingerUrls[profileId];
   if (!stingerUrl || !window.Audio) {
@@ -1788,6 +1921,7 @@ function playSelectSound(profileId = "default") {
       });
     }
     playChampionFoley(profileId);
+    playPremiumMaterialFoley(profileId);
   } catch {
     playSynthSelectSound(profileId);
   }
@@ -2650,6 +2784,250 @@ function drawMaterialVeil(ctx, width, height, t, profile, stage, alpha) {
   ctx.restore();
 }
 
+function drawPremiumMaterialWorld(ctx, width, height, t, profile, stage) {
+  const alpha = sceneEnvelope(t, 0.95);
+  if (!alpha) return;
+
+  const material = stage.material;
+  const sweep = easeInOutSine(smoothstep(0.02, 0.9, t));
+  const impact = Math.min(1, stageImpactPulse(t, stage, 0.082));
+  const minSide = Math.min(width, height);
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  const base = ctx.createLinearGradient(0, 0, width, height);
+  base.addColorStop(0, `rgba(${profile.dark}, ${0.34 * alpha})`);
+  base.addColorStop(0.42, `rgba(${profile.main}, ${0.055 * alpha})`);
+  base.addColorStop(1, `rgba(2, 5, 9, ${0.58 * alpha})`);
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+
+  if (material === "water") {
+    const waterline = height * (0.57 - sweep * 0.04 + Math.sin(t * 8.2) * 0.008);
+    const sharkX = width * (0.5 + Math.sin(t * 3.2) * 0.05);
+    const sharkY = waterline + height * (0.09 - smoothstep(0.16, 0.58, t) * 0.14);
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    const deep = ctx.createLinearGradient(0, 0, 0, height);
+    deep.addColorStop(0, `rgba(4, 12, 18, ${0.72 * alpha})`);
+    deep.addColorStop(0.43, `rgba(9, 52, 65, ${0.76 * alpha})`);
+    deep.addColorStop(0.68, `rgba(${profile.main}, ${0.22 * alpha})`);
+    deep.addColorStop(1, `rgba(0, 9, 15, ${0.96 * alpha})`);
+    ctx.fillStyle = deep;
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalCompositeOperation = "screen";
+    for (let i = 0; i < 12; i += 1) {
+      const y = height * (0.14 + i * 0.04) + Math.sin(t * (10 + i * 0.18) + i) * height * 0.012;
+      const p = (t * (0.22 + i * 0.008) + seededUnit(i, 2.1)) % 1;
+      drawCurveStreak(ctx, [
+        [-width * 0.08, y + p * height * 0.04],
+        [width * (0.24 + p * 0.08), y - height * (0.028 + impact * 0.015)],
+        [width * 0.68, y + height * 0.025],
+        [width * 1.08, y - height * 0.018]
+      ], 1 + seededUnit(i, 8.6) * 2.8, i % 3 ? "rgba(221,255,251,.32)" : `rgba(${profile.main}, .3)`, alpha * (0.035 + impact * 0.028), 18);
+    }
+    for (let i = 0; i < 24; i += 1) {
+      const rise = (t * (0.34 + seededUnit(i, 6.7) * 0.42) + seededUnit(i, 1.9)) % 1;
+      const x = width * (0.08 + seededUnit(i, 2.6) * 0.84) + Math.sin(t * 6 + i) * width * 0.018;
+      const y = height * (0.95 - rise * 0.48);
+      const size = minSide * (0.0025 + seededUnit(i, 9.1) * 0.007);
+      drawSoftParticle(ctx, x, y, size, i % 4 ? "rgba(229,255,251,.74)" : `rgba(${profile.main}, .68)`, alpha * (0.06 + rise * 0.15), 18);
+    }
+    ctx.globalCompositeOperation = "source-over";
+    ctx.filter = "blur(8px) saturate(1.08)";
+    ctx.globalAlpha = alpha * (0.56 + impact * 0.22);
+    ctx.fillStyle = "rgba(0, 8, 14, .92)";
+    ctx.beginPath();
+    ctx.ellipse(sharkX, sharkY, width * 0.26, height * 0.064, -0.18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(sharkX - width * 0.2, sharkY - height * 0.018);
+    ctx.lineTo(sharkX - width * 0.34, sharkY - height * 0.12);
+    ctx.lineTo(sharkX - width * 0.27, sharkY + height * 0.012);
+    ctx.closePath();
+    ctx.fill();
+    ctx.filter = "blur(1px)";
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = alpha * (0.2 + impact * 0.14);
+    ctx.strokeStyle = "rgba(229,255,252,.86)";
+    ctx.lineWidth = Math.max(1.2, width * 0.0014);
+    ctx.beginPath();
+    ctx.moveTo(sharkX - width * 0.12, sharkY - height * 0.03);
+    ctx.quadraticCurveTo(sharkX + width * 0.08, sharkY - height * 0.075, sharkX + width * 0.22, sharkY - height * 0.005);
+    ctx.stroke();
+    drawSoftParticle(ctx, sharkX + width * 0.17, sharkY - height * 0.04, minSide * 0.006, "rgba(235,255,252,.92)", alpha * (0.26 + impact * 0.12), 8);
+    ctx.filter = "blur(2px)";
+    ctx.globalAlpha = alpha * (0.38 + impact * 0.3);
+    const foam = ctx.createLinearGradient(0, waterline - height * 0.04, 0, waterline + height * 0.08);
+    foam.addColorStop(0, "rgba(234,255,252,0)");
+    foam.addColorStop(0.48, "rgba(234,255,252,.48)");
+    foam.addColorStop(1, `rgba(${profile.main}, 0)`);
+    ctx.fillStyle = foam;
+    ctx.fillRect(0, waterline - height * 0.05, width, height * 0.16);
+    ctx.restore();
+  } else if (material === "scope") {
+    const cx = width * (0.5 + stage.panX * 0.28);
+    const cy = height * (0.49 + stage.panY * 0.24);
+    const radius = minSide * (0.28 + sweep * 0.06);
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = `rgba(3, 4, 9, ${0.2 * alpha})`;
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalCompositeOperation = "screen";
+    drawRadialGlow(ctx, cx, cy, radius * 1.4, [
+      [0, "rgba(255,250,226,.2)"],
+      [0.36, `rgba(${profile.third}, .18)`],
+      [0.7, `rgba(${profile.main}, .08)`],
+      [1, `rgba(${profile.main}, 0)`]
+    ], alpha);
+    for (let i = 0; i < 9; i += 1) {
+      const r = radius * (0.42 + i * 0.12);
+      drawArcRibbon(ctx, cx, cy, r, -Math.PI * (0.86 - i * 0.012), Math.PI * (0.86 - i * 0.012), 0.8 + i * 0.18, i % 2 ? `rgba(${profile.third}, .48)` : "rgba(255,250,226,.52)", alpha * (0.22 - i * 0.018 + impact * 0.02));
+    }
+    for (let i = 0; i < 5; i += 1) {
+      const x = width * (-0.16 + ((sweep + i * 0.19) % 1) * 1.32);
+      drawStreak(ctx, x, height * 0.14, x + width * 0.16, height * 0.86, 1.2 + i * 0.22, "rgba(255,250,226,.54)", alpha * 0.08, 18);
+    }
+    ctx.restore();
+  } else if (material === "blade") {
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    for (let i = 0; i < 16; i += 1) {
+      const p = (sweep + i * 0.07) % 1;
+      const side = i % 2 ? 1 : -1;
+      const x = width * (0.5 + side * (0.42 - p * 0.58));
+      const y = height * (0.52 + Math.sin(i + t * 9) * 0.12);
+      drawStreak(ctx, x - side * width * 0.22, y + height * 0.12, x + side * width * 0.28, y - height * 0.17, 1.4 + seededUnit(i, 9.1) * 4.4, i % 3 ? `rgba(${profile.secondary}, .64)` : "rgba(255,245,214,.74)", alpha * (0.08 + impact * 0.08), 22);
+    }
+    drawRadialGlow(ctx, width * 0.5, height * 0.52, minSide * 0.5, [
+      [0, `rgba(${profile.secondary}, .2)`],
+      [0.38, `rgba(${profile.main}, .1)`],
+      [1, `rgba(${profile.main}, 0)`]
+    ], alpha);
+    ctx.restore();
+  } else if (material === "void") {
+    const cx = width * 0.5;
+    const cy = height * 0.48;
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    for (let layer = 0; layer < 7; layer += 1) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(t * (0.8 + layer * 0.12) + layer * 0.74);
+      ctx.globalAlpha = alpha * (0.12 + layer * 0.018);
+      const gradient = ctx.createRadialGradient(0, 0, minSide * 0.04, 0, 0, minSide * (0.22 + layer * 0.052));
+      gradient.addColorStop(0, `rgba(${profile.third}, .26)`);
+      gradient.addColorStop(0.42, `rgba(${profile.secondary}, .16)`);
+      gradient.addColorStop(1, `rgba(${profile.main}, 0)`);
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, minSide * (0.16 + layer * 0.045), minSide * (0.08 + layer * 0.028), 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    drawShardField(ctx, width, height, t, `rgba(${profile.third}, .38)`, 24, 1);
+    ctx.restore();
+  } else if (material === "gunfire") {
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.filter = "blur(20px)";
+    for (let i = 0; i < 10; i += 1) {
+      const side = i % 2 ? 1 : -1;
+      const x = width * (0.5 + side * (0.16 + seededUnit(i, 4) * 0.16));
+      const y = height * (0.72 - seededUnit(i, 5) * 0.34);
+      ctx.globalAlpha = alpha * (0.08 + impact * 0.04);
+      ctx.fillStyle = i % 3 ? `rgba(${profile.dark}, .74)` : `rgba(${profile.secondary}, .34)`;
+      ctx.beginPath();
+      ctx.ellipse(x, y, minSide * (0.1 + seededUnit(i, 6) * 0.12), minSide * (0.04 + seededUnit(i, 7) * 0.06), side * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    [[0.28, -1], [0.72, 1]].forEach(([xRatio, side], index) => {
+      const x = width * xRatio;
+      const flash = beatPulse(t, index ? 0.34 : 0.12, 0.08);
+      drawStreak(ctx, x, height * 0.73, width * (xRatio + side * 0.52), height * 0.2, Math.max(6, width * 0.008 + flash * 12), index ? `rgba(${profile.secondary}, .7)` : `rgba(${profile.main}, .78)`, alpha * (0.18 + flash * 0.6), 34);
+    });
+    ctx.restore();
+  } else if (material === "arcane") {
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    for (let i = 0; i < 14; i += 1) {
+      const p = (sweep + i * 0.061) % 1;
+      const x = width * (-0.1 + p * 1.2);
+      const y = height * (0.92 - p * 0.95 + Math.sin(t * 8 + i) * 0.03);
+      drawCurveStreak(ctx, [
+        [x - width * 0.2, y + height * 0.14],
+        [x - width * 0.04, y - height * 0.05],
+        [x + width * 0.16, y + height * 0.02]
+      ], 2 + seededUnit(i, 1.2) * 3.4, i % 2 ? `rgba(${profile.secondary}, .64)` : `rgba(${profile.main}, .72)`, alpha * (0.08 + impact * 0.06), 20);
+    }
+    ctx.restore();
+  } else if (material === "stage") {
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    const curtain = ctx.createLinearGradient(0, 0, width, 0);
+    curtain.addColorStop(0, `rgba(${profile.dark}, ${0.42 * alpha})`);
+    curtain.addColorStop(0.5, "rgba(0,0,0,0)");
+    curtain.addColorStop(1, `rgba(${profile.dark}, ${0.42 * alpha})`);
+    ctx.fillStyle = curtain;
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalCompositeOperation = "screen";
+    for (let i = 0; i < 5; i += 1) {
+      const x = width * (0.26 + i * 0.12 + Math.sin(t * 1.4 + i) * 0.02);
+      const beam = ctx.createLinearGradient(x, 0, width * 0.5, height * 0.76);
+      beam.addColorStop(0, `rgba(255, 239, 196, ${0.22 * alpha})`);
+      beam.addColorStop(0.62, `rgba(${profile.secondary}, ${0.08 * alpha})`);
+      beam.addColorStop(1, "rgba(255,239,196,0)");
+      ctx.fillStyle = beam;
+      ctx.beginPath();
+      ctx.moveTo(x - width * 0.03, 0);
+      ctx.lineTo(width * (0.42 + i * 0.04), height * 0.82);
+      ctx.lineTo(width * (0.3 + i * 0.09), height * 0.82);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  } else if (material === "ice") {
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    for (let i = 0; i < 26; i += 1) {
+      const p = (sweep + i * 0.035) % 1;
+      const x = width * (-0.12 + p * 1.24);
+      const y = height * (0.16 + seededUnit(i, 3.2) * 0.7 - p * 0.18);
+      const size = minSide * (0.018 + seededUnit(i, 4.5) * 0.055);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(-0.7 + seededUnit(i, 5.8) * 1.4);
+      ctx.globalAlpha = alpha * (0.08 + seededUnit(i, 6.1) * 0.18);
+      ctx.fillStyle = i % 2 ? "rgba(248,254,255,.62)" : `rgba(${profile.main}, .5)`;
+      ctx.beginPath();
+      ctx.moveTo(0, -size);
+      ctx.lineTo(size * 0.18, 0);
+      ctx.lineTo(0, size);
+      ctx.lineTo(-size * 0.18, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+  } else if (material === "quake") {
+    const cx = width * (0.08 + sweep * 0.78);
+    const cy = height * 0.74;
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    for (let ring = 0; ring < 9; ring += 1) {
+      drawArcRibbon(ctx, cx, cy, minSide * (0.05 + ring * 0.058 + impact * 0.08), Math.PI * 0.06, Math.PI * 1.22, 2.6 - ring * 0.16, ring % 2 ? `rgba(${profile.secondary}, .48)` : `rgba(${profile.third}, .44)`, alpha * (0.2 - ring * 0.014));
+    }
+    drawCracks(ctx, cx, cy + minSide * 0.06, minSide * (0.32 + impact * 0.12), 18, sweep, `rgba(${profile.secondary}, .34)`);
+    ctx.restore();
+  }
+
+  drawMaterialVeil(ctx, width, height, t, profile, stage, alpha * 1.35);
+}
+
 function drawSoftParticle(ctx, x, y, radius, color, alpha, blur = 12) {
   ctx.save();
   ctx.globalCompositeOperation = "screen";
@@ -2721,7 +3099,7 @@ function drawFizzActionCue(ctx, width, height, t, profile, stage, alpha) {
     [cx - width * 0.23, waterline - height * (0.1 + breach * 0.04)],
     [cx + width * 0.18, waterline - height * (0.12 + breach * 0.08)],
     [width * 0.94, waterline + height * 0.06]
-  ], Math.max(10, width * 0.011 + breach * 16), "rgba(226,255,252,.74)", alpha * (0.28 + breach * 0.56), 34);
+  ], Math.max(5, width * 0.005 + breach * 7), "rgba(226,255,252,.52)", alpha * (0.08 + breach * 0.2), 24);
 
   ctx.globalCompositeOperation = "multiply";
   ctx.globalAlpha = alpha * (0.3 + breach * 0.2);
@@ -2792,10 +3170,10 @@ function drawFizzActionCue(ctx, width, height, t, profile, stage, alpha) {
   const spearY = waterline - height * (0.16 + breach * 0.05);
   ctx.translate(spearX, spearY);
   ctx.rotate(-0.34 + Math.sin(t * 5) * 0.035);
-  drawStreak(ctx, -width * 0.18, 0, width * 0.16, -height * 0.1, Math.max(4, width * 0.005), "rgba(232,255,250,.84)", alpha * surge * 0.55, 24);
+  drawStreak(ctx, -width * 0.18, 0, width * 0.16, -height * 0.1, Math.max(3, width * 0.0038), "rgba(232,255,250,.66)", alpha * surge * 0.22, 18);
   [-1, 0, 1].forEach((tooth) => {
     const offset = tooth * width * 0.028;
-    drawStreak(ctx, width * 0.16, -height * 0.1, width * (0.22 + Math.abs(tooth) * 0.02), -height * (0.16 + Math.abs(tooth) * 0.02) + offset * 0.08, Math.max(2.2, width * 0.0028), `rgba(${profile.secondary}, .66)`, alpha * surge * 0.5, 18);
+    drawStreak(ctx, width * 0.16, -height * 0.1, width * (0.22 + Math.abs(tooth) * 0.02), -height * (0.16 + Math.abs(tooth) * 0.02) + offset * 0.08, Math.max(1.6, width * 0.002), `rgba(${profile.secondary}, .54)`, alpha * surge * 0.2, 14);
   });
   ctx.restore();
 
@@ -3384,8 +3762,8 @@ function drawSharkScene(ctx, width, height, t, profile) {
 
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = alpha * (0.18 + rise * 0.08);
-  ctx.filter = "blur(4px) saturate(1.08) contrast(1.08)";
+  ctx.globalAlpha = alpha * (0.62 + rise * 0.26);
+  ctx.filter = "blur(1px) saturate(1.18) contrast(1.14)";
   ctx.translate(x - size * 0.12, y - size * 0.03);
   ctx.rotate(-0.2 - rise * 0.2 + Math.sin(t * 5) * 0.025);
   const shark = ctx.createLinearGradient(-size * 1.2, -size * 0.36, size * 1.16, size * 0.34);
@@ -3394,8 +3772,8 @@ function drawSharkScene(ctx, width, height, t, profile) {
   shark.addColorStop(0.62, "rgba(46, 132, 146, .42)");
   shark.addColorStop(1, "rgba(1, 12, 22, .98)");
   ctx.fillStyle = shark;
-  ctx.shadowColor = "rgba(102, 242, 255, .16)";
-  ctx.shadowBlur = 26;
+  ctx.shadowColor = "rgba(102, 242, 255, .38)";
+  ctx.shadowBlur = 30;
   ctx.beginPath();
   ctx.moveTo(size * 1.12, -size * 0.02);
   ctx.bezierCurveTo(size * 0.68, -size * 0.46, -size * 0.22, -size * 0.45, -size * 0.98, -size * 0.2);
@@ -3404,7 +3782,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  ctx.globalAlpha = alpha * 0.12;
+  ctx.globalAlpha = alpha * 0.44;
   ctx.fillStyle = "rgba(2, 12, 20, .72)";
   ctx.beginPath();
   ctx.moveTo(-size * 0.94, -size * 0.08);
@@ -3428,7 +3806,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.fill();
 
   ctx.filter = "blur(1.8px)";
-  ctx.globalAlpha = alpha * 0.18;
+  ctx.globalAlpha = alpha * 0.58;
   ctx.fillStyle = "rgba(0, 6, 12, .94)";
   ctx.beginPath();
   ctx.moveTo(size * 0.7, size * 0.04);
@@ -3437,7 +3815,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.closePath();
   ctx.fill();
   ctx.filter = "blur(.4px)";
-  ctx.globalAlpha = alpha * 0.18;
+  ctx.globalAlpha = alpha * 0.7;
   ctx.strokeStyle = "rgba(234,255,250,.9)";
   ctx.lineWidth = Math.max(1.2, size * 0.008);
   ctx.beginPath();
@@ -3452,7 +3830,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   for (let tooth = 0; tooth < 9; tooth += 1) {
     const tx = size * (0.54 + tooth * 0.047);
     const ty = size * (0.1 + Math.sin(tooth) * 0.018);
-    ctx.globalAlpha = alpha * (0.035 + rise * 0.035);
+    ctx.globalAlpha = alpha * (0.11 + rise * 0.09);
     ctx.fillStyle = "rgba(238,255,250,.82)";
     ctx.beginPath();
     ctx.moveTo(tx, ty);
@@ -3944,6 +4322,7 @@ function drawUltimateFrame(ctx, profile, width, height, elapsed, duration) {
   const stage = cinematicStageFor(profile.id);
   ctx.clearRect(0, 0, width, height);
   drawCinematicBackdrop(ctx, width, height, t, profile);
+  drawPremiumMaterialWorld(ctx, width, height, t, profile, stage);
   drawChampionSignatureScene(ctx, profile, width, height, t);
   drawCinematicLensPass(ctx, width, height, t, profile);
   drawChampionActionCues(ctx, width, height, t, profile, stage, sceneEnvelope(t, 0.94));
@@ -3955,7 +4334,6 @@ function drawUltimateFrame(ctx, profile, width, height, elapsed, duration) {
   ctx.restore();
 
   drawCameraShudder(ctx, width, height, t, profile);
-  drawVignette(ctx, width, height, 0.42);
   drawLetterbox(ctx, width, height, 0.14 * Math.sin(Math.PI * clamp(t / 0.98, 0, 1)));
 }
 
@@ -3990,17 +4368,20 @@ function spawnSelectionFx(button, profileId = "default") {
   });
 
   const fx = document.createElement("div");
+  const shaderCanvas = document.createElement("canvas");
   const threeCanvas = document.createElement("canvas");
   const canvas = document.createElement("canvas");
   fx.className = "selection-fx ultimate-scene";
   fx.dataset.championFx = profile.id;
   fx.setAttribute("aria-hidden", "true");
+  shaderCanvas.className = "fx-shader-canvas";
   threeCanvas.className = "fx-three-canvas";
   canvas.className = "fx-2d-canvas";
   applyFxProfileVars(fx, profile);
-  fx.append(threeCanvas, canvas);
+  fx.append(shaderCanvas, threeCanvas, canvas);
   document.body.append(fx);
 
+  const shaderState = createUltimateShaderState(shaderCanvas);
   const context = canvas.getContext("2d", { alpha: true, desynchronized: true });
   const startedAt = performance.now();
   const duration = visualDurations[profile.id] || 3800;
@@ -4060,6 +4441,9 @@ function spawnSelectionFx(button, profileId = "default") {
       fx.dataset.frameStats = JSON.stringify(window.__leagueVfxStats);
     }
     frameCount += 1;
+    if (shaderState) {
+      renderUltimateShader(shaderState, profile, width, height, elapsed, duration, dpr);
+    }
     if (threeScene) {
       threeScene.resize(width, height, dpr);
       threeScene.render(elapsed, duration);
@@ -4073,8 +4457,9 @@ function spawnSelectionFx(button, profileId = "default") {
       context.imageSmoothingQuality = "high";
       last2dDrawAt = -Infinity;
     }
-    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 95;
-    const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= 360;
+    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 48;
+    const twoDFrameInterval = profile.id === "fizz" && width > 900 ? 80 : 48;
+    const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= twoDFrameInterval;
     if (needsFirst2dDraw || needs2dDraw || elapsed > duration - 140) {
       context.setTransform(1, 0, 0, 1, 0, 0);
       drawUltimateFrame(context, profile, pixelWidth, pixelHeight, elapsed, duration);
@@ -4168,10 +4553,10 @@ function renderPicker() {
       button.style.setProperty("--my", "42%");
     });
     button.addEventListener("pointerenter", () => {
-      void warmVfx3dRenderer(champion.id);
+      void loadVfx3dModule();
     });
     button.addEventListener("focus", () => {
-      void warmVfx3dRenderer(champion.id);
+      void loadVfx3dModule();
     });
     button.addEventListener("click", () => {
       button.classList.remove("is-flashing");

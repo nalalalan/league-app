@@ -10,7 +10,7 @@ const DEFAULT_PROFILE = {
 const PRESETS = {
   samira: { mode: 1, particles: 280, speed: 1.7, ringCount: 4, shardCount: 22, beamCount: 8, roll: -0.26, cameraZ: 6.2 },
   caitlyn: { mode: 2, particles: 220, speed: 1.08, ringCount: 5, shardCount: 14, beamCount: 5, roll: 0.02, cameraZ: 6.5 },
-  fizz: { mode: 3, particles: 300, speed: 1.36, ringCount: 5, shardCount: 18, beamCount: 6, roll: -0.08, cameraZ: 6.0 },
+  fizz: { mode: 3, particles: 320, speed: 1.48, ringCount: 0, shardCount: 24, beamCount: 1, roll: -0.08, cameraZ: 6.0 },
   kaisa: { mode: 4, particles: 300, speed: 1.44, ringCount: 5, shardCount: 22, beamCount: 7, roll: 0.2, cameraZ: 6.15 },
   missfortune: { mode: 5, particles: 260, speed: 1.5, ringCount: 3, shardCount: 18, beamCount: 8, roll: 0.08, cameraZ: 6.3 },
   ezreal: { mode: 6, particles: 280, speed: 1.58, ringCount: 5, shardCount: 18, beamCount: 7, roll: -0.18, cameraZ: 6.0 },
@@ -438,12 +438,17 @@ function createShards(colors, preset) {
 }
 
 function relicMaterial(color, opacity = 0.48) {
-  return new THREE.MeshBasicMaterial({
-    color,
+  const baseColor = color.clone ? color.clone() : new THREE.Color(color);
+  return new THREE.MeshPhongMaterial({
+    color: baseColor,
+    emissive: baseColor.clone().multiplyScalar(0.42),
+    specular: new THREE.Color(1, 0.96, 0.82),
+    shininess: 120,
     transparent: true,
     opacity: Math.min(0.86, opacity * 1.25),
     blending: THREE.AdditiveBlending,
     depthWrite: false,
+    depthTest: true,
     side: THREE.DoubleSide
   });
 }
@@ -470,7 +475,7 @@ function registerRelic(mesh, options = {}) {
 }
 
 function addRelicPlane(group, width, height, color, opacity, x, y, z, rotationZ = 0, options = {}) {
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), relicMaterial(color, opacity));
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, 0.025), relicMaterial(color, opacity));
   mesh.position.set(x, y, z);
   mesh.rotation.z = rotationZ;
   if (options.scale) mesh.scale.set(options.scale[0], options.scale[1], options.scale[2] ?? 1);
@@ -498,7 +503,7 @@ function addRelicSphere(group, radius, color, opacity, x, y, z, options = {}) {
 }
 
 function addRelicCone(group, radius, height, color, opacity, x, y, z, rotationZ = 0, options = {}) {
-  const mesh = new THREE.Mesh(new THREE.ConeGeometry(radius, height, 4, 1, false), relicMaterial(color, opacity));
+  const mesh = new THREE.Mesh(new THREE.ConeGeometry(radius, height, 24, 1, false), relicMaterial(color, opacity));
   mesh.position.set(x, y, z);
   mesh.rotation.z = rotationZ;
   if (options.scale) mesh.scale.set(options.scale[0], options.scale[1], options.scale[2] ?? 1);
@@ -508,7 +513,7 @@ function addRelicCone(group, radius, height, color, opacity, x, y, z, rotationZ 
 }
 
 function addRelicCylinder(group, radius, height, color, opacity, x, y, z, rotationZ = 0, options = {}) {
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 12, 1, false), relicMaterial(color, opacity));
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 24, 1, false), relicMaterial(color, opacity));
   mesh.position.set(x, y, z);
   mesh.rotation.z = rotationZ;
   if (options.scale) mesh.scale.set(options.scale[0], options.scale[1], options.scale[2] ?? 1);
@@ -559,7 +564,7 @@ function createChampionRelic(colors, preset) {
   } else if (mode === 3) {
     group.position.y = -0.12;
     for (let index = 0; index < 5; index += 1) {
-      addRelicTorus(group, 0.42 + index * 0.16, 0.01, index % 2 ? water : colors.main, 0.3, 0.03, -0.24 + index * 0.045, -index * 0.055, [0.82, 0.04, index * 0.34], { role: "water-ring", scale: [1.48, 0.34, 1], phase: index * 0.12, spin: index % 2 ? -0.72 : 0.86 });
+      addRelicTorus(group, 0.42 + index * 0.16, 0.008, index % 2 ? water : colors.main, 0.12, 0.03, -0.24 + index * 0.045, -index * 0.055, [0.82, 0.04, index * 0.34], { role: "water-ring", scale: [1.36, 0.24, 1], phase: index * 0.12, spin: index % 2 ? -0.72 : 0.86 });
     }
     addRelicCylinder(group, 0.028, 1.52, water, 0.46, -0.24, 0.12, -0.05, -0.24, { role: "trident", phase: 0.12 });
     addRelicCone(group, 0.085, 0.34, water, 0.46, -0.41, 0.86, -0.04, -0.24, { role: "trident-tip", phase: 0.18 });
@@ -672,7 +677,7 @@ function updateRings(group, elapsed, progress, preset) {
     mesh.rotation.z = preset.roll + elapsed * 0.0004 * mesh.userData.spin + index * 0.42;
     mesh.rotation.x = mode === 2 ? 0 : 0.32 + index * 0.035;
     mesh.rotation.y = mode === 4 ? elapsed * 0.0005 + index * 0.12 : index * 0.03;
-    mesh.material.opacity = pulse * (mode === 3 ? 0.2 : 0.26);
+    mesh.material.opacity = pulse * (mode === 3 ? 0.045 : 0.22);
   });
 }
 
@@ -727,7 +732,7 @@ function updateBeams(group, elapsed, progress, preset) {
     mesh.position.set(x, y, -1.0 - seeded(index, 11.2) * 2.2);
     mesh.rotation.z = angle;
     mesh.scale.set(length * (0.45 + hit), 1, 1);
-    mesh.material.opacity = hit * (mode === 3 ? 0.16 : 0.22);
+    mesh.material.opacity = hit * (mode === 3 ? 0.07 : 0.19);
   });
 }
 
@@ -822,6 +827,12 @@ function updateChampionRelic(group, elapsed, progress, preset) {
       mesh.rotation.z = data.baseRotZ + time * 0.08 + pulse * 0.08;
       mesh.scale.y = data.baseScaleY * (0.9 + pulse * 0.22);
     }
+
+    if (mode === 3) {
+      if (data.role === "bubble") mesh.material.opacity = Math.min(mesh.material.opacity, 0.18 * visibility);
+      else if (data.role.includes("trident")) mesh.material.opacity = Math.min(mesh.material.opacity, 0.035 * visibility);
+      else mesh.material.opacity = Math.min(mesh.material.opacity, 0.018 * visibility);
+    }
   });
 }
 
@@ -832,7 +843,7 @@ export function createChampionVfx3D({ canvas, championId = "default", profile = 
     canvas,
     alpha: true,
     antialias: false,
-    depth: false,
+    depth: true,
     premultipliedAlpha: false,
     powerPreference: "high-performance"
   });
@@ -843,6 +854,15 @@ export function createChampionVfx3D({ canvas, championId = "default", profile = 
   const camera = new THREE.PerspectiveCamera(42, 16 / 9, 0.1, 40);
   camera.position.set(0, 0, preset.cameraZ);
 
+  const ambient = new THREE.AmbientLight(new THREE.Color(0.56, 0.62, 0.72), 0.7);
+  const keyLight = new THREE.PointLight(colors.main, 2.2, 9);
+  keyLight.position.set(-1.8, 1.4, 3.8);
+  const rimLight = new THREE.PointLight(colors.secondary, 1.6, 8);
+  rimLight.position.set(2.4, -1.1, 3.2);
+  const coolLight = new THREE.PointLight(colors.third, 1.25, 7);
+  coolLight.position.set(0.2, 1.8, 2.4);
+  scene.add(ambient, keyLight, rimLight, coolLight);
+
   const backdrop = createBackdrop(colors, preset);
   scene.add(backdrop);
 
@@ -851,11 +871,11 @@ export function createChampionVfx3D({ canvas, championId = "default", profile = 
   scene.add(root);
 
   const particles = createParticles(colors, preset);
-  const rings = createRings(colors, preset);
-  const beams = createBeams(colors, preset);
+  const rings = new THREE.Group();
+  const beams = new THREE.Group();
   const shards = createShards(colors, preset);
-  const relic = createChampionRelic(colors, preset);
-  root.add(particles, rings, beams, shards, relic);
+  const relic = new THREE.Group();
+  root.add(particles, shards);
 
   let disposed = false;
   let lastWidth = 0;
