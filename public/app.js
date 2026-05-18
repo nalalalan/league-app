@@ -702,7 +702,7 @@ const recordingReview = {
     { title: "highlight 10", duration: "0:11", kind: "highlight", champion: "Samira", feedbackTitle: "Do not duel without the exit", feedback: "When an enemy catches a wave, pressure the objective first; take the duel only with ult, summoner info, and a walk-out.", src: "/recordings/16-10_NA1-5563247854_10.webm", poster: "/recordings/posters/16-10-na1-5563247854-10.jpg" },
     { title: "highlight 11", duration: "0:12", kind: "highlight", champion: "Samira", feedbackTitle: "Never be first into choke", feedback: "At jungle walls, hold the edge until enemy CC is used; entering first makes Samira the target instead of the finisher.", src: "/recordings/16-10_NA1-5563247854_11.webm", poster: "/recordings/posters/16-10-na1-5563247854-11.jpg" },
     { title: "highlight 12", duration: "0:50", kind: "highlight", champion: "Samira", feedbackTitle: "End after the base win", feedback: "At inhib or nexus, kills are only a tool; hit the structure as soon as the fight is won instead of extending.", src: "/recordings/16-10_NA1-5563247854_12.webm", poster: "/recordings/posters/16-10-na1-5563247854-12.jpg" },
-    { title: "full game 8x", duration: "2:09", kind: "full 8x", champion: "Samira", feedbackTitle: "Cut the 10-death pattern", feedback: "16/10 Samira says damage is not the gap; climb by refusing the second fight unless it buys tower, dragon, Baron, or nexus.", src: "/recordings/16-10_NA1-5563247854_13.webm", poster: "/recordings/posters/16-10-na1-5563247854-13.jpg" }
+    { title: "full game 8x", duration: "2:09", kind: "full 8x", champion: "Samira", feedbackTitle: "Cut the 10-death pattern", feedback: "16/10 Samira says damage is not the gap; climb by refusing the second fight unless it buys tower, dragon, Baron, or nexus.", src: "/recordings/16-10_NA1-5563247854_13.mp4", poster: "/recordings/posters/16-10-na1-5563247854-13.jpg" }
   ]
 };
 
@@ -730,7 +730,7 @@ const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx22";
+const visualFxVersion = "20260518-world-vfx23";
 let vfx3dModulePromise;
 const vfx3dWarmPromises = {};
 let vfx2dWarmPromise;
@@ -4924,7 +4924,7 @@ function spawnSelectionFx(button, profileId = "default") {
   const canvas = document.createElement("canvas");
   fx.className = "selection-fx ultimate-scene";
   fx.dataset.championFx = profile.id;
-  fx.dataset.vfxTier = "panel-atmosphere-vfx22";
+  fx.dataset.vfxTier = "panel-atmosphere-vfx23";
   fx.setAttribute("aria-hidden", "true");
   shaderCanvas.className = "fx-shader-canvas";
   threeCanvas.className = "fx-three-canvas";
