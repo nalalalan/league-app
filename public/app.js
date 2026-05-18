@@ -632,9 +632,15 @@ let currentChampionId = "";
 let swapTimer = 0;
 let settleTimer = 0;
 let audioContext;
+let activeStinger;
 const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
+const stingerVersion = "20260518-orchestra16";
+const stingerUrls = Object.fromEntries(champions.map((champion) => [
+  champion.id,
+  `/audio/${champion.id}.mp3?v=${stingerVersion}`
+]));
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -820,7 +826,7 @@ function setPressedChampion(championId) {
   });
 }
 
-function playSelectSound(profileId = "default") {
+function playSynthSelectSound(profileId = "default") {
   const profile = soundProfileFor(profileId);
   const scene = soundSceneFor(profileId);
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -1184,6 +1190,33 @@ function playSelectSound(profileId = "default") {
   }
 }
 
+function playSelectSound(profileId = "default") {
+  const stingerUrl = stingerUrls[profileId];
+  if (!stingerUrl || !window.Audio) {
+    playSynthSelectSound(profileId);
+    return;
+  }
+
+  try {
+    if (activeStinger) {
+      activeStinger.pause();
+      activeStinger.currentTime = 0;
+    }
+    const audio = new window.Audio(stingerUrl);
+    audio.volume = 0.92;
+    activeStinger = audio;
+    const playback = audio.play();
+    if (playback?.catch) {
+      playback.catch(() => {
+        if (activeStinger === audio) activeStinger = undefined;
+        playSynthSelectSound(profileId);
+      });
+    }
+  } catch {
+    playSynthSelectSound(profileId);
+  }
+}
+
 function playSelectionBurst(button, profileId = "default") {
   if (motionQuery.matches || !page) return;
   const profile = fxProfileFor(profileId);
@@ -1261,6 +1294,69 @@ function drawCracks(ctx, x, y, radius, count, progress, color) {
     ctx.lineTo(x + Math.cos(angle) * length * 0.55, y + Math.sin(angle) * length * 0.55);
     ctx.lineTo(x + Math.cos(kink) * length, y + Math.sin(kink) * length);
     ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function seededUnit(index, salt = 0) {
+  const value = Math.sin(index * 12.9898 + salt * 78.233) * 43758.5453;
+  return value - Math.floor(value);
+}
+
+function drawAtmosphericDust(ctx, width, height, t, color, count = 36, intensity = 1) {
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let index = 0; index < count; index += 1) {
+    const baseX = seededUnit(index, 1.4) * width;
+    const baseY = seededUnit(index, 2.7) * height;
+    const drift = (t * (70 + seededUnit(index, 4.1) * 90)) % (height * 0.32);
+    const x = baseX + Math.sin(t * 5 + index) * 18;
+    const y = (baseY - drift + height * 0.16) % (height * 1.08);
+    const radius = 1.2 + seededUnit(index, 5.8) * 3.4;
+    ctx.globalAlpha = (0.08 + seededUnit(index, 6.2) * 0.16) * intensity;
+    fillRadial(ctx, x, y, 0, radius * 7, [
+      [0, color],
+      [0.35, color.replace(/,\s*[\d.]+\)$/, ", .18)")],
+      [1, color.replace(/,\s*[\d.]+\)$/, ", 0)")]
+    ]);
+  }
+  ctx.restore();
+}
+
+function drawArcRibbon(ctx, cx, cy, radius, startAngle, endAngle, width, color, alpha) {
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, startAngle, endAngle);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawShardField(ctx, width, height, t, color, count = 12, direction = 1) {
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let index = 0; index < count; index += 1) {
+    const p = (t * (0.55 + seededUnit(index, 3.9) * 0.5) + seededUnit(index, 2.1)) % 1;
+    const x = width * (direction > 0 ? -0.1 + p * 1.22 : 1.1 - p * 1.22);
+    const y = height * (0.18 + seededUnit(index, 4.6) * 0.66);
+    const size = 10 + seededUnit(index, 6.8) * 38;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((direction > 0 ? -0.8 : 0.8) + seededUnit(index, 9.2) * 0.9);
+    ctx.globalAlpha = 0.08 + seededUnit(index, 10.3) * 0.28;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0, -size);
+    ctx.lineTo(size * 0.22, 0);
+    ctx.lineTo(0, size);
+    ctx.lineTo(-size * 0.2, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
   ctx.restore();
 }
@@ -1407,6 +1503,7 @@ function drawCaitlynScene(ctx, width, height, t) {
   ctx.save();
   ctx.fillStyle = `rgba(9, 8, 11, ${0.16 + lock * 0.24})`;
   ctx.fillRect(0, 0, width, height);
+  drawAtmosphericDust(ctx, width, height, t, "rgba(255, 226, 151, .38)", 28, lock);
   ctx.strokeStyle = "rgba(255, 229, 150, .82)";
   ctx.lineWidth = Math.max(1.5, width * 0.002);
   for (let i = 0; i < 3; i += 1) {
@@ -1415,6 +1512,18 @@ function drawCaitlynScene(ctx, width, height, t) {
     ctx.arc(cx, cy, radius * (1 + i * 0.24), 0, Math.PI * 2);
     ctx.stroke();
   }
+  for (let index = 0; index < 48; index += 1) {
+    const angle = (index / 48) * Math.PI * 2;
+    const inner = radius * (0.94 + (index % 4 === 0 ? 0.08 : 0.02));
+    const outer = radius * (1.02 + (index % 4 === 0 ? 0.16 : 0.08));
+    ctx.globalAlpha = lock * (index % 4 === 0 ? 0.5 : 0.22);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
+    ctx.lineTo(cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer);
+    ctx.stroke();
+  }
+  drawArcRibbon(ctx, cx, cy, radius * 1.42, Math.PI * 1.1, Math.PI * 1.86, 2, "rgba(255, 248, 205, .74)", lock * 0.5);
+  drawArcRibbon(ctx, cx, cy, radius * 0.62, Math.PI * -0.12, Math.PI * 0.62, 3, "rgba(129, 226, 214, .44)", lock * 0.38);
   ctx.globalAlpha = lock;
   ctx.beginPath();
   ctx.moveTo(cx - radius * 1.35, cy);
@@ -1441,6 +1550,7 @@ function drawCaitlynScene(ctx, width, height, t) {
       [1, "rgba(255,211,113,0)"]
     ]);
     drawCracks(ctx, cx, cy, radius * 1.2, 12, shot, "rgba(255,246,218,.48)");
+    drawCracks(ctx, cx, cy, radius * 0.7, 7, shot, "rgba(104,221,212,.34)");
   }
   ctx.restore();
 }
@@ -1450,17 +1560,32 @@ function drawEzrealScene(ctx, width, height, t) {
   const x = width * (-0.18 + travel * 1.48);
   const y = height * (1.08 - travel * 1.16);
   ctx.save();
+  drawAtmosphericDust(ctx, width, height, t, "rgba(96, 214, 255, .42)", 44, 0.9);
   ctx.globalCompositeOperation = "screen";
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  drawArcRibbon(ctx, width * 0.08, height * 0.88, Math.min(width, height) * 0.18, -0.8, 1.2, 2.5, "rgba(255, 230, 132, .44)", 0.55);
+  drawArcRibbon(ctx, width * 0.08, height * 0.88, Math.min(width, height) * 0.25, -0.6, 1.0, 1.8, "rgba(83, 225, 255, .42)", 0.48);
   for (let i = 0; i < 9; i += 1) {
-    const back = i * 38 * (width / 1280 + 0.55);
+    const back = i * 44 * (width / 1280 + 0.55);
     ctx.globalAlpha = 0.12 + (9 - i) * 0.045;
     ctx.strokeStyle = i % 2 ? "rgba(93,214,255,.75)" : "rgba(255,224,117,.62)";
-    ctx.lineWidth = 12 + i * 6;
+    ctx.lineWidth = 6 + i * 3.8;
+    ctx.shadowColor = i % 2 ? "rgba(95, 224, 255, .48)" : "rgba(255, 229, 130, .4)";
+    ctx.shadowBlur = 16 + i * 3;
     ctx.beginPath();
-    ctx.moveTo(x - back, y + back * 0.74);
-    ctx.lineTo(x - back - width * 0.42, y + back * 0.74 + height * 0.34);
+    ctx.moveTo(x - back, y + back * 0.7);
+    ctx.bezierCurveTo(
+      x - back - width * 0.14,
+      y + back * 0.7 + height * 0.05 + Math.sin(i + t * 8) * 16,
+      x - back - width * 0.28,
+      y + back * 0.7 + height * 0.2,
+      x - back - width * 0.42,
+      y + back * 0.7 + height * 0.34
+    );
     ctx.stroke();
   }
+  ctx.shadowBlur = 0;
   ctx.globalAlpha = 1;
   fillRadial(ctx, x, y, 0, Math.min(width, height) * 0.22, [
     [0, "rgba(255,252,232,1)"],
@@ -1468,6 +1593,39 @@ function drawEzrealScene(ctx, width, height, t) {
     [0.56, "rgba(96,106,255,.26)"],
     [1, "rgba(96,106,255,0)"]
   ]);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-0.7);
+  const headGradient = ctx.createLinearGradient(-72, 0, 96, 0);
+  headGradient.addColorStop(0, "rgba(86, 195, 255, 0)");
+  headGradient.addColorStop(0.46, "rgba(88, 222, 255, .62)");
+  headGradient.addColorStop(0.72, "rgba(255, 247, 203, .98)");
+  headGradient.addColorStop(1, "rgba(255, 255, 255, .88)");
+  ctx.fillStyle = headGradient;
+  ctx.globalAlpha = 0.92;
+  ctx.beginPath();
+  ctx.moveTo(106, 0);
+  ctx.bezierCurveTo(42, -36, -44, -30, -84, 0);
+  ctx.bezierCurveTo(-42, 30, 42, 36, 106, 0);
+  ctx.fill();
+  ctx.restore();
+  ctx.globalAlpha = 0.58;
+  ctx.strokeStyle = "rgba(255, 245, 185, .72)";
+  ctx.lineWidth = 1.6;
+  for (let index = 0; index < 5; index += 1) {
+    const offset = index * 42;
+    ctx.save();
+    ctx.translate(x - offset * 0.45, y + offset * 0.34);
+    ctx.rotate(-0.72);
+    ctx.beginPath();
+    ctx.moveTo(0, -22);
+    ctx.lineTo(22, 0);
+    ctx.lineTo(0, 22);
+    ctx.lineTo(-22, 0);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
   ctx.restore();
 }
 
@@ -1477,6 +1635,7 @@ function drawSamiraScene(ctx, width, height, t) {
   const cy = height * 0.52;
   const r = Math.min(width, height) * (0.24 + p * 0.16);
   ctx.save();
+  drawAtmosphericDust(ctx, width, height, t, "rgba(255, 102, 146, .36)", 42, 0.95);
   ctx.globalCompositeOperation = "screen";
   for (let i = 0; i < 10; i += 1) {
     const a = t * 10 + i * 0.63;
@@ -1496,6 +1655,18 @@ function drawSamiraScene(ctx, width, height, t) {
   ctx.moveTo(width * 0.16, height * 0.3);
   ctx.bezierCurveTo(width * 0.34, height * 0.2, width * 0.66, height * 0.82, width * 0.86, height * 0.68);
   ctx.stroke();
+  for (let index = 0; index < 14; index += 1) {
+    const a = t * 8 + index * 0.45;
+    const bx = cx + Math.cos(a) * r * 0.9;
+    const by = cy + Math.sin(a) * r * 0.52;
+    ctx.save();
+    ctx.translate(bx, by);
+    ctx.rotate(a + Math.PI * 0.5);
+    ctx.globalAlpha = 0.28 + (index % 3) * 0.08;
+    ctx.fillStyle = index % 2 ? "rgba(255, 232, 160, .66)" : "rgba(255, 72, 132, .52)";
+    ctx.fillRect(-3, -18, 6, 36);
+    ctx.restore();
+  }
   ctx.restore();
 }
 
@@ -1505,6 +1676,7 @@ function drawKaisaScene(ctx, width, height, t) {
   const cy = height * 0.48;
   const size = Math.min(width, height) * (0.18 + open * 0.38);
   ctx.save();
+  drawAtmosphericDust(ctx, width, height, t, "rgba(241, 112, 232, .4)", 40, 0.9);
   ctx.globalCompositeOperation = "screen";
   ctx.translate(cx, cy);
   ctx.rotate((t * 2.4 + 0.4) * Math.PI);
@@ -1527,6 +1699,15 @@ function drawKaisaScene(ctx, width, height, t) {
   ctx.restore();
   ctx.save();
   ctx.globalCompositeOperation = "screen";
+  for (let index = 0; index < 4; index += 1) {
+    ctx.globalAlpha = 0.22 + index * 0.06;
+    ctx.strokeStyle = index % 2 ? "rgba(255,132,235,.54)" : "rgba(95,244,224,.44)";
+    ctx.lineWidth = 3 + index * 1.8;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, size * (0.8 + index * 0.2), size * (0.24 + index * 0.09), t * 3 + index * 0.6, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  drawShardField(ctx, width, height, t, "rgba(255, 140, 241, .34)", 14, 1);
   for (let i = 0; i < 6; i += 1) {
     const a = -0.8 + i * 0.32;
     const x = width * (0.05 + open * 0.7) + i * width * 0.035;
@@ -1544,6 +1725,7 @@ function drawKaisaScene(ctx, width, height, t) {
 function drawMissFortuneScene(ctx, width, height, t) {
   const fire = easeOutCubic(clamp((t - 0.1) / 0.62, 0, 1));
   ctx.save();
+  drawAtmosphericDust(ctx, width, height, t, "rgba(255, 190, 126, .38)", 34, 0.85);
   ctx.globalCompositeOperation = "screen";
   [["rgba(255,193,87,.72)", width * 0.28], ["rgba(238,79,108,.66)", width * 0.72]].forEach(([color, x], index) => {
     ctx.fillStyle = color;
@@ -1564,6 +1746,17 @@ function drawMissFortuneScene(ctx, width, height, t) {
     ctx.lineTo(x + (i % 2 ? 80 : -80), y - 140 * fire);
     ctx.stroke();
   }
+  for (let index = 0; index < 12; index += 1) {
+    const x = width * (0.18 + seededUnit(index, 2) * 0.64);
+    const y = height * (0.24 + seededUnit(index, 3) * 0.44 + fire * 0.08);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(0.9 + seededUnit(index, 5) * 0.8);
+    ctx.globalAlpha = 0.18 + seededUnit(index, 6) * 0.18;
+    ctx.fillStyle = "rgba(255, 231, 168, .72)";
+    ctx.fillRect(-4, -14, 8, 28);
+    ctx.restore();
+  }
   ctx.restore();
 }
 
@@ -1574,6 +1767,7 @@ function drawJhinScene(ctx, width, height, t) {
   ctx.save();
   ctx.fillStyle = `rgba(22, 12, 18, ${0.34 + p * 0.32})`;
   ctx.fillRect(0, 0, width, height);
+  drawAtmosphericDust(ctx, width, height, t, "rgba(201, 77, 118, .36)", 34, 0.75);
   ctx.globalCompositeOperation = "screen";
   for (let i = 0; i < 4; i += 1) {
     ctx.save();
@@ -1597,6 +1791,20 @@ function drawJhinScene(ctx, width, height, t) {
     ctx.lineTo(width * 0.92, height * 0.5);
     ctx.stroke();
   }
+  for (let index = 0; index < 16; index += 1) {
+    const a = index * 0.9 + p * 2;
+    const px = cx + Math.cos(a) * Math.min(width, height) * (0.12 + seededUnit(index, 2) * 0.34);
+    const py = cy + Math.sin(a) * Math.min(width, height) * (0.08 + seededUnit(index, 3) * 0.22);
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(a);
+    ctx.globalAlpha = 0.18 + seededUnit(index, 8) * 0.24;
+    ctx.fillStyle = index % 2 ? "rgba(188, 47, 91, .6)" : "rgba(255, 218, 171, .5)";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 8 + seededUnit(index, 7) * 10, 22 + seededUnit(index, 9) * 16, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
   ctx.restore();
 }
 
@@ -1605,6 +1813,8 @@ function drawAsheScene(ctx, width, height, t) {
   const x = width * (-0.2 + travel * 1.42);
   const y = height * (0.6 - travel * 0.18);
   ctx.save();
+  drawAtmosphericDust(ctx, width, height, t, "rgba(180, 239, 255, .42)", 52, 0.95);
+  drawShardField(ctx, width, height, t, "rgba(210, 246, 255, .34)", 18, -1);
   ctx.globalCompositeOperation = "screen";
   ctx.strokeStyle = "rgba(183,240,255,.6)";
   ctx.lineWidth = Math.max(18, width * 0.02);
@@ -1628,6 +1838,14 @@ function drawAsheScene(ctx, width, height, t) {
     ctx.lineTo(x - i * 72 - 60, y + (i % 2 ? 86 : -82));
     ctx.stroke();
   }
+  for (let index = 0; index < 7; index += 1) {
+    ctx.globalAlpha = 0.18 + index * 0.035;
+    ctx.strokeStyle = "rgba(255, 255, 255, .64)";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(x - index * 52, y, 20 + index * 12, -0.7, 0.7);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -1637,6 +1855,7 @@ function drawRammusScene(ctx, width, height, t) {
   const y = height * 0.72;
   const r = Math.min(width, height) * 0.13;
   ctx.save();
+  drawAtmosphericDust(ctx, width, height, t, "rgba(255, 216, 105, .34)", 42, 0.88);
   ctx.globalCompositeOperation = "screen";
   for (let i = 0; i < 4; i += 1) {
     ctx.globalAlpha = 0.35 * (1 - i * 0.14);
@@ -1655,6 +1874,15 @@ function drawRammusScene(ctx, width, height, t) {
   ctx.beginPath();
   ctx.arc(x, y - r * 0.2, r, 0, Math.PI * 2);
   ctx.fill();
+  ctx.strokeStyle = "rgba(255, 245, 172, .62)";
+  ctx.lineWidth = 2.2;
+  for (let index = 0; index < 7; index += 1) {
+    const a = t * 8 + index * 0.9;
+    ctx.beginPath();
+    ctx.moveTo(x + Math.cos(a) * r * 0.2, y - r * 0.2 + Math.sin(a) * r * 0.2);
+    ctx.lineTo(x + Math.cos(a) * r * 0.88, y - r * 0.2 + Math.sin(a) * r * 0.88);
+    ctx.stroke();
+  }
   drawCracks(ctx, x, y + r * 0.7, r * 2.3, 9, roll, "rgba(255,239,166,.34)");
   ctx.restore();
 }
