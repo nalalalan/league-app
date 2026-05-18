@@ -3,7 +3,7 @@ Champion stingers are derived from the University of Iowa Musical Instrument Sam
 Source: https://theremin.music.uiowa.edu/MIS.html
 The source page states that the samples may be downloaded and used for any projects, without restrictions.
 
-Rendered stingers in this folder combine short excerpts from recorded violin, cello, horn, trumpet, flute,
-soprano saxophone, tam-tam/gong, cymbal roll, crash cymbal, triangle, woodblock, and granite-block samples
-with a low synthetic timpani-style pulse. Each champion file is arranged as a short motif with a rise,
-impact, and tail. No Riot audio is used.
+Rendered stingers in this folder combine short excerpts from recorded tam-tam/gong, cymbal roll, crash
+cymbal, triangle, woodblock, and granite-block samples with synthetic low pulses and filtered noise.
+The current pass avoids melodic phrases and uses impact-first sound design: swell, texture, hit, tail.
+No Riot audio is used.
