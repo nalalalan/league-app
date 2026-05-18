@@ -685,7 +685,7 @@ const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx14";
+const visualFxVersion = "20260518-world-vfx15";
 let vfx3dModulePromise;
 let vfx3dWarmPromise;
 let vfx2dWarmPromise;
