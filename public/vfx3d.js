@@ -831,7 +831,7 @@ export function createChampionVfx3D({ canvas, championId = "default", profile = 
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: true,
+    antialias: false,
     depth: false,
     premultipliedAlpha: false,
     powerPreference: "high-performance"
