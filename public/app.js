@@ -721,6 +721,7 @@ const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 let currentChampionId = "";
+let championAtmosphere;
 let swapTimer = 0;
 let settleTimer = 0;
 let audioContext;
@@ -729,7 +730,7 @@ const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx19";
+const visualFxVersion = "20260518-world-vfx20";
 let vfx3dModulePromise;
 const vfx3dWarmPromises = {};
 let vfx2dWarmPromise;
@@ -742,15 +743,15 @@ const stingerUrls = Object.fromEntries(champions.map((champion) => [
 ]));
 
 const visualDurations = {
-  samira: 6640,
-  caitlyn: 4750,
-  fizz: 3080,
-  kaisa: 6550,
-  missfortune: 5480,
-  ezreal: 6080,
-  jhin: 2750,
-  ashe: 5030,
-  rammus: 8000
+  samira: 1180,
+  caitlyn: 1080,
+  fizz: 980,
+  kaisa: 1220,
+  missfortune: 1120,
+  ezreal: 1160,
+  jhin: 1300,
+  ashe: 1120,
+  rammus: 1240
 };
 
 const shaderSceneIds = {
@@ -914,6 +915,132 @@ function fxProfileFor(profileId = "default") {
 
 function championById(championId) {
   return champions.find((champion) => champion.id === championId) || champions[0];
+}
+
+function ensureChampionAtmosphere() {
+  if (championAtmosphere || !championPanel) return championAtmosphere;
+
+  const root = document.createElement("div");
+  const shaderCanvas = document.createElement("canvas");
+  const materialCanvas = document.createElement("canvas");
+  const art = document.createElement("img");
+  root.className = "champion-atmosphere";
+  shaderCanvas.className = "champion-atmosphere-shader";
+  materialCanvas.className = "champion-atmosphere-material";
+  art.className = "champion-atmosphere-art";
+  art.alt = "";
+  art.decoding = "async";
+  art.loading = "eager";
+  root.setAttribute("aria-hidden", "true");
+  root.append(shaderCanvas, art, materialCanvas);
+  championPanel.prepend(root);
+
+  championAtmosphere = {
+    root,
+    shaderCanvas,
+    materialCanvas,
+    art,
+    context: materialCanvas.getContext("2d", { alpha: true, desynchronized: true }),
+    shaderState: createUltimateShaderState(shaderCanvas),
+    champion: null,
+    profile: null,
+    startedAt: performance.now(),
+    burstStartedAt: 0,
+    raf: 0
+  };
+
+  return championAtmosphere;
+}
+
+function resizeAtmosphereCanvas(canvas, context, width, height, dpr) {
+  const pixelWidth = Math.max(1, Math.round(width * dpr));
+  const pixelHeight = Math.max(1, Math.round(height * dpr));
+  if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+    canvas.width = pixelWidth;
+    canvas.height = pixelHeight;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    if (context) {
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = "high";
+    }
+  }
+  if (context) context.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function renderChampionAtmosphereFrame(now = performance.now()) {
+  const scene = championAtmosphere;
+  if (!scene?.root?.isConnected || !scene.profile) return;
+
+  const rect = scene.root.getBoundingClientRect();
+  const width = Math.max(1, Math.ceil(rect.width));
+  const height = Math.max(1, Math.ceil(rect.height));
+  const dpr = Math.min(window.devicePixelRatio || 1, width < 760 ? 0.92 : 0.86);
+  const elapsed = now - scene.startedAt;
+  const cycle = ((elapsed % 6200) / 6200);
+  const shaderDuration = 6200;
+  const shaderElapsed = (0.1 + cycle * 0.72) * shaderDuration;
+  const burst = scene.burstStartedAt ? Math.max(0, 1 - ((now - scene.burstStartedAt) / 960)) : 0;
+
+  if (scene.shaderState) {
+    renderUltimateShader(scene.shaderState, scene.profile, width, height, shaderElapsed, shaderDuration, dpr);
+  }
+
+  if (scene.context) {
+    resizeAtmosphereCanvas(scene.materialCanvas, scene.context, width, height, dpr);
+    scene.context.clearRect(0, 0, width, height);
+    drawChampionAtmosphereFrame(scene.context, scene.profile, width, height, elapsed / 1000, burst);
+  }
+
+  window.__leagueAmbientStats = {
+    champion: scene.profile.id,
+    width,
+    height,
+    dpr,
+    material: "static-plate",
+    shader: Boolean(scene.shaderState)
+  };
+  scene.raf = 0;
+}
+
+function updateChampionAtmosphere(champion, options = {}) {
+  if (!championPanel || !champion) return;
+  const profile = fxProfileFor(champion.id);
+  const scene = ensureChampionAtmosphere();
+  if (!scene) return;
+
+  applyFxProfileVars(championPanel, profile);
+  championPanel.dataset.championFx = champion.id;
+  if (scene.art.src !== champion.image) scene.art.src = champion.image;
+  scene.champion = champion;
+  scene.profile = profile;
+  if (!scene.startedAt || options.reset) scene.startedAt = performance.now();
+  if (options.burst) scene.burstStartedAt = performance.now();
+
+  if (scene.raf) cancelAnimationFrame(scene.raf);
+  scene.raf = requestAnimationFrame(renderChampionAtmosphereFrame);
+}
+
+function selectionStageFor(button) {
+  const panelRect = championPanel?.getBoundingClientRect();
+  const buttonRect = button?.getBoundingClientRect();
+  const source = panelRect?.width ? panelRect : buttonRect;
+  const viewportWidth = window.innerWidth || 1;
+  const viewportHeight = window.innerHeight || 1;
+  const width = clamp((source?.width || 520) * 1.16, 320, Math.min(920, viewportWidth - 20));
+  const height = clamp((source?.height || 260) + 112, 220, Math.min(430, viewportHeight - 110));
+  const x = clamp((source?.left || 0) + (source?.width || viewportWidth) * 0.5, width * 0.5 + 10, viewportWidth - width * 0.5 - 10);
+  const y = clamp((source?.top || viewportHeight * 0.42) + (source?.height || height) * 0.55, height * 0.5 + 76, viewportHeight - height * 0.5 - 10);
+  return { x, y, width, height };
+}
+
+function applySelectionStage(fx, button) {
+  const stage = selectionStageFor(button);
+  fx.style.setProperty("--fx-stage-x", `${stage.x}px`);
+  fx.style.setProperty("--fx-stage-y", `${stage.y}px`);
+  fx.style.setProperty("--fx-stage-width", `${stage.width}px`);
+  fx.style.setProperty("--fx-stage-height", `${stage.height}px`);
+  return stage;
 }
 
 function applyFxProfileVars(element, profile) {
@@ -1159,6 +1286,10 @@ function writeChampion(champion) {
   championNote.textContent = champion.note;
   situationCount.textContent = `${champion.situations.length} situations`;
   situationList.replaceChildren(...champion.situations.map(situationCard));
+  updateChampionAtmosphere(champion, {
+    burst: Boolean(currentChampionId && champion.id !== currentChampionId),
+    reset: !currentChampionId
+  });
 }
 
 function recordingMainCard(review) {
@@ -4605,6 +4736,45 @@ function drawVfxAccentLayer(ctx, width, height, opacity, renderer) {
   ctx.restore();
 }
 
+function drawChampionAtmosphereFrame(ctx, profile, width, height, seconds, burst = 0) {
+  const stage = cinematicStageFor(profile.id);
+  const cycle = (seconds * 0.08) % 1;
+  const t = 0.16 + cycle * 0.68;
+  const reveal = Math.max(0, Math.min(1, burst));
+  const impact = 0.18 + reveal * 0.82;
+
+  ctx.save();
+  ctx.globalAlpha = 0.86;
+  drawPremiumMaterialWorld(ctx, width, height, t, profile, stage);
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = 0.52 + reveal * 0.36;
+  drawChampionActionCues(ctx, width, height, t, profile, stage, impact);
+  ctx.restore();
+
+  if (reveal > 0.01) {
+    const pulseT = 0.2 + (1 - reveal) * 0.56;
+    ctx.save();
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = reveal * 0.64;
+    drawChampionSignatureScene(ctx, profile, width, height, pulseT);
+    drawCinematicLensPass(ctx, width, height, pulseT, profile);
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.globalCompositeOperation = "multiply";
+  const shade = ctx.createLinearGradient(0, 0, width, height);
+  shade.addColorStop(0, "rgba(0,0,0,.18)");
+  shade.addColorStop(0.45, "rgba(0,0,0,.03)");
+  shade.addColorStop(1, "rgba(0,0,0,.42)");
+  ctx.fillStyle = shade;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+}
+
 function drawUltimateFrame(ctx, profile, width, height, elapsed, duration) {
   const t = clamp(elapsed / duration, 0, 1);
   const stage = cinematicStageFor(profile.id);
@@ -4666,7 +4836,7 @@ function spawnSelectionFx(button, profileId = "default") {
   const canvas = document.createElement("canvas");
   fx.className = "selection-fx ultimate-scene";
   fx.dataset.championFx = profile.id;
-  fx.dataset.vfxTier = "shader-first-vfx19";
+  fx.dataset.vfxTier = "panel-atmosphere-vfx20";
   fx.setAttribute("aria-hidden", "true");
   shaderCanvas.className = "fx-shader-canvas";
   threeCanvas.className = "fx-three-canvas";
@@ -4685,14 +4855,16 @@ function spawnSelectionFx(button, profileId = "default") {
   let frameMax = 0;
   let slowFrames = 0;
   let last2dDrawAt = -Infinity;
-  let stageWidth = Math.ceil(window.innerWidth);
-  let stageHeight = Math.ceil(window.innerHeight);
+  let stage = applySelectionStage(fx, button);
+  let stageWidth = Math.ceil(stage.width);
+  let stageHeight = Math.ceil(stage.height);
   let stageDpr = effectPixelRatioFor();
   let threeScene;
   let threeStartTimer = 0;
   const updateStageSize = () => {
-    stageWidth = Math.ceil(window.innerWidth);
-    stageHeight = Math.ceil(window.innerHeight);
+    stage = applySelectionStage(fx, button);
+    stageWidth = Math.ceil(stage.width);
+    stageHeight = Math.ceil(stage.height);
     stageDpr = effectPixelRatioFor();
   };
   window.addEventListener("resize", updateStageSize, { passive: true });
@@ -4710,7 +4882,7 @@ function spawnSelectionFx(button, profileId = "default") {
         threeScene = undefined;
       };
     });
-  }, 320);
+  }, 90);
   fx._threeStartTimer = threeStartTimer;
   const render = (now) => {
     const width = stageWidth;
@@ -4758,7 +4930,7 @@ function spawnSelectionFx(button, profileId = "default") {
       last2dDrawAt = -Infinity;
     }
     const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 180;
-    const twoDFrameInterval = width > 900 ? (profile.id === "fizz" ? 160 : 120) : 72;
+    const twoDFrameInterval = width > 900 ? 58 : 44;
     const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= twoDFrameInterval;
     if (needsFirst2dDraw || needs2dDraw || elapsed > duration - 140) {
       context.setTransform(1, 0, 0, 1, 0, 0);
