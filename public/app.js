@@ -686,9 +686,10 @@ const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx10";
+const visualFxVersion = "20260518-world-vfx11";
 let vfx3dModulePromise;
 let vfx3dWarmPromise;
+let vfx2dWarmPromise;
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -912,6 +913,7 @@ function primeCinematicAssets() {
   });
   void loadVfx3dModule();
   void warmVfx3dRenderer();
+  void warmCinematicCanvases();
 }
 
 function warmVfx3dRenderer(championId = "fizz") {
@@ -3970,6 +3972,27 @@ function drawUltimateFrame(ctx, profile, image, width, height, elapsed, duration
   drawLetterbox(ctx, width, height, 0.14 * Math.sin(Math.PI * clamp(t / 0.98, 0, 1)));
 }
 
+function warmCinematicCanvases() {
+  if (motionQuery.matches || vfx2dWarmPromise) return vfx2dWarmPromise || Promise.resolve();
+  vfx2dWarmPromise = Promise.resolve().then(async () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 640;
+    canvas.height = 360;
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    for (const champion of champions) {
+      const image = cinematicImageFor(champion.id);
+      if (image?.decode) await image.decode().catch(() => {});
+      const duration = visualDurations[champion.id] || 3800;
+      drawUltimateFrame(context, fxProfileFor(champion.id), image, canvas.width, canvas.height, duration * 0.38, duration);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    }
+  }).catch(() => {});
+  return vfx2dWarmPromise;
+}
+
 function spawnSelectionFx(button, profileId = "default") {
   if (motionQuery.matches || !page || !button) return;
   const profile = fxProfileFor(profileId);
@@ -4065,7 +4088,9 @@ function spawnSelectionFx(button, profileId = "default") {
       context.imageSmoothingQuality = "high";
       last2dDrawAt = -Infinity;
     }
-    if (elapsed - last2dDrawAt >= 180 || elapsed < 80 || elapsed > duration - 120) {
+    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 70;
+    const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= 240;
+    if (needsFirst2dDraw || needs2dDraw || elapsed > duration - 140) {
       context.setTransform(1, 0, 0, 1, 0, 0);
       drawUltimateFrame(context, profile, image, pixelWidth, pixelHeight, elapsed, duration);
       last2dDrawAt = elapsed;
