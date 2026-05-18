@@ -161,6 +161,7 @@ const defaultSoundScene = [
 
 const soundScenes = {
   samira: [
+    { kind: "cinematic", flavor: "gunblade", start: 0, length: 1.45, gain: 0.78 },
     { kind: "drum", frequency: 43, endFrequency: 18, start: 0, length: 0.72, gain: 1.04 },
     { kind: "noise", filter: "highpass", start: 0.04, length: 0.16, startFrequency: 14800, endFrequency: 3200, gain: 0.36, pan: -0.74 },
     { kind: "noise", filter: "highpass", start: 0.18, length: 0.16, startFrequency: 14200, endFrequency: 3000, gain: 0.34, pan: 0.7 },
@@ -169,6 +170,7 @@ const soundScenes = {
     { kind: "hit", frequency: 112, endFrequency: 36, start: 0.62, length: 0.34, gain: 0.62 }
   ],
   caitlyn: [
+    { kind: "cinematic", flavor: "sniper", start: 0, length: 1.65, gain: 0.74 },
     { kind: "noise", filter: "lowpass", start: 0, length: 0.8, startFrequency: 900, endFrequency: 110, gain: 0.22 },
     { kind: "bell", notes: [1244.51, 1864.66], start: 0.06, length: 1.15, gain: 0.12 },
     { kind: "hit", frequency: 92, endFrequency: 32, start: 0.28, length: 0.22, gain: 0.72 },
@@ -177,6 +179,7 @@ const soundScenes = {
     { kind: "noise", filter: "highpass", start: 0.32, length: 0.08, startFrequency: 16400, endFrequency: 8200, gain: 0.58, pan: 0.34 }
   ],
   fizz: [
+    { kind: "cinematic", flavor: "monster", start: 0, length: 1.7, gain: 0.82 },
     { kind: "water", start: 0, length: 1.25, gain: 0.4, pan: -0.12 },
     { kind: "drum", frequency: 66, endFrequency: 24, start: 0.05, length: 0.48, gain: 0.56 },
     { kind: "bell", notes: [392, 587.33, 783.99], start: 0.14, length: 0.8, gain: 0.12, pan: 0.18 },
@@ -185,6 +188,7 @@ const soundScenes = {
     { kind: "noise", filter: "highpass", start: 0.88, length: 0.38, startFrequency: 7600, endFrequency: 2600, gain: 0.18 }
   ],
   kaisa: [
+    { kind: "cinematic", flavor: "void", start: 0, length: 1.65, gain: 0.78 },
     { kind: "choir", notes: [55, 82.41, 164.81], start: 0, length: 1.62, gain: 0.22 },
     { kind: "pulse", notes: [110, 220, 440], start: 0.08, length: 1.22, gain: 0.22, pan: -0.18 },
     { kind: "noise", filter: "bandpass", start: 0.18, length: 1.15, startFrequency: 9200, endFrequency: 180, gain: 0.28, q: 0.34 },
@@ -193,6 +197,7 @@ const soundScenes = {
     { kind: "string", notes: [329.63, 493.88, 987.77], start: 0.9, length: 0.95, gain: 0.11, pan: 0.24 }
   ],
   missfortune: [
+    { kind: "cinematic", flavor: "sax", start: 0, length: 1.62, gain: 0.76 },
     { kind: "drum", frequency: 40, endFrequency: 18, start: 0, length: 0.78, gain: 0.86 },
     { kind: "brass", notes: [65.41, 98, 130.81, 196], start: 0.04, length: 1.18, gain: 0.3 },
     { kind: "noise", filter: "highpass", start: 0.18, length: 0.08, startFrequency: 15600, endFrequency: 6200, gain: 0.48, pan: -0.62 },
@@ -202,6 +207,7 @@ const soundScenes = {
     { kind: "string", notes: [293.66, 440, 587.33], start: 0.56, length: 1.04, gain: 0.13 }
   ],
   ezreal: [
+    { kind: "cinematic", flavor: "arcane", start: 0, length: 1.45, gain: 0.72 },
     { kind: "spark", notes: [392, 587.33, 783.99], start: 0, length: 0.62, gain: 0.16, pan: -0.42 },
     { kind: "spark", notes: [523.25, 783.99, 1174.66], start: 0.18, length: 0.68, gain: 0.15, pan: 0.42 },
     { kind: "string", notes: [196, 293.66, 392], start: 0.32, length: 1.0, gain: 0.14 },
@@ -210,6 +216,7 @@ const soundScenes = {
     { kind: "noise", filter: "bandpass", start: 0.64, length: 0.82, startFrequency: 11200, endFrequency: 2200, gain: 0.18 }
   ],
   jhin: [
+    { kind: "cinematic", flavor: "curtain", start: 0, length: 1.9, gain: 0.82 },
     { kind: "string", notes: [196], start: 0, length: 0.52, gain: 0.18 },
     { kind: "string", notes: [246.94], start: 0.24, length: 0.54, gain: 0.17 },
     { kind: "string", notes: [293.66], start: 0.5, length: 0.56, gain: 0.16 },
@@ -219,6 +226,7 @@ const soundScenes = {
     { kind: "choir", notes: [146.83, 220, 293.66], start: 1.06, length: 1.2, gain: 0.12 }
   ],
   ashe: [
+    { kind: "cinematic", flavor: "ice", start: 0, length: 1.6, gain: 0.7 },
     { kind: "string", notes: [261.63, 392, 523.25], start: 0, length: 1.12, gain: 0.16, pan: -0.2 },
     { kind: "bell", notes: [1046.5, 1567.98, 2093], start: 0.12, length: 1.18, gain: 0.12, pan: 0.2 },
     { kind: "noise", filter: "highpass", start: 0.16, length: 0.72, startFrequency: 14800, endFrequency: 3200, gain: 0.18 },
@@ -226,6 +234,7 @@ const soundScenes = {
     { kind: "choir", notes: [174.61, 261.63, 349.23], start: 0.62, length: 1.18, gain: 0.11 }
   ],
   rammus: [
+    { kind: "cinematic", flavor: "quake", start: 0, length: 1.58, gain: 0.84 },
     { kind: "roll", frequency: 30, endFrequency: 12, start: 0, length: 1.52, gain: 0.86 },
     { kind: "drum", frequency: 28, endFrequency: 12, start: 0.02, length: 0.92, gain: 0.92 },
     { kind: "noise", filter: "lowpass", start: 0.08, length: 1.38, startFrequency: 1600, endFrequency: 80, gain: 0.36, q: 0.35 },
@@ -736,7 +745,7 @@ function buildFallbackSoundUrl(profileId = "default") {
       const filterTone = event.filter === "lowpass" ? 0.42 : event.filter === "highpass" ? 1 : 0.72;
       return (Math.random() * 2 - 1) * envelope * (event.gain || 0.12) * filterTone;
     }
-    if (event.kind === "thump" || event.kind === "drum" || event.kind === "hit" || event.kind === "roll") {
+    if (event.kind === "thump" || event.kind === "drum" || event.kind === "hit" || event.kind === "roll" || event.kind === "cinematic") {
       return toneSample(time, { ...event, type: "sine" });
     }
     if (event.notes) {
@@ -1036,8 +1045,110 @@ function playSelectSound(profileId = "default") {
       }
     };
 
+    const playImpactSample = (event) => {
+      const start = event.start || 0;
+      const length = Math.max(0.22, event.length || 0.9);
+      const gainValue = event.gain || 0.62;
+      const buffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * length), audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      const base = event.frequency || 42;
+      const texture = event.texture || "impact";
+      for (let index = 0; index < data.length; index += 1) {
+        const time = index / audioContext.sampleRate;
+        const progress = index / data.length;
+        const envelope = Math.exp(-progress * (texture === "swell" ? 2.8 : 5.4));
+        const hit = Math.sin(2 * Math.PI * (base - base * 0.44 * progress) * time);
+        const sub = Math.sin(2 * Math.PI * (base * 0.5) * time) * 0.72;
+        const scrape = (Math.random() * 2 - 1) * (texture === "water" ? 0.42 : texture === "crack" ? 0.22 : 0.16);
+        const bow = Math.sin(2 * Math.PI * (base * 2.02 + Math.sin(progress * 7) * 18) * time) * (texture === "sax" ? 0.26 : 0.08);
+        data[index] = (hit * 0.72 + sub * 0.42 + scrape + bow) * envelope;
+      }
+      const source = audioContext.createBufferSource();
+      const filter = audioContext.createBiquadFilter();
+      const gain = audioContext.createGain();
+      const shaper = audioContext.createWaveShaper();
+      const curve = new Float32Array(256);
+      for (let index = 0; index < curve.length; index += 1) {
+        const x = (index / 127.5) - 1;
+        curve[index] = Math.tanh(x * (texture === "crack" ? 2.4 : 1.55));
+      }
+      shaper.curve = curve;
+      shaper.oversample = "2x";
+      source.buffer = buffer;
+      filter.type = event.filter || (texture === "crack" ? "bandpass" : "lowpass");
+      filter.frequency.setValueAtTime(event.startFrequency || (texture === "crack" ? 3800 : 620), now + start);
+      filter.frequency.exponentialRampToValueAtTime(event.endFrequency || (texture === "crack" ? 1200 : 96), now + start + length);
+      filter.Q.setValueAtTime(event.q || (texture === "crack" ? 1.1 : 0.54), now + start);
+      gain.gain.setValueAtTime(0.0001, now + start);
+      gain.gain.exponentialRampToValueAtTime(gainValue, now + start + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+      source.connect(filter).connect(shaper).connect(gain);
+      connectOutput(gain, event);
+      source.start(now + start);
+      source.stop(now + start + length + 0.04);
+    };
+
+    const playCinematic = (event) => {
+      const start = event.start || 0;
+      const gain = event.gain || 0.7;
+      const flavor = event.flavor || "default";
+      const palettes = {
+        gunblade: { brass: [55, 82.41, 110, 164.81], choir: [220, 277.18], drum: 42, noise: 11600 },
+        sniper: { brass: [36.71, 55, 73.42], choir: [146.83, 220], drum: 32, noise: 15000 },
+        monster: { brass: [32.7, 49, 65.41], choir: [98, 146.83], drum: 38, noise: 820 },
+        void: { brass: [41.2, 61.74, 82.41], choir: [164.81, 246.94, 329.63], drum: 30, noise: 9000 },
+        sax: { brass: [73.42, 110, 146.83], choir: [220, 293.66], drum: 40, noise: 12800 },
+        arcane: { brass: [49, 73.42, 98], choir: [196, 293.66, 392], drum: 46, noise: 12400 },
+        curtain: { brass: [49, 73.42, 98, 146.83], choir: [196, 246.94, 392], drum: 34, noise: 6200 },
+        ice: { brass: [58.27, 87.31, 116.54], choir: [261.63, 392, 523.25], drum: 44, noise: 14800 },
+        quake: { brass: [30.87, 46.25, 61.74], choir: [92.5, 138.59], drum: 28, noise: 1200 },
+        default: { brass: [55, 82.41, 110], choir: [164.81, 246.94], drum: 36, noise: 6400 }
+      };
+      const palette = palettes[flavor] || palettes.default;
+      playImpactSample({
+        start,
+        length: flavor === "curtain" ? 1.2 : 0.95,
+        frequency: palette.drum,
+        gain: gain * 0.84,
+        texture: flavor === "monster" ? "water" : flavor === "sax" ? "sax" : flavor === "sniper" || flavor === "curtain" ? "crack" : "impact",
+        wet: 1
+      });
+      playDrum({ start: start + 0.02, length: 0.92, frequency: palette.drum, endFrequency: Math.max(12, palette.drum * 0.42), gain: gain * 0.54 });
+      playChord({ start: start + 0.04, length: 1.36, notes: palette.brass, gain: gain * 0.42 }, "brass");
+      playChord({ start: start + 0.18, length: 1.62, notes: palette.choir, gain: gain * 0.28 }, "choir");
+      playNoise({ start: start + 0.02, length: 1.28, filter: flavor === "monster" || flavor === "quake" ? "lowpass" : "bandpass", startFrequency: palette.noise, endFrequency: flavor === "ice" ? 3600 : 140, gain: gain * 0.24, q: 0.5, wet: 1 });
+      if (flavor === "sax") {
+        [220, 246.94, 293.66, 277.18].forEach((note, index) => {
+          playTone({
+            type: "sawtooth",
+            frequency: note,
+            endFrequency: note * (index === 3 ? 0.92 : 1.035),
+            start: start + 0.18 + index * 0.16,
+            length: 0.28,
+            gain: gain * 0.11,
+            attack: 0.055,
+            filter: "bandpass",
+            startFrequency: 780,
+            endFilterFrequency: 1240,
+            q: 1.4,
+            pan: -0.12 + index * 0.08
+          });
+        });
+      }
+      if (flavor === "sniper" || flavor === "curtain") {
+        playImpactSample({ start: start + 0.58, length: 0.46, frequency: flavor === "sniper" ? 96 : 62, gain: gain * 0.9, texture: "crack", filter: "bandpass", startFrequency: 5200, endFrequency: 320, wet: 0 });
+        playHit({ start: start + 0.6, length: 0.22, frequency: flavor === "sniper" ? 94 : 58, endFrequency: 18, gain: gain * 0.56, wet: 0 });
+      }
+      if (flavor === "monster") {
+        playWater({ start: start + 0.08, length: 1.18, gain: gain * 0.44, pan: -0.16 });
+      }
+    };
+
     scene.forEach((event) => {
       switch (event.kind) {
+        case "cinematic":
+          playCinematic(event);
+          break;
         case "noise":
           playNoise(event);
           break;
@@ -1091,48 +1202,528 @@ function playSelectionBurst(button, profileId = "default") {
   }, 2600);
 }
 
+function easeOutCubic(value) {
+  return 1 - ((1 - value) ** 3);
+}
+
+function easeInOutCubic(value) {
+  return value < 0.5 ? 4 * value * value * value : 1 - ((-2 * value + 2) ** 3) / 2;
+}
+
+function drawCoverImage(ctx, image, width, height, opacity, scale = 1, xOffset = 0, yOffset = 0) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
+  const ratio = Math.max(width / image.naturalWidth, height / image.naturalHeight) * scale;
+  const drawWidth = image.naturalWidth * ratio;
+  const drawHeight = image.naturalHeight * ratio;
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.filter = "blur(7px) saturate(1.28) contrast(1.05) brightness(.8)";
+  ctx.drawImage(image, (width - drawWidth) / 2 + xOffset, (height - drawHeight) / 2 + yOffset, drawWidth, drawHeight);
+  ctx.restore();
+}
+
+function fillRadial(ctx, x, y, inner, outer, stops) {
+  const gradient = ctx.createRadialGradient(x, y, inner, x, y, outer);
+  stops.forEach(([stop, color]) => gradient.addColorStop(stop, color));
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
+function drawVignette(ctx, width, height, strength = 0.58) {
+  ctx.save();
+  fillRadial(ctx, width * 0.5, height * 0.48, Math.min(width, height) * 0.12, Math.max(width, height) * 0.72, [
+    [0, "rgba(255,255,255,0)"],
+    [0.48, "rgba(38,28,28,0)"],
+    [1, `rgba(18,12,14,${strength})`]
+  ]);
+  ctx.restore();
+}
+
+function drawLetterbox(ctx, width, height, opacity) {
+  ctx.save();
+  ctx.fillStyle = `rgba(18, 12, 14, ${opacity})`;
+  ctx.fillRect(0, 0, width, height * 0.075);
+  ctx.fillRect(0, height * 0.925, width, height * 0.075);
+  ctx.restore();
+}
+
+function drawCracks(ctx, x, y, radius, count, progress, color) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(1, radius * 0.008);
+  ctx.lineCap = "round";
+  for (let index = 0; index < count; index += 1) {
+    const angle = (Math.PI * 2 * index) / count + (index % 2 ? 0.25 : -0.12);
+    const length = radius * (0.24 + ((index * 37) % 60) / 100) * progress;
+    const kink = angle + (index % 3 - 1) * 0.32;
+    ctx.beginPath();
+    ctx.moveTo(x + Math.cos(angle) * radius * 0.08, y + Math.sin(angle) * radius * 0.08);
+    ctx.lineTo(x + Math.cos(angle) * length * 0.55, y + Math.sin(angle) * length * 0.55);
+    ctx.lineTo(x + Math.cos(kink) * length, y + Math.sin(kink) * length);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawSharkScene(ctx, width, height, t) {
+  const rise = easeOutCubic(clamp((t - 0.12) / 0.58, 0, 1));
+  const settle = clamp((t - 0.68) / 0.28, 0, 1);
+  const x = width * (0.52 + Math.sin(t * 5.2) * 0.025);
+  const y = height * (1.16 - rise * 0.38 + settle * 0.04);
+  const size = Math.min(width, height) * (0.28 + rise * 0.1);
+
+  ctx.save();
+  const water = ctx.createLinearGradient(0, height * 0.48, 0, height);
+  water.addColorStop(0, "rgba(25, 110, 126, 0)");
+  water.addColorStop(0.62, "rgba(33, 153, 170, .22)");
+  water.addColorStop(1, "rgba(6, 48, 66, .42)");
+  ctx.fillStyle = water;
+  ctx.fillRect(0, height * 0.54, width, height * 0.46);
+
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = 0.2 + rise * 0.26;
+  for (let i = 0; i < 10; i += 1) {
+    const yy = height * (0.61 + i * 0.042) + Math.sin(t * 13 + i) * 7;
+    ctx.strokeStyle = i % 2 ? "rgba(184, 255, 250, .26)" : "rgba(255, 250, 220, .16)";
+    ctx.lineWidth = 1.4 + i * 0.32;
+    ctx.beginPath();
+    ctx.moveTo(-width * 0.1, yy);
+    ctx.bezierCurveTo(width * 0.28, yy - 28, width * 0.58, yy + 28, width * 1.1, yy - 8);
+    ctx.stroke();
+  }
+
+  for (let i = 0; i < 12; i += 1) {
+    const angle = -Math.PI * 0.74 + i * 0.14;
+    const length = size * (0.26 + (i % 3) * 0.08);
+    ctx.globalAlpha = rise * (0.18 + i * 0.012);
+    ctx.strokeStyle = i % 2 ? "rgba(218,255,250,.38)" : "rgba(95,201,218,.22)";
+    ctx.lineWidth = 2 + (i % 4);
+    ctx.beginPath();
+    ctx.moveTo(x + Math.cos(angle) * size * 0.28, y + Math.sin(angle) * size * 0.18);
+    ctx.quadraticCurveTo(
+      x + Math.cos(angle) * size * 0.42,
+      y + Math.sin(angle) * size * 0.1 - size * 0.12,
+      x + Math.cos(angle) * (size * 0.3 + length),
+      y + Math.sin(angle) * (size * 0.15 + length)
+    );
+    ctx.stroke();
+  }
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 0.68 * rise;
+  ctx.translate(x - size * 0.16, y - size * 0.02);
+  ctx.rotate(-0.22 - rise * 0.18);
+  const shark = ctx.createLinearGradient(-size * 1.12, -size * 0.35, size * 1.12, size * 0.35);
+  shark.addColorStop(0, "rgba(7, 26, 35, .94)");
+  shark.addColorStop(0.45, "rgba(29, 82, 97, .92)");
+  shark.addColorStop(0.72, "rgba(95, 151, 159, .84)");
+  shark.addColorStop(1, "rgba(11, 42, 54, .95)");
+  ctx.fillStyle = shark;
+  ctx.beginPath();
+  ctx.moveTo(size * 1.08, -size * 0.03);
+  ctx.bezierCurveTo(size * 0.72, -size * 0.38, -size * 0.18, -size * 0.4, -size * 0.92, -size * 0.18);
+  ctx.bezierCurveTo(-size * 1.14, -size * 0.12, -size * 1.18, size * 0.1, -size * 0.94, size * 0.18);
+  ctx.bezierCurveTo(-size * 0.12, size * 0.42, size * 0.72, size * 0.26, size * 1.08, -size * 0.03);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(5, 22, 30, .86)";
+  ctx.beginPath();
+  ctx.moveTo(-size * 0.96, -size * 0.08);
+  ctx.lineTo(-size * 1.42, -size * 0.46);
+  ctx.lineTo(-size * 1.26, -size * 0.04);
+  ctx.lineTo(-size * 1.42, size * 0.34);
+  ctx.lineTo(-size * 0.96, size * 0.12);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(9, 38, 49, .9)";
+  ctx.beginPath();
+  ctx.moveTo(-size * 0.18, -size * 0.34);
+  ctx.lineTo(size * 0.08, -size * 0.74);
+  ctx.lineTo(size * 0.18, -size * 0.26);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(size * 0.1, size * 0.24);
+  ctx.lineTo(size * 0.42, size * 0.56);
+  ctx.lineTo(size * 0.22, size * 0.12);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.globalAlpha = 0.7 * rise;
+  ctx.fillStyle = "rgba(2, 14, 20, .82)";
+  ctx.beginPath();
+  ctx.moveTo(size * 0.72, size * 0.06);
+  ctx.quadraticCurveTo(size * 0.9, size * 0.14, size * 1.05, -size * 0.01);
+  ctx.quadraticCurveTo(size * 0.86, size * 0.22, size * 0.58, size * 0.2);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.globalAlpha = 0.78 * rise;
+  ctx.fillStyle = "rgba(255,255,245,.78)";
+  for (let i = 0; i < 6; i += 1) {
+    const tx = size * (0.64 + i * 0.054);
+    ctx.beginPath();
+    ctx.moveTo(tx, size * 0.09);
+    ctx.lineTo(tx + size * 0.025, size * 0.18);
+    ctx.lineTo(tx - size * 0.02, size * 0.17);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  ctx.globalAlpha = 0.55 * rise;
+  ctx.strokeStyle = "rgba(201, 244, 241, .42)";
+  ctx.lineWidth = 1.4;
+  for (let i = 0; i < 4; i += 1) {
+    ctx.beginPath();
+    ctx.moveTo(size * (0.38 + i * 0.045), -size * 0.15);
+    ctx.lineTo(size * (0.34 + i * 0.045), size * 0.1);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "rgba(222,255,248,.8)";
+  ctx.beginPath();
+  ctx.arc(size * 0.62, -size * 0.14, size * 0.026, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = 0.28 * rise;
+  fillRadial(ctx, x, y - size * 0.08, size * 0.04, size * 0.72, [
+    [0, "rgba(151,250,255,.56)"],
+    [0.46, "rgba(63,187,205,.16)"],
+    [1, "rgba(63,187,205,0)"]
+  ]);
+  ctx.restore();
+}
+
+function drawCaitlynScene(ctx, width, height, t) {
+  const lock = easeInOutCubic(clamp(t / 0.48, 0, 1));
+  const shot = easeOutCubic(clamp((t - 0.42) / 0.18, 0, 1));
+  const cx = width * 0.5;
+  const cy = height * 0.5;
+  const radius = Math.min(width, height) * (0.34 + lock * 0.08);
+
+  ctx.save();
+  ctx.fillStyle = `rgba(9, 8, 11, ${0.16 + lock * 0.24})`;
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = "rgba(255, 229, 150, .82)";
+  ctx.lineWidth = Math.max(1.5, width * 0.002);
+  for (let i = 0; i < 3; i += 1) {
+    ctx.globalAlpha = (0.62 - i * 0.14) * lock;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * (1 + i * 0.24), 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = lock;
+  ctx.beginPath();
+  ctx.moveTo(cx - radius * 1.35, cy);
+  ctx.lineTo(cx - radius * 0.18, cy);
+  ctx.moveTo(cx + radius * 0.18, cy);
+  ctx.lineTo(cx + radius * 1.35, cy);
+  ctx.moveTo(cx, cy - radius * 1.35);
+  ctx.lineTo(cx, cy - radius * 0.18);
+  ctx.moveTo(cx, cy + radius * 0.18);
+  ctx.lineTo(cx, cy + radius * 1.35);
+  ctx.stroke();
+
+  if (shot > 0) {
+    ctx.globalAlpha = 0.96 * (1 - clamp((t - 0.62) / 0.4, 0, 1));
+    ctx.strokeStyle = "rgba(255, 251, 230, .98)";
+    ctx.lineWidth = Math.max(3, width * 0.004);
+    ctx.beginPath();
+    ctx.moveTo(width * (-0.15 + shot * 0.38), height * 0.18);
+    ctx.lineTo(cx, cy);
+    ctx.stroke();
+    fillRadial(ctx, cx, cy, 0, radius * (0.12 + shot * 0.36), [
+      [0, "rgba(255,252,232,.95)"],
+      [0.25, "rgba(255,211,113,.55)"],
+      [1, "rgba(255,211,113,0)"]
+    ]);
+    drawCracks(ctx, cx, cy, radius * 1.2, 12, shot, "rgba(255,246,218,.48)");
+  }
+  ctx.restore();
+}
+
+function drawEzrealScene(ctx, width, height, t) {
+  const travel = easeInOutCubic(clamp((t - 0.04) / 0.78, 0, 1));
+  const x = width * (-0.18 + travel * 1.48);
+  const y = height * (1.08 - travel * 1.16);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let i = 0; i < 9; i += 1) {
+    const back = i * 38 * (width / 1280 + 0.55);
+    ctx.globalAlpha = 0.12 + (9 - i) * 0.045;
+    ctx.strokeStyle = i % 2 ? "rgba(93,214,255,.75)" : "rgba(255,224,117,.62)";
+    ctx.lineWidth = 12 + i * 6;
+    ctx.beginPath();
+    ctx.moveTo(x - back, y + back * 0.74);
+    ctx.lineTo(x - back - width * 0.42, y + back * 0.74 + height * 0.34);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  fillRadial(ctx, x, y, 0, Math.min(width, height) * 0.22, [
+    [0, "rgba(255,252,232,1)"],
+    [0.18, "rgba(111,225,255,.82)"],
+    [0.56, "rgba(96,106,255,.26)"],
+    [1, "rgba(96,106,255,0)"]
+  ]);
+  ctx.restore();
+}
+
+function drawSamiraScene(ctx, width, height, t) {
+  const p = easeOutCubic(clamp(t / 0.72, 0, 1));
+  const cx = width * 0.5;
+  const cy = height * 0.52;
+  const r = Math.min(width, height) * (0.24 + p * 0.16);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let i = 0; i < 10; i += 1) {
+    const a = t * 10 + i * 0.63;
+    const x = cx + Math.cos(a) * r * (1 + i * 0.018);
+    const y = cy + Math.sin(a) * r * 0.62;
+    ctx.strokeStyle = i % 2 ? "rgba(255,200,104,.76)" : "rgba(255,92,151,.7)";
+    ctx.lineWidth = 2.2 + i * 0.16;
+    ctx.beginPath();
+    ctx.moveTo(x - Math.cos(a) * 80, y - Math.sin(a) * 44);
+    ctx.lineTo(x + Math.cos(a) * 120, y + Math.sin(a) * 60);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 0.82 * p;
+  ctx.strokeStyle = "rgba(255,249,226,.9)";
+  ctx.lineWidth = Math.max(4, width * 0.006);
+  ctx.beginPath();
+  ctx.moveTo(width * 0.16, height * 0.3);
+  ctx.bezierCurveTo(width * 0.34, height * 0.2, width * 0.66, height * 0.82, width * 0.86, height * 0.68);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawKaisaScene(ctx, width, height, t) {
+  const open = easeInOutCubic(clamp(t / 0.68, 0, 1));
+  const cx = width * 0.5;
+  const cy = height * 0.48;
+  const size = Math.min(width, height) * (0.18 + open * 0.38);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.translate(cx, cy);
+  ctx.rotate((t * 2.4 + 0.4) * Math.PI);
+  const gradient = ctx.createLinearGradient(-size, -size, size, size);
+  gradient.addColorStop(0, "rgba(255,123,230,.84)");
+  gradient.addColorStop(0.5, "rgba(118,129,255,.58)");
+  gradient.addColorStop(1, "rgba(104,242,224,.64)");
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.moveTo(0, -size);
+  ctx.lineTo(size * 0.42, -size * 0.16);
+  ctx.lineTo(size, 0);
+  ctx.lineTo(size * 0.42, size * 0.16);
+  ctx.lineTo(0, size);
+  ctx.lineTo(-size * 0.42, size * 0.16);
+  ctx.lineTo(-size, 0);
+  ctx.lineTo(-size * 0.42, -size * 0.16);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let i = 0; i < 6; i += 1) {
+    const a = -0.8 + i * 0.32;
+    const x = width * (0.05 + open * 0.7) + i * width * 0.035;
+    const y = height * (0.78 - i * 0.1);
+    ctx.strokeStyle = i % 2 ? "rgba(245,120,224,.54)" : "rgba(97,233,220,.48)";
+    ctx.lineWidth = 8 - i * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x - 260, y + 180);
+    ctx.lineTo(x + Math.cos(a) * width * 0.7, y + Math.sin(a) * height * 0.6);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawMissFortuneScene(ctx, width, height, t) {
+  const fire = easeOutCubic(clamp((t - 0.1) / 0.62, 0, 1));
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  [["rgba(255,193,87,.72)", width * 0.28], ["rgba(238,79,108,.66)", width * 0.72]].forEach(([color, x], index) => {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, height * 0.92);
+    ctx.lineTo(width * (index ? 1.08 : -0.08), height * (0.36 - fire * 0.16));
+    ctx.lineTo(width * (index ? 0.58 : 0.42), height * (0.46 - fire * 0.08));
+    ctx.closePath();
+    ctx.fill();
+  });
+  for (let i = 0; i < 20; i += 1) {
+    const x = width * (0.1 + ((i * 41) % 80) / 100);
+    const y = height * (0.2 + ((i * 23) % 70) / 100);
+    ctx.strokeStyle = "rgba(255,244,204,.54)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + (i % 2 ? 80 : -80), y - 140 * fire);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawJhinScene(ctx, width, height, t) {
+  const p = easeInOutCubic(clamp(t / 0.74, 0, 1));
+  const cx = width * 0.5;
+  const cy = height * 0.5;
+  ctx.save();
+  ctx.fillStyle = `rgba(22, 12, 18, ${0.34 + p * 0.32})`;
+  ctx.fillRect(0, 0, width, height);
+  ctx.globalCompositeOperation = "screen";
+  for (let i = 0; i < 4; i += 1) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(i * Math.PI * 0.5 + p * 0.7);
+    const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.min(width, height) * 0.32);
+    grd.addColorStop(0, "rgba(255,236,190,.46)");
+    grd.addColorStop(1, "rgba(187,43,84,0)");
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.ellipse(0, -Math.min(width, height) * 0.16, Math.min(width, height) * 0.08, Math.min(width, height) * 0.26, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  if (t > 0.48) {
+    ctx.globalAlpha = 0.9 * (1 - clamp((t - 0.76) / 0.24, 0, 1));
+    ctx.strokeStyle = "rgba(255,248,218,.95)";
+    ctx.lineWidth = Math.max(3, width * 0.004);
+    ctx.beginPath();
+    ctx.moveTo(width * 0.08, height * 0.5);
+    ctx.lineTo(width * 0.92, height * 0.5);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawAsheScene(ctx, width, height, t) {
+  const travel = easeInOutCubic(clamp((t - 0.04) / 0.74, 0, 1));
+  const x = width * (-0.2 + travel * 1.42);
+  const y = height * (0.6 - travel * 0.18);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.strokeStyle = "rgba(183,240,255,.6)";
+  ctx.lineWidth = Math.max(18, width * 0.02);
+  ctx.beginPath();
+  ctx.moveTo(x - width * 0.56, y + 46);
+  ctx.lineTo(x, y);
+  ctx.stroke();
+  ctx.fillStyle = "rgba(239,252,255,.94)";
+  ctx.beginPath();
+  ctx.moveTo(x + 90, y);
+  ctx.lineTo(x - 44, y - 46);
+  ctx.lineTo(x - 18, y);
+  ctx.lineTo(x - 44, y + 46);
+  ctx.closePath();
+  ctx.fill();
+  for (let i = 0; i < 8; i += 1) {
+    ctx.strokeStyle = "rgba(135,189,255,.42)";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(x - i * 45, y + (i % 2 ? 50 : -44));
+    ctx.lineTo(x - i * 72 - 60, y + (i % 2 ? 86 : -82));
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawRammusScene(ctx, width, height, t) {
+  const roll = easeInOutCubic(clamp(t / 0.76, 0, 1));
+  const x = width * (-0.1 + roll * 1.08);
+  const y = height * 0.72;
+  const r = Math.min(width, height) * 0.13;
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let i = 0; i < 4; i += 1) {
+    ctx.globalAlpha = 0.35 * (1 - i * 0.14);
+    ctx.strokeStyle = i % 2 ? "rgba(255,216,92,.7)" : "rgba(174,222,88,.72)";
+    ctx.lineWidth = 6 - i;
+    ctx.beginPath();
+    ctx.ellipse(x, y, r * (1 + i * 0.9 + roll), r * 0.42 * (1 + i * 0.7 + roll), 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 0.92;
+  const shell = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r * 1.2);
+  shell.addColorStop(0, "rgba(255,236,132,.96)");
+  shell.addColorStop(0.45, "rgba(138,183,67,.82)");
+  shell.addColorStop(1, "rgba(34,57,28,.88)");
+  ctx.fillStyle = shell;
+  ctx.beginPath();
+  ctx.arc(x, y - r * 0.2, r, 0, Math.PI * 2);
+  ctx.fill();
+  drawCracks(ctx, x, y + r * 0.7, r * 2.3, 9, roll, "rgba(255,239,166,.34)");
+  ctx.restore();
+}
+
+function drawUltimateFrame(ctx, profileId, image, width, height, elapsed) {
+  const t = clamp(elapsed / 2100, 0, 1);
+  ctx.clearRect(0, 0, width, height);
+  drawCoverImage(ctx, image, width, height, 0.16 * (1 - t * 0.24), 1.12, Math.sin(t * 4) * 16, Math.cos(t * 3) * 8);
+  ctx.save();
+  ctx.fillStyle = `rgba(250, 246, 236, ${0.035 * (1 - t)})`;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+
+  if (profileId === "fizz") drawSharkScene(ctx, width, height, t);
+  else if (profileId === "caitlyn") drawCaitlynScene(ctx, width, height, t);
+  else if (profileId === "ezreal") drawEzrealScene(ctx, width, height, t);
+  else if (profileId === "samira") drawSamiraScene(ctx, width, height, t);
+  else if (profileId === "kaisa") drawKaisaScene(ctx, width, height, t);
+  else if (profileId === "missfortune") drawMissFortuneScene(ctx, width, height, t);
+  else if (profileId === "jhin") drawJhinScene(ctx, width, height, t);
+  else if (profileId === "ashe") drawAsheScene(ctx, width, height, t);
+  else if (profileId === "rammus") drawRammusScene(ctx, width, height, t);
+  else drawEzrealScene(ctx, width, height, t);
+
+  drawVignette(ctx, width, height, 0.28);
+  drawLetterbox(ctx, width, height, 0.18 * Math.sin(Math.PI * clamp(t / 0.95, 0, 1)));
+}
+
 function spawnSelectionFx(button, profileId = "default") {
   if (motionQuery.matches || !page || !button) return;
   const profile = fxProfileFor(profileId);
   window.clearTimeout(fxTimer);
-  document.querySelectorAll(".selection-fx").forEach((node) => node.remove());
-
-  const { x: centerX, y: centerY } = fxCenterFor(button);
-  const stageWidth = Math.min(520, Math.max(284, window.innerWidth - 36));
-  const stageHeight = Math.min(430, Math.max(280, window.innerHeight - 170));
-  const stageX = clamp(centerX, stageWidth / 2 + 18, window.innerWidth - stageWidth / 2 - 18);
-  const stageY = clamp(centerY, stageHeight / 2 + 18, window.innerHeight - stageHeight / 2 - 18);
-  const localX = clamp(centerX - stageX + stageWidth / 2, 72, stageWidth - 72);
-  const localY = clamp(centerY - stageY + stageHeight / 2, 72, stageHeight - 72);
-  const fx = document.createElement("div");
-  fx.className = "selection-fx";
-  fx.setAttribute("aria-hidden", "true");
-  fx.style.setProperty("--fx-stage-x", `${stageX}px`);
-  fx.style.setProperty("--fx-stage-y", `${stageY}px`);
-  fx.style.setProperty("--fx-stage-width", `${stageWidth}px`);
-  fx.style.setProperty("--fx-stage-height", `${stageHeight}px`);
-  fx.style.setProperty("--fx-x", `${localX}px`);
-  fx.style.setProperty("--fx-y", `${localY}px`);
-  const image = button.querySelector("img")?.currentSrc || button.querySelector("img")?.src || "";
-  if (image) fx.style.setProperty("--fx-image", `url("${image.replaceAll('"', "%22")}")`);
-  applyFxProfileVars(fx, profile);
-
-  [
-    "backdrop",
-    "vignette",
-    "impact",
-    "cut-a",
-    "cut-b",
-    "rift",
-    "debris"
-  ].forEach((name) => {
-    const layer = document.createElement("span");
-    layer.className = `fx-cinema fx-cinema-${name}`;
-    fx.append(layer);
+  document.querySelectorAll(".selection-fx").forEach((node) => {
+    if (node._raf) cancelAnimationFrame(node._raf);
+    node.remove();
   });
 
+  const fx = document.createElement("div");
+  const canvas = document.createElement("canvas");
+  const image = button.querySelector("img");
+  fx.className = "selection-fx ultimate-scene";
+  fx.setAttribute("aria-hidden", "true");
+  applyFxProfileVars(fx, profile);
+  fx.append(canvas);
   document.body.append(fx);
-  fxTimer = window.setTimeout(() => fx.remove(), 2600);
+
+  const context = canvas.getContext("2d");
+  const startedAt = performance.now();
+  const render = (now) => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+    }
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawUltimateFrame(context, profile.id, image, width, height, now - startedAt);
+    if (now - startedAt < 2160) {
+      fx._raf = requestAnimationFrame(render);
+    }
+  };
+  fx._raf = requestAnimationFrame(render);
+  fxTimer = window.setTimeout(() => {
+    if (fx._raf) cancelAnimationFrame(fx._raf);
+    fx.remove();
+  }, 2320);
 }
 
 function animateChampionSwap(champion) {

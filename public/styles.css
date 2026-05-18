@@ -252,6 +252,23 @@ summary {
   transform: translate(-50%, -50%) translateZ(0);
 }
 
+.selection-fx.ultimate-scene {
+  inset: 0;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  contain: strict;
+  transform: none;
+}
+
+.selection-fx.ultimate-scene canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
 .fx-cinema {
   position: absolute;
   inset: 0;
