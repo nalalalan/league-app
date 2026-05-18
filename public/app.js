@@ -685,7 +685,7 @@ const fallbackAudioUrls = {};
 const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
-const stingerVersion = "20260518-cinematic43";
+const stingerVersion = "20260518-cinematic44";
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
