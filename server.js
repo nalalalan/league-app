@@ -18,6 +18,7 @@ const types = {
   ".svg": "image/svg+xml",
   ".jpg": "image/jpeg",
   ".webm": "video/webm",
+  ".mp4": "video/mp4",
   ".pdf": "application/pdf",
   ".tex": "text/plain; charset=utf-8",
   ".bib": "text/plain; charset=utf-8"
