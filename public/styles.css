@@ -1366,7 +1366,8 @@ h1 {
 }
 
 .recording-main-rule,
-.recording-main-rep {
+.recording-main-rep,
+.recording-main-why {
   margin: 0;
   color: #4b4039;
   font-size: 15px;
@@ -1375,7 +1376,8 @@ h1 {
 }
 
 .recording-meta p,
-.recording-card-feedback {
+.recording-card-feedback,
+.recording-card-why {
   margin: 0;
   color: #4b4039;
   font-size: 14px;
@@ -1391,6 +1393,11 @@ h1 {
 
 .recording-card-feedback {
   color: #4b4039 !important;
+}
+
+.recording-main-why,
+.recording-card-why {
+  color: #5f534a !important;
 }
 
 .recording-evidence {

@@ -670,11 +670,13 @@ const recordingReview = {
   captured: "May 18, 2026, 5:46-5:57 PM ET",
   totalDuration: "5:57",
   totalRecordings: 13,
+  reviewBasis: "Newer recordings count more as current form; older clips stay as baseline leak history.",
   mainFeedback: {
-    title: "Samira: E only with an exit",
-    focus: "Before every E, name the exit: lethal reset, Flash, teammate cover, or a clean walk-out path.",
-    rule: "Kill or tower -> crash wave, take objective space, or recall; no second fight unless it wins the map.",
-    nextRep: "Next queue cue: exit before E."
+    title: "Samira: exit first, cash out second",
+    focus: "Newest clips count most: keep naming the exit before E, then stop the fight as soon as the map payoff is available.",
+    rule: "If the first win creates wave, tower, dragon, Baron, nexus, or recall, take it before another duel.",
+    nextRep: "Next queue cue: exit, win, leave.",
+    whyTrust: "It weights the newest attempts most and targets the part that still costs games after the damage is already good."
   },
   detectedChampions: [
     {
@@ -1145,6 +1147,12 @@ function situationCard(item) {
   return article;
 }
 
+function trustLine(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  return /^why\b/i.test(text) ? text : `Why trust this: ${text}`;
+}
+
 function writeChampion(champion) {
   championName.textContent = champion.name;
   championFocus.textContent = champion.focus;
@@ -1169,12 +1177,17 @@ function recordingMainCard(review) {
   rule.className = "recording-main-rule";
   rule.textContent = item.rule || "";
 
+  const why = document.createElement("p");
+  why.className = "recording-main-why";
+  why.textContent = trustLine(item.whyTrust || review.reviewBasis);
+
   const nextRep = document.createElement("p");
   nextRep.className = "recording-main-rep";
   nextRep.textContent = item.nextRep || "";
 
   article.append(title, focus);
   if (rule.textContent) article.append(rule);
+  if (why.textContent) article.append(why);
   if (nextRep.textContent) article.append(nextRep);
   return article;
 }
@@ -1197,7 +1210,8 @@ function recordingCard(item) {
   title.textContent = item.title;
 
   const detail = document.createElement("p");
-  detail.textContent = `${item.champion} · ${item.kind} · ${item.duration}`;
+  const phase = item.reviewPhase ? `${item.reviewPhase} · ` : "";
+  detail.textContent = `${item.champion} · ${phase}${item.kind} · ${item.duration}`;
 
   const feedbackTitle = document.createElement("p");
   feedbackTitle.className = "recording-card-feedback-title";
@@ -1207,7 +1221,12 @@ function recordingCard(item) {
   feedback.className = "recording-card-feedback";
   feedback.textContent = item.feedback || "No feedback generated yet.";
 
+  const why = document.createElement("p");
+  why.className = "recording-card-why";
+  why.textContent = trustLine(item.whyTrust || "This rule is tied to a repeated Samira risk pattern, not a vague style preference.");
+
   meta.append(title, detail, feedbackTitle, feedback);
+  if (why.textContent) meta.append(why);
   article.append(video, meta);
   return article;
 }

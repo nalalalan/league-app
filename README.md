@@ -35,6 +35,8 @@ npm run sync:recordings
 
 The sync copies recordings into `public/recordings/`, extracts poster frames, and writes `public/recordings/recordings.json`. The page loads that manifest so new recordings can appear without editing `app.js`.
 
+Recording order is source-modified-time order. Older clips are treated as baseline leak history, while newer clips are tagged as implementation/current-form evidence and weighted more heavily. Each generated feedback item also carries a `whyTrust` rationale so the page explains why the rule is worth trying.
+
 ## Paper
 
 The public paper artifacts are:
