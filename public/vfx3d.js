@@ -20,6 +20,8 @@ const PRESETS = {
   default: { mode: 0, particles: 240, speed: 1.2, ringCount: 4, shardCount: 16, beamCount: 5, roll: 0, cameraZ: 6.4 }
 };
 
+const TAU = Math.PI * 2;
+
 const BACKDROP_VERTEX = `
 varying vec2 vUv;
 void main() {
@@ -435,6 +437,225 @@ function createShards(colors, preset) {
   return group;
 }
 
+function relicMaterial(color, opacity = 0.48) {
+  return new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: Math.min(0.86, opacity * 1.25),
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+}
+
+function registerRelic(mesh, options = {}) {
+  mesh.userData = {
+    ...mesh.userData,
+    role: options.role || "detail",
+    baseOpacity: options.baseOpacity ?? mesh.material.opacity ?? 0.42,
+    baseX: mesh.position.x,
+    baseY: mesh.position.y,
+    baseZ: mesh.position.z,
+    baseRotX: mesh.rotation.x,
+    baseRotY: mesh.rotation.y,
+    baseRotZ: mesh.rotation.z,
+    baseScaleX: mesh.scale.x,
+    baseScaleY: mesh.scale.y,
+    baseScaleZ: mesh.scale.z,
+    phase: options.phase ?? 0,
+    side: options.side ?? 1,
+    spin: options.spin ?? 0
+  };
+  return mesh;
+}
+
+function addRelicPlane(group, width, height, color, opacity, x, y, z, rotationZ = 0, options = {}) {
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, height), relicMaterial(color, opacity));
+  mesh.position.set(x, y, z);
+  mesh.rotation.z = rotationZ;
+  if (options.scale) mesh.scale.set(options.scale[0], options.scale[1], options.scale[2] ?? 1);
+  registerRelic(mesh, { ...options, baseOpacity: opacity });
+  group.add(mesh);
+  return mesh;
+}
+
+function addRelicTorus(group, radius, tube, color, opacity, x, y, z, rotations = [0, 0, 0], options = {}) {
+  const mesh = new THREE.Mesh(new THREE.TorusGeometry(radius, tube, 8, 128), relicMaterial(color, opacity));
+  mesh.position.set(x, y, z);
+  mesh.rotation.set(rotations[0], rotations[1], rotations[2]);
+  if (options.scale) mesh.scale.set(options.scale[0], options.scale[1], options.scale[2] ?? 1);
+  registerRelic(mesh, { ...options, baseOpacity: opacity });
+  group.add(mesh);
+  return mesh;
+}
+
+function addRelicSphere(group, radius, color, opacity, x, y, z, options = {}) {
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 18, 12), relicMaterial(color, opacity));
+  mesh.position.set(x, y, z);
+  registerRelic(mesh, { ...options, baseOpacity: opacity });
+  group.add(mesh);
+  return mesh;
+}
+
+function addRelicCone(group, radius, height, color, opacity, x, y, z, rotationZ = 0, options = {}) {
+  const mesh = new THREE.Mesh(new THREE.ConeGeometry(radius, height, 4, 1, false), relicMaterial(color, opacity));
+  mesh.position.set(x, y, z);
+  mesh.rotation.z = rotationZ;
+  if (options.scale) mesh.scale.set(options.scale[0], options.scale[1], options.scale[2] ?? 1);
+  registerRelic(mesh, { ...options, baseOpacity: opacity });
+  group.add(mesh);
+  return mesh;
+}
+
+function addRelicCylinder(group, radius, height, color, opacity, x, y, z, rotationZ = 0, options = {}) {
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 12, 1, false), relicMaterial(color, opacity));
+  mesh.position.set(x, y, z);
+  mesh.rotation.z = rotationZ;
+  if (options.scale) mesh.scale.set(options.scale[0], options.scale[1], options.scale[2] ?? 1);
+  registerRelic(mesh, { ...options, baseOpacity: opacity });
+  group.add(mesh);
+  return mesh;
+}
+
+function createChampionRelic(colors, preset) {
+  const group = new THREE.Group();
+  const mode = preset.mode;
+  const warm = new THREE.Color(1, 0.96, 0.78);
+  const water = new THREE.Color(0.76, 1, 0.96);
+  const ice = new THREE.Color(0.9, 0.98, 1);
+  const shadow = colors.dark.clone().lerp(colors.main, 0.42);
+  group.position.z = -0.44;
+  group.scale.setScalar(1.42);
+
+  if (mode === 1) {
+    addRelicTorus(group, 0.76, 0.012, colors.secondary, 0.42, 0, 0.02, 0, [0.35, 0, 0.2], { role: "ring", scale: [1.12, 0.38, 1], spin: 0.8 });
+    addRelicTorus(group, 0.98, 0.008, colors.main, 0.32, 0, 0.02, -0.08, [0.32, 0, -0.26], { role: "ring", scale: [1.2, 0.32, 1], spin: -0.7, phase: 0.22 });
+    for (let index = 0; index < 10; index += 1) {
+      const angle = index * 0.34 - 1.62;
+      const radius = 0.24 + (index % 3) * 0.035;
+      addRelicPlane(
+        group,
+        1.75 + (index % 2) * 0.32,
+        0.035,
+        index % 2 ? colors.main : colors.secondary,
+        0.34,
+        Math.cos(angle) * radius,
+        Math.sin(angle) * radius * 0.45,
+        -0.04 - index * 0.018,
+        angle,
+        { role: "blade", phase: index / 10, spin: index % 2 ? 0.75 : -0.62, side: index % 2 ? 1 : -1 }
+      );
+    }
+    addRelicPlane(group, 0.72, 0.06, warm, 0.3, -0.72, -0.38, -0.05, 0.18, { role: "muzzle", phase: 0.18, side: -1 });
+    addRelicPlane(group, 0.72, 0.06, warm, 0.3, 0.74, -0.36, -0.05, -0.18, { role: "muzzle", phase: 0.62, side: 1 });
+  } else if (mode === 2) {
+    for (let index = 0; index < 4; index += 1) {
+      addRelicTorus(group, 0.48 + index * 0.17, 0.006 + index * 0.001, index % 2 ? colors.third : warm, 0.28, 0.1, 0.02, -index * 0.04, [0.02, 0, index * 0.09], { role: "scope", scale: [1.38, 0.72, 1], phase: index * 0.11, spin: index % 2 ? -0.28 : 0.2 });
+    }
+    addRelicPlane(group, 1.78, 0.012, warm, 0.42, 0.1, 0.02, -0.02, 0, { role: "reticle", phase: 0.1 });
+    addRelicPlane(group, 0.012, 1.02, colors.third, 0.32, 0.1, 0.02, -0.02, 0, { role: "reticle", phase: 0.26 });
+    addRelicPlane(group, 3.4, 0.032, colors.main, 0.3, -1.32, -0.08, -0.14, -0.05, { role: "beam", phase: 0.42 });
+    addRelicPlane(group, 0.78, 0.12, warm, 0.44, -1.42, -0.08, -0.1, -0.05, { role: "muzzle", phase: 0.42 });
+  } else if (mode === 3) {
+    group.position.y = -0.12;
+    for (let index = 0; index < 5; index += 1) {
+      addRelicTorus(group, 0.42 + index * 0.16, 0.01, index % 2 ? water : colors.main, 0.3, 0.03, -0.24 + index * 0.045, -index * 0.055, [0.82, 0.04, index * 0.34], { role: "water-ring", scale: [1.48, 0.34, 1], phase: index * 0.12, spin: index % 2 ? -0.72 : 0.86 });
+    }
+    addRelicCylinder(group, 0.028, 1.52, water, 0.46, -0.24, 0.12, -0.05, -0.24, { role: "trident", phase: 0.12 });
+    addRelicCone(group, 0.085, 0.34, water, 0.46, -0.41, 0.86, -0.04, -0.24, { role: "trident-tip", phase: 0.18 });
+    addRelicCone(group, 0.07, 0.28, colors.main, 0.38, -0.24, 0.91, -0.04, 0, { role: "trident-tip", phase: 0.28 });
+    addRelicCone(group, 0.085, 0.34, water, 0.46, -0.07, 0.84, -0.04, 0.24, { role: "trident-tip", phase: 0.38 });
+    for (let index = 0; index < 22; index += 1) {
+      const angle = (index / 22) * TAU;
+      const radius = 0.36 + (index % 5) * 0.12;
+      addRelicSphere(
+        group,
+        0.018 + (index % 4) * 0.006,
+        index % 2 ? water : warm,
+        0.2,
+        Math.cos(angle) * radius * 1.5,
+        -0.8 + (index % 7) * 0.13,
+        -0.16 - (index % 4) * 0.05,
+        { role: "bubble", phase: index / 22, spin: index % 2 ? 1 : -1 }
+      );
+    }
+  } else if (mode === 4) {
+    addRelicSphere(group, 0.23, colors.secondary, 0.46, 0, 0.02, -0.04, { role: "core", phase: 0.2, spin: 0.8 });
+    addRelicTorus(group, 0.38, 0.009, colors.third, 0.34, 0, 0.02, -0.02, [0.5, 0.2, -0.35], { role: "ring", scale: [1.05, 0.58, 1], phase: 0.1, spin: 0.6 });
+    [-1, 1].forEach((side) => {
+      for (let index = 0; index < 4; index += 1) {
+        addRelicPlane(
+          group,
+          0.18 + index * 0.035,
+          1.06 - index * 0.08,
+          index % 2 ? colors.main : colors.secondary,
+          0.32,
+          side * (0.34 + index * 0.18),
+          0.08 - index * 0.055,
+          -0.08 - index * 0.035,
+          side * (0.52 + index * 0.14),
+          { role: "wing", phase: 0.16 + index * 0.11, side, spin: side * 0.18 }
+        );
+      }
+    });
+  } else if (mode === 5) {
+    [-1, 1].forEach((side) => {
+      addRelicPlane(group, 1.18, 0.11, warm, 0.36, side * 0.52, -0.34, -0.05, side * -0.2, { role: "pistol", phase: side > 0 ? 0.35 : 0.15, side });
+      addRelicPlane(group, 0.88, 0.035, colors.main, 0.34, side * 0.92, -0.18, -0.08, side * -0.72, { role: "muzzle", phase: side > 0 ? 0.5 : 0.26, side });
+      addRelicTorus(group, 0.22, 0.008, colors.secondary, 0.28, side * 0.72, -0.19, -0.12, [0.2, 0.05, side * -0.2], { role: "muzzle-ring", scale: [1.4, 0.42, 1], phase: side > 0 ? 0.55 : 0.32, side });
+    });
+    for (let index = 0; index < 8; index += 1) {
+      addRelicPlane(group, 1.6, 0.022, index % 2 ? colors.secondary : warm, 0.22, 0, -0.02 + index * 0.06, -0.28 - index * 0.02, -0.95 + index * 0.26, { role: "fan", phase: index / 8, spin: 0.18 });
+    }
+  } else if (mode === 6) {
+    group.position.x = -0.1;
+    for (let index = 0; index < 5; index += 1) {
+      addRelicTorus(group, 0.26 + index * 0.13, 0.008, index % 2 ? colors.secondary : colors.main, 0.3, -0.52 + index * 0.03, -0.08 + index * 0.025, -index * 0.05, [0.55, -0.18, -0.72 + index * 0.18], { role: "gauntlet-ring", scale: [1.25, 0.62, 1], phase: index * 0.1, spin: index % 2 ? -0.6 : 0.7 });
+    }
+    for (let index = 0; index < 7; index += 1) {
+      addRelicPlane(group, 0.34, 0.042, index % 2 ? warm : colors.third, 0.34, -0.12 + index * 0.26, 0.4 - index * 0.18, -0.12 - index * 0.025, -0.76, { role: "chevron", phase: index / 7, spin: 0.24 });
+      addRelicPlane(group, 0.34, 0.042, index % 2 ? warm : colors.third, 0.34, 0.02 + index * 0.26, 0.29 - index * 0.18, -0.12 - index * 0.025, 0.76, { role: "chevron", phase: index / 7 + 0.08, spin: -0.24 });
+    }
+  } else if (mode === 7) {
+    addRelicTorus(group, 0.58, 0.01, warm, 0.36, 0, 0.02, -0.06, [0.1, 0.05, 0], { role: "aperture", scale: [1.1, 0.8, 1], phase: 0.1, spin: 0.24 });
+    for (let index = 0; index < 4; index += 1) {
+      const angle = index * Math.PI * 0.5 + 0.34;
+      addRelicPlane(group, 0.34, 1.02, index % 2 ? colors.secondary : colors.main, 0.3, Math.cos(angle) * 0.2, Math.sin(angle) * 0.16, -0.08, angle, { role: "petal", phase: index * 0.18, spin: 0.16 });
+    }
+    for (let index = 0; index < 4; index += 1) {
+      const angle = index * Math.PI * 0.5;
+      addRelicPlane(group, 1.48, 0.015, shadow, 0.24, Math.cos(angle) * 0.02, Math.sin(angle) * 0.02, -0.16, angle, { role: "curtain-cut", phase: index * 0.12, spin: 0.12 });
+    }
+  } else if (mode === 8) {
+    addRelicPlane(group, 2.7, 0.045, ice, 0.44, 0.05, 0.1, -0.05, -0.1, { role: "arrow", phase: 0.16 });
+    addRelicCone(group, 0.22, 0.48, ice, 0.48, 1.42, -0.04, -0.04, -Math.PI * 0.6, { role: "arrowhead", phase: 0.2 });
+    for (let index = 0; index < 10; index += 1) {
+      const side = index % 2 ? 1 : -1;
+      addRelicCone(group, 0.055 + (index % 3) * 0.018, 0.42 + (index % 4) * 0.08, index % 2 ? colors.main : ice, 0.28, -0.86 + index * 0.2, side * (0.18 + (index % 3) * 0.07), -0.15 - index * 0.025, side * (0.8 + index * 0.04), { role: "ice-shard", phase: index / 10, side });
+    }
+  } else if (mode === 9) {
+    const shellMaterial = relicMaterial(colors.main, 0.4);
+    shellMaterial.wireframe = true;
+    const shell = new THREE.Mesh(new THREE.IcosahedronGeometry(0.58, 2), shellMaterial);
+    shell.position.set(0, -0.06, -0.06);
+    registerRelic(shell, { role: "shell", baseOpacity: 0.4, spin: 0.9 });
+    group.add(shell);
+    addRelicTorus(group, 0.7, 0.012, colors.third, 0.28, 0, -0.08, -0.12, [0.72, 0.1, 0], { role: "roll-ring", scale: [1.24, 0.34, 1], phase: 0.12, spin: 1 });
+    for (let index = 0; index < 12; index += 1) {
+      const angle = (index / 12) * TAU;
+      addRelicCone(group, 0.052, 0.32, index % 2 ? colors.secondary : warm, 0.28, Math.cos(angle) * 0.58, Math.sin(angle) * 0.42 - 0.04, -0.04, angle - Math.PI * 0.5, { role: "spike", phase: index / 12, spin: 0.12 });
+    }
+  } else {
+    addRelicTorus(group, 0.66, 0.01, colors.main, 0.34, 0, 0, -0.05, [0.4, 0.1, 0], { role: "ring", scale: [1.16, 0.55, 1], spin: 0.3 });
+    addRelicSphere(group, 0.24, colors.secondary, 0.36, 0, 0, -0.03, { role: "core", spin: 0.4 });
+  }
+
+  group.traverse((node) => {
+    if (node.material) node.material.opacity = 0;
+  });
+  return group;
+}
+
 function updateRings(group, elapsed, progress, preset) {
   group.children.forEach((mesh, index) => {
     const local = Math.max(0, Math.min(1, (progress - mesh.userData.delay) / 0.84));
@@ -540,6 +761,70 @@ function updateShards(group, elapsed, progress, preset) {
   });
 }
 
+function updateChampionRelic(group, elapsed, progress, preset) {
+  const time = elapsed / 1000;
+  const visibility = smoothstep(0.025, 0.18, progress) * (1 - smoothstep(0.88, 1, progress));
+  const mode = preset.mode;
+  group.visible = visibility > 0.005;
+  group.rotation.x = Math.sin(time * 0.58 + mode) * 0.045 + (mode === 3 ? 0.08 : 0);
+  group.rotation.y = Math.sin(time * 0.42 + mode * 0.4) * 0.07;
+  group.rotation.z = preset.roll * 0.18 + Math.sin(time * 0.34 + mode) * 0.03;
+  if (mode === 1) group.rotation.z += time * 0.42;
+  if (mode === 3) group.rotation.z += Math.sin(time * 0.9) * 0.08;
+  if (mode === 9) group.rotation.z -= progress * 5.6;
+
+  group.children.forEach((mesh, index) => {
+    const data = mesh.userData;
+    const phase = data.phase + index * 0.03;
+    const pulse = 0.5 + Math.sin(time * (1.4 + preset.speed * 0.28) + phase * TAU) * 0.5;
+    const shimmer = 0.78 + pulse * 0.38;
+    mesh.position.set(data.baseX, data.baseY, data.baseZ);
+    mesh.rotation.set(data.baseRotX, data.baseRotY, data.baseRotZ);
+    mesh.scale.set(data.baseScaleX, data.baseScaleY, data.baseScaleZ);
+    mesh.material.opacity = Math.min(0.92, data.baseOpacity * visibility * shimmer * 1.42);
+
+    if (data.role.includes("ring") || data.role === "scope" || data.role === "aperture") {
+      const swell = 1 + Math.sin(time * (0.8 + Math.abs(data.spin)) + phase * TAU) * 0.035 + progress * 0.08;
+      mesh.scale.set(data.baseScaleX * swell, data.baseScaleY * (1 + (swell - 1) * 0.42), data.baseScaleZ);
+      mesh.rotation.z = data.baseRotZ + time * data.spin * 0.32;
+    } else if (data.role === "bubble") {
+      const drift = (progress * 1.55 + phase) % 1;
+      mesh.position.x = data.baseX + Math.sin(time * 2.4 + phase * TAU) * 0.11;
+      mesh.position.y = data.baseY + drift * 1.08;
+      mesh.scale.setScalar(data.baseScaleX * (0.72 + drift * 0.8));
+      mesh.material.opacity = Math.min(0.78, data.baseOpacity * visibility * (1 - smoothstep(0.72, 1, drift)) * (0.92 + pulse * 0.55) * 1.42);
+    } else if (data.role === "blade" || data.role === "fan" || data.role === "curtain-cut") {
+      mesh.rotation.z = data.baseRotZ + Math.sin(time * 1.2 + phase * TAU) * 0.08 * data.side;
+      mesh.scale.x = data.baseScaleX * (1 + pulse * 0.18);
+    } else if (data.role === "beam" || data.role === "muzzle") {
+      const flash = smoothstep(0.12, 0.34, progress) * (1 - smoothstep(0.68, 0.92, progress));
+      mesh.scale.x = data.baseScaleX * (1 + flash * 1.4 + pulse * 0.18);
+      mesh.material.opacity = Math.min(0.95, data.baseOpacity * visibility * (0.78 + flash * 1.45 + pulse * 0.24) * 1.38);
+    } else if (data.role.includes("trident")) {
+      mesh.position.y = data.baseY + Math.sin(time * 1.2 + phase * TAU) * 0.045;
+      mesh.rotation.z = data.baseRotZ + Math.sin(time * 0.9 + phase * TAU) * 0.035;
+    } else if (data.role === "wing") {
+      mesh.rotation.z = data.baseRotZ + Math.sin(time * 0.9 + phase * TAU) * 0.08 * data.side;
+      mesh.position.x = data.baseX + Math.sin(time * 0.7 + phase * TAU) * 0.055 * data.side;
+    } else if (data.role === "core" || data.role === "shell") {
+      mesh.rotation.x = data.baseRotX + time * 0.28;
+      mesh.rotation.y = data.baseRotY + time * (0.45 + Math.abs(data.spin) * 0.22);
+      mesh.scale.setScalar(data.baseScaleX * (1 + pulse * 0.08));
+    } else if (data.role === "arrow" || data.role === "arrowhead" || data.role === "chevron") {
+      const travel = smoothstep(0.04, 0.76, progress);
+      mesh.position.x = data.baseX + travel * 0.26;
+      mesh.position.y = data.baseY - travel * 0.08 + Math.sin(time * 1.6 + phase * TAU) * 0.02;
+      mesh.scale.x = data.baseScaleX * (1 + travel * 0.22 + pulse * 0.08);
+    } else if (data.role === "ice-shard" || data.role === "spike") {
+      mesh.rotation.z = data.baseRotZ + Math.sin(time * 1.3 + phase * TAU) * 0.07 * data.side;
+      mesh.scale.setScalar(data.baseScaleX * (0.9 + pulse * 0.22));
+    } else if (data.role === "petal") {
+      mesh.rotation.z = data.baseRotZ + time * 0.08 + pulse * 0.08;
+      mesh.scale.y = data.baseScaleY * (0.9 + pulse * 0.22);
+    }
+  });
+}
+
 export function createChampionVfx3D({ canvas, championId = "default", profile = DEFAULT_PROFILE, duration = 4200 } = {}) {
   const preset = presetFor(championId);
   const colors = makeColors(profile);
@@ -569,7 +854,8 @@ export function createChampionVfx3D({ canvas, championId = "default", profile = 
   const rings = createRings(colors, preset);
   const beams = createBeams(colors, preset);
   const shards = createShards(colors, preset);
-  root.add(particles, rings, beams, shards);
+  const relic = createChampionRelic(colors, preset);
+  root.add(particles, rings, beams, shards, relic);
 
   let disposed = false;
   let lastWidth = 0;
@@ -609,6 +895,7 @@ export function createChampionVfx3D({ canvas, championId = "default", profile = 
     updateRings(rings, elapsed, progress, preset);
     updateBeams(beams, elapsed, progress, preset);
     updateShards(shards, elapsed, progress, preset);
+    updateChampionRelic(relic, elapsed, progress, preset);
     renderer.render(scene, camera);
   }
 

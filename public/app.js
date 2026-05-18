@@ -682,11 +682,10 @@ let settleTimer = 0;
 let audioContext;
 let activeStinger;
 const fallbackAudioUrls = {};
-const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx12";
+const visualFxVersion = "20260518-world-vfx14";
 let vfx3dModulePromise;
 let vfx3dWarmPromise;
 let vfx2dWarmPromise;
@@ -870,20 +869,6 @@ function championById(championId) {
   return champions.find((champion) => champion.id === championId) || champions[0];
 }
 
-function cinematicImageFor(championId, fallbackImage) {
-  const champion = championById(championId);
-  const url = champion.image.replace("/loading/", "/splash/");
-  if (!cinematicImageCache[url]) {
-    const image = new Image();
-    image.decoding = "async";
-    image.loading = "eager";
-    image.src = url;
-    cinematicImageCache[url] = image;
-  }
-  const cinematicImage = cinematicImageCache[url];
-  return cinematicImage.complete && cinematicImage.naturalWidth ? cinematicImage : fallbackImage;
-}
-
 function applyFxProfileVars(element, profile) {
   if (!element) return;
   element.dataset.championFx = profile.id;
@@ -907,36 +892,37 @@ function loadVfx3dModule() {
 }
 
 function primeCinematicAssets() {
-  champions.forEach((champion) => {
-    const image = cinematicImageFor(champion.id);
-    if (image?.decode) void image.decode().catch(() => {});
-  });
   void loadVfx3dModule();
   void warmVfx3dRenderer();
   void warmCinematicCanvases();
 }
 
-function warmVfx3dRenderer(championId = "fizz") {
+function warmVfx3dRenderer() {
   if (motionQuery.matches || !("WebGLRenderingContext" in window)) return Promise.resolve();
-  vfx3dWarmPromise ||= loadVfx3dModule().then((module) => {
+  vfx3dWarmPromise ||= loadVfx3dModule().then(async (module) => {
     if (!module) return;
+    const warmWidth = Math.max(390, Math.min(720, Math.ceil(window.innerWidth || 960)));
+    const warmHeight = Math.max(360, Math.min(540, Math.ceil(window.innerHeight || 540)));
+    const warmRatio = effectPixelRatioFor();
     const canvas = document.createElement("canvas");
-    canvas.width = 16;
-    canvas.height = 16;
-    canvas.style.cssText = "position:fixed;left:-40px;top:-40px;width:16px;height:16px;opacity:0;pointer-events:none;";
+    canvas.width = warmWidth;
+    canvas.height = warmHeight;
+    canvas.style.cssText = `position:fixed;left:-${warmWidth + 80}px;top:-${warmHeight + 80}px;width:${warmWidth}px;height:${warmHeight}px;opacity:0;pointer-events:none;`;
     document.body.append(canvas);
-    const champion = championById(championId);
-    const profile = fxProfileFor(champion.id);
-    const scene = module.createChampionVfx3D({
-      canvas,
-      championId: champion.id,
-      profile,
-      duration: 900
-    });
-    scene.resize(16, 16, 1);
-    scene.render(0, 900);
-    scene.render(33, 900);
-    scene.dispose();
+    for (const champion of champions) {
+      const profile = fxProfileFor(champion.id);
+      const scene = module.createChampionVfx3D({
+        canvas,
+        championId: champion.id,
+        profile,
+        duration: 900
+      });
+      scene.resize(warmWidth, warmHeight, warmRatio);
+      scene.render(0, 900);
+      scene.render(150, 900);
+      scene.dispose();
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    }
     canvas.remove();
   }).catch(() => {});
   return vfx3dWarmPromise;
@@ -2748,8 +2734,8 @@ function drawFizzActionCue(ctx, width, height, t, profile, stage, alpha) {
 
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = alpha * (0.22 + breach * 0.18 + bite * 0.1);
-  ctx.filter = `blur(${1.8 - Math.min(1, breach + bite) * 0.52}px) saturate(1.18) contrast(1.08)`;
+  ctx.globalAlpha = alpha * (0.08 + breach * 0.08 + bite * 0.05);
+  ctx.filter = `blur(${5.2 - Math.min(1, breach + bite) * 1.4}px) saturate(1.08) contrast(1.04)`;
   ctx.translate(cx - width * 0.02, waterline + height * (0.02 - breach * 0.08));
   ctx.rotate(-0.18 - breach * 0.08);
   const sharkBody = ctx.createLinearGradient(-width * 0.28, -height * 0.08, width * 0.33, height * 0.1);
@@ -2771,7 +2757,7 @@ function drawFizzActionCue(ctx, width, height, t, profile, stage, alpha) {
   ctx.closePath();
   ctx.fill();
   ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = alpha * (0.34 + bite * 0.38);
+  ctx.globalAlpha = alpha * (0.08 + bite * 0.12);
   ctx.strokeStyle = "rgba(232,255,250,.82)";
   ctx.lineWidth = Math.max(1.5, width * 0.002);
   ctx.beginPath();
@@ -2786,7 +2772,7 @@ function drawFizzActionCue(ctx, width, height, t, profile, stage, alpha) {
     ctx.lineTo(tx + width * 0.007, ty + height * 0.026);
     ctx.lineTo(tx - width * 0.006, ty + height * 0.024);
     ctx.closePath();
-    ctx.fillStyle = "rgba(232,255,250,.76)";
+    ctx.fillStyle = "rgba(232,255,250,.34)";
     ctx.fill();
   }
   ctx.restore();
@@ -3398,8 +3384,8 @@ function drawSharkScene(ctx, width, height, t, profile) {
 
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = alpha * (0.46 + rise * 0.16);
-  ctx.filter = "blur(.8px) saturate(1.18) contrast(1.22)";
+  ctx.globalAlpha = alpha * (0.18 + rise * 0.08);
+  ctx.filter = "blur(4px) saturate(1.08) contrast(1.08)";
   ctx.translate(x - size * 0.12, y - size * 0.03);
   ctx.rotate(-0.2 - rise * 0.2 + Math.sin(t * 5) * 0.025);
   const shark = ctx.createLinearGradient(-size * 1.2, -size * 0.36, size * 1.16, size * 0.34);
@@ -3408,8 +3394,8 @@ function drawSharkScene(ctx, width, height, t, profile) {
   shark.addColorStop(0.62, "rgba(46, 132, 146, .42)");
   shark.addColorStop(1, "rgba(1, 12, 22, .98)");
   ctx.fillStyle = shark;
-  ctx.shadowColor = "rgba(102, 242, 255, .22)";
-  ctx.shadowBlur = 34;
+  ctx.shadowColor = "rgba(102, 242, 255, .16)";
+  ctx.shadowBlur = 26;
   ctx.beginPath();
   ctx.moveTo(size * 1.12, -size * 0.02);
   ctx.bezierCurveTo(size * 0.68, -size * 0.46, -size * 0.22, -size * 0.45, -size * 0.98, -size * 0.2);
@@ -3418,7 +3404,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  ctx.globalAlpha = alpha * 0.34;
+  ctx.globalAlpha = alpha * 0.12;
   ctx.fillStyle = "rgba(2, 12, 20, .72)";
   ctx.beginPath();
   ctx.moveTo(-size * 0.94, -size * 0.08);
@@ -3442,7 +3428,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.fill();
 
   ctx.filter = "blur(1.8px)";
-  ctx.globalAlpha = alpha * 0.54;
+  ctx.globalAlpha = alpha * 0.18;
   ctx.fillStyle = "rgba(0, 6, 12, .94)";
   ctx.beginPath();
   ctx.moveTo(size * 0.7, size * 0.04);
@@ -3451,7 +3437,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.closePath();
   ctx.fill();
   ctx.filter = "blur(.4px)";
-  ctx.globalAlpha = alpha * 0.68;
+  ctx.globalAlpha = alpha * 0.18;
   ctx.strokeStyle = "rgba(234,255,250,.9)";
   ctx.lineWidth = Math.max(1.2, size * 0.008);
   ctx.beginPath();
@@ -3466,7 +3452,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   for (let tooth = 0; tooth < 9; tooth += 1) {
     const tx = size * (0.54 + tooth * 0.047);
     const ty = size * (0.1 + Math.sin(tooth) * 0.018);
-    ctx.globalAlpha = alpha * (0.16 + rise * 0.12);
+    ctx.globalAlpha = alpha * (0.035 + rise * 0.035);
     ctx.fillStyle = "rgba(238,255,250,.82)";
     ctx.beginPath();
     ctx.moveTo(tx, ty);
@@ -3953,14 +3939,15 @@ function drawChampionSignatureScene(ctx, profile, width, height, t) {
   else drawEzrealScene(ctx, width, height, t, profile);
 }
 
-function drawUltimateFrame(ctx, profile, image, width, height, elapsed, duration) {
+function drawUltimateFrame(ctx, profile, width, height, elapsed, duration) {
   const t = clamp(elapsed / duration, 0, 1);
+  const stage = cinematicStageFor(profile.id);
   ctx.clearRect(0, 0, width, height);
   drawCinematicBackdrop(ctx, width, height, t, profile);
   drawChampionSignatureScene(ctx, profile, width, height, t);
-  drawSourceArtCinematicStage(ctx, image, width, height, t, profile);
   drawCinematicLensPass(ctx, width, height, t, profile);
-  drawChampionActionCues(ctx, width, height, t, profile, cinematicStageFor(profile.id), sceneEnvelope(t, 0.94));
+  drawChampionActionCues(ctx, width, height, t, profile, stage, sceneEnvelope(t, 0.94));
+  drawCinematicFilmFinish(ctx, width, height, t, profile, stage);
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
   ctx.fillStyle = `rgba(12, 8, 10, ${0.1 * (1 - sceneEnvelope(t, 0.92))})`;
@@ -3976,19 +3963,16 @@ function warmCinematicCanvases() {
   if (motionQuery.matches || vfx2dWarmPromise) return vfx2dWarmPromise || Promise.resolve();
   vfx2dWarmPromise = Promise.resolve().then(async () => {
     const canvas = document.createElement("canvas");
-    canvas.width = Math.max(390, Math.min(1280, Math.ceil(window.innerWidth || 960)));
-    canvas.height = Math.max(360, Math.min(844, Math.ceil(window.innerHeight || 540)));
+    canvas.width = Math.max(390, Math.min(720, Math.ceil(window.innerWidth || 960)));
+    canvas.height = Math.max(360, Math.min(540, Math.ceil(window.innerHeight || 540)));
     const context = canvas.getContext("2d", { alpha: true });
     if (!context) return;
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = "high";
     for (const champion of champions) {
-      const image = cinematicImageFor(champion.id);
-      if (image?.decode) await image.decode().catch(() => {});
       const duration = visualDurations[champion.id] || 3800;
       const profile = fxProfileFor(champion.id);
-      drawUltimateFrame(context, profile, image, canvas.width, canvas.height, duration * 0.03, duration);
-      drawUltimateFrame(context, profile, image, canvas.width, canvas.height, duration * 0.38, duration);
+      drawUltimateFrame(context, profile, canvas.width, canvas.height, duration * 0.38, duration);
       await new Promise((resolve) => requestAnimationFrame(resolve));
     }
   }).catch(() => {});
@@ -4008,7 +3992,6 @@ function spawnSelectionFx(button, profileId = "default") {
   const fx = document.createElement("div");
   const threeCanvas = document.createElement("canvas");
   const canvas = document.createElement("canvas");
-  const image = cinematicImageFor(profile.id, button.querySelector("img"));
   fx.className = "selection-fx ultimate-scene";
   fx.dataset.championFx = profile.id;
   fx.setAttribute("aria-hidden", "true");
@@ -4090,11 +4073,11 @@ function spawnSelectionFx(button, profileId = "default") {
       context.imageSmoothingQuality = "high";
       last2dDrawAt = -Infinity;
     }
-    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 70;
-    const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= 240;
+    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 95;
+    const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= 360;
     if (needsFirst2dDraw || needs2dDraw || elapsed > duration - 140) {
       context.setTransform(1, 0, 0, 1, 0, 0);
-      drawUltimateFrame(context, profile, image, pixelWidth, pixelHeight, elapsed, duration);
+      drawUltimateFrame(context, profile, pixelWidth, pixelHeight, elapsed, duration);
       last2dDrawAt = elapsed;
     }
     if (elapsed < duration + 60) {
@@ -4169,7 +4152,6 @@ function renderPicker() {
     img.loading = "eager";
     img.decoding = "async";
     button.append(img);
-    cinematicImageFor(champion.id, img);
     button.addEventListener("pointermove", (event) => {
       const rect = button.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
