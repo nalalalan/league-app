@@ -730,7 +730,7 @@ const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx21";
+const visualFxVersion = "20260518-world-vfx22";
 let vfx3dModulePromise;
 const vfx3dWarmPromises = {};
 let vfx2dWarmPromise;
@@ -1027,10 +1027,23 @@ function selectionStageFor(button) {
   const source = panelRect?.width ? panelRect : buttonRect;
   const viewportWidth = window.innerWidth || 1;
   const viewportHeight = window.innerHeight || 1;
-  const width = clamp((source?.width || 520) * 1.16, 320, Math.min(920, viewportWidth - 20));
-  const height = clamp((source?.height || 260) + 112, 220, Math.min(430, viewportHeight - 110));
+  const isCompactStage = viewportWidth < 560;
+  const width = clamp(
+    (source?.width || 520) * (isCompactStage ? 0.94 : 1.06),
+    isCompactStage ? 250 : 300,
+    Math.min(880, viewportWidth - (isCompactStage ? 46 : 20))
+  );
+  const height = clamp(
+    (source?.height || 260) + (isCompactStage ? 36 : 72),
+    isCompactStage ? 190 : 210,
+    Math.min(isCompactStage ? 320 : 380, viewportHeight - 120)
+  );
   const x = clamp((source?.left || 0) + (source?.width || viewportWidth) * 0.5, width * 0.5 + 10, viewportWidth - width * 0.5 - 10);
-  const y = clamp((source?.top || viewportHeight * 0.42) + (source?.height || height) * 0.55, height * 0.5 + 76, viewportHeight - height * 0.5 - 10);
+  const y = clamp(
+    (source?.top || viewportHeight * 0.42) + (source?.height || height) * (isCompactStage ? 0.48 : 0.52),
+    height * 0.5 + 76,
+    viewportHeight - height * 0.5 - 10
+  );
   return { x, y, width, height };
 }
 
@@ -1114,7 +1127,9 @@ function primeCinematicAssets() {
   cinematicPrimeStarted = true;
   void loadVfx3dModule();
   void warmUltimateShader();
-  window.setTimeout(scheduleVfxWarmQueue, 2600);
+  void warmCinematicCanvases();
+  void warmVfx3dRenderer(currentChampionId || champions[0]?.id);
+  window.setTimeout(scheduleVfxWarmQueue, 700);
 }
 
 function warmVfx3dRenderer(championId = currentChampionId || champions[0]?.id) {
@@ -4822,7 +4837,8 @@ function drawChampionAtmosphereFrame(ctx, profile, width, height, seconds, burst
 
   ctx.save();
   ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = 0.52 + reveal * 0.36;
+  ctx.globalAlpha = 0.42 + reveal * 0.34;
+  drawChampionSignatureScene(ctx, profile, width, height, 0.22 + cycle * 0.5);
   drawChampionActionCues(ctx, width, height, t, profile, stage, impact);
   ctx.restore();
 
@@ -4908,7 +4924,7 @@ function spawnSelectionFx(button, profileId = "default") {
   const canvas = document.createElement("canvas");
   fx.className = "selection-fx ultimate-scene";
   fx.dataset.championFx = profile.id;
-  fx.dataset.vfxTier = "panel-atmosphere-vfx21";
+  fx.dataset.vfxTier = "panel-atmosphere-vfx22";
   fx.setAttribute("aria-hidden", "true");
   shaderCanvas.className = "fx-shader-canvas";
   threeCanvas.className = "fx-three-canvas";
@@ -5001,8 +5017,8 @@ function spawnSelectionFx(button, profileId = "default") {
       context.imageSmoothingQuality = "high";
       last2dDrawAt = -Infinity;
     }
-    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 90;
-    const twoDFrameInterval = width > 900 ? 58 : 44;
+    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 32;
+    const twoDFrameInterval = 16;
     const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= twoDFrameInterval;
     if (needsFirst2dDraw || needs2dDraw || elapsed > duration - 140) {
       context.setTransform(1, 0, 0, 1, 0, 0);
@@ -5034,7 +5050,7 @@ function animateChampionSwap(champion) {
     panel.classList.add("is-leaving");
   });
 
-  const delay = motionQuery.matches ? 0 : 170;
+  const delay = motionQuery.matches ? 0 : 85;
   swapTimer = window.setTimeout(() => {
     writeChampion(champion);
     currentChampionId = champion.id;
@@ -5049,7 +5065,7 @@ function animateChampionSwap(champion) {
         panel.classList.remove("is-entering", "is-leaving");
         panel.removeAttribute("aria-busy");
       });
-    }, motionQuery.matches ? 0 : 560);
+    }, motionQuery.matches ? 0 : 420);
   }, delay);
 }
 
@@ -5109,7 +5125,7 @@ function renderPicker() {
       button.classList.add("is-flashing");
       playSelectSound(champion.id);
       spawnSelectionFx(button, champion.id);
-      window.setTimeout(() => button.classList.remove("is-flashing"), 2080);
+      window.setTimeout(() => button.classList.remove("is-flashing"), (visualDurations[champion.id] || 760) + 280);
       renderChampion(champion.id, { animate: true });
     });
     return button;
