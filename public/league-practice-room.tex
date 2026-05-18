@@ -175,7 +175,7 @@ Champion fit affects repetition & Champion picker & Visual pick first; details a
 
 \subsection{Champion-specific situations replaced generic cards}
 
-The site organizes knowledge by situations rather than by abstract lessons. The current version makes those situations champion-specific and removes the intermediate public labels that had made the cards feel misleading. Selecting Samira now shows one-sentence prompts for stressful moments: wanting to press E because a fight feels urgent, not recognizing the crowd control that can stop the dash, chasing a low-health enemy into fog, pressing W because proximity feels dangerous, staying after R because the damage felt good, or trying to W a tower shot. Each prompt is followed by one combined response paragraph that explains the action, the reason it matters, and the repetition to practice. Selecting Caitlyn shifts the same practice-room idea toward next safe minion, leaving when noticed, recovering after poke, and shooting the closest safe target. This format was chosen because the user needed enough detail to recognize the exact tricky moment without reading a giant rule wall or a card taxonomy.
+The site organizes knowledge by situations rather than by abstract lessons. The current version makes those situations champion-specific and removes the intermediate public labels that had made the cards feel misleading. Selecting Samira now shows one-sentence prompts for stressful moments: wanting to press E because a fight feels urgent, not recognizing the crowd control that can stop the dash, chasing a low-health enemy into fog, pressing W because proximity feels dangerous, preparing for R near a team fight before S rank is ready, tunneling on one target while other enemies attack, using R because it is loaded rather than because enemies are already losing, or disappearing into unsafe solo farm when the team is weak. Each prompt is followed by one combined response paragraph that explains the action, the reason it matters, and the repetition to practice. Selecting Caitlyn shifts the same practice-room idea toward next safe minion, leaving when noticed, recovering after poke, and shooting the closest safe target. This format was chosen because the user needed enough detail to recognize the exact tricky moment without reading a giant rule wall or a card taxonomy.
 
 \begin{table}[H]
 \centering
@@ -193,6 +193,8 @@ W feels necessary immediately after dashing in. & Hold W for the real spell; it 
 R works and the excitement makes staying feel automatic. & Treat R as the reward, then leave unless the next target is already low and reachable. \\
 E resets after a takedown. & Read the reset as a new check, not an instruction to dash into tank, tower, fog, or fresh crowd control. \\
 One hit lands and feels like proof that the enemy is competent. & Treat damage as information, step back, stabilize the camera, and choose the next action. \\
+The player is near a team fight, R is not ready, and waiting there costs HP. & Move to the edge, build style from safety, and enter only when S rank exists and the fight is already committed. \\
+The player tunnels on one low target. & Check target, danger, target, danger; stop chasing if the chaser becomes the low target. \\
 \bottomrule
 \end{tabular}
 }
@@ -206,7 +208,7 @@ The same logic applies to other champions. Kai'Sa is not treated as automaticall
 
 \subsection{The public log made mindset part of the artifact}
 
-The public log starts with three source entries: the seed arc import, the practice-room frame, and the current Samira law. This is intentionally public. The design choice is that thoughts, panic notes, and mindset rules are not private by default; they are part of the learning artifact. The only excluded material is unrelated sensitive information such as credentials, access tokens, or private third-party identifiers.
+The public log starts with source entries for the seed arc import, the practice-room frame, the current Samira law, and later user-supplied Samira proof-game notes. This is intentionally public. The design choice is that thoughts, panic notes, and mindset rules are not private by default; they are part of the learning artifact. The only excluded material is unrelated sensitive information such as credentials, access tokens, or private third-party identifiers.
 
 \section{Discussion}
 
@@ -220,7 +222,7 @@ Several limits are important. First, this is a single-user artifact, not a clini
 
 \subsection*{Source corpus}
 
-The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. A later May 17, 2026 prompt added a Samira crowd-control guide as a source for the page's CC-specific situation. The implementation treated these texts as the current source of truth for the public situation notes. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
+The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. Later May 17 and May 18 prompts added Samira crowd-control, W-blocking, poke-lane, bait-recognition, team-fight, bad-team, normal-game, and proof-game refinements. The implementation treated these texts as the current source of truth for the public situation notes. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
 
 \subsection*{Interface requirements}
 

@@ -386,12 +386,36 @@ const champions = [
         response: "If you cannot name the stun, root, hook, charm, engage, or point-and-click lockdown that can stop you, do not E in first. Play Q-only: Q, safe auto, move, Q, and watch one danger spell. Sidestep or W flying threats like Lux Q, Morgana Q, Xerath E, Ahri charm, Ashe R, Anivia Q, and hooks; assume Annie walking near you has stun loaded; back up when Leona, Nautilus, Rell, Alistar, Rakan, or Pantheon walks at you; do not dive Malzahar, Lissandra, Warwick, Skarner-style grab, or Vi alone. When the scary spell misses, is used on someone else, or the fight is already messy, E is allowed only if the target is low and reachable."
       },
       {
+        title: "Xerath or Annie is on screen and you cannot tell if the stun is ready.",
+        response: "Treat them like loaded guns until the evidence changes. Xerath stun is the bright blue-purple ball flying straight at you: move sideways, Q from range, and W only if the ball is actually going to hit. Annie is harder because her stun is a passive, so the beginner rule is simpler: Annie walking toward you means assume stun ready. Into either champion, do not E first while they are facing you; wait for the stun to miss, hit someone else, or get spent before Samira enters."
+      },
+      {
+        title: "A dangerous spell sound happens and your hand wants W immediately.",
+        response: "Sound is a warning, not the final trigger. Use the chain: sound means look, visual means confirm, W means block. Lux Q, Morgana Q, Ashe R, Amumu Q, Blitz hook, Xerath E, Anivia Q, Ahri charm, Thresh hook, Nautilus hook, Seraphine root/ult, Zyra root, Bard Q, Jhin W, and similar threats should make your eyes snap to the projectile. Press W when it is actually coming toward you, not when fear says maybe."
+      },
+      {
+        title: "Amumu throws bandage and you are unsure if W can save you.",
+        response: "If Amumu is an enemy, W is for Bandage Toss, not his area ult. Press W when the bandage is already flying toward you, ideally about one or two champion widths away. If Amumu is very close, W on the throw animation; if he is far, sidestep first and W only if the bandage is still on track to hit. If Amumu is your ally, his Q or R starts the fight and your job is to follow late, not spend W randomly."
+      },
+      {
         title: "An enemy is low, but you have not compared their HP to yours.",
         response: "A low health bar is not enough by itself. Before E, compare their HP to yours and ask what kind of champion they are. Squishy targets become reasonable when they are below roughly half your HP or already trapped by your team; tanks, drain champions, and bruisers need to be much lower because they can survive the first burst and punish the dash."
       },
       {
         title: "A low-health target runs into fog and chasing feels mandatory.",
         response: "When a low-health enemy runs toward fog, river, tri-brush, or teammates, stop at the edge instead of following the health bar. Q only if they are still visible. The useful question is not whether they are low; it is whether they are low, reachable, and cheap to kill. Fog, tower, tanks, and missing enemies turn the chase into a trap."
+      },
+      {
+        title: "A low enemy enters an unwarded bush and the health bar pulls you in.",
+        response: "Low enemy plus unwarded bush is bait until proven safe. Do not enter a bush you cannot see just because the target is low. Q from outside if they are visible, ward only if it is safe, go with a teammate, or take the wave, tower, or objective instead. The moment you lose vision, the kill is no longer a Samira reward; it is a test of whether panic can make you walk into hidden damage."
+      },
+      {
+        title: "Jinx and Xerath turn lane into poke hell and CS starts feeling impossible.",
+        response: "This is a survival lane, not a Samira fun lane. Back up behind caster minions, stop trading, Q only for safe CS, and move side to side when Xerath aims. Do not start the fight. Go only when Xerath stun misses, Zilean or your support lands real help, Jinx is low, traps are not blocking the path, or they walk too far forward. Below 50 percent HP, stop walking up; around 35 to 40 percent, recall instead of proving you can stay."
+      },
+      {
+        title: "Jinx flashes in while Morgana is nearby and the whole fight feels sudden.",
+        response: "Jinx flashing in is not automatically death; Jinx flashing in plus Morgana bind is the real danger. Step back first. Exhaust Jinx if she is actually hitting you, W Morgana Q if it is flying at you, and Q Jinx while backing up. E only if Jinx becomes low or overextended and Morgana bind is no longer the next thing that can stop you from playing."
       },
       {
         title: "After E, being close to enemies makes W feel like armor.",
@@ -402,6 +426,10 @@ const champions = [
         response: "If you do not have S yet, standing near the group is not preparation; it is leaking health while your hands wait for permission to ult. Move to the edge first. Build style from safety with Q, auto, and one real W block if a projectile is coming. Do not E just to finish the style bar unless the target is already losing, reachable, and the scary CC is gone. The pre-ult job is edge, poke, breathe, check S; only when S exists and the fight is already committed do you enter for R."
       },
       {
+        title: "S rank appears and R starts feeling like it must fire.",
+        response: "S rank means R is loaded, not that R must fire. R is the payoff after Q, autos, W, and E have already made the enemy disadvantaged. Use it to finish someone, hit multiple people who are already losing, or cash out a fight that is cracked open. If enemies are full HP, tanky, armored, walking away, or still holding CC, R can feel weak and get you killed. R when they are already losing, not to make them lose."
+      },
+      {
         title: "R lands, damage happens, and staying suddenly feels safer than leaving.",
         response: "When R lands and damage numbers happen, the successful moment can make the middle of the fight feel safer than it is. Treat R as the reward, not a promise to keep fighting. After R, leave unless the next target is already low and reachable. If someone dies, check E first, then decide whether another dash is actually safe."
       },
@@ -410,12 +438,32 @@ const champions = [
         response: "When E comes back after a takedown, the refreshed button can feel like the game is telling you to go again. It is not. A reset only gives you a new check. Look for a low squishy on the edge of the fight; do not spend the reset into a tank, tower, fog, or fresh crowd control just because the button came back."
       },
       {
+        title: "You tunnel on killing one target and stop seeing who is hitting you.",
+        response: "Target tunnel is death. Use target, danger, target, danger: after every two buttons, check who is hitting you and whether a second enemy is creating the real problem. Kill the low target unless you become the low target. If chasing Jinx makes Morgana, Xerath, Annie, or another threat start hitting or CC'ing you, the kill has become bait and the correct play is to stop chasing."
+      },
+      {
+        title: "You do not know what is happening and panic wants E.",
+        response: "Uncertainty means distance. If you know they are losing, E or R can happen; if you do not know, run or Q from range. The panic loop is Q, move back, Q, move back. E is not allowed until the situation becomes readable again. Running when confused is not cowardice; it is the reset that keeps panic from becoming a free death."
+      },
+      {
         title: "The enemy ADC hits first at level 1 and it feels personal.",
         response: "If the enemy ADC tags you at level 1 or 2, the hit can feel socially loaded, like you need to prove immediately that you are not scared. Step back before answering. Use Q from range, let your minions punish their chase, and only add autos or E if their health and position become clearly bad for them."
       },
       {
         title: "Nasus or Swain is chasing you and turning feels safer than running.",
         response: "When Nasus, Swain, Volibear, or another sticky champion is walking you down, turning around can feel more controllable than continuing to run. Run first and make them waste time. Q only when there is space, use Exhaust or Flash if needed, and do not E into them unless they are basically dead. A slow expensive death is better than an instant free one."
+      },
+      {
+        title: "Your team is bad and farming alone starts feeling like the whole answer.",
+        response: "Safe gold matters, but safe gold still has to connect to fights. Farm only on your side of the map, with a path back, and without entering fog. Mid is usually safer than deep side lane because it is shorter, closer to teammates, and easier to retreat from. If enemies start grouping, hover toward team but stay on the edge. The missing piece is safe gold plus late entry: be close enough to clean up after big enemy spells fly."
+      },
+      {
+        title: "A good Samira game makes reckless Samira feel unlocked.",
+        response: "The lesson from S+ and A+ games is not that you are now allowed to E whenever. The lesson is that the boring rules caused the good game: Q a lot, save W for real danger, wait for enemy disadvantage, E only when real, R only when they are losing, stay near teammates, run when chased, and leave bad fights. A good game proves the blueprint; it does not remove the blueprint."
+      },
+      {
+        title: "Normals still feel like judgment even when you are improving.",
+        response: "Normals are reps, not a verdict. Getting poked is damage tolerance, dying is reset tolerance, getting baited is bait recognition, panicking is fighting-with-anxiety, remembering Q before E is Samira improvement, blocking one spell with W is huge, losing is exposure, and winning is confidence. The objective is making human games familiar enough that your hands can use the rules."
       },
       {
         title: "One hit lands and suddenly feels like proof the fight is doomed.",
@@ -634,13 +682,39 @@ let settleTimer = 0;
 let audioContext;
 let activeStinger;
 const fallbackAudioUrls = {};
+const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
-const stingerVersion = "20260518-phrase28";
+const stingerVersion = "20260518-cinematic39";
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
 ]));
+
+const visualDurations = {
+  samira: 6640,
+  caitlyn: 4750,
+  fizz: 3080,
+  kaisa: 6550,
+  missfortune: 5480,
+  ezreal: 6080,
+  jhin: 2750,
+  ashe: 5030,
+  rammus: 8000
+};
+
+const shaderSceneIds = {
+  default: 0,
+  samira: 1,
+  caitlyn: 2,
+  fizz: 3,
+  kaisa: 4,
+  missfortune: 5,
+  ezreal: 6,
+  jhin: 7,
+  ashe: 8,
+  rammus: 9
+};
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -672,6 +746,24 @@ function fxProfileFor(profileId = "default") {
     ...(fxProfiles[profileId] || {}),
     id: (fxProfiles[profileId] || defaultFxProfile).id || profileId
   };
+}
+
+function championById(championId) {
+  return champions.find((champion) => champion.id === championId) || champions[0];
+}
+
+function cinematicImageFor(championId, fallbackImage) {
+  const champion = championById(championId);
+  const url = champion.image.replace("/loading/", "/splash/");
+  if (!cinematicImageCache[url]) {
+    const image = new Image();
+    image.decoding = "async";
+    image.loading = "eager";
+    image.src = url;
+    cinematicImageCache[url] = image;
+  }
+  const cinematicImage = cinematicImageCache[url];
+  return cinematicImage.complete && cinematicImage.naturalWidth ? cinematicImage : fallbackImage;
 }
 
 function applyFxProfileVars(element, profile) {
@@ -1190,6 +1282,109 @@ function playSynthSelectSound(profileId = "default") {
   }
 }
 
+function playCinematicAccent(profileId = "default") {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+
+  const accents = {
+    samira: { low: 42, crack: 5200, swell: 0.62, hits: [0.18, 0.52, 0.86], texture: "metal", pan: [-0.48, 0.42, 0] },
+    caitlyn: { low: 38, crack: 7800, swell: 0.34, hits: [0.16, 0.74], texture: "rifle", pan: [0.18, -0.06] },
+    fizz: { low: 34, crack: 1200, swell: 0.86, hits: [0.08, 0.48], texture: "water", pan: [-0.24, 0.12] },
+    kaisa: { low: 36, crack: 6400, swell: 0.72, hits: [0.12, 0.62, 1.02], texture: "void", pan: [-0.18, 0.18, 0] },
+    missfortune: { low: 40, crack: 6900, swell: 0.42, hits: [0.2, 0.42], texture: "guns", pan: [-0.44, 0.44] },
+    ezreal: { low: 46, crack: 8200, swell: 0.58, hits: [0.16, 0.72], texture: "arcane", pan: [-0.32, 0.26] },
+    jhin: { low: 32, crack: 4600, swell: 0.76, hits: [0.24, 0.88], texture: "stage", pan: [0, 0] },
+    ashe: { low: 44, crack: 9600, swell: 0.64, hits: [0.18, 0.74], texture: "ice", pan: [-0.22, 0.18] },
+    rammus: { low: 28, crack: 860, swell: 0.9, hits: [0.1, 0.36, 0.64, 0.92], texture: "stone", pan: [-0.18, 0.12, -0.06, 0.16] },
+    default: { low: 38, crack: 5200, swell: 0.54, hits: [0.2, 0.62], texture: "impact", pan: [0, 0] }
+  };
+  const accent = accents[profileId] || accents.default;
+
+  try {
+    audioContext ||= new AudioContextClass();
+    if (audioContext.state === "suspended") audioContext.resume();
+    const now = audioContext.currentTime;
+    const output = audioContext.createGain();
+    const compressor = audioContext.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-18, now);
+    compressor.knee.setValueAtTime(18, now);
+    compressor.ratio.setValueAtTime(5, now);
+    compressor.attack.setValueAtTime(0.004, now);
+    compressor.release.setValueAtTime(0.22, now);
+    output.gain.setValueAtTime(0.88, now);
+    output.connect(compressor).connect(audioContext.destination);
+
+    const connect = (node, pan = 0) => {
+      if (audioContext.createStereoPanner) {
+        const panner = audioContext.createStereoPanner();
+        panner.pan.setValueAtTime(pan, now);
+        node.connect(panner).connect(output);
+      } else {
+        node.connect(output);
+      }
+    };
+
+    const playSub = (start, length, gainValue, frequency) => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(frequency, now + start);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(18, frequency * 0.46), now + start + length);
+      gain.gain.setValueAtTime(0.0001, now + start);
+      gain.gain.exponentialRampToValueAtTime(gainValue, now + start + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+      osc.connect(gain);
+      connect(gain);
+      osc.start(now + start);
+      osc.stop(now + start + length + 0.04);
+    };
+
+    const playNoise = (start, length, gainValue, filterType, startFrequency, endFrequency, pan = 0, curve = 1.2) => {
+      const frameCount = Math.floor(audioContext.sampleRate * length);
+      const buffer = audioContext.createBuffer(1, frameCount, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let index = 0; index < frameCount; index += 1) {
+        const progress = index / frameCount;
+        const attack = Math.min(1, progress / 0.08);
+        const release = (1 - progress) ** curve;
+        const texture =
+          accent.texture === "water" ? Math.sin(progress * 60) * 0.2 :
+          accent.texture === "stone" ? Math.sign(Math.sin(progress * 220)) * 0.1 :
+          accent.texture === "ice" ? Math.sin(progress * 420) * 0.1 :
+          0;
+        data[index] = ((Math.random() * 2 - 1) + texture) * attack * release;
+      }
+      const source = audioContext.createBufferSource();
+      const filter = audioContext.createBiquadFilter();
+      const gain = audioContext.createGain();
+      source.buffer = buffer;
+      filter.type = filterType;
+      filter.frequency.setValueAtTime(startFrequency, now + start);
+      filter.frequency.exponentialRampToValueAtTime(Math.max(40, endFrequency), now + start + length);
+      filter.Q.setValueAtTime(accent.texture === "rifle" ? 2.2 : 0.85, now + start);
+      gain.gain.setValueAtTime(0.0001, now + start);
+      gain.gain.exponentialRampToValueAtTime(gainValue, now + start + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+      source.connect(filter).connect(gain);
+      connect(gain, pan);
+      source.start(now + start);
+      source.stop(now + start + length + 0.04);
+    };
+
+    playNoise(0.02, 1.28, accent.swell * 0.18, accent.texture === "water" || accent.texture === "stone" ? "lowpass" : "bandpass", accent.crack, accent.texture === "ice" ? 2600 : 180, 0, 1.6);
+    accent.hits.forEach((start, index) => {
+      const pan = accent.pan[index] || 0;
+      playSub(start, 0.42, 0.24, accent.low + index * 4);
+      playNoise(start + 0.012, accent.texture === "rifle" ? 0.16 : 0.24, accent.texture === "rifle" ? 0.36 : 0.22, "highpass", accent.crack, accent.crack * 0.32, pan, 2.4);
+      if (accent.texture === "water") {
+        playNoise(start + 0.06, 0.58, 0.18, "bandpass", 520, 3600, pan, 1.3);
+      }
+    });
+  } catch {
+    // The licensed music remains the primary sound if the accent layer cannot play.
+  }
+}
+
 function playSelectSound(profileId = "default") {
   const stingerUrl = stingerUrls[profileId];
   if (!stingerUrl || !window.Audio) {
@@ -1212,6 +1407,7 @@ function playSelectSound(profileId = "default") {
         playSynthSelectSound(profileId);
       });
     }
+    playCinematicAccent(profileId);
   } catch {
     playSynthSelectSound(profileId);
   }
@@ -1243,15 +1439,624 @@ function easeInOutCubic(value) {
   return value < 0.5 ? 4 * value * value * value : 1 - ((-2 * value + 2) ** 3) / 2;
 }
 
-function drawCoverImage(ctx, image, width, height, opacity, scale = 1, xOffset = 0, yOffset = 0) {
-  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
+function smoothstep(edge0, edge1, value) {
+  const x = clamp((value - edge0) / (edge1 - edge0), 0, 1);
+  return x * x * (3 - 2 * x);
+}
+
+function sceneEnvelope(t, outStart = 0.78) {
+  return smoothstep(0, 0.08, t) * (1 - smoothstep(outStart, 1, t));
+}
+
+function drawRadialGlow(ctx, x, y, radius, stops, alpha = 1) {
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+  stops.forEach(([stop, color]) => gradient.addColorStop(stop, color));
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = gradient;
+  ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  ctx.restore();
+}
+
+function drawStreak(ctx, x1, y1, x2, y2, width, color, alpha = 1, blur = 16) {
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.shadowColor = color;
+  ctx.shadowBlur = blur;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawCurveStreak(ctx, points, width, color, alpha = 1, blur = 16) {
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.shadowColor = color;
+  ctx.shadowBlur = blur;
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1]);
+  if (points.length === 4) {
+    ctx.bezierCurveTo(points[1][0], points[1][1], points[2][0], points[2][1], points[3][0], points[3][1]);
+  } else if (points.length === 3) {
+    ctx.quadraticCurveTo(points[1][0], points[1][1], points[2][0], points[2][1]);
+  } else {
+    points.slice(1).forEach(([x, y]) => ctx.lineTo(x, y));
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawCinematicBackdrop(ctx, width, height, t, profile) {
+  const alpha = sceneEnvelope(t, 0.86);
+  const cx = width * (0.5 + Math.sin(t * 2.8) * 0.025);
+  const cy = height * (0.48 + Math.cos(t * 2.1) * 0.025);
+  ctx.save();
+  ctx.fillStyle = `rgba(${profile.dark}, ${0.04 + alpha * 0.09})`;
+  ctx.fillRect(0, 0, width, height);
+  ctx.globalCompositeOperation = "screen";
+  drawRadialGlow(ctx, cx, cy, Math.max(width, height) * 0.58, [
+    [0, `rgba(${profile.main}, .22)`],
+    [0.34, `rgba(${profile.secondary}, .11)`],
+    [0.72, `rgba(${profile.third}, .06)`],
+    [1, `rgba(${profile.main}, 0)`]
+  ], alpha);
+  const sweep = ctx.createLinearGradient(-width * 0.2, 0, width * 1.2, height);
+  sweep.addColorStop(0, `rgba(${profile.main}, 0)`);
+  sweep.addColorStop(0.44, `rgba(255, 252, 235, ${0.08 * alpha})`);
+  sweep.addColorStop(0.5, `rgba(${profile.main}, ${0.2 * alpha})`);
+  sweep.addColorStop(0.58, `rgba(${profile.secondary}, ${0.09 * alpha})`);
+  sweep.addColorStop(1, `rgba(${profile.third}, 0)`);
+  ctx.fillStyle = sweep;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+}
+
+function drawDepthDust(ctx, width, height, t, profile, count = 82, speed = 1) {
+  const alpha = sceneEnvelope(t, 0.9);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let index = 0; index < count; index += 1) {
+    const depth = 0.25 + seededUnit(index, 7.7) * 0.95;
+    const drift = ((t * speed * (0.16 + depth * 0.22) + seededUnit(index, 8.1)) % 1);
+    const side = seededUnit(index, 9.6) > 0.5 ? 1 : -1;
+    const x = width * (seededUnit(index, 2.4) + side * (drift - 0.5) * 0.22 * depth);
+    const y = height * ((seededUnit(index, 3.6) + drift * 0.42) % 1);
+    const radius = (1.1 + depth * 3.7) * (width < 700 ? 0.78 : 1);
+    const rgb = profile.sparkColors[index % profile.sparkColors.length] || profile.main;
+    ctx.globalAlpha = alpha * (0.035 + depth * 0.08);
+    ctx.shadowColor = `rgba(${rgb}, .6)`;
+    ctx.shadowBlur = 10 + depth * 12;
+    ctx.fillStyle = `rgba(${rgb}, .58)`;
+    ctx.beginPath();
+    ctx.ellipse(x, y, radius * (1 + depth * 0.8), radius, t * 4 + index, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawCameraShudder(ctx, width, height, t, profile) {
+  const pulse = smoothstep(0.16, 0.34, t) * (1 - smoothstep(0.72, 1, t));
+  if (!pulse) return;
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = pulse * 0.04;
+  const lineCount = 3;
+  for (let index = 0; index < lineCount; index += 1) {
+    const y = height * (0.2 + index * 0.14 + Math.sin(t * 10 + index) * 0.02);
+    const gradient = ctx.createLinearGradient(0, y, width, y);
+    gradient.addColorStop(0, `rgba(${profile.main}, 0)`);
+    gradient.addColorStop(0.5, `rgba(255, 252, 235, .8)`);
+    gradient.addColorStop(1, `rgba(${profile.secondary}, 0)`);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, y, width, 1.2 + index * 0.2);
+  }
+  ctx.restore();
+}
+
+const ultimateVertexShader = `
+attribute vec2 a_position;
+void main() {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}
+`;
+
+const ultimateFragmentShader = `
+precision highp float;
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform float u_progress;
+uniform int u_scene;
+uniform vec3 u_main;
+uniform vec3 u_secondary;
+uniform vec3 u_third;
+uniform vec3 u_dark;
+
+float hash21(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = hash21(i);
+  float b = hash21(i + vec2(1.0, 0.0));
+  float c = hash21(i + vec2(0.0, 1.0));
+  float d = hash21(i + vec2(1.0, 1.0));
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  mat2 rot = mat2(0.8, -0.6, 0.6, 0.8);
+  for (int i = 0; i < 5; i++) {
+    v += a * noise(p);
+    p = rot * p * 2.05 + 3.17;
+    a *= 0.5;
+  }
+  return v;
+}
+
+float sdSegment(vec2 p, vec2 a, vec2 b) {
+  vec2 pa = p - a;
+  vec2 ba = b - a;
+  float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+  return length(pa - ba * h);
+}
+
+mat2 rotate2d(float a) {
+  float s = sin(a);
+  float c = cos(a);
+  return mat2(c, -s, s, c);
+}
+
+float ring(float d, float r, float w) {
+  return 1.0 - smoothstep(w, w * 2.5, abs(d - r));
+}
+
+vec3 baseField(vec2 p, float fade) {
+  float mist = fbm(p * 2.0 + vec2(u_time * 0.045, -u_time * 0.026));
+  float aura = exp(-dot(p, p) * 2.0);
+  float edge = smoothstep(1.2, 0.1, length(p));
+  vec3 col = u_dark * 0.14 * edge;
+  col += u_main * aura * (0.2 + mist * 0.15);
+  col += u_secondary * exp(-length(p - vec2(0.22, -0.06)) * 2.8) * 0.13;
+  col += u_third * exp(-length(p + vec2(0.26, 0.12)) * 3.0) * 0.1;
+  return col * fade;
+}
+
+vec3 particleField(vec2 p, float fade, float speed) {
+  vec3 col = vec3(0.0);
+  for (int i = 0; i < 58; i++) {
+    float fi = float(i);
+    vec2 seed = vec2(hash21(vec2(fi, 1.7)), hash21(vec2(fi, 7.3)));
+    float depth = 0.3 + hash21(vec2(fi, 13.4)) * 1.4;
+    vec2 pos = vec2(seed.x * 2.4 - 1.2, seed.y * 1.8 - 0.9);
+    pos += vec2(sin(u_time * (0.24 + depth * 0.1) + fi), cos(u_time * (0.18 + depth * 0.08) + fi * 0.7)) * 0.08 * depth;
+    pos.y += mod(u_time * speed * (0.05 + depth * 0.05) + seed.x, 1.8) - 0.9;
+    float d = length(p - pos);
+    float spark = exp(-d * d * (190.0 / depth));
+    vec3 sparkColor = mix(u_main, mix(u_secondary, u_third, seed.y), seed.x);
+    col += sparkColor * spark * (0.05 + depth * 0.04);
+  }
+  return col * fade;
+}
+
+vec3 samiraFx(vec2 p, float fade) {
+  vec3 col = vec3(0.0);
+  float r = length(p);
+  float a = atan(p.y, p.x);
+  float heat = fbm(p * 4.8 + vec2(u_time * 0.28, -u_time * 0.12));
+  col += mix(u_secondary, u_main, heat) * exp(-r * 1.85) * (0.12 + 0.12 * sin(a * 3.0 + u_time * 1.4));
+  for (int i = 0; i < 7; i++) {
+    float fi = float(i);
+    float ang = u_time * 1.6 + fi * 0.9;
+    vec2 axis = vec2(cos(ang), sin(ang) * 0.55);
+    float d = sdSegment(p, axis * -0.72, axis * 0.72);
+    float slash = exp(-d * 34.0) * smoothstep(0.72, 0.0, abs(dot(p, normalize(axis.yx * vec2(-1.0, 1.0)))));
+    col += mix(u_main, u_secondary, mod(fi, 2.0)) * slash * (0.08 + 0.035 * sin(u_time * 7.0 + fi));
+  }
+  col += u_third * pow(max(0.0, 1.0 - r), 3.0) * 0.4;
+  return col * fade;
+}
+
+vec3 caitlynFx(vec2 p, float fade) {
+  vec3 col = vec3(0.0);
+  float r = length(p);
+  float a = atan(p.y, p.x);
+  float iris = 0.0;
+  for (int i = 0; i < 7; i++) {
+    float fi = float(i);
+    iris += ring(r, 0.18 + fi * 0.085 + sin(u_time * 0.7 + fi) * 0.004, 0.006 + fi * 0.001);
+  }
+  float ticks = smoothstep(0.96, 1.0, sin(a * 64.0 + u_time * 0.45));
+  col += u_main * iris * (0.34 + ticks * 0.18);
+  float cross = exp(-abs(p.x) * 110.0) + exp(-abs(p.y) * 110.0);
+  col += vec3(1.0, 0.94, 0.72) * cross * 0.08;
+  float shot = smoothstep(0.33, 0.47, u_progress) * (1.0 - smoothstep(0.72, 0.95, u_progress));
+  float beam = exp(-sdSegment(p, vec2(-1.15, -0.46), vec2(0.0, 0.0)) * 58.0);
+  col += vec3(1.0, 0.93, 0.72) * beam * shot * 0.75;
+  col += u_third * exp(-r * r * 18.0) * shot;
+  return col * fade;
+}
+
+vec3 fizzFx(vec2 p, float fade) {
+  vec3 col = vec3(0.0);
+  float water = fbm(p * vec2(3.0, 5.0) + vec2(u_time * 0.12, u_time * 0.04));
+  float caustic = pow(abs(sin((p.x + water * 0.18) * 18.0 + u_time * 1.6) * sin((p.y - water * 0.1) * 14.0 - u_time)), 7.0);
+  col += u_main * caustic * 0.34;
+  vec2 q = p - vec2(0.02, 0.14 - u_progress * 0.12);
+  q = rotate2d(-0.18 + sin(u_time * 0.5) * 0.05) * q;
+  float body = smoothstep(0.5, 0.0, length(q / vec2(0.82, 0.22)));
+  float tail = smoothstep(0.34, 0.0, length((q + vec2(0.64, -0.01)) / vec2(0.34, 0.2)));
+  float fin = smoothstep(0.26, 0.0, length((q + vec2(0.1, -0.22)) / vec2(0.15, 0.28)));
+  float shadow = max(body, max(tail * 0.7, fin * 0.6));
+  col += mix(u_dark * 0.4, u_main * 0.38, body) * shadow;
+  col += u_main * exp(-abs(q.y + 0.02) * 18.0) * smoothstep(-0.1, 0.64, q.x) * smoothstep(0.82, 0.15, q.x) * 0.22;
+  col += u_secondary * caustic * exp(-length(p - vec2(0.0, 0.12)) * 1.8) * 0.18;
+  return col * fade;
+}
+
+vec3 kaisaFx(vec2 p, float fade) {
+  vec2 q = p * rotate2d(u_time * 0.18);
+  float r = length(q);
+  float a = atan(q.y, q.x);
+  vec3 col = vec3(0.0);
+  float vortex = sin(a * 8.0 - r * 10.0 + u_time * 2.0);
+  col += mix(u_secondary, u_main, vortex * 0.5 + 0.5) * exp(-r * 2.2) * 0.36;
+  float diamond = abs(q.x) + abs(q.y) * 1.35;
+  col += u_third * (1.0 - smoothstep(0.42, 0.5, diamond)) * 0.32;
+  col += u_main * ring(diamond, 0.46 + sin(u_time) * 0.02, 0.02) * 0.62;
+  for (int i = 0; i < 5; i++) {
+    float fi = float(i);
+    float wing = exp(-sdSegment(p, vec2(0.0, 0.02), vec2(0.7, -0.45 + fi * 0.16)) * (24.0 - fi * 2.0));
+    wing += exp(-sdSegment(p, vec2(0.0, 0.02), vec2(-0.7, -0.45 + fi * 0.16)) * (24.0 - fi * 2.0));
+    col += mix(u_main, u_third, fi / 5.0) * wing * 0.11;
+  }
+  return col * fade;
+}
+
+vec3 missFortuneFx(vec2 p, float fade) {
+  vec3 col = vec3(0.0);
+  float left = exp(-sdSegment(p, vec2(-0.48, 0.65), vec2(-1.18, -0.34)) * 18.0);
+  float right = exp(-sdSegment(p, vec2(0.48, 0.65), vec2(1.18, -0.34)) * 18.0);
+  float smoke = fbm(p * 3.4 + vec2(0.0, -u_time * 0.28));
+  col += u_main * left * (0.28 + smoke * 0.18);
+  col += u_secondary * right * (0.3 + smoke * 0.16);
+  col += vec3(1.0, 0.78, 0.38) * exp(-length(p - vec2(-0.45, 0.48)) * 7.0) * 0.5;
+  col += vec3(1.0, 0.58, 0.58) * exp(-length(p - vec2(0.45, 0.48)) * 7.0) * 0.5;
+  for (int i = 0; i < 16; i++) {
+    float fi = float(i);
+    vec2 dir = vec2(sign(mod(fi, 2.0) - 0.5), -1.0);
+    vec2 start = vec2(dir.x * 0.45, 0.55);
+    vec2 end = start + normalize(vec2(dir.x * (0.55 + hash21(vec2(fi, 3.0)) * 0.4), -0.7)) * 1.3;
+    float tracer = exp(-sdSegment(p, start, end) * 55.0) * (0.4 + hash21(vec2(fi, 9.0)));
+    col += mix(u_main, u_secondary, mod(fi, 2.0)) * tracer * 0.08;
+  }
+  return col * fade;
+}
+
+vec3 ezrealFx(vec2 p, float fade) {
+  vec3 col = vec3(0.0);
+  vec2 start = vec2(-1.05, 0.68);
+  vec2 end = vec2(1.1, -0.62);
+  vec2 missile = mix(start, end, smoothstep(0.04, 0.82, u_progress));
+  float trail = exp(-sdSegment(p, start, missile) * 12.0);
+  float core = exp(-length(p - missile) * 9.0);
+  col += u_main * trail * 0.38 + u_secondary * trail * 0.16;
+  col += vec3(1.0, 0.96, 0.74) * core * 1.05;
+  col += u_third * exp(-length(p - missile) * 3.2) * 0.34;
+  for (int i = 0; i < 8; i++) {
+    float fi = float(i);
+    vec2 rune = mix(start, end, fract(u_progress * 1.6 - fi * 0.11));
+    float d = abs(abs((p.x - rune.x)) + abs((p.y - rune.y)) - 0.055);
+    col += mix(u_secondary, u_main, mod(fi, 2.0)) * (1.0 - smoothstep(0.0, 0.012, d)) * 0.16;
+  }
+  return col * fade;
+}
+
+vec3 jhinFx(vec2 p, float fade) {
+  vec3 col = vec3(0.0);
+  float spotlight = smoothstep(0.84, 0.08, abs(p.x * 0.34) + max(0.0, p.y + 0.08));
+  col += u_main * spotlight * 0.18;
+  vec2 q = p * rotate2d(u_time * 0.12);
+  float r = length(q);
+  float a = atan(q.y, q.x);
+  float aperture = smoothstep(0.88, 1.0, cos(a * 4.0 - u_time * 0.8)) * exp(-r * 1.6);
+  col += mix(u_secondary, u_main, smoothstep(0.0, 0.8, r)) * aperture * 0.45;
+  for (int i = 0; i < 38; i++) {
+    float fi = float(i);
+    vec2 seed = vec2(hash21(vec2(fi, 2.1)), hash21(vec2(fi, 6.4)));
+    vec2 pos = vec2(seed.x * 2.0 - 1.0, seed.y * 1.3 - 0.64);
+    pos += vec2(sin(u_time * 0.22 + fi), cos(u_time * 0.18 + fi)) * 0.06;
+    float petal = exp(-length(rotate2d(fi) * (p - pos)) * 18.0);
+    col += mix(u_secondary, u_main, seed.x) * petal * 0.045;
+  }
+  float shot = smoothstep(0.28, 0.38, u_progress) * (1.0 - smoothstep(0.72, 0.96, u_progress));
+  col += vec3(1.0, 0.9, 0.72) * exp(-abs(p.y) * 80.0) * shot * 0.26;
+  return col * fade;
+}
+
+vec3 asheFx(vec2 p, float fade) {
+  vec3 col = vec3(0.0);
+  vec2 start = vec2(-1.02, 0.22);
+  vec2 end = vec2(1.08, -0.2);
+  vec2 arrow = mix(start, end, smoothstep(0.03, 0.8, u_progress));
+  float path = exp(-sdSegment(p, start, arrow) * 18.0);
+  float head = exp(-length((p - arrow) / vec2(0.16, 0.08)) * 7.0);
+  col += u_main * path * 0.34 + vec3(1.0, 1.0, 1.0) * head * 0.82;
+  float frost = fbm(p * 7.0 - u_time * 0.08);
+  col += u_secondary * pow(frost, 5.0) * 0.34;
+  for (int i = 0; i < 10; i++) {
+    float fi = float(i);
+    float crack = exp(-sdSegment(p, arrow - vec2(fi * 0.05, 0.0), arrow - vec2(0.35 + fi * 0.06, (hash21(vec2(fi, 5.0)) - 0.5) * 0.32)) * 70.0);
+    col += vec3(0.82, 0.96, 1.0) * crack * 0.07;
+  }
+  return col * fade;
+}
+
+vec3 rammusFx(vec2 p, float fade) {
+  vec3 col = vec3(0.0);
+  vec2 center = vec2(-0.82 + u_progress * 1.7, 0.44 + sin(u_time * 0.6) * 0.04);
+  float d = length((p - center) / vec2(1.0, 0.45));
+  float wake = exp(-abs(d - (0.36 + u_progress * 0.34)) * 9.0) * smoothstep(0.95, 0.2, p.x - center.x);
+  col += mix(u_secondary, u_main, 0.42) * wake * 0.18;
+  float shell = exp(-length(p - center) * 6.0);
+  col += mix(u_main, u_third, 0.5) * shell * 0.58;
+  float dust = fbm((p - center) * 5.0 + vec2(-u_time * 0.4, u_time * 0.12));
+  col += u_secondary * dust * smoothstep(0.7, 0.1, abs(p.y - 0.58)) * 0.16;
+  return col * fade;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+  vec2 p = (uv - 0.5) * vec2(u_resolution.x / u_resolution.y, 1.0);
+  float fade = smoothstep(0.0, 0.05, u_progress) * (1.0 - smoothstep(0.9, 1.0, u_progress));
+  vec3 col = baseField(p, fade);
+  col += particleField(p, fade, 1.0);
+  if (u_scene == 1) col += samiraFx(p, fade);
+  else if (u_scene == 2) col += caitlynFx(p, fade);
+  else if (u_scene == 3) col += fizzFx(p, fade);
+  else if (u_scene == 4) col += kaisaFx(p, fade);
+  else if (u_scene == 5) col += missFortuneFx(p, fade);
+  else if (u_scene == 6) col += ezrealFx(p, fade);
+  else if (u_scene == 7) col += jhinFx(p, fade);
+  else if (u_scene == 8) col += asheFx(p, fade);
+  else if (u_scene == 9) col += rammusFx(p, fade);
+  float grain = hash21(gl_FragCoord.xy + floor(u_time * 60.0)) - 0.5;
+  col = col * 1.26 + grain * 0.025 * fade;
+  float alpha = clamp(max(max(col.r, col.g), col.b) * 0.86 + fade * 0.1, 0.0, 0.9);
+  gl_FragColor = vec4(col, alpha);
+}
+`;
+
+function compileShader(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.warn(gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
+  return shader;
+}
+
+function createUltimateShaderState(canvas) {
+  const gl = canvas.getContext("webgl", {
+    alpha: true,
+    antialias: true,
+    depth: false,
+    premultipliedAlpha: false,
+    preserveDrawingBuffer: false
+  });
+  if (!gl) return null;
+  const vertex = compileShader(gl, gl.VERTEX_SHADER, ultimateVertexShader);
+  const fragment = compileShader(gl, gl.FRAGMENT_SHADER, ultimateFragmentShader);
+  if (!vertex || !fragment) return null;
+  const program = gl.createProgram();
+  gl.attachShader(program, vertex);
+  gl.attachShader(program, fragment);
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.warn(gl.getProgramInfoLog(program));
+    return null;
+  }
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1, -1,
+    1, -1,
+    -1, 1,
+    -1, 1,
+    1, -1,
+    1, 1
+  ]), gl.STATIC_DRAW);
+  const position = gl.getAttribLocation(program, "a_position");
+  return {
+    gl,
+    program,
+    buffer,
+    position,
+    resolution: gl.getUniformLocation(program, "u_resolution"),
+    time: gl.getUniformLocation(program, "u_time"),
+    progress: gl.getUniformLocation(program, "u_progress"),
+    scene: gl.getUniformLocation(program, "u_scene"),
+    main: gl.getUniformLocation(program, "u_main"),
+    secondary: gl.getUniformLocation(program, "u_secondary"),
+    third: gl.getUniformLocation(program, "u_third"),
+    dark: gl.getUniformLocation(program, "u_dark")
+  };
+}
+
+function colorVector(value) {
+  return value.split(",").map((part) => Number(part.trim()) / 255);
+}
+
+function renderUltimateShader(state, profile, width, height, elapsed, duration, dpr) {
+  if (!state) return;
+  const { gl, program, buffer, position } = state;
+  const pixelWidth = Math.round(width * dpr);
+  const pixelHeight = Math.round(height * dpr);
+  if (gl.canvas.width !== pixelWidth || gl.canvas.height !== pixelHeight) {
+    gl.canvas.width = pixelWidth;
+    gl.canvas.height = pixelHeight;
+    gl.canvas.style.width = `${width}px`;
+    gl.canvas.style.height = `${height}px`;
+  }
+  const main = colorVector(profile.main);
+  const secondary = colorVector(profile.secondary);
+  const third = colorVector(profile.third);
+  const dark = colorVector(profile.dark);
+  gl.viewport(0, 0, pixelWidth, pixelHeight);
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.useProgram(program);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.enableVertexAttribArray(position);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  gl.uniform2f(state.resolution, pixelWidth, pixelHeight);
+  gl.uniform1f(state.time, elapsed / 1000);
+  gl.uniform1f(state.progress, clamp(elapsed / duration, 0, 1));
+  gl.uniform1i(state.scene, shaderSceneIds[profile.id] || 0);
+  gl.uniform3f(state.main, main[0], main[1], main[2]);
+  gl.uniform3f(state.secondary, secondary[0], secondary[1], secondary[2]);
+  gl.uniform3f(state.third, third[0], third[1], third[2]);
+  gl.uniform3f(state.dark, dark[0], dark[1], dark[2]);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
+function coverImageBox(image, width, height, scale = 1, xOffset = 0, yOffset = 0) {
   const ratio = Math.max(width / image.naturalWidth, height / image.naturalHeight) * scale;
   const drawWidth = image.naturalWidth * ratio;
   const drawHeight = image.naturalHeight * ratio;
+  return {
+    x: (width - drawWidth) / 2 + xOffset,
+    y: (height - drawHeight) / 2 + yOffset,
+    width: drawWidth,
+    height: drawHeight
+  };
+}
+
+function drawCoverImage(ctx, image, width, height, opacity, scale = 1, xOffset = 0, yOffset = 0) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
+  const box = coverImageBox(image, width, height, scale, xOffset, yOffset);
   ctx.save();
   ctx.globalAlpha = opacity;
-  ctx.filter = "blur(7px) saturate(1.28) contrast(1.05) brightness(.8)";
-  ctx.drawImage(image, (width - drawWidth) / 2 + xOffset, (height - drawHeight) / 2 + yOffset, drawWidth, drawHeight);
+  ctx.filter = "blur(14px) saturate(1.5) contrast(1.1) brightness(.54)";
+  ctx.drawImage(image, box.x, box.y, box.width, box.height);
+  ctx.restore();
+}
+
+function drawPortraitProjection(ctx, image, width, height, t, profile) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
+  const alpha = sceneEnvelope(t, 0.9);
+  const drift = Math.sin(t * 2.6) * width * 0.026;
+  const box = coverImageBox(
+    image,
+    width,
+    height,
+    1.03 + Math.sin(t * 1.8) * 0.012,
+    drift,
+    Math.cos(t * 2.2) * height * 0.016
+  );
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = alpha * 0.24;
+  ctx.filter = "blur(26px) saturate(1.44) contrast(1.2) brightness(.34)";
+  ctx.drawImage(image, box.x - box.width * 0.12, box.y - box.height * 0.08, box.width * 1.24, box.height * 1.16);
+  ctx.globalAlpha = alpha * 0.84;
+  ctx.filter = "blur(.4px) saturate(1.4) contrast(1.25) brightness(.76)";
+  ctx.drawImage(image, box.x, box.y, box.width, box.height);
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = alpha * 0.1;
+  ctx.filter = "blur(0px) saturate(1.72) contrast(1.22)";
+  ctx.drawImage(image, box.x + width * 0.014, box.y - height * 0.006, box.width, box.height);
+  ctx.globalAlpha = alpha * 0.16;
+  ctx.fillStyle = `rgba(${profile.main}, .18)`;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+}
+
+function drawArtworkParallaxRifts(ctx, image, width, height, t, profile) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
+  const alpha = sceneEnvelope(t, 0.88);
+  const box = coverImageBox(image, width, height, 1.08 + Math.sin(t * 1.4) * 0.01, 0, 0);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let index = 0; index < 7; index += 1) {
+    const start = index / 7;
+    const end = (index + 0.72) / 7;
+    const center = (start + end) * 0.5;
+    const skew = Math.sin(t * 4.2 + index * 1.7) * width * 0.014;
+    const sliceX = width * start;
+    const sliceWidth = width * (end - start);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(sliceX, 0, sliceWidth, height);
+    ctx.clip();
+    ctx.globalAlpha = alpha * (0.035 + index * 0.006);
+    ctx.filter = "blur(.2px) saturate(1.78) contrast(1.18) brightness(1.05)";
+    ctx.drawImage(
+      image,
+      box.x + skew + Math.cos(t * 2.5 + index) * width * 0.01,
+      box.y + Math.sin(t * 2.2 + index) * height * 0.006,
+      box.width,
+      box.height
+    );
+    const sweep = ctx.createLinearGradient(sliceX, 0, sliceX + sliceWidth, height);
+    sweep.addColorStop(0, `rgba(${profile.main}, 0)`);
+    sweep.addColorStop(0.52, `rgba(255, 252, 232, ${0.12 * alpha * (1 - Math.abs(center - 0.5))})`);
+    sweep.addColorStop(1, `rgba(${profile.secondary}, 0)`);
+    ctx.fillStyle = sweep;
+    ctx.fillRect(sliceX, 0, sliceWidth, height);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function drawCinematicLensPass(ctx, width, height, t, profile) {
+  const alpha = sceneEnvelope(t, 0.9);
+  const sweep = smoothstep(0.06, 0.74, t);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  const flareX = width * (-0.18 + sweep * 1.32);
+  const flareY = height * (0.28 + Math.sin(t * 2.4) * 0.08);
+  const flare = ctx.createLinearGradient(flareX - width * 0.28, flareY, flareX + width * 0.28, flareY);
+  flare.addColorStop(0, `rgba(${profile.main}, 0)`);
+  flare.addColorStop(0.46, `rgba(${profile.main}, ${0.14 * alpha})`);
+  flare.addColorStop(0.5, `rgba(255, 252, 232, ${0.4 * alpha})`);
+  flare.addColorStop(0.55, `rgba(${profile.secondary}, ${0.12 * alpha})`);
+  flare.addColorStop(1, `rgba(${profile.third}, 0)`);
+  ctx.fillStyle = flare;
+  ctx.filter = "blur(.4px)";
+  ctx.translate(0, flareY);
+  ctx.rotate(-0.08);
+  ctx.fillRect(flareX - width * 0.38, -height * 0.015, width * 0.76, height * 0.03);
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  const glaze = ctx.createLinearGradient(0, 0, width, height);
+  glaze.addColorStop(0, `rgba(255, 252, 232, ${0.03 * alpha})`);
+  glaze.addColorStop(0.48, "rgba(255,255,255,0)");
+  glaze.addColorStop(1, `rgba(${profile.dark}, ${0.18 * alpha})`);
+  ctx.fillStyle = glaze;
+  ctx.fillRect(0, 0, width, height);
   ctx.restore();
 }
 
@@ -1361,554 +2166,621 @@ function drawShardField(ctx, width, height, t, color, count = 12, direction = 1)
   ctx.restore();
 }
 
-function drawSharkScene(ctx, width, height, t) {
-  const rise = easeOutCubic(clamp((t - 0.12) / 0.58, 0, 1));
-  const settle = clamp((t - 0.68) / 0.28, 0, 1);
-  const x = width * (0.52 + Math.sin(t * 5.2) * 0.025);
-  const y = height * (1.16 - rise * 0.38 + settle * 0.04);
-  const size = Math.min(width, height) * (0.28 + rise * 0.1);
+function drawSharkScene(ctx, width, height, t, profile) {
+  const alpha = sceneEnvelope(t, 0.9);
+  const rise = easeOutCubic(clamp((t - 0.06) / 0.54, 0, 1));
+  const recoil = smoothstep(0.62, 0.88, t);
+  const x = width * (0.52 + Math.sin(t * 7.2) * 0.026);
+  const y = height * (1.02 - rise * 0.46 + recoil * 0.035);
+  const size = Math.min(width, height) * (0.46 + rise * 0.2);
 
   ctx.save();
-  const water = ctx.createLinearGradient(0, height * 0.48, 0, height);
-  water.addColorStop(0, "rgba(25, 110, 126, 0)");
-  water.addColorStop(0.62, "rgba(33, 153, 170, .22)");
-  water.addColorStop(1, "rgba(6, 48, 66, .42)");
+  const water = ctx.createLinearGradient(0, height * 0.42, 0, height);
+  water.addColorStop(0, "rgba(21, 103, 120, 0)");
+  water.addColorStop(0.5, `rgba(${profile.main}, ${0.18 * alpha})`);
+  water.addColorStop(1, `rgba(${profile.dark}, ${0.44 * alpha})`);
   ctx.fillStyle = water;
-  ctx.fillRect(0, height * 0.54, width, height * 0.46);
-
+  ctx.fillRect(0, height * 0.48, width, height * 0.52);
   ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = 0.2 + rise * 0.26;
-  for (let i = 0; i < 10; i += 1) {
-    const yy = height * (0.61 + i * 0.042) + Math.sin(t * 13 + i) * 7;
-    ctx.strokeStyle = i % 2 ? "rgba(184, 255, 250, .26)" : "rgba(255, 250, 220, .16)";
-    ctx.lineWidth = 1.4 + i * 0.32;
+
+  for (let i = 0; i < 13; i += 1) {
+    const yy = height * (0.57 + i * 0.038) + Math.sin(t * 15 + i) * (5 + i * 0.45);
+    const phase = t * (0.7 + i * 0.04);
+    ctx.globalAlpha = alpha * (0.11 + i * 0.014);
+    ctx.strokeStyle = i % 2 ? "rgba(222,255,251,.48)" : `rgba(${profile.main}, .35)`;
+    ctx.lineWidth = 1.2 + i * 0.26;
     ctx.beginPath();
     ctx.moveTo(-width * 0.1, yy);
-    ctx.bezierCurveTo(width * 0.28, yy - 28, width * 0.58, yy + 28, width * 1.1, yy - 8);
+    ctx.bezierCurveTo(width * (0.18 + phase * 0.05), yy - 38, width * 0.64, yy + 34, width * 1.12, yy - 10);
     ctx.stroke();
   }
 
-  for (let i = 0; i < 12; i += 1) {
-    const angle = -Math.PI * 0.74 + i * 0.14;
-    const length = size * (0.26 + (i % 3) * 0.08);
-    ctx.globalAlpha = rise * (0.18 + i * 0.012);
-    ctx.strokeStyle = i % 2 ? "rgba(218,255,250,.38)" : "rgba(95,201,218,.22)";
-    ctx.lineWidth = 2 + (i % 4);
-    ctx.beginPath();
-    ctx.moveTo(x + Math.cos(angle) * size * 0.28, y + Math.sin(angle) * size * 0.18);
-    ctx.quadraticCurveTo(
-      x + Math.cos(angle) * size * 0.42,
-      y + Math.sin(angle) * size * 0.1 - size * 0.12,
-      x + Math.cos(angle) * (size * 0.3 + length),
-      y + Math.sin(angle) * (size * 0.15 + length)
-    );
-    ctx.stroke();
+  for (let i = 0; i < 24; i += 1) {
+    const p = smoothstep(0.1, 0.72, t);
+    const angle = -Math.PI * 0.92 + i * 0.08 + Math.sin(i) * 0.06;
+    const length = size * (0.34 + seededUnit(i, 2.3) * 0.38) * p;
+    const sx = x + Math.cos(angle) * size * 0.1;
+    const sy = y + Math.sin(angle) * size * 0.08;
+    drawCurveStreak(ctx, [
+      [sx, sy],
+      [sx + Math.cos(angle) * length * 0.35, sy + Math.sin(angle) * length * 0.2 - size * 0.18],
+      [sx + Math.cos(angle) * length, sy + Math.sin(angle) * length]
+    ], 1.4 + seededUnit(i, 3.1) * 3.8, i % 2 ? "rgba(224,255,250,.62)" : `rgba(${profile.main}, .42)`, alpha * (0.16 + seededUnit(i, 4.2) * 0.26), 9);
   }
+  ctx.restore();
 
+  ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = 0.68 * rise;
-  ctx.translate(x - size * 0.16, y - size * 0.02);
-  ctx.rotate(-0.22 - rise * 0.18);
-  const shark = ctx.createLinearGradient(-size * 1.12, -size * 0.35, size * 1.12, size * 0.35);
-  shark.addColorStop(0, "rgba(7, 26, 35, .94)");
-  shark.addColorStop(0.45, "rgba(29, 82, 97, .92)");
-  shark.addColorStop(0.72, "rgba(95, 151, 159, .84)");
-  shark.addColorStop(1, "rgba(11, 42, 54, .95)");
+  ctx.globalAlpha = alpha * (0.76 + rise * 0.2);
+  ctx.filter = "blur(1.5px) saturate(1.24) contrast(1.18)";
+  ctx.translate(x - size * 0.12, y - size * 0.03);
+  ctx.rotate(-0.2 - rise * 0.2 + Math.sin(t * 5) * 0.025);
+  const shark = ctx.createLinearGradient(-size * 1.2, -size * 0.36, size * 1.16, size * 0.34);
+  shark.addColorStop(0, "rgba(0, 7, 14, .98)");
+  shark.addColorStop(0.38, "rgba(8, 44, 62, .94)");
+  shark.addColorStop(0.62, "rgba(96, 174, 184, .68)");
+  shark.addColorStop(1, "rgba(1, 12, 22, .98)");
   ctx.fillStyle = shark;
+  ctx.shadowColor = "rgba(102, 242, 255, .22)";
+  ctx.shadowBlur = 34;
   ctx.beginPath();
-  ctx.moveTo(size * 1.08, -size * 0.03);
-  ctx.bezierCurveTo(size * 0.72, -size * 0.38, -size * 0.18, -size * 0.4, -size * 0.92, -size * 0.18);
-  ctx.bezierCurveTo(-size * 1.14, -size * 0.12, -size * 1.18, size * 0.1, -size * 0.94, size * 0.18);
-  ctx.bezierCurveTo(-size * 0.12, size * 0.42, size * 0.72, size * 0.26, size * 1.08, -size * 0.03);
+  ctx.moveTo(size * 1.12, -size * 0.02);
+  ctx.bezierCurveTo(size * 0.68, -size * 0.46, -size * 0.22, -size * 0.45, -size * 0.98, -size * 0.2);
+  ctx.bezierCurveTo(-size * 1.22, -size * 0.1, -size * 1.22, size * 0.12, -size * 0.96, size * 0.2);
+  ctx.bezierCurveTo(-size * 0.22, size * 0.46, size * 0.76, size * 0.3, size * 1.12, -size * 0.02);
   ctx.fill();
+  ctx.shadowBlur = 0;
 
-  ctx.fillStyle = "rgba(5, 22, 30, .86)";
+  ctx.globalAlpha = alpha * 0.42;
+  ctx.fillStyle = "rgba(2, 12, 20, .72)";
   ctx.beginPath();
-  ctx.moveTo(-size * 0.96, -size * 0.08);
-  ctx.lineTo(-size * 1.42, -size * 0.46);
-  ctx.lineTo(-size * 1.26, -size * 0.04);
-  ctx.lineTo(-size * 1.42, size * 0.34);
-  ctx.lineTo(-size * 0.96, size * 0.12);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.fillStyle = "rgba(9, 38, 49, .9)";
-  ctx.beginPath();
-  ctx.moveTo(-size * 0.18, -size * 0.34);
-  ctx.lineTo(size * 0.08, -size * 0.74);
-  ctx.lineTo(size * 0.18, -size * 0.26);
+  ctx.moveTo(-size * 0.94, -size * 0.08);
+  ctx.lineTo(-size * 1.45, -size * 0.48);
+  ctx.lineTo(-size * 1.28, -size * 0.04);
+  ctx.lineTo(-size * 1.45, size * 0.36);
+  ctx.lineTo(-size * 0.94, size * 0.12);
   ctx.closePath();
   ctx.fill();
   ctx.beginPath();
-  ctx.moveTo(size * 0.1, size * 0.24);
-  ctx.lineTo(size * 0.42, size * 0.56);
-  ctx.lineTo(size * 0.22, size * 0.12);
+  ctx.moveTo(-size * 0.18, -size * 0.35);
+  ctx.lineTo(size * 0.12, -size * 0.82);
+  ctx.lineTo(size * 0.2, -size * 0.26);
   ctx.closePath();
   ctx.fill();
-
-  ctx.globalAlpha = 0.7 * rise;
-  ctx.fillStyle = "rgba(2, 14, 20, .82)";
   ctx.beginPath();
-  ctx.moveTo(size * 0.72, size * 0.06);
-  ctx.quadraticCurveTo(size * 0.9, size * 0.14, size * 1.05, -size * 0.01);
-  ctx.quadraticCurveTo(size * 0.86, size * 0.22, size * 0.58, size * 0.2);
+  ctx.moveTo(size * 0.08, size * 0.24);
+  ctx.lineTo(size * 0.46, size * 0.62);
+  ctx.lineTo(size * 0.23, size * 0.11);
   ctx.closePath();
   ctx.fill();
 
-  ctx.globalAlpha = 0.78 * rise;
-  ctx.fillStyle = "rgba(255,255,245,.78)";
-  for (let i = 0; i < 6; i += 1) {
-    const tx = size * (0.64 + i * 0.054);
+  ctx.filter = "blur(1.8px)";
+  ctx.globalAlpha = alpha * 0.68;
+  ctx.fillStyle = "rgba(0, 6, 12, .94)";
+  ctx.beginPath();
+  ctx.moveTo(size * 0.7, size * 0.04);
+  ctx.quadraticCurveTo(size * 0.94, size * 0.14, size * 1.08, -size * 0.01);
+  ctx.quadraticCurveTo(size * 0.86, size * 0.25, size * 0.55, size * 0.21);
+  ctx.closePath();
+  ctx.fill();
+  ctx.filter = "blur(.4px)";
+  ctx.globalAlpha = alpha * 0.8;
+  ctx.strokeStyle = "rgba(234,255,250,.9)";
+  ctx.lineWidth = Math.max(1.2, size * 0.008);
+  ctx.beginPath();
+  ctx.moveTo(size * 0.56, size * 0.13);
+  ctx.quadraticCurveTo(size * 0.78, size * 0.24, size * 1.0, size * 0.02);
+  ctx.stroke();
+  ctx.fillStyle = "rgba(225,255,250,.95)";
+  ctx.beginPath();
+  ctx.arc(size * 0.61, -size * 0.14, size * 0.025, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalCompositeOperation = "screen";
+  for (let tooth = 0; tooth < 9; tooth += 1) {
+    const tx = size * (0.54 + tooth * 0.047);
+    const ty = size * (0.1 + Math.sin(tooth) * 0.018);
+    ctx.globalAlpha = alpha * (0.22 + rise * 0.2);
+    ctx.fillStyle = "rgba(238,255,250,.82)";
     ctx.beginPath();
-    ctx.moveTo(tx, size * 0.09);
-    ctx.lineTo(tx + size * 0.025, size * 0.18);
-    ctx.lineTo(tx - size * 0.02, size * 0.17);
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx + size * 0.018, ty + size * 0.055);
+    ctx.lineTo(tx - size * 0.012, ty + size * 0.05);
     ctx.closePath();
     ctx.fill();
   }
-
-  ctx.globalAlpha = 0.55 * rise;
-  ctx.strokeStyle = "rgba(201, 244, 241, .42)";
-  ctx.lineWidth = 1.4;
-  for (let i = 0; i < 4; i += 1) {
-    ctx.beginPath();
-    ctx.moveTo(size * (0.38 + i * 0.045), -size * 0.15);
-    ctx.lineTo(size * (0.34 + i * 0.045), size * 0.1);
-    ctx.stroke();
-  }
-  ctx.fillStyle = "rgba(222,255,248,.8)";
-  ctx.beginPath();
-  ctx.arc(size * 0.62, -size * 0.14, size * 0.026, 0, Math.PI * 2);
-  ctx.fill();
-
   ctx.restore();
-  ctx.save();
-  ctx.globalCompositeOperation = "screen";
-  ctx.globalAlpha = 0.28 * rise;
-  fillRadial(ctx, x, y - size * 0.08, size * 0.04, size * 0.72, [
-    [0, "rgba(151,250,255,.56)"],
-    [0.46, "rgba(63,187,205,.16)"],
-    [1, "rgba(63,187,205,0)"]
-  ]);
-  ctx.restore();
+
+  drawRadialGlow(ctx, x, y - size * 0.1, size * 0.82, [
+    [0, "rgba(151,250,255,.7)"],
+    [0.34, `rgba(${profile.main}, .24)`],
+    [1, `rgba(${profile.main}, 0)`]
+  ], alpha * 0.72);
 }
 
-function drawCaitlynScene(ctx, width, height, t) {
-  const lock = easeInOutCubic(clamp(t / 0.48, 0, 1));
-  const shot = easeOutCubic(clamp((t - 0.42) / 0.18, 0, 1));
+function drawCaitlynScene(ctx, width, height, t, profile) {
+  const lock = easeInOutCubic(clamp(t / 0.5, 0, 1));
+  const shot = easeOutCubic(clamp((t - 0.44) / 0.22, 0, 1));
+  const fade = sceneEnvelope(t, 0.9);
   const cx = width * 0.5;
   const cy = height * 0.5;
-  const radius = Math.min(width, height) * (0.34 + lock * 0.08);
+  const radius = Math.min(width, height) * (0.3 + lock * 0.12);
 
+  drawDepthDust(ctx, width, height, t, profile, 46, 0.7);
   ctx.save();
-  ctx.fillStyle = `rgba(9, 8, 11, ${0.16 + lock * 0.24})`;
+  ctx.fillStyle = `rgba(5, 5, 8, ${0.22 * lock * fade})`;
   ctx.fillRect(0, 0, width, height);
-  drawAtmosphericDust(ctx, width, height, t, "rgba(255, 226, 151, .38)", 28, lock);
-  ctx.strokeStyle = "rgba(255, 229, 150, .82)";
-  ctx.lineWidth = Math.max(1.5, width * 0.002);
-  for (let i = 0; i < 3; i += 1) {
-    ctx.globalAlpha = (0.62 - i * 0.14) * lock;
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius * (1 + i * 0.24), 0, Math.PI * 2);
-    ctx.stroke();
-  }
-  for (let index = 0; index < 48; index += 1) {
-    const angle = (index / 48) * Math.PI * 2;
-    const inner = radius * (0.94 + (index % 4 === 0 ? 0.08 : 0.02));
-    const outer = radius * (1.02 + (index % 4 === 0 ? 0.16 : 0.08));
-    ctx.globalAlpha = lock * (index % 4 === 0 ? 0.5 : 0.22);
-    ctx.beginPath();
-    ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
-    ctx.lineTo(cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer);
-    ctx.stroke();
-  }
-  drawArcRibbon(ctx, cx, cy, radius * 1.42, Math.PI * 1.1, Math.PI * 1.86, 2, "rgba(255, 248, 205, .74)", lock * 0.5);
-  drawArcRibbon(ctx, cx, cy, radius * 0.62, Math.PI * -0.12, Math.PI * 0.62, 3, "rgba(129, 226, 214, .44)", lock * 0.38);
-  ctx.globalAlpha = lock;
-  ctx.beginPath();
-  ctx.moveTo(cx - radius * 1.35, cy);
-  ctx.lineTo(cx - radius * 0.18, cy);
-  ctx.moveTo(cx + radius * 0.18, cy);
-  ctx.lineTo(cx + radius * 1.35, cy);
-  ctx.moveTo(cx, cy - radius * 1.35);
-  ctx.lineTo(cx, cy - radius * 0.18);
-  ctx.moveTo(cx, cy + radius * 0.18);
-  ctx.lineTo(cx, cy + radius * 1.35);
-  ctx.stroke();
-
-  if (shot > 0) {
-    ctx.globalAlpha = 0.96 * (1 - clamp((t - 0.62) / 0.4, 0, 1));
-    ctx.strokeStyle = "rgba(255, 251, 230, .98)";
-    ctx.lineWidth = Math.max(3, width * 0.004);
-    ctx.beginPath();
-    ctx.moveTo(width * (-0.15 + shot * 0.38), height * 0.18);
-    ctx.lineTo(cx, cy);
-    ctx.stroke();
-    fillRadial(ctx, cx, cy, 0, radius * (0.12 + shot * 0.36), [
-      [0, "rgba(255,252,232,.95)"],
-      [0.25, "rgba(255,211,113,.55)"],
-      [1, "rgba(255,211,113,0)"]
-    ]);
-    drawCracks(ctx, cx, cy, radius * 1.2, 12, shot, "rgba(255,246,218,.48)");
-    drawCracks(ctx, cx, cy, radius * 0.7, 7, shot, "rgba(104,221,212,.34)");
-  }
-  ctx.restore();
-}
-
-function drawEzrealScene(ctx, width, height, t) {
-  const travel = easeInOutCubic(clamp((t - 0.04) / 0.78, 0, 1));
-  const x = width * (-0.18 + travel * 1.48);
-  const y = height * (1.08 - travel * 1.16);
-  ctx.save();
-  drawAtmosphericDust(ctx, width, height, t, "rgba(96, 214, 255, .42)", 44, 0.9);
-  ctx.globalCompositeOperation = "screen";
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  drawArcRibbon(ctx, width * 0.08, height * 0.88, Math.min(width, height) * 0.18, -0.8, 1.2, 2.5, "rgba(255, 230, 132, .44)", 0.55);
-  drawArcRibbon(ctx, width * 0.08, height * 0.88, Math.min(width, height) * 0.25, -0.6, 1.0, 1.8, "rgba(83, 225, 255, .42)", 0.48);
-  for (let i = 0; i < 9; i += 1) {
-    const back = i * 44 * (width / 1280 + 0.55);
-    ctx.globalAlpha = 0.12 + (9 - i) * 0.045;
-    ctx.strokeStyle = i % 2 ? "rgba(93,214,255,.75)" : "rgba(255,224,117,.62)";
-    ctx.lineWidth = 6 + i * 3.8;
-    ctx.shadowColor = i % 2 ? "rgba(95, 224, 255, .48)" : "rgba(255, 229, 130, .4)";
-    ctx.shadowBlur = 16 + i * 3;
-    ctx.beginPath();
-    ctx.moveTo(x - back, y + back * 0.7);
-    ctx.bezierCurveTo(
-      x - back - width * 0.14,
-      y + back * 0.7 + height * 0.05 + Math.sin(i + t * 8) * 16,
-      x - back - width * 0.28,
-      y + back * 0.7 + height * 0.2,
-      x - back - width * 0.42,
-      y + back * 0.7 + height * 0.34
-    );
-    ctx.stroke();
-  }
-  ctx.shadowBlur = 0;
-  ctx.globalAlpha = 1;
-  fillRadial(ctx, x, y, 0, Math.min(width, height) * 0.22, [
-    [0, "rgba(255,252,232,1)"],
-    [0.18, "rgba(111,225,255,.82)"],
-    [0.56, "rgba(96,106,255,.26)"],
-    [1, "rgba(96,106,255,0)"]
-  ]);
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(-0.7);
-  const headGradient = ctx.createLinearGradient(-72, 0, 96, 0);
-  headGradient.addColorStop(0, "rgba(86, 195, 255, 0)");
-  headGradient.addColorStop(0.46, "rgba(88, 222, 255, .62)");
-  headGradient.addColorStop(0.72, "rgba(255, 247, 203, .98)");
-  headGradient.addColorStop(1, "rgba(255, 255, 255, .88)");
-  ctx.fillStyle = headGradient;
-  ctx.globalAlpha = 0.92;
-  ctx.beginPath();
-  ctx.moveTo(106, 0);
-  ctx.bezierCurveTo(42, -36, -44, -30, -84, 0);
-  ctx.bezierCurveTo(-42, 30, 42, 36, 106, 0);
-  ctx.fill();
-  ctx.restore();
-  ctx.globalAlpha = 0.58;
-  ctx.strokeStyle = "rgba(255, 245, 185, .72)";
-  ctx.lineWidth = 1.6;
-  for (let index = 0; index < 5; index += 1) {
-    const offset = index * 42;
-    ctx.save();
-    ctx.translate(x - offset * 0.45, y + offset * 0.34);
-    ctx.rotate(-0.72);
-    ctx.beginPath();
-    ctx.moveTo(0, -22);
-    ctx.lineTo(22, 0);
-    ctx.lineTo(0, 22);
-    ctx.lineTo(-22, 0);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
-  }
-  ctx.restore();
-}
-
-function drawSamiraScene(ctx, width, height, t) {
-  const p = easeOutCubic(clamp(t / 0.72, 0, 1));
-  const cx = width * 0.5;
-  const cy = height * 0.52;
-  const r = Math.min(width, height) * (0.24 + p * 0.16);
-  ctx.save();
-  drawAtmosphericDust(ctx, width, height, t, "rgba(255, 102, 146, .36)", 42, 0.95);
-  ctx.globalCompositeOperation = "screen";
-  for (let i = 0; i < 10; i += 1) {
-    const a = t * 10 + i * 0.63;
-    const x = cx + Math.cos(a) * r * (1 + i * 0.018);
-    const y = cy + Math.sin(a) * r * 0.62;
-    ctx.strokeStyle = i % 2 ? "rgba(255,200,104,.76)" : "rgba(255,92,151,.7)";
-    ctx.lineWidth = 2.2 + i * 0.16;
-    ctx.beginPath();
-    ctx.moveTo(x - Math.cos(a) * 80, y - Math.sin(a) * 44);
-    ctx.lineTo(x + Math.cos(a) * 120, y + Math.sin(a) * 60);
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 0.82 * p;
-  ctx.strokeStyle = "rgba(255,249,226,.9)";
-  ctx.lineWidth = Math.max(4, width * 0.006);
-  ctx.beginPath();
-  ctx.moveTo(width * 0.16, height * 0.3);
-  ctx.bezierCurveTo(width * 0.34, height * 0.2, width * 0.66, height * 0.82, width * 0.86, height * 0.68);
-  ctx.stroke();
-  for (let index = 0; index < 14; index += 1) {
-    const a = t * 8 + index * 0.45;
-    const bx = cx + Math.cos(a) * r * 0.9;
-    const by = cy + Math.sin(a) * r * 0.52;
-    ctx.save();
-    ctx.translate(bx, by);
-    ctx.rotate(a + Math.PI * 0.5);
-    ctx.globalAlpha = 0.28 + (index % 3) * 0.08;
-    ctx.fillStyle = index % 2 ? "rgba(255, 232, 160, .66)" : "rgba(255, 72, 132, .52)";
-    ctx.fillRect(-3, -18, 6, 36);
-    ctx.restore();
-  }
-  ctx.restore();
-}
-
-function drawKaisaScene(ctx, width, height, t) {
-  const open = easeInOutCubic(clamp(t / 0.68, 0, 1));
-  const cx = width * 0.5;
-  const cy = height * 0.48;
-  const size = Math.min(width, height) * (0.18 + open * 0.38);
-  ctx.save();
-  drawAtmosphericDust(ctx, width, height, t, "rgba(241, 112, 232, .4)", 40, 0.9);
   ctx.globalCompositeOperation = "screen";
   ctx.translate(cx, cy);
-  ctx.rotate((t * 2.4 + 0.4) * Math.PI);
-  const gradient = ctx.createLinearGradient(-size, -size, size, size);
-  gradient.addColorStop(0, "rgba(255,123,230,.84)");
-  gradient.addColorStop(0.5, "rgba(118,129,255,.58)");
-  gradient.addColorStop(1, "rgba(104,242,224,.64)");
-  ctx.fillStyle = gradient;
+  ctx.rotate((1 - lock) * -0.3 + t * 0.08);
+  for (let i = 0; i < 5; i += 1) {
+    const ring = radius * (0.72 + i * 0.2 + Math.sin(t * 4 + i) * 0.012);
+    ctx.globalAlpha = fade * lock * (0.48 - i * 0.055);
+    ctx.strokeStyle = i % 2 ? `rgba(${profile.third}, .76)` : `rgba(${profile.main}, .86)`;
+    ctx.lineWidth = 1.2 + i * 0.32;
+    ctx.beginPath();
+    ctx.arc(0, 0, ring, 0.18 + i * 0.2, Math.PI * 2 - 0.18);
+    ctx.stroke();
+  }
+  for (let index = 0; index < 64; index += 1) {
+    const angle = (index / 64) * Math.PI * 2;
+    const long = index % 8 === 0;
+    const inner = radius * (0.82 + (long ? 0.06 : 0.02));
+    const outer = radius * (0.96 + (long ? 0.22 : 0.08));
+    ctx.globalAlpha = fade * lock * (long ? 0.5 : 0.16);
+    ctx.strokeStyle = long ? "rgba(255,249,226,.9)" : `rgba(${profile.main}, .58)`;
+    ctx.lineWidth = long ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+    ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = fade * lock * 0.94;
+  ctx.strokeStyle = "rgba(255,251,230,.92)";
+  ctx.lineWidth = Math.max(1.4, width * 0.0018);
   ctx.beginPath();
-  ctx.moveTo(0, -size);
-  ctx.lineTo(size * 0.42, -size * 0.16);
-  ctx.lineTo(size, 0);
-  ctx.lineTo(size * 0.42, size * 0.16);
-  ctx.lineTo(0, size);
-  ctx.lineTo(-size * 0.42, size * 0.16);
-  ctx.lineTo(-size, 0);
-  ctx.lineTo(-size * 0.42, -size * 0.16);
-  ctx.closePath();
-  ctx.fill();
+  ctx.moveTo(-radius * 1.35, 0);
+  ctx.lineTo(-radius * 0.16, 0);
+  ctx.moveTo(radius * 0.16, 0);
+  ctx.lineTo(radius * 1.35, 0);
+  ctx.moveTo(0, -radius * 1.35);
+  ctx.lineTo(0, -radius * 0.16);
+  ctx.moveTo(0, radius * 0.16);
+  ctx.lineTo(0, radius * 1.35);
+  ctx.stroke();
   ctx.restore();
-  ctx.save();
-  ctx.globalCompositeOperation = "screen";
-  for (let index = 0; index < 4; index += 1) {
-    ctx.globalAlpha = 0.22 + index * 0.06;
-    ctx.strokeStyle = index % 2 ? "rgba(255,132,235,.54)" : "rgba(95,244,224,.44)";
-    ctx.lineWidth = 3 + index * 1.8;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, size * (0.8 + index * 0.2), size * (0.24 + index * 0.09), t * 3 + index * 0.6, 0, Math.PI * 2);
-    ctx.stroke();
+
+  if (shot > 0) {
+    const tail = 1 - smoothstep(0.7, 0.98, t);
+    drawStreak(ctx, width * (-0.22 + shot * 0.58), height * 0.18, cx, cy, Math.max(5, width * 0.006), "rgba(255,252,232,.98)", tail, 22);
+    drawStreak(ctx, width * (-0.3 + shot * 0.62), height * 0.2, cx, cy, Math.max(12, width * 0.012), `rgba(${profile.main}, .42)`, tail * 0.75, 34);
+    drawRadialGlow(ctx, cx, cy, radius * (0.2 + shot * 0.54), [
+      [0, "rgba(255,252,232,.98)"],
+      [0.22, `rgba(${profile.main}, .62)`],
+      [0.64, `rgba(${profile.third}, .18)`],
+      [1, `rgba(${profile.main}, 0)`]
+    ], tail);
+    drawCracks(ctx, cx, cy, radius * 1.22, 16, shot, "rgba(255,246,218,.52)");
+    drawCracks(ctx, cx, cy, radius * 0.76, 9, shot, `rgba(${profile.third}, .36)`);
   }
-  drawShardField(ctx, width, height, t, "rgba(255, 140, 241, .34)", 14, 1);
-  for (let i = 0; i < 6; i += 1) {
-    const a = -0.8 + i * 0.32;
-    const x = width * (0.05 + open * 0.7) + i * width * 0.035;
-    const y = height * (0.78 - i * 0.1);
-    ctx.strokeStyle = i % 2 ? "rgba(245,120,224,.54)" : "rgba(97,233,220,.48)";
-    ctx.lineWidth = 8 - i * 0.5;
-    ctx.beginPath();
-    ctx.moveTo(x - 260, y + 180);
-    ctx.lineTo(x + Math.cos(a) * width * 0.7, y + Math.sin(a) * height * 0.6);
-    ctx.stroke();
-  }
-  ctx.restore();
 }
 
-function drawMissFortuneScene(ctx, width, height, t) {
-  const fire = easeOutCubic(clamp((t - 0.1) / 0.62, 0, 1));
+function drawEzrealScene(ctx, width, height, t, profile) {
+  const travel = easeInOutCubic(clamp((t - 0.02) / 0.82, 0, 1));
+  const fade = sceneEnvelope(t, 0.9);
+  const x = width * (-0.18 + travel * 1.52);
+  const y = height * (1.08 - travel * 1.17);
+  const angle = -0.72;
+  drawDepthDust(ctx, width, height, t, profile, 68, 1.4);
   ctx.save();
-  drawAtmosphericDust(ctx, width, height, t, "rgba(255, 190, 126, .38)", 34, 0.85);
   ctx.globalCompositeOperation = "screen";
-  [["rgba(255,193,87,.72)", width * 0.28], ["rgba(238,79,108,.66)", width * 0.72]].forEach(([color, x], index) => {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(x, height * 0.92);
-    ctx.lineTo(width * (index ? 1.08 : -0.08), height * (0.36 - fire * 0.16));
-    ctx.lineTo(width * (index ? 0.58 : 0.42), height * (0.46 - fire * 0.08));
-    ctx.closePath();
-    ctx.fill();
-  });
-  for (let i = 0; i < 20; i += 1) {
-    const x = width * (0.1 + ((i * 41) % 80) / 100);
-    const y = height * (0.2 + ((i * 23) % 70) / 100);
-    ctx.strokeStyle = "rgba(255,244,204,.54)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + (i % 2 ? 80 : -80), y - 140 * fire);
-    ctx.stroke();
+  for (let i = 0; i < 11; i += 1) {
+    const back = i * (36 + width * 0.012);
+    const wobble = Math.sin(t * 11 + i) * (8 + i * 1.4);
+    const sx = x - back;
+    const sy = y + back * 0.68 + wobble;
+    drawCurveStreak(ctx, [
+      [sx, sy],
+      [sx - width * 0.1, sy + height * 0.03],
+      [sx - width * 0.24, sy + height * 0.18],
+      [sx - width * 0.4, sy + height * 0.32]
+    ], 5 + i * 2.5, i % 2 ? `rgba(${profile.main}, .74)` : `rgba(${profile.secondary}, .66)`, fade * (0.11 + (11 - i) * 0.036), 20 + i * 2);
   }
-  for (let index = 0; index < 12; index += 1) {
-    const x = width * (0.18 + seededUnit(index, 2) * 0.64);
-    const y = height * (0.24 + seededUnit(index, 3) * 0.44 + fire * 0.08);
+  drawRadialGlow(ctx, x, y, Math.min(width, height) * 0.27, [
+    [0, "rgba(255,252,232,1)"],
+    [0.2, `rgba(${profile.main}, .86)`],
+    [0.52, `rgba(${profile.third}, .28)`],
+    [1, `rgba(${profile.main}, 0)`]
+  ], fade);
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  const headGradient = ctx.createLinearGradient(-110, 0, 130, 0);
+  headGradient.addColorStop(0, `rgba(${profile.main}, 0)`);
+  headGradient.addColorStop(0.44, `rgba(${profile.main}, .7)`);
+  headGradient.addColorStop(0.7, "rgba(255, 248, 203, .98)");
+  headGradient.addColorStop(1, "rgba(255, 255, 255, .9)");
+  ctx.fillStyle = headGradient;
+  ctx.globalAlpha = fade * 0.95;
+  ctx.shadowColor = `rgba(${profile.main}, .72)`;
+  ctx.shadowBlur = 28;
+  ctx.beginPath();
+  ctx.moveTo(136, 0);
+  ctx.bezierCurveTo(52, -42, -68, -34, -108, 0);
+  ctx.bezierCurveTo(-62, 36, 52, 42, 136, 0);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  for (let index = 0; index < 6; index += 1) {
+    const offset = index * 52;
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(0.9 + seededUnit(index, 5) * 0.8);
-    ctx.globalAlpha = 0.18 + seededUnit(index, 6) * 0.18;
-    ctx.fillStyle = "rgba(255, 231, 168, .72)";
-    ctx.fillRect(-4, -14, 8, 28);
+    ctx.translate(-offset * 0.52, offset * 0.1);
+    ctx.rotate(index * 0.2 + t * 3);
+    ctx.globalAlpha = fade * (0.2 + index * 0.04);
+    ctx.strokeStyle = index % 2 ? `rgba(${profile.secondary}, .78)` : "rgba(255,245,185,.78)";
+    ctx.lineWidth = 1.4 + index * 0.2;
+    ctx.beginPath();
+    ctx.moveTo(0, -24);
+    ctx.lineTo(24, 0);
+    ctx.lineTo(0, 24);
+    ctx.lineTo(-24, 0);
+    ctx.closePath();
+    ctx.stroke();
     ctx.restore();
   }
   ctx.restore();
 }
 
-function drawJhinScene(ctx, width, height, t) {
+function drawSamiraScene(ctx, width, height, t, profile) {
+  const p = easeOutCubic(clamp(t / 0.76, 0, 1));
+  const fade = sceneEnvelope(t, 0.9);
+  const cx = width * 0.5;
+  const cy = height * 0.52;
+  const r = Math.min(width, height) * (0.21 + p * 0.19);
+  drawDepthDust(ctx, width, height, t, profile, 54, 1.55);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let ring = 0; ring < 2; ring += 1) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(t * (4.2 + ring * 0.8) + ring * 1.4);
+    ctx.globalAlpha = fade * (0.045 - ring * 0.012);
+    ctx.strokeStyle = ring % 2 ? `rgba(${profile.main}, .82)` : `rgba(${profile.secondary}, .82)`;
+    ctx.lineWidth = 1.4 + ring * 0.7;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * (1.05 + ring * 0.16), r * (0.38 + ring * 0.06), 0, 0.08, Math.PI * 1.28);
+    ctx.stroke();
+    ctx.restore();
+  }
+  for (let i = 0; i < 11; i += 1) {
+    const a = t * 12 + i * 0.42;
+    const radius = r * (0.62 + seededUnit(i, 2) * 0.64);
+    const x = cx + Math.cos(a) * radius;
+    const y = cy + Math.sin(a) * radius * 0.56;
+    drawStreak(
+      ctx,
+      x - Math.cos(a) * (70 + i * 4),
+      y - Math.sin(a) * (38 + i * 2),
+      x + Math.cos(a) * (120 + i * 5),
+      y + Math.sin(a) * (60 + i * 3),
+      1.4 + seededUnit(i, 6) * 3.4,
+      i % 2 ? `rgba(${profile.main}, .88)` : `rgba(${profile.secondary}, .82)`,
+      fade * (0.075 + seededUnit(i, 7) * 0.11),
+      15
+    );
+  }
+  for (let i = 0; i < 4; i += 1) {
+    const a = -0.7 + i * 0.28 + Math.sin(t * 5) * 0.05;
+    const mx = cx + Math.cos(a) * r * 0.8;
+    const my = cy + Math.sin(a) * r * 0.3;
+    drawStreak(ctx, mx, my, mx + Math.cos(a) * width * 0.34, my + Math.sin(a) * height * 0.22, 5 + i * 0.7, "rgba(255,246,212,.64)", fade * (0.05 + i * 0.012), 20);
+  }
+  drawRadialGlow(ctx, cx, cy, r * 1.1, [
+    [0, "rgba(255, 252, 232, .32)"],
+    [0.28, `rgba(${profile.secondary}, .18)`],
+    [0.68, `rgba(${profile.main}, .08)`],
+    [1, `rgba(${profile.main}, 0)`]
+  ], fade * 0.58);
+  ctx.restore();
+}
+
+function drawKaisaScene(ctx, width, height, t, profile) {
+  const open = easeInOutCubic(clamp(t / 0.68, 0, 1));
+  const fade = sceneEnvelope(t, 0.9);
+  const cx = width * 0.5;
+  const cy = height * 0.48;
+  const size = Math.min(width, height) * (0.14 + open * 0.42);
+  drawDepthDust(ctx, width, height, t, profile, 92, 1.3);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  for (let wing = -1; wing <= 1; wing += 2) {
+    for (let index = 0; index < 5; index += 1) {
+      const spread = 0.28 + index * 0.16;
+      const y1 = cy + (index - 2) * size * 0.08;
+      drawCurveStreak(ctx, [
+        [cx + wing * size * 0.06, y1],
+        [cx + wing * size * (0.34 + open * 0.2), cy - size * spread],
+        [cx + wing * size * (0.86 + open * 0.32), cy + size * (0.08 + spread * 0.5)]
+      ], 3 + index * 1.1, index % 2 ? `rgba(${profile.secondary}, .74)` : `rgba(${profile.third}, .68)`, fade * (0.2 + index * 0.035), 18);
+    }
+  }
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate((t * 1.1 + 0.16) * Math.PI);
+  for (let layer = 0; layer < 3; layer += 1) {
+    const s = size * (1 - layer * 0.18);
+    const gradient = ctx.createLinearGradient(-s, -s, s, s);
+    gradient.addColorStop(0, `rgba(${profile.main}, ${0.74 - layer * 0.12})`);
+    gradient.addColorStop(0.48, `rgba(${profile.secondary}, ${0.5 - layer * 0.08})`);
+    gradient.addColorStop(1, `rgba(${profile.third}, ${0.62 - layer * 0.1})`);
+    ctx.globalAlpha = fade * (0.84 - layer * 0.18);
+    ctx.fillStyle = gradient;
+    ctx.shadowColor = `rgba(${profile.main}, .4)`;
+    ctx.shadowBlur = 20 - layer * 4;
+    ctx.beginPath();
+    ctx.moveTo(0, -s);
+    ctx.lineTo(s * 0.42, -s * 0.18);
+    ctx.lineTo(s, 0);
+    ctx.lineTo(s * 0.42, s * 0.18);
+    ctx.lineTo(0, s);
+    ctx.lineTo(-s * 0.42, s * 0.18);
+    ctx.lineTo(-s, 0);
+    ctx.lineTo(-s * 0.42, -s * 0.18);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+  for (let index = 0; index < 6; index += 1) {
+    drawArcRibbon(ctx, cx, cy, size * (0.8 + index * 0.16), t * 6 + index, t * 6 + index + Math.PI * 1.2, 2 + index * 0.6, index % 2 ? `rgba(${profile.main}, .72)` : `rgba(${profile.third}, .62)`, fade * (0.22 + index * 0.025));
+  }
+  drawShardField(ctx, width, height, t, `rgba(${profile.main}, .34)`, 18, 1);
+  ctx.restore();
+}
+
+function drawMissFortuneScene(ctx, width, height, t, profile) {
+  const fire = easeOutCubic(clamp((t - 0.08) / 0.62, 0, 1));
+  const fade = sceneEnvelope(t, 0.9);
+  drawDepthDust(ctx, width, height, t, profile, 70, 1.2);
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  [[width * 0.28, -1], [width * 0.72, 1]].forEach(([x, dir], index) => {
+    const color = index ? `rgba(${profile.secondary}, .72)` : `rgba(${profile.main}, .78)`;
+    const cone = ctx.createLinearGradient(x, height * 0.92, width * (dir > 0 ? 1.04 : -0.04), height * 0.28);
+    cone.addColorStop(0, color);
+    cone.addColorStop(0.62, "rgba(255,245,204,.26)");
+    cone.addColorStop(1, "rgba(255,245,204,0)");
+    ctx.globalAlpha = fade * (0.3 + fire * 0.35);
+    ctx.fillStyle = cone;
+    ctx.beginPath();
+    ctx.moveTo(x, height * 0.9);
+    ctx.lineTo(width * (dir > 0 ? 1.08 : -0.08), height * (0.32 - fire * 0.1));
+    ctx.lineTo(width * (dir > 0 ? 0.52 : 0.48), height * (0.45 - fire * 0.06));
+    ctx.closePath();
+    ctx.fill();
+    drawRadialGlow(ctx, x, height * 0.8, Math.min(width, height) * 0.24, [
+      [0, "rgba(255,248,218,.8)"],
+      [0.28, color],
+      [1, `rgba(${profile.main}, 0)`]
+    ], fade * fire);
+  });
+  for (let i = 0; i < 36; i += 1) {
+    const side = i % 2 ? 1 : -1;
+    const startX = width * (side > 0 ? 0.72 : 0.28);
+    const startY = height * (0.76 + seededUnit(i, 1.7) * 0.1);
+    const endX = startX + side * width * (0.36 + seededUnit(i, 2.8) * 0.42);
+    const endY = height * (0.16 + seededUnit(i, 3.2) * 0.54);
+    drawStreak(ctx, startX, startY, endX, endY, 1.2 + seededUnit(i, 4.4) * 3.2, i % 3 ? "rgba(255,244,204,.66)" : `rgba(${profile.secondary}, .58)`, fade * fire * (0.12 + seededUnit(i, 5.2) * 0.28), 13);
+  }
+  for (let index = 0; index < 18; index += 1) {
+    const x = width * (0.16 + seededUnit(index, 2) * 0.68);
+    const y = height * (0.2 + seededUnit(index, 3) * 0.5 + fire * 0.08);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(0.8 + seededUnit(index, 5) * 1.1);
+    ctx.globalAlpha = fade * (0.16 + seededUnit(index, 6) * 0.22);
+    ctx.fillStyle = "rgba(255, 231, 168, .78)";
+    ctx.fillRect(-3.5, -18, 7, 36);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function drawJhinScene(ctx, width, height, t, profile) {
   const p = easeInOutCubic(clamp(t / 0.74, 0, 1));
+  const fade = sceneEnvelope(t, 0.9);
   const cx = width * 0.5;
   const cy = height * 0.5;
   ctx.save();
-  ctx.fillStyle = `rgba(22, 12, 18, ${0.34 + p * 0.32})`;
+  ctx.fillStyle = `rgba(22, 10, 18, ${0.28 * fade + p * 0.16})`;
   ctx.fillRect(0, 0, width, height);
-  drawAtmosphericDust(ctx, width, height, t, "rgba(201, 77, 118, .36)", 34, 0.75);
+  drawDepthDust(ctx, width, height, t, profile, 52, 0.65);
   ctx.globalCompositeOperation = "screen";
+  const spot = ctx.createRadialGradient(cx, height * 0.05, 0, cx, cy, Math.min(width, height) * 0.68);
+  spot.addColorStop(0, `rgba(${profile.main}, ${0.22 * fade})`);
+  spot.addColorStop(0.5, `rgba(${profile.secondary}, ${0.08 * fade})`);
+  spot.addColorStop(1, `rgba(${profile.secondary}, 0)`);
+  ctx.fillStyle = spot;
+  ctx.fillRect(0, 0, width, height);
   for (let i = 0; i < 4; i += 1) {
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(i * Math.PI * 0.5 + p * 0.7);
-    const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.min(width, height) * 0.32);
-    grd.addColorStop(0, "rgba(255,236,190,.46)");
-    grd.addColorStop(1, "rgba(187,43,84,0)");
+    ctx.rotate(i * Math.PI * 0.5 + p * 0.82);
+    const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.min(width, height) * 0.36);
+    grd.addColorStop(0, "rgba(255,236,190,.5)");
+    grd.addColorStop(0.56, `rgba(${profile.secondary}, .18)`);
+    grd.addColorStop(1, `rgba(${profile.secondary}, 0)`);
     ctx.fillStyle = grd;
+    ctx.globalAlpha = fade * (0.74 - i * 0.06);
     ctx.beginPath();
-    ctx.ellipse(0, -Math.min(width, height) * 0.16, Math.min(width, height) * 0.08, Math.min(width, height) * 0.26, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, -Math.min(width, height) * 0.18, Math.min(width, height) * 0.075, Math.min(width, height) * 0.28, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
-  if (t > 0.48) {
-    ctx.globalAlpha = 0.9 * (1 - clamp((t - 0.76) / 0.24, 0, 1));
-    ctx.strokeStyle = "rgba(255,248,218,.95)";
-    ctx.lineWidth = Math.max(3, width * 0.004);
-    ctx.beginPath();
-    ctx.moveTo(width * 0.08, height * 0.5);
-    ctx.lineTo(width * 0.92, height * 0.5);
-    ctx.stroke();
-  }
-  for (let index = 0; index < 16; index += 1) {
-    const a = index * 0.9 + p * 2;
-    const px = cx + Math.cos(a) * Math.min(width, height) * (0.12 + seededUnit(index, 2) * 0.34);
-    const py = cy + Math.sin(a) * Math.min(width, height) * (0.08 + seededUnit(index, 3) * 0.22);
+  for (let index = 0; index < 34; index += 1) {
+    const a = index * 0.54 + p * 3.2;
+    const dist = Math.min(width, height) * (0.14 + seededUnit(index, 2) * 0.46);
+    const px = cx + Math.cos(a) * dist;
+    const py = cy + Math.sin(a) * dist * 0.62 + Math.sin(t * 5 + index) * 12;
     ctx.save();
     ctx.translate(px, py);
-    ctx.rotate(a);
-    ctx.globalAlpha = 0.18 + seededUnit(index, 8) * 0.24;
-    ctx.fillStyle = index % 2 ? "rgba(188, 47, 91, .6)" : "rgba(255, 218, 171, .5)";
+    ctx.rotate(a + Math.PI * 0.2);
+    ctx.globalAlpha = fade * (0.12 + seededUnit(index, 8) * 0.32);
+    ctx.fillStyle = index % 2 ? `rgba(${profile.secondary}, .68)` : `rgba(${profile.main}, .56)`;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 8 + seededUnit(index, 7) * 10, 22 + seededUnit(index, 9) * 16, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, 7 + seededUnit(index, 7) * 11, 20 + seededUnit(index, 9) * 22, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
+  if (t > 0.43) {
+    const shot = 1 - smoothstep(0.74, 0.98, t);
+    drawStreak(ctx, width * 0.07, cy, width * 0.93, cy, Math.max(4, width * 0.0048), "rgba(255,248,218,.96)", fade * shot, 26);
+    drawRadialGlow(ctx, cx, cy, Math.min(width, height) * 0.34, [
+      [0, "rgba(255,248,218,.84)"],
+      [0.34, `rgba(${profile.secondary}, .3)`],
+      [1, `rgba(${profile.secondary}, 0)`]
+    ], fade * shot);
+  }
   ctx.restore();
 }
 
-function drawAsheScene(ctx, width, height, t) {
-  const travel = easeInOutCubic(clamp((t - 0.04) / 0.74, 0, 1));
-  const x = width * (-0.2 + travel * 1.42);
-  const y = height * (0.6 - travel * 0.18);
+function drawAsheScene(ctx, width, height, t, profile) {
+  const travel = easeInOutCubic(clamp((t - 0.04) / 0.78, 0, 1));
+  const fade = sceneEnvelope(t, 0.9);
+  const x = width * (-0.18 + travel * 1.44);
+  const y = height * (0.62 - travel * 0.2);
+  drawDepthDust(ctx, width, height, t, profile, 84, 0.9);
+  drawShardField(ctx, width, height, t, `rgba(${profile.main}, .32)`, 22, -1);
   ctx.save();
-  drawAtmosphericDust(ctx, width, height, t, "rgba(180, 239, 255, .42)", 52, 0.95);
-  drawShardField(ctx, width, height, t, "rgba(210, 246, 255, .34)", 18, -1);
   ctx.globalCompositeOperation = "screen";
-  ctx.strokeStyle = "rgba(183,240,255,.6)";
-  ctx.lineWidth = Math.max(18, width * 0.02);
+  drawStreak(ctx, x - width * 0.62, y + 54, x, y, Math.max(22, width * 0.021), `rgba(${profile.main}, .48)`, fade, 26);
+  drawStreak(ctx, x - width * 0.52, y + 34, x + 42, y, Math.max(8, width * 0.008), "rgba(248,254,255,.86)", fade, 20);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-0.08 + Math.sin(t * 5) * 0.015);
+  ctx.shadowColor = `rgba(${profile.main}, .7)`;
+  ctx.shadowBlur = 22;
+  const arrow = ctx.createLinearGradient(-70, 0, 118, 0);
+  arrow.addColorStop(0, `rgba(${profile.secondary}, .34)`);
+  arrow.addColorStop(0.48, `rgba(${profile.main}, .82)`);
+  arrow.addColorStop(1, "rgba(250,254,255,.98)");
+  ctx.fillStyle = arrow;
+  ctx.globalAlpha = fade * 0.95;
   ctx.beginPath();
-  ctx.moveTo(x - width * 0.56, y + 46);
-  ctx.lineTo(x, y);
-  ctx.stroke();
-  ctx.fillStyle = "rgba(239,252,255,.94)";
-  ctx.beginPath();
-  ctx.moveTo(x + 90, y);
-  ctx.lineTo(x - 44, y - 46);
-  ctx.lineTo(x - 18, y);
-  ctx.lineTo(x - 44, y + 46);
+  ctx.moveTo(124, 0);
+  ctx.lineTo(-48, -54);
+  ctx.lineTo(-20, 0);
+  ctx.lineTo(-48, 54);
   ctx.closePath();
   ctx.fill();
-  for (let i = 0; i < 8; i += 1) {
-    ctx.strokeStyle = "rgba(135,189,255,.42)";
-    ctx.lineWidth = 1.4;
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = "rgba(255,255,255,.76)";
+  ctx.lineWidth = 1.6;
+  ctx.stroke();
+  ctx.restore();
+  for (let i = 0; i < 16; i += 1) {
+    const px = x - i * (34 + width * 0.01);
+    const py = y + Math.sin(i * 0.7 + t * 7) * 46;
+    const shard = 12 + seededUnit(i, 6) * 28;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(-0.62 + seededUnit(i, 8) * 1.2);
+    ctx.globalAlpha = fade * (0.15 + seededUnit(i, 9) * 0.22);
+    ctx.fillStyle = i % 2 ? `rgba(${profile.main}, .62)` : "rgba(255,255,255,.58)";
     ctx.beginPath();
-    ctx.moveTo(x - i * 45, y + (i % 2 ? 50 : -44));
-    ctx.lineTo(x - i * 72 - 60, y + (i % 2 ? 86 : -82));
-    ctx.stroke();
+    ctx.moveTo(0, -shard);
+    ctx.lineTo(shard * 0.22, 0);
+    ctx.lineTo(0, shard);
+    ctx.lineTo(-shard * 0.18, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
-  for (let index = 0; index < 7; index += 1) {
-    ctx.globalAlpha = 0.18 + index * 0.035;
-    ctx.strokeStyle = "rgba(255, 255, 255, .64)";
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.arc(x - index * 52, y, 20 + index * 12, -0.7, 0.7);
-    ctx.stroke();
+  if (travel > 0.72) {
+    const impact = smoothstep(0.72, 0.94, travel);
+    for (let index = 0; index < 6; index += 1) {
+      drawArcRibbon(ctx, x, y, 28 + index * 26 * impact, -0.9, 0.9, 1.2 + index * 0.4, "rgba(255,255,255,.72)", fade * impact * (0.28 - index * 0.03));
+    }
   }
   ctx.restore();
 }
 
-function drawRammusScene(ctx, width, height, t) {
-  const roll = easeInOutCubic(clamp(t / 0.76, 0, 1));
-  const x = width * (-0.1 + roll * 1.08);
+function drawRammusScene(ctx, width, height, t, profile) {
+  const roll = easeInOutCubic(clamp(t / 0.78, 0, 1));
+  const fade = sceneEnvelope(t, 0.9);
+  const x = width * (-0.08 + roll * 1.12);
   const y = height * 0.72;
-  const r = Math.min(width, height) * 0.13;
+  const r = Math.min(width, height) * 0.14;
+  drawDepthDust(ctx, width, height, t, profile, 76, 1.7);
   ctx.save();
-  drawAtmosphericDust(ctx, width, height, t, "rgba(255, 216, 105, .34)", 42, 0.88);
   ctx.globalCompositeOperation = "screen";
-  for (let i = 0; i < 4; i += 1) {
-    ctx.globalAlpha = 0.35 * (1 - i * 0.14);
-    ctx.strokeStyle = i % 2 ? "rgba(255,216,92,.7)" : "rgba(174,222,88,.72)";
-    ctx.lineWidth = 6 - i;
+  for (let i = 0; i < 3; i += 1) {
+    ctx.globalAlpha = fade * (0.34 - i * 0.032);
+    ctx.strokeStyle = i % 2 ? `rgba(${profile.secondary}, .74)` : `rgba(${profile.main}, .72)`;
+    ctx.lineWidth = 3.4 - i * 0.42;
     ctx.beginPath();
-    ctx.ellipse(x, y, r * (1 + i * 0.9 + roll), r * 0.42 * (1 + i * 0.7 + roll), 0, 0, Math.PI * 2);
+    ctx.ellipse(x - r * (0.8 + i * 0.5), y + r * 0.7, r * (0.7 + i * 0.46 + roll * 0.46), r * 0.26 * (1 + i * 0.34 + roll * 0.4), -0.08, Math.PI * 0.08, Math.PI * 1.3);
     ctx.stroke();
   }
-  ctx.globalAlpha = 0.92;
-  const shell = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r * 1.2);
-  shell.addColorStop(0, "rgba(255,236,132,.96)");
-  shell.addColorStop(0.45, "rgba(138,183,67,.82)");
-  shell.addColorStop(1, "rgba(34,57,28,.88)");
+  for (let index = 0; index < 18; index += 1) {
+    const startX = x - width * 0.32 - index * 10;
+    const yy = y - r * 0.35 + (seededUnit(index, 5) - 0.5) * r * 2.1;
+    drawStreak(ctx, startX, yy, startX - width * (0.14 + seededUnit(index, 6) * 0.2), yy + 10 + seededUnit(index, 7) * 34, 1.4 + seededUnit(index, 9) * 4, `rgba(${profile.secondary}, .56)`, fade * roll * (0.14 + seededUnit(index, 10) * 0.22), 12);
+  }
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = fade * 0.96;
+  const shell = ctx.createRadialGradient(x - r * 0.34, y - r * 0.45, r * 0.1, x, y - r * 0.16, r * 1.35);
+  shell.addColorStop(0, "rgba(255,242,148,.98)");
+  shell.addColorStop(0.42, `rgba(${profile.main}, .9)`);
+  shell.addColorStop(0.78, `rgba(${profile.third}, .88)`);
+  shell.addColorStop(1, "rgba(28,45,24,.96)");
   ctx.fillStyle = shell;
+  ctx.shadowColor = `rgba(${profile.secondary}, .48)`;
+  ctx.shadowBlur = 22;
   ctx.beginPath();
-  ctx.arc(x, y - r * 0.2, r, 0, Math.PI * 2);
+  ctx.arc(x, y - r * 0.18, r, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = "rgba(255, 245, 172, .62)";
-  ctx.lineWidth = 2.2;
-  for (let index = 0; index < 7; index += 1) {
-    const a = t * 8 + index * 0.9;
+  ctx.shadowBlur = 0;
+  ctx.globalCompositeOperation = "screen";
+  ctx.strokeStyle = "rgba(255, 245, 172, .72)";
+  ctx.lineWidth = 2.4;
+  for (let index = 0; index < 10; index += 1) {
+    const a = t * 14 + index * 0.72;
     ctx.beginPath();
-    ctx.moveTo(x + Math.cos(a) * r * 0.2, y - r * 0.2 + Math.sin(a) * r * 0.2);
-    ctx.lineTo(x + Math.cos(a) * r * 0.88, y - r * 0.2 + Math.sin(a) * r * 0.88);
+    ctx.moveTo(x + Math.cos(a) * r * 0.18, y - r * 0.18 + Math.sin(a) * r * 0.18);
+    ctx.lineTo(x + Math.cos(a) * r * 0.92, y - r * 0.18 + Math.sin(a) * r * 0.92);
     ctx.stroke();
   }
-  drawCracks(ctx, x, y + r * 0.7, r * 2.3, 9, roll, "rgba(255,239,166,.34)");
+  drawCracks(ctx, x, y + r * 0.72, r * 2.8, 14, roll, `rgba(${profile.secondary}, .36)`);
+  drawCracks(ctx, x, y + r * 0.72, r * 1.7, 9, roll, "rgba(255,245,172,.34)");
   ctx.restore();
 }
 
-function drawUltimateFrame(ctx, profileId, image, width, height, elapsed) {
-  const t = clamp(elapsed / 2100, 0, 1);
+function drawUltimateFrame(ctx, profile, image, width, height, elapsed, duration) {
+  const profileId = profile.id;
+  const t = clamp(elapsed / duration, 0, 1);
   ctx.clearRect(0, 0, width, height);
-  drawCoverImage(ctx, image, width, height, 0.16 * (1 - t * 0.24), 1.12, Math.sin(t * 4) * 16, Math.cos(t * 3) * 8);
+  drawCinematicBackdrop(ctx, width, height, t, profile);
+  drawCoverImage(ctx, image, width, height, 0.46 * (1 - t * 0.2), 1.18 + t * 0.05, Math.sin(t * 4) * 18, Math.cos(t * 3) * 9);
+  drawPortraitProjection(ctx, image, width, height, t, profile);
+  drawArtworkParallaxRifts(ctx, image, width, height, t, profile);
+  drawCinematicLensPass(ctx, width, height, t, profile);
   ctx.save();
-  ctx.fillStyle = `rgba(250, 246, 236, ${0.035 * (1 - t)})`;
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = `rgba(12, 8, 10, ${0.1 * (1 - sceneEnvelope(t, 0.92))})`;
   ctx.fillRect(0, 0, width, height);
   ctx.restore();
 
-  if (profileId === "fizz") drawSharkScene(ctx, width, height, t);
-  else if (profileId === "caitlyn") drawCaitlynScene(ctx, width, height, t);
-  else if (profileId === "ezreal") drawEzrealScene(ctx, width, height, t);
-  else if (profileId === "samira") drawSamiraScene(ctx, width, height, t);
-  else if (profileId === "kaisa") drawKaisaScene(ctx, width, height, t);
-  else if (profileId === "missfortune") drawMissFortuneScene(ctx, width, height, t);
-  else if (profileId === "jhin") drawJhinScene(ctx, width, height, t);
-  else if (profileId === "ashe") drawAsheScene(ctx, width, height, t);
-  else if (profileId === "rammus") drawRammusScene(ctx, width, height, t);
-  else drawEzrealScene(ctx, width, height, t);
+  if (profileId === "fizz") drawSharkScene(ctx, width, height, t, profile);
+  else if (profileId === "caitlyn") drawCaitlynScene(ctx, width, height, t, profile);
+  else if (profileId === "ezreal") drawEzrealScene(ctx, width, height, t, profile);
+  else if (profileId === "samira") drawSamiraScene(ctx, width, height, t, profile);
+  else if (profileId === "kaisa") drawKaisaScene(ctx, width, height, t, profile);
+  else if (profileId === "missfortune") drawMissFortuneScene(ctx, width, height, t, profile);
+  else if (profileId === "jhin") drawJhinScene(ctx, width, height, t, profile);
+  else if (profileId === "ashe") drawAsheScene(ctx, width, height, t, profile);
+  else if (profileId === "rammus") drawRammusScene(ctx, width, height, t, profile);
+  else drawEzrealScene(ctx, width, height, t, profile);
 
-  drawVignette(ctx, width, height, 0.28);
-  drawLetterbox(ctx, width, height, 0.18 * Math.sin(Math.PI * clamp(t / 0.95, 0, 1)));
+  drawCameraShudder(ctx, width, height, t, profile);
+  drawVignette(ctx, width, height, 0.42);
+  drawLetterbox(ctx, width, height, 0.14 * Math.sin(Math.PI * clamp(t / 0.98, 0, 1)));
 }
 
 function spawnSelectionFx(button, profileId = "default") {
@@ -1921,29 +2793,38 @@ function spawnSelectionFx(button, profileId = "default") {
   });
 
   const fx = document.createElement("div");
+  const shaderCanvas = document.createElement("canvas");
   const canvas = document.createElement("canvas");
-  const image = button.querySelector("img");
+  const image = cinematicImageFor(profile.id, button.querySelector("img"));
   fx.className = "selection-fx ultimate-scene";
   fx.setAttribute("aria-hidden", "true");
+  shaderCanvas.className = "fx-shader-canvas";
+  canvas.className = "fx-2d-canvas";
   applyFxProfileVars(fx, profile);
-  fx.append(canvas);
+  fx.append(shaderCanvas, canvas);
   document.body.append(fx);
 
+  const shaderState = createUltimateShaderState(shaderCanvas);
   const context = canvas.getContext("2d");
   const startedAt = performance.now();
+  const duration = visualDurations[profile.id] || 3800;
   const render = (now) => {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const width = window.innerWidth;
     const height = window.innerHeight;
-    if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
+    const pixelWidth = Math.round(width * dpr);
+    const pixelHeight = Math.round(height * dpr);
+    const elapsed = now - startedAt;
+    renderUltimateShader(shaderState, profile, width, height, elapsed, duration, dpr);
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
     }
-    context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    drawUltimateFrame(context, profile.id, image, width, height, now - startedAt);
-    if (now - startedAt < 2160) {
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    drawUltimateFrame(context, profile, image, pixelWidth, pixelHeight, elapsed, duration);
+    if (elapsed < duration + 60) {
       fx._raf = requestAnimationFrame(render);
     }
   };
@@ -1951,7 +2832,7 @@ function spawnSelectionFx(button, profileId = "default") {
   fxTimer = window.setTimeout(() => {
     if (fx._raf) cancelAnimationFrame(fx._raf);
     fx.remove();
-  }, 2320);
+  }, duration + 220);
 }
 
 function animateChampionSwap(champion) {
@@ -1985,7 +2866,7 @@ function animateChampionSwap(champion) {
 }
 
 function renderChampion(championId, options = {}) {
-  const champion = champions.find((item) => item.id === championId) || champions[0];
+  const champion = championById(championId);
   applyFxProfileVars(page, fxProfileFor(champion.id));
   setPressedChampion(champion.id);
 
@@ -2013,6 +2894,7 @@ function renderPicker() {
     img.loading = "eager";
     img.decoding = "async";
     button.append(img);
+    cinematicImageFor(champion.id, img);
     button.addEventListener("pointermove", (event) => {
       const rect = button.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;

@@ -39,6 +39,24 @@ const seedNotes = [
     created_at: "2026-05-17T00:00:00-04:00",
     title: "current Samira law",
     body: "Q is the test. E is the commit. W is parry. R is reward. After kill, check E; dash again only if safe."
+  },
+  {
+    id: "samira-s-plus-proof",
+    created_at: "2026-05-18T00:00:00-04:00",
+    title: "S+ Samira proof game",
+    body: "User-supplied Swiftplay result: 13/6/5, 39,136 damage, 27,378 gold, 925 gold/min, S+ in a loss. The working blueprint was Q often, save W for real danger, wait for enemy disadvantage, enter late, R only when they are losing, run when chased, and mute everyone."
+  },
+  {
+    id: "samira-a-plus-proof",
+    created_at: "2026-05-18T00:00:00-04:00",
+    title: "A+ Samira follow-up",
+    body: "User-supplied follow-up: 10/1/8, 21,209 damage, 16,272 gold, 871 gold/min, A+ in a win. The lesson is not cockiness; it is that the boring rules are what made the good game happen."
+  },
+  {
+    id: "samira-safe-gold-late-entry",
+    created_at: "2026-05-18T00:00:00-04:00",
+    title: "safe gold plus late entry",
+    body: "Bad-team games need safe farming without disappearing. Farm on Alan's side of the map, hover toward team when enemies group, wait for big spells to fly, then clean up from the edge."
   }
 ];
 

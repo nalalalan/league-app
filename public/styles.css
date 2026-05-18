@@ -260,13 +260,35 @@ summary {
   height: 100vh;
   overflow: hidden;
   contain: strict;
-  transform: none;
+  transform: scale(1.34);
+  transform-origin: 0 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 245, 218, .14), transparent 22%),
+    radial-gradient(circle at 50% 56%, rgba(var(--fx-main), .24), transparent 42%),
+    linear-gradient(180deg, rgba(18, 13, 15, .9), rgba(var(--fx-dark), .96));
+  backdrop-filter: blur(5px) saturate(.82) brightness(.58);
+  animation: ultimateStageIn .34s cubic-bezier(.16, .9, .18, 1) both;
 }
 
 .selection-fx.ultimate-scene canvas {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100vw;
   height: 100vh;
+}
+
+.selection-fx.ultimate-scene .fx-shader-canvas {
+  z-index: 0;
+  opacity: 1;
+  filter: saturate(1.18) contrast(1.08);
+  mix-blend-mode: screen;
+}
+
+.selection-fx.ultimate-scene .fx-2d-canvas {
+  z-index: 1;
+  opacity: .98;
+  mix-blend-mode: normal;
 }
 
 .fx-cinema {
@@ -1001,20 +1023,20 @@ summary {
 }
 
 .portrait-button.is-flashing {
-  animation: championSelect 1.64s cubic-bezier(.16, .9, .18, 1);
+  animation: championSelect 2.18s cubic-bezier(.16, .9, .18, 1);
 }
 
 .portrait-button.is-flashing::before {
   opacity: 1;
-  animation: championBeam 1.64s cubic-bezier(.16, .9, .18, 1);
+  animation: championBeam 2.18s cubic-bezier(.16, .9, .18, 1);
 }
 
 .portrait-button.is-flashing::after {
-  animation: championRing 1.64s cubic-bezier(.16, .9, .18, 1);
+  animation: championRing 2.18s cubic-bezier(.16, .9, .18, 1);
 }
 
 .portrait-button.is-flashing img {
-  animation: championImageLock 1.64s cubic-bezier(.16, .9, .18, 1);
+  animation: championImageLock 2.18s cubic-bezier(.16, .9, .18, 1);
 }
 
 .portrait-button.is-flashing[data-champion-fx="samira"]::before {
@@ -1362,22 +1384,33 @@ h1 {
   border: 0;
 }
 
+@keyframes ultimateStageIn {
+  from {
+    opacity: 0;
+    filter: saturate(.86) brightness(.62);
+  }
+  to {
+    opacity: 1;
+    filter: saturate(1) brightness(1);
+  }
+}
+
 @keyframes championSelect {
   0% {
     filter: saturate(1.04) brightness(1);
     transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) scale(1);
   }
-  18% {
-    filter: saturate(1.58) brightness(1.34) contrast(1.1);
-    transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.085);
+  16% {
+    filter: saturate(1.46) brightness(1.22) contrast(1.08);
+    transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.035);
   }
-  34% {
-    filter: saturate(1.28) brightness(1.16) contrast(1.06);
-    transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.04);
+  42% {
+    filter: saturate(1.24) brightness(1.12) contrast(1.05);
+    transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.022);
   }
-  66% {
-    filter: saturate(1.18) brightness(1.08) contrast(1.03);
-    transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.026);
+  76% {
+    filter: saturate(1.12) brightness(1.05) contrast(1.03);
+    transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.014);
   }
   100% {
     filter: saturate(1.04) brightness(1);
@@ -1388,22 +1421,26 @@ h1 {
 @keyframes championBeam {
   0% {
     opacity: 0;
-    transform: translateX(-142%);
+    filter: blur(5px);
+    transform: translateX(-148%) skewX(-12deg);
   }
   12% {
     opacity: 1;
+    filter: blur(1px);
   }
-  38% {
-    opacity: .95;
-    transform: translateX(0);
+  44% {
+    opacity: .86;
+    transform: translateX(-4%) skewX(-3deg);
   }
-  66% {
-    opacity: .75;
-    transform: translateX(58%);
+  74% {
+    opacity: .58;
+    filter: blur(2px);
+    transform: translateX(62%) skewX(6deg);
   }
   100% {
     opacity: 0;
-    transform: translateX(146%);
+    filter: blur(7px);
+    transform: translateX(150%) skewX(14deg);
   }
 }
 
@@ -1414,11 +1451,11 @@ h1 {
   }
   18% {
     opacity: 1;
-    box-shadow: inset 0 0 0 1px rgba(255, 250, 224, .96), inset 0 -28px 38px rgba(var(--fx-dark), .13), 0 0 0 7px rgba(var(--fx-secondary), .34), 0 0 74px 18px rgba(var(--fx-main), .62), 0 0 82px 8px rgba(var(--fx-third), .26);
+    box-shadow: inset 0 0 0 1px rgba(255, 250, 224, .96), inset 0 -28px 38px rgba(var(--fx-dark), .13), 0 0 0 5px rgba(var(--fx-secondary), .3), 0 0 58px 14px rgba(var(--fx-main), .54), 0 0 74px 8px rgba(var(--fx-third), .24);
   }
-  58% {
+  62% {
     opacity: .96;
-    box-shadow: inset 0 0 0 1px rgba(255, 250, 224, .7), inset 0 -28px 38px rgba(var(--fx-dark), .15), 0 0 0 20px rgba(var(--fx-secondary), .15), 0 0 74px 9px rgba(var(--fx-main), .32), 0 0 56px 4px rgba(var(--fx-third), .16);
+    box-shadow: inset 0 0 0 1px rgba(255, 250, 224, .7), inset 0 -28px 38px rgba(var(--fx-dark), .15), 0 0 0 14px rgba(var(--fx-secondary), .13), 0 0 54px 8px rgba(var(--fx-main), .28), 0 0 50px 4px rgba(var(--fx-third), .14);
   }
   100% {
     opacity: .72;
@@ -1432,12 +1469,12 @@ h1 {
     transform: translateZ(12px) scale(1.01);
   }
   18% {
-    filter: saturate(1.48) contrast(1.14) brightness(1.22);
-    transform: translateZ(38px) scale(1.12);
+    filter: saturate(1.38) contrast(1.1) brightness(1.16);
+    transform: translateZ(26px) scale(1.055);
   }
   58% {
     filter: saturate(1.14) contrast(1.05) brightness(1.05);
-    transform: translateZ(18px) scale(1.04);
+    transform: translateZ(18px) scale(1.028);
   }
   100% {
     filter: saturate(1.04) contrast(1.03);
