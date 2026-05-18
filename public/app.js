@@ -636,7 +636,7 @@ let activeStinger;
 const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
-const stingerVersion = "20260518-orchestra16";
+const stingerVersion = "20260518-motif18";
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`

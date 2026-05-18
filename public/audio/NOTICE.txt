@@ -4,5 +4,6 @@ Source: https://theremin.music.uiowa.edu/MIS.html
 The source page states that the samples may be downloaded and used for any projects, without restrictions.
 
 Rendered stingers in this folder combine short excerpts from recorded violin, cello, horn, trumpet, flute,
-soprano saxophone, tam-tam/gong, triangle, woodblock, and granite-block samples with a low synthetic
-timpani-style pulse. No Riot audio is used.
+soprano saxophone, tam-tam/gong, cymbal roll, crash cymbal, triangle, woodblock, and granite-block samples
+with a low synthetic timpani-style pulse. Each champion file is arranged as a short motif with a rise,
+impact, and tail. No Riot audio is used.
