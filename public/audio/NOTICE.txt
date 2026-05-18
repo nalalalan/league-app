@@ -1,9 +1,19 @@
-Champion stingers are derived from the University of Iowa Musical Instrument Samples.
+Champion stingers are short normalized cuts from user-provided licensed local audio files.
 
-Source: https://theremin.music.uiowa.edu/MIS.html
-The source page states that the samples may be downloaded and used for any projects, without restrictions.
+Source handling:
+The full source tracks stay in _licensed-audio/ and are ignored by git.
+The public app includes only the short champion clips in public/audio/.
+No Riot audio is used. No Spotify, YouTube, or streaming extraction is used.
 
-Rendered stingers in this folder combine short excerpts from recorded cello, horn, trumpet, violin, flute,
-tam-tam/gong, cymbal roll, crash cymbal, triangle, woodblock, and granite-block samples with synthetic
-low pulses and light filtered noise. The current pass uses chord-bounded orchestral swells with a shared
-hall tail so the layers blend as one cue. No Riot audio is used.
+Current champion mapping:
+Samira: Red Velvet - Rainbow Halo, chorus return cut, start 127.05s, length 9.45s.
+Caitlyn: NewJeans - Cookie, named hook cut, start 11.55s, length 3.35s.
+Fizz: Le Van Khoa - Festival, opening cut, start 0.0s, length 5.8s.
+Kai'Sa: ILLIT - Jellyous, opening hook cut, start 6.62s, length 3.15s.
+Miss Fortune: aespa - Life's Too Short, first chorus line cut, start 16.15s, length 6.05s.
+Ezreal: Rogers: The Musical - I Want You, opening cut, start 0.0s, length 5.2s.
+Jhin: Le Van Khoa - Hymn to Freedom, orchestral peak-region cut, start 186.0s, length 7.2s.
+Ashe: ILLIT - Not Cute Anymore, named phrase cut, start 36.05s, length 3.45s.
+Rammus: Le Van Khoa - Introduction, early orchestral impact cut, start 5.0s, length 6.8s.
+
+Files are faded and normalized for web playback.
