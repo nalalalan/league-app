@@ -40,7 +40,7 @@ const soundProfiles = {
   caitlyn: {
     ...defaultSoundProfile,
     duration: 1.2,
-    thump: { frequency: 68, endFrequency: 38, length: 0.18, gain: 0.52 },
+    thump: { frequency: 68, endFrequency: 38, length: 0.36, gain: 0.42 },
     noise: { start: 0.008, length: 0.28, startFrequency: 7200, endFrequency: 1300, gain: 0.28 },
     tail: { frequency: 54, center: 0.42, width: 0.28, gain: 0.012 },
     tones: [
@@ -97,11 +97,11 @@ const soundProfiles = {
   ezreal: {
     ...defaultSoundProfile,
     duration: 1.26,
-    thump: { frequency: 76, endFrequency: 52, length: 0.22, gain: 0.3 },
+    thump: { frequency: 76, endFrequency: 52, length: 0.36, gain: 0.24 },
     noise: { start: 0.02, length: 0.42, startFrequency: 5800, endFrequency: 1600, gain: 0.12 },
     tail: { frequency: 62, center: 0.62, width: 0.42, gain: 0.015 },
     tones: [
-      { type: "sine", frequency: 392, start: 0, length: 0.22, gain: 0.18, pan: -0.35 },
+      { type: "sine", frequency: 392, start: 0, length: 0.34, gain: 0.14, pan: -0.35 },
       { type: "sine", frequency: 587.33, start: 0.08, length: 0.24, gain: 0.16, pan: 0.25 },
       { type: "sine", frequency: 783.99, start: 0.16, length: 0.28, gain: 0.14, pan: -0.18 },
       { type: "triangle", frequency: 1174.66, start: 0.28, length: 0.36, gain: 0.11, pan: 0.18 },
@@ -163,20 +163,20 @@ const soundScenes = {
   samira: [
     { kind: "cinematic", flavor: "gunblade", start: 0, length: 1.45, gain: 0.78 },
     { kind: "drum", frequency: 43, endFrequency: 18, start: 0, length: 0.72, gain: 1.04 },
-    { kind: "noise", filter: "highpass", start: 0.04, length: 0.16, startFrequency: 14800, endFrequency: 3200, gain: 0.36, pan: -0.74 },
-    { kind: "noise", filter: "highpass", start: 0.18, length: 0.16, startFrequency: 14200, endFrequency: 3000, gain: 0.34, pan: 0.7 },
+    { kind: "noise", filter: "bandpass", start: 0.04, length: 0.52, startFrequency: 4200, endFrequency: 1100, gain: 0.18, pan: -0.74 },
+    { kind: "noise", filter: "bandpass", start: 0.18, length: 0.52, startFrequency: 3800, endFrequency: 980, gain: 0.17, pan: 0.7 },
     { kind: "brass", notes: [73.42, 110, 146.83], start: 0.1, length: 1.1, gain: 0.3, pan: -0.08 },
     { kind: "string", notes: [220, 277.18, 370], start: 0.34, length: 0.95, gain: 0.16, pan: 0.18 },
-    { kind: "hit", frequency: 112, endFrequency: 36, start: 0.62, length: 0.34, gain: 0.62 }
+    { kind: "bloom", frequency: 112, endFrequency: 36, start: 0.62, length: 0.56, gain: 0.42 }
   ],
   caitlyn: [
     { kind: "cinematic", flavor: "sniper", start: 0, length: 1.65, gain: 0.74 },
     { kind: "noise", filter: "lowpass", start: 0, length: 0.8, startFrequency: 900, endFrequency: 110, gain: 0.22 },
     { kind: "bell", notes: [1244.51, 1864.66], start: 0.06, length: 1.15, gain: 0.12 },
-    { kind: "hit", frequency: 92, endFrequency: 32, start: 0.28, length: 0.22, gain: 0.72 },
+    { kind: "bloom", frequency: 92, endFrequency: 32, start: 0.28, length: 0.62, gain: 0.46 },
     { kind: "drum", frequency: 34, endFrequency: 16, start: 0.3, length: 0.7, gain: 0.58 },
     { kind: "brass", notes: [46.25, 69.3, 92.5], start: 0.38, length: 1.22, gain: 0.24 },
-    { kind: "noise", filter: "highpass", start: 0.32, length: 0.08, startFrequency: 16400, endFrequency: 8200, gain: 0.58, pan: 0.34 }
+    { kind: "noise", filter: "bandpass", start: 0.32, length: 0.5, startFrequency: 5200, endFrequency: 940, gain: 0.2, pan: 0.34 }
   ],
   fizz: [
     { kind: "cinematic", flavor: "monster", start: 0, length: 1.7, gain: 0.82 },
@@ -185,7 +185,7 @@ const soundScenes = {
     { kind: "bell", notes: [392, 587.33, 783.99], start: 0.14, length: 0.8, gain: 0.12, pan: 0.18 },
     { kind: "water", start: 0.48, length: 1.0, gain: 0.32, pan: 0.34 },
     { kind: "string", notes: [261.63, 392, 523.25], start: 0.58, length: 0.95, gain: 0.13 },
-    { kind: "noise", filter: "highpass", start: 0.88, length: 0.38, startFrequency: 7600, endFrequency: 2600, gain: 0.18 }
+    { kind: "noise", filter: "bandpass", start: 0.88, length: 0.72, startFrequency: 4200, endFrequency: 1100, gain: 0.12 }
   ],
   kaisa: [
     { kind: "cinematic", flavor: "void", start: 0, length: 1.65, gain: 0.78 },
@@ -193,17 +193,17 @@ const soundScenes = {
     { kind: "pulse", notes: [110, 220, 440], start: 0.08, length: 1.22, gain: 0.22, pan: -0.18 },
     { kind: "noise", filter: "bandpass", start: 0.18, length: 1.15, startFrequency: 9200, endFrequency: 180, gain: 0.28, q: 0.34 },
     { kind: "brass", notes: [65.41, 98, 130.81], start: 0.42, length: 1.06, gain: 0.22 },
-    { kind: "hit", frequency: 78, endFrequency: 22, start: 0.72, length: 0.42, gain: 0.5 },
+    { kind: "bloom", frequency: 78, endFrequency: 22, start: 0.72, length: 0.62, gain: 0.36 },
     { kind: "string", notes: [329.63, 493.88, 987.77], start: 0.9, length: 0.95, gain: 0.11, pan: 0.24 }
   ],
   missfortune: [
     { kind: "cinematic", flavor: "sax", start: 0, length: 1.62, gain: 0.76 },
     { kind: "drum", frequency: 40, endFrequency: 18, start: 0, length: 0.78, gain: 0.86 },
     { kind: "brass", notes: [65.41, 98, 130.81, 196], start: 0.04, length: 1.18, gain: 0.3 },
-    { kind: "noise", filter: "highpass", start: 0.18, length: 0.08, startFrequency: 15600, endFrequency: 6200, gain: 0.48, pan: -0.62 },
-    { kind: "hit", frequency: 98, endFrequency: 30, start: 0.18, length: 0.26, gain: 0.56, pan: -0.24 },
-    { kind: "noise", filter: "highpass", start: 0.38, length: 0.08, startFrequency: 15600, endFrequency: 6200, gain: 0.5, pan: 0.62 },
-    { kind: "hit", frequency: 92, endFrequency: 28, start: 0.38, length: 0.28, gain: 0.58, pan: 0.24 },
+    { kind: "noise", filter: "bandpass", start: 0.18, length: 0.48, startFrequency: 4800, endFrequency: 900, gain: 0.18, pan: -0.62 },
+    { kind: "bloom", frequency: 98, endFrequency: 30, start: 0.18, length: 0.58, gain: 0.34, pan: -0.24 },
+    { kind: "noise", filter: "bandpass", start: 0.38, length: 0.48, startFrequency: 4800, endFrequency: 900, gain: 0.18, pan: 0.62 },
+    { kind: "bloom", frequency: 92, endFrequency: 28, start: 0.38, length: 0.58, gain: 0.35, pan: 0.24 },
     { kind: "string", notes: [293.66, 440, 587.33], start: 0.56, length: 1.04, gain: 0.13 }
   ],
   ezreal: [
@@ -211,7 +211,7 @@ const soundScenes = {
     { kind: "spark", notes: [392, 587.33, 783.99], start: 0, length: 0.62, gain: 0.16, pan: -0.42 },
     { kind: "spark", notes: [523.25, 783.99, 1174.66], start: 0.18, length: 0.68, gain: 0.15, pan: 0.42 },
     { kind: "string", notes: [196, 293.66, 392], start: 0.32, length: 1.0, gain: 0.14 },
-    { kind: "hit", frequency: 84, endFrequency: 30, start: 0.5, length: 0.3, gain: 0.46 },
+    { kind: "bloom", frequency: 84, endFrequency: 30, start: 0.5, length: 0.58, gain: 0.32 },
     { kind: "drum", frequency: 46, endFrequency: 22, start: 0.54, length: 0.5, gain: 0.42 },
     { kind: "noise", filter: "bandpass", start: 0.64, length: 0.82, startFrequency: 11200, endFrequency: 2200, gain: 0.18 }
   ],
@@ -221,7 +221,7 @@ const soundScenes = {
     { kind: "string", notes: [246.94], start: 0.24, length: 0.54, gain: 0.17 },
     { kind: "string", notes: [293.66], start: 0.5, length: 0.56, gain: 0.16 },
     { kind: "bell", notes: [392, 783.99], start: 0.8, length: 1.1, gain: 0.14 },
-    { kind: "hit", frequency: 58, endFrequency: 14, start: 0.82, length: 0.82, gain: 0.86 },
+    { kind: "bloom", frequency: 58, endFrequency: 14, start: 0.82, length: 0.82, gain: 0.58 },
     { kind: "brass", notes: [49, 73.42, 98], start: 0.92, length: 1.1, gain: 0.28 },
     { kind: "choir", notes: [146.83, 220, 293.66], start: 1.06, length: 1.2, gain: 0.12 }
   ],
@@ -229,8 +229,8 @@ const soundScenes = {
     { kind: "cinematic", flavor: "ice", start: 0, length: 1.6, gain: 0.7 },
     { kind: "string", notes: [261.63, 392, 523.25], start: 0, length: 1.12, gain: 0.16, pan: -0.2 },
     { kind: "bell", notes: [1046.5, 1567.98, 2093], start: 0.12, length: 1.18, gain: 0.12, pan: 0.2 },
-    { kind: "noise", filter: "highpass", start: 0.16, length: 0.72, startFrequency: 14800, endFrequency: 3200, gain: 0.18 },
-    { kind: "hit", frequency: 72, endFrequency: 28, start: 0.46, length: 0.28, gain: 0.38 },
+    { kind: "noise", filter: "bandpass", start: 0.16, length: 0.88, startFrequency: 6200, endFrequency: 1500, gain: 0.12 },
+    { kind: "bloom", frequency: 72, endFrequency: 28, start: 0.46, length: 0.58, gain: 0.26 },
     { kind: "choir", notes: [174.61, 261.63, 349.23], start: 0.62, length: 1.18, gain: 0.11 }
   ],
   rammus: [
@@ -238,8 +238,8 @@ const soundScenes = {
     { kind: "roll", frequency: 30, endFrequency: 12, start: 0, length: 1.52, gain: 0.86 },
     { kind: "drum", frequency: 28, endFrequency: 12, start: 0.02, length: 0.92, gain: 0.92 },
     { kind: "noise", filter: "lowpass", start: 0.08, length: 1.38, startFrequency: 1600, endFrequency: 80, gain: 0.36, q: 0.35 },
-    { kind: "hit", frequency: 52, endFrequency: 18, start: 0.5, length: 0.42, gain: 0.58 },
-    { kind: "hit", frequency: 42, endFrequency: 14, start: 0.92, length: 0.42, gain: 0.46 },
+    { kind: "bloom", frequency: 52, endFrequency: 18, start: 0.5, length: 0.62, gain: 0.4 },
+    { kind: "bloom", frequency: 42, endFrequency: 14, start: 0.92, length: 0.62, gain: 0.32 },
     { kind: "brass", notes: [36.71, 55, 73.42], start: 0.86, length: 1.05, gain: 0.22 }
   ]
 };
@@ -686,7 +686,7 @@ const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx9";
+const visualFxVersion = "20260518-world-vfx10";
 let vfx3dModulePromise;
 let vfx3dWarmPromise;
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
@@ -1175,14 +1175,16 @@ function playSynthSelectSound(profileId = "default") {
     };
 
     const playNoise = (event) => {
-      const length = Math.max(0.03, event.length || 0.24);
+      const length = Math.max(event.filter === "highpass" ? 0.32 : 0.18, event.length || 0.24);
       const start = event.start || 0;
       const noiseBuffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * length), audioContext.sampleRate);
       const noiseData = noiseBuffer.getChannelData(0);
+      let smoothed = 0;
       for (let i = 0; i < noiseData.length; i += 1) {
         const progress = i / noiseData.length;
-        const fade = Math.sin(Math.PI * progress) ** (event.curve || 0.7);
-        noiseData[i] = (Math.random() * 2 - 1) * fade;
+        const fade = Math.sin(Math.PI * progress) ** (event.curve || 0.9);
+        smoothed = smoothed * 0.82 + (Math.random() * 2 - 1) * 0.18;
+        noiseData[i] = smoothed * fade;
       }
       const noise = audioContext.createBufferSource();
       const noiseFilter = audioContext.createBiquadFilter();
@@ -1193,7 +1195,7 @@ function playSynthSelectSound(profileId = "default") {
       noiseFilter.frequency.exponentialRampToValueAtTime(event.endFrequency || 520, now + start + length);
       noiseFilter.Q.setValueAtTime(event.q || 0.78, now + start);
       noiseGain.gain.setValueAtTime(0.0001, now + start);
-      noiseGain.gain.exponentialRampToValueAtTime(event.gain || 0.12, now + start + 0.018);
+      noiseGain.gain.exponentialRampToValueAtTime(event.gain || 0.12, now + start + 0.045);
       noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
       noise.connect(noiseFilter).connect(noiseGain);
       connectOutput(noiseGain, event);
@@ -1221,7 +1223,7 @@ function playSynthSelectSound(profileId = "default") {
         brass: { type: "sawtooth", attack: 0.06, filter: "lowpass", startFrequency: 950, endFilterFrequency: 2400, q: 0.55, wet: 1 },
         string: { type: "triangle", attack: 0.05, filter: "lowpass", startFrequency: 1700, endFilterFrequency: 900, q: 0.72, wet: 1 },
         choir: { type: "sine", attack: 0.18, filter: "lowpass", startFrequency: 1150, endFilterFrequency: 720, q: 0.48, wet: 1 },
-        bell: { type: "sine", attack: 0.006, filter: "highpass", startFrequency: 520, endFilterFrequency: 780, q: 0.38, wet: 1 },
+        bell: { type: "sine", attack: 0.032, filter: "bandpass", startFrequency: 680, endFilterFrequency: 1120, q: 0.42, wet: 1 },
         spark: { type: "square", attack: 0.008, filter: "bandpass", startFrequency: 3600, endFilterFrequency: 6200, q: 1.4, wet: 1 },
         pulse: { type: "sawtooth", attack: 0.02, filter: "bandpass", startFrequency: 760, endFilterFrequency: 2100, q: 1.1, wet: 1 }
       }[instrument];
@@ -1239,17 +1241,19 @@ function playSynthSelectSound(profileId = "default") {
       });
     };
 
-    const playHit = (event) => {
-      playThump(event);
+    const playBloom = (event) => {
+      const length = Math.max(0.48, event.length || 0.58);
+      playThump({ ...event, length, gain: (event.gain || 0.4) * 0.72 });
       playNoise({
         ...event,
-        start: (event.start || 0) + 0.012,
-        length: Math.min(0.16, event.length || 0.18),
-        filter: "highpass",
-        startFrequency: 9400,
-        endFrequency: 2600,
-        gain: (event.gain || 0.4) * 0.38,
-        wet: 0
+        start: (event.start || 0) + 0.035,
+        length,
+        filter: "bandpass",
+        startFrequency: 2600,
+        endFrequency: 420,
+        gain: (event.gain || 0.4) * 0.18,
+        q: 0.62,
+        wet: 1
       });
     };
 
@@ -1293,13 +1297,13 @@ function playSynthSelectSound(profileId = "default") {
       const pulses = 6;
       for (let index = 0; index < pulses; index += 1) {
         const progress = index / (pulses - 1);
-        playHit({
+        playBloom({
           ...event,
           start: (event.start || 0) + progress * (event.length || 1.2) * 0.72,
-          length: 0.2,
+          length: 0.48,
           frequency: (event.frequency || 34) + index * 3,
           endFrequency: (event.endFrequency || 14) + index,
-          gain: (event.gain || 0.5) * (0.38 + progress * 0.18),
+          gain: (event.gain || 0.5) * (0.24 + progress * 0.1),
           pan: Math.sin(index * 1.7) * 0.22
         });
       }
@@ -1397,7 +1401,7 @@ function playSynthSelectSound(profileId = "default") {
       }
       if (flavor === "sniper" || flavor === "curtain") {
         playImpactSample({ start: start + 0.58, length: 0.46, frequency: flavor === "sniper" ? 96 : 62, gain: gain * 0.9, texture: "crack", filter: "bandpass", startFrequency: 5200, endFrequency: 320, wet: 0 });
-        playHit({ start: start + 0.6, length: 0.22, frequency: flavor === "sniper" ? 94 : 58, endFrequency: 18, gain: gain * 0.56, wet: 0 });
+        playBloom({ start: start + 0.6, length: 0.56, frequency: flavor === "sniper" ? 94 : 58, endFrequency: 18, gain: gain * 0.38, wet: 1 });
       }
       if (flavor === "monster") {
         playWater({ start: start + 0.08, length: 1.18, gain: gain * 0.44, pan: -0.16 });
@@ -1418,8 +1422,8 @@ function playSynthSelectSound(profileId = "default") {
         case "drum":
           playDrum(event);
           break;
-        case "hit":
-          playHit(event);
+        case "bloom":
+          playBloom(event);
           break;
         case "brass":
         case "string":
@@ -1605,11 +1609,12 @@ function playChampionFoley(profileId = "default") {
     const tone = ({ start = 0, length = 0.24, frequency = 440, endFrequency, gain = 0.12, type = "sine", pan = 0, attack = 0.01, filter, q = 0.8, send = 0.22 }) => {
       const osc = audioContext.createOscillator();
       const amp = audioContext.createGain();
+      const safeAttack = Math.max(0.016, attack);
       osc.type = type;
       osc.frequency.setValueAtTime(frequency, now + start);
       if (endFrequency) osc.frequency.exponentialRampToValueAtTime(Math.max(12, endFrequency), now + start + length);
       amp.gain.setValueAtTime(0.0001, now + start);
-      amp.gain.exponentialRampToValueAtTime(gain, now + start + attack);
+      amp.gain.exponentialRampToValueAtTime(gain, now + start + safeAttack);
       amp.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
       let output = amp;
       osc.connect(amp);
@@ -1628,7 +1633,9 @@ function playChampionFoley(profileId = "default") {
     };
 
     const texture = ({ start = 0, length = 0.28, gain = 0.12, pan = 0, filter = "bandpass", from = 1200, to = 400, q = 0.9, color = "air", send = 0.22, curve = 1.5 }) => {
-      const frames = Math.max(1, Math.floor(audioContext.sampleRate * length));
+      const safeLength = Math.max(filter === "highpass" ? 0.4 : 0.24, length);
+      const safeFilter = filter === "highpass" && length < 0.4 ? "bandpass" : filter;
+      const frames = Math.max(1, Math.floor(audioContext.sampleRate * safeLength));
       const buffer = audioContext.createBuffer(1, frames, audioContext.sampleRate);
       const data = buffer.getChannelData(0);
       let smoothed = 0;
@@ -1649,32 +1656,32 @@ function playChampionFoley(profileId = "default") {
       const biquad = audioContext.createBiquadFilter();
       const amp = audioContext.createGain();
       source.buffer = buffer;
-      biquad.type = filter;
+      biquad.type = safeFilter;
       biquad.frequency.setValueAtTime(from, now + start);
-      biquad.frequency.exponentialRampToValueAtTime(Math.max(40, to), now + start + length);
+      biquad.frequency.exponentialRampToValueAtTime(Math.max(40, to), now + start + safeLength);
       biquad.Q.setValueAtTime(q, now + start);
       amp.gain.setValueAtTime(0.0001, now + start);
-      amp.gain.exponentialRampToValueAtTime(gain, now + start + 0.018);
-      amp.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+      amp.gain.exponentialRampToValueAtTime(gain, now + start + 0.045);
+      amp.gain.exponentialRampToValueAtTime(0.0001, now + start + safeLength);
       source.connect(biquad).connect(amp);
       connect(amp, pan, send);
       source.start(now + start);
-      source.stop(now + start + length + 0.04);
+      source.stop(now + start + safeLength + 0.04);
     };
 
     const impact = (start, frequency, gain, pan = 0, color = "air") => {
-      tone({ start, length: 0.5, frequency, endFrequency: Math.max(18, frequency * 0.38), gain, type: "sine", pan, attack: 0.012, send: 0.12 });
-      texture({ start: start + 0.012, length: 0.18, gain: gain * 0.45, pan, filter: "highpass", from: color === "stone" ? 1800 : 8400, to: color === "water" ? 880 : 1800, q: 0.9, color, send: 0.12, curve: 2.4 });
+      tone({ start, length: 0.76, frequency, endFrequency: Math.max(18, frequency * 0.38), gain: gain * 0.72, type: "sine", pan, attack: 0.04, send: 0.2 });
+      texture({ start: start + 0.035, length: 0.58, gain: gain * 0.24, pan, filter: color === "stone" || color === "water" ? "lowpass" : "bandpass", from: color === "stone" ? 900 : 3200, to: color === "water" ? 520 : 420, q: 0.62, color, send: 0.28, curve: 1.45 });
     };
 
     const bubble = (start, pan, size = 1) => {
-      texture({ start, length: 0.16 * size, gain: 0.08 * size, pan, filter: "bandpass", from: 480 + size * 300, to: 2400 + size * 700, q: 1.8, color: "water", send: 0.32, curve: 1.2 });
-      tone({ start: start + 0.018, length: 0.13 * size, frequency: 520 + size * 420, endFrequency: 980 + size * 760, gain: 0.03 * size, type: "sine", pan, attack: 0.006, send: 0.36 });
+      texture({ start, length: 0.24 + size * 0.12, gain: 0.06 * size, pan, filter: "bandpass", from: 480 + size * 300, to: 2400 + size * 700, q: 1.4, color: "water", send: 0.38, curve: 1.08 });
+      tone({ start: start + 0.035, length: 0.24 + size * 0.08, frequency: 520 + size * 420, endFrequency: 980 + size * 760, gain: 0.022 * size, type: "sine", pan, attack: 0.028, send: 0.42 });
     };
 
     const metalSlash = (start, pan, reverse = false) => {
-      texture({ start, length: 0.18, gain: 0.16, pan, filter: "highpass", from: reverse ? 5200 : 2400, to: reverse ? 1700 : 8400, q: 1.1, color: "metal", send: 0.2, curve: 1.7 });
-      tone({ start: start + 0.01, length: 0.22, frequency: reverse ? 740 : 980, endFrequency: reverse ? 220 : 1540, gain: 0.05, type: "triangle", pan, attack: 0.004, filter: { type: "bandpass", start: 1800, end: 4200, q: 1.6 }, send: 0.28 });
+      texture({ start, length: 0.46, gain: 0.13, pan, filter: "bandpass", from: reverse ? 4600 : 1800, to: reverse ? 900 : 5200, q: 0.92, color: "metal", send: 0.3, curve: 1.35 });
+      tone({ start: start + 0.03, length: 0.44, frequency: reverse ? 620 : 820, endFrequency: reverse ? 240 : 1280, gain: 0.042, type: "triangle", pan, attack: 0.028, filter: { type: "bandpass", start: 1400, end: 3600, q: 1.1 }, send: 0.36 });
     };
 
     const gesture = ({ start = 0, length = 0.9, color = "air", pan = 0, noiseGain = 0.1, toneGain = 0.04, from = 1800, to = 260, frequency = 220, endFrequency = 180, send = 0.32 }) => {
@@ -1707,7 +1714,7 @@ function playChampionFoley(profileId = "default") {
       [0.08, 0.17, 0.3, 0.44, 0.62, 0.78, 0.96, 1.18, 1.42, 1.68].forEach((start, index) => {
         bubble(start, -0.42 + (index % 6) * 0.16, 0.55 + (index % 4) * 0.22);
       });
-      texture({ start: 0.58, length: 1.08, gain: 0.16, pan: 0.12, filter: "highpass", from: 7200, to: 900, q: 0.9, color: "water", send: 0.3, curve: 1.9 });
+      texture({ start: 0.58, length: 1.08, gain: 0.12, pan: 0.12, filter: "bandpass", from: 4200, to: 820, q: 0.72, color: "water", send: 0.38, curve: 1.5 });
       tone({ start: 0.34, length: 1.45, frequency: 42, endFrequency: 27, gain: 0.16, type: "sine", pan: -0.02, attack: 0.06, send: 0.24 });
     } else if (profileId === "samira") {
       gesture({ start: 0, length: 1.55, color: "metal", pan: 0, noiseGain: 0.12, toneGain: 0.04, from: 4200, to: 520, frequency: 180, endFrequency: 132, send: 0.34 });
@@ -1717,7 +1724,7 @@ function playChampionFoley(profileId = "default") {
     } else if (profileId === "caitlyn") {
       gesture({ start: 0.02, length: 1.18, color: "metal", pan: -0.08, noiseGain: 0.08, toneGain: 0.036, from: 900, to: 3600, frequency: 164, endFrequency: 246, send: 0.42 });
       sparkleCloud(0.12, 4, "metal", 920, -0.24, 0.16);
-      texture({ start: 0.54, length: 0.22, gain: 0.18, pan: 0.18, filter: "highpass", from: 9800, to: 1800, q: 1.4, color: "metal", send: 0.18, curve: 2.0 });
+      texture({ start: 0.54, length: 0.56, gain: 0.1, pan: 0.18, filter: "bandpass", from: 4800, to: 1100, q: 0.92, color: "metal", send: 0.3, curve: 1.45 });
       impact(0.56, 58, 0.18, 0.1, "metal");
       gesture({ start: 0.74, length: 0.86, color: "air", pan: -0.28, noiseGain: 0.065, toneGain: 0.022, from: 2200, to: 320, frequency: 510, endFrequency: 210, send: 0.44 });
     } else if (profileId === "kaisa") {
@@ -1730,7 +1737,7 @@ function playChampionFoley(profileId = "default") {
       gesture({ start: 0.06, length: 1.65, color: "air", pan: 0, noiseGain: 0.1, toneGain: 0.03, from: 1800, to: 150, frequency: 86, endFrequency: 46, send: 0.38 });
       [0.26, 0.5].forEach((start, index) => {
         impact(start, index ? 54 : 62, 0.18, index ? 0.46 : -0.46, "metal");
-        texture({ start: start + 0.04, length: 0.42, gain: 0.11, pan: index ? 0.55 : -0.55, filter: "highpass", from: 10400, to: 1500, q: 0.9, color: "metal", send: 0.18, curve: 1.9 });
+        texture({ start: start + 0.04, length: 0.56, gain: 0.08, pan: index ? 0.55 : -0.55, filter: "bandpass", from: 4200, to: 900, q: 0.72, color: "metal", send: 0.28, curve: 1.45 });
       });
       sparkleCloud(0.7, 3, "metal", 980, -0.26, 0.26);
       texture({ start: 0.54, length: 1.1, gain: 0.1, pan: 0, filter: "lowpass", from: 1500, to: 140, q: 0.46, color: "air", send: 0.36 });
@@ -1745,7 +1752,7 @@ function playChampionFoley(profileId = "default") {
       gesture({ start: 0, length: 1.5, color: "metal", pan: 0, noiseGain: 0.075, toneGain: 0.045, from: 480, to: 1800, frequency: 146, endFrequency: 98, send: 0.52 });
       [0.12, 0.36, 0.62, 0.96].forEach((start, index) => {
         tone({ start, length: index === 3 ? 0.82 : 0.32, frequency: 196 + index * 49, endFrequency: index === 3 ? 98 : 160 + index * 36, gain: index === 3 ? 0.085 : 0.034, type: "triangle", pan: -0.18 + index * 0.12, filter: { type: "bandpass", start: 420 + index * 260, end: 980 + index * 320, q: 1.0 }, send: 0.5 });
-        if (index < 3) texture({ start: start + 0.03, length: 0.18, gain: 0.032, pan: -0.18 + index * 0.12, filter: "highpass", from: 3800, to: 1500, q: 1.4, color: "metal", send: 0.24, curve: 1.8 });
+        if (index < 3) texture({ start: start + 0.03, length: 0.44, gain: 0.024, pan: -0.18 + index * 0.12, filter: "bandpass", from: 2400, to: 940, q: 0.9, color: "metal", send: 0.34, curve: 1.4 });
       });
       impact(1.1, 38, 0.18, 0, "metal");
     } else if (profileId === "ashe") {
