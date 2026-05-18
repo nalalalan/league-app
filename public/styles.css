@@ -282,22 +282,22 @@ summary {
 .selection-fx.ultimate-scene .fx-shader-canvas {
   z-index: 0;
   opacity: 1;
-  filter: saturate(1.45) contrast(1.18) brightness(1.04);
+  filter: saturate(1.62) contrast(1.24) brightness(1.08);
   mix-blend-mode: screen;
 }
 
 .selection-fx.ultimate-scene .fx-three-canvas {
   z-index: 2;
-  opacity: .86;
-  filter: saturate(1.38) contrast(1.16) brightness(1.04) drop-shadow(0 0 20px rgba(var(--fx-main), .28));
+  opacity: .92;
+  filter: saturate(1.46) contrast(1.2) brightness(1.08) drop-shadow(0 0 24px rgba(var(--fx-main), .34));
   mix-blend-mode: screen;
   transform: translateZ(0);
 }
 
 .selection-fx.ultimate-scene .fx-2d-canvas {
   z-index: 3;
-  opacity: 1;
-  filter: saturate(1.16) contrast(1.12);
+  opacity: .78;
+  filter: saturate(1.08) contrast(1.08) brightness(.96);
   mix-blend-mode: normal;
 }
 

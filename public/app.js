@@ -685,10 +685,13 @@ const fallbackAudioUrls = {};
 let burstTimer = 0;
 let fxTimer = 0;
 const stingerVersion = "20260518-cinematic53";
-const visualFxVersion = "20260518-world-vfx18";
+const visualFxVersion = "20260518-world-vfx19";
 let vfx3dModulePromise;
 const vfx3dWarmPromises = {};
 let vfx2dWarmPromise;
+let ultimateShaderWarmPromise;
+let cinematicPrimeStarted = false;
+let vfxWarmQueueStarted = false;
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -884,7 +887,13 @@ function applyFxProfileVars(element, profile) {
 function effectPixelRatioFor() {
   const maxDimension = Math.max(window.innerWidth || 1, window.innerHeight || 1);
   if (maxDimension <= 900) return 1;
-  return Math.max(0.46, 660 / maxDimension);
+  return Math.min(0.86, Math.max(0.62, 920 / maxDimension));
+}
+
+function effect2dPixelRatioFor(profileId, width, shaderDpr) {
+  if (width <= 760) return Math.min(shaderDpr, 0.86);
+  if (width <= 1100) return Math.min(shaderDpr, 0.56);
+  return Math.min(shaderDpr, profileId === "fizz" ? 0.38 : 0.44);
 }
 
 function loadVfx3dModule() {
@@ -893,8 +902,48 @@ function loadVfx3dModule() {
   return vfx3dModulePromise;
 }
 
+function warmUltimateShader() {
+  if (motionQuery.matches || ultimateShaderWarmPromise || !("WebGLRenderingContext" in window)) return ultimateShaderWarmPromise || Promise.resolve();
+  ultimateShaderWarmPromise = Promise.resolve().then(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 420;
+    canvas.height = 260;
+    canvas.style.cssText = "position:fixed;left:-520px;top:-360px;width:420px;height:260px;opacity:0;pointer-events:none;";
+    document.body.append(canvas);
+    const state = createUltimateShaderState(canvas);
+    if (state) {
+      renderUltimateShader(state, fxProfileFor(currentChampionId || champions[0]?.id || "samira"), 420, 260, 180, 1000, 1);
+      const loseContext = state.gl.getExtension("WEBGL_lose_context");
+      state.gl.deleteBuffer(state.buffer);
+      state.gl.deleteProgram(state.program);
+      loseContext?.loseContext();
+    }
+    canvas.remove();
+  }).catch(() => {});
+  return ultimateShaderWarmPromise;
+}
+
+function scheduleVfxWarmQueue() {
+  if (motionQuery.matches || vfxWarmQueueStarted) return;
+  vfxWarmQueueStarted = true;
+  const activeId = currentChampionId || champions[0]?.id;
+  const ids = [
+    activeId,
+    ...champions.map((champion) => champion.id).filter((championId) => championId !== activeId)
+  ].filter(Boolean);
+  ids.forEach((championId, index) => {
+    window.setTimeout(() => {
+      void warmVfx3dRenderer(championId);
+    }, 220 + index * 260);
+  });
+}
+
 function primeCinematicAssets() {
+  if (cinematicPrimeStarted) return;
+  cinematicPrimeStarted = true;
   void loadVfx3dModule();
+  void warmUltimateShader();
+  window.setTimeout(scheduleVfxWarmQueue, 2600);
 }
 
 function warmVfx3dRenderer(championId = currentChampionId || champions[0]?.id) {
@@ -2167,12 +2216,18 @@ float ring(float d, float r, float w) {
 
 vec3 baseField(vec2 p, float fade) {
   float mist = fbm(p * 2.0 + vec2(u_time * 0.045, -u_time * 0.026));
+  float largeMist = fbm(p * 0.92 + vec2(-u_time * 0.018, u_time * 0.014));
+  float fineMist = fbm(p * 6.4 + vec2(u_time * 0.16, -u_time * 0.1));
   float aura = exp(-dot(p, p) * 2.0);
-  float edge = smoothstep(1.2, 0.1, length(p));
-  vec3 col = u_dark * 0.14 * edge;
-  col += u_main * aura * (0.2 + mist * 0.15);
-  col += u_secondary * exp(-length(p - vec2(0.22, -0.06)) * 2.8) * 0.13;
-  col += u_third * exp(-length(p + vec2(0.26, 0.12)) * 3.0) * 0.1;
+  float edge = 1.0 - smoothstep(0.14, 1.38, length(p));
+  float sweep = exp(-abs(p.y + sin(p.x * 2.2 + u_time * 0.42) * 0.04) * 5.2);
+  float glass = pow(max(0.0, 1.0 - length(p * vec2(0.78, 1.08))), 2.4);
+  vec3 col = u_dark * (0.22 + largeMist * 0.18) * edge;
+  col += mix(u_main, vec3(1.0), 0.14) * aura * (0.24 + mist * 0.22);
+  col += u_secondary * exp(-length(p - vec2(0.22, -0.06)) * 2.8) * 0.18;
+  col += u_third * exp(-length(p + vec2(0.26, 0.12)) * 3.0) * 0.14;
+  col += mix(u_main, u_third, 0.42) * sweep * (0.035 + fineMist * 0.06) * edge;
+  col += vec3(1.0, 0.96, 0.82) * glass * 0.035;
   return col * fade;
 }
 
@@ -2215,55 +2270,87 @@ vec3 caitlynFx(vec2 p, float fade) {
   vec3 col = vec3(0.0);
   float r = length(p);
   float a = atan(p.y, p.x);
+  float glass = exp(-r * r * 1.7);
   float iris = 0.0;
-  for (int i = 0; i < 7; i++) {
+  for (int i = 0; i < 5; i++) {
     float fi = float(i);
-    iris += ring(r, 0.18 + fi * 0.085 + sin(u_time * 0.7 + fi) * 0.004, 0.006 + fi * 0.001);
+    iris += ring(r, 0.2 + fi * 0.12 + sin(u_time * 0.6 + fi) * 0.004, 0.012 + fi * 0.002);
   }
-  float ticks = smoothstep(0.96, 1.0, sin(a * 64.0 + u_time * 0.45));
-  col += u_main * iris * (0.34 + ticks * 0.18);
-  float cross = exp(-abs(p.x) * 110.0) + exp(-abs(p.y) * 110.0);
-  col += vec3(1.0, 0.94, 0.72) * cross * 0.08;
+  float aperture = 0.0;
+  for (int i = 0; i < 8; i++) {
+    float fi = float(i);
+    vec2 q = rotate2d(fi * 0.785 + sin(u_time * 0.26) * 0.02) * p;
+    aperture += smoothstep(0.018, 0.0, abs(q.x)) * smoothstep(0.66, 0.08, abs(q.y)) * 0.22;
+  }
+  float ticks = smoothstep(0.985, 1.0, sin(a * 72.0 + u_time * 0.35));
+  col += mix(u_main, vec3(1.0, 0.95, 0.76), 0.36) * iris * (0.2 + ticks * 0.12);
+  col += u_third * aperture * glass * 0.24;
+  float cross = exp(-abs(p.x) * 75.0) + exp(-abs(p.y) * 75.0);
+  col += vec3(1.0, 0.94, 0.72) * cross * 0.045;
   float shot = smoothstep(0.33, 0.47, u_progress) * (1.0 - smoothstep(0.72, 0.95, u_progress));
   float beam = exp(-sdSegment(p, vec2(-1.15, -0.46), vec2(0.0, 0.0)) * 58.0);
-  col += vec3(1.0, 0.93, 0.72) * beam * shot * 0.75;
-  col += u_third * exp(-r * r * 18.0) * shot;
+  float muzzleMist = fbm(p * 6.0 + vec2(-u_time * 0.36, u_time * 0.1));
+  col += vec3(1.0, 0.93, 0.72) * beam * shot * (0.62 + muzzleMist * 0.22);
+  col += u_third * exp(-r * r * 10.0) * shot * 0.8;
+  col += vec3(0.82, 0.95, 1.0) * glass * fbm(p * 8.0 + u_time * 0.1) * 0.05;
   return col * fade;
 }
 
 vec3 fizzFx(vec2 p, float fade) {
   vec3 col = vec3(0.0);
   float water = fbm(p * vec2(3.0, 5.0) + vec2(u_time * 0.12, u_time * 0.04));
-  float caustic = pow(abs(sin((p.x + water * 0.18) * 18.0 + u_time * 1.6) * sin((p.y - water * 0.1) * 14.0 - u_time)), 7.0);
-  col += u_main * caustic * 0.34;
+  float deep = fbm(p * vec2(1.2, 2.2) + vec2(-u_time * 0.04, u_time * 0.03));
+  float caustic = pow(abs(sin((p.x + water * 0.18) * 18.0 + u_time * 1.6) * sin((p.y - water * 0.1) * 14.0 - u_time)), 6.0);
+  float foam = pow(abs(sin((p.x * 9.0 + p.y * 3.2) + water * 4.0 - u_time * 2.2)), 12.0);
+  col += u_dark * deep * 0.16;
+  col += u_main * caustic * 0.46;
+  col += vec3(0.82, 1.0, 0.96) * foam * smoothstep(-0.12, 0.52, p.y) * 0.18;
   vec2 q = p - vec2(0.02, 0.14 - u_progress * 0.12);
   q = rotate2d(-0.18 + sin(u_time * 0.5) * 0.05) * q;
-  float body = smoothstep(0.5, 0.0, length(q / vec2(0.82, 0.22)));
-  float tail = smoothstep(0.34, 0.0, length((q + vec2(0.64, -0.01)) / vec2(0.34, 0.2)));
-  float fin = smoothstep(0.26, 0.0, length((q + vec2(0.1, -0.22)) / vec2(0.15, 0.28)));
+  float bodyD = length(q / vec2(0.82, 0.22));
+  float tailD = length((q + vec2(0.64, -0.01)) / vec2(0.34, 0.2));
+  float finD = length((q + vec2(0.1, -0.22)) / vec2(0.15, 0.28));
+  float body = smoothstep(0.5, 0.0, bodyD);
+  float tail = smoothstep(0.34, 0.0, tailD);
+  float fin = smoothstep(0.26, 0.0, finD);
   float shadow = max(body, max(tail * 0.7, fin * 0.6));
-  col += mix(u_dark * 0.4, u_main * 0.38, body) * shadow;
-  col += u_main * exp(-abs(q.y + 0.02) * 18.0) * smoothstep(-0.1, 0.64, q.x) * smoothstep(0.82, 0.15, q.x) * 0.22;
-  col += u_secondary * caustic * exp(-length(p - vec2(0.0, 0.12)) * 1.8) * 0.18;
+  float bodyEdge = 1.0 - smoothstep(0.0, 0.05, abs(bodyD - 0.5));
+  float tailEdge = 1.0 - smoothstep(0.0, 0.05, abs(tailD - 0.34));
+  float finEdge = 1.0 - smoothstep(0.0, 0.045, abs(finD - 0.26));
+  float outline = max(bodyEdge, max(tailEdge * 0.7, finEdge * 0.74));
+  float eye = exp(-length(q - vec2(0.42, -0.02)) * 58.0);
+  col += mix(u_dark * 0.58, u_main * 0.34, body) * shadow * 1.18;
+  col += vec3(0.78, 1.0, 0.95) * outline * (0.18 + caustic * 0.12);
+  col += vec3(1.0, 0.28, 0.16) * eye * 0.36;
+  col += u_main * exp(-abs(q.y + 0.02) * 15.0) * smoothstep(-0.1, 0.64, q.x) * smoothstep(0.82, 0.15, q.x) * 0.26;
+  col += u_secondary * caustic * exp(-length(p - vec2(0.0, 0.12)) * 1.8) * 0.24;
+  for (int i = 0; i < 22; i++) {
+    float fi = float(i);
+    vec2 seed = vec2(hash21(vec2(fi, 4.1)), hash21(vec2(fi, 8.4)));
+    vec2 bubble = vec2(seed.x * 2.2 - 1.1 + sin(u_time + fi) * 0.035, 0.82 - fract(seed.y + u_time * (0.05 + seed.x * 0.08)) * 1.55);
+    float b = ring(length(p - bubble), 0.01 + seed.x * 0.018, 0.006 + seed.y * 0.004);
+    col += vec3(0.8, 1.0, 0.96) * b * (0.045 + seed.y * 0.045);
+  }
   return col * fade;
 }
 
 vec3 kaisaFx(vec2 p, float fade) {
-  vec2 q = p * rotate2d(u_time * 0.18);
+  vec2 q = rotate2d(u_time * 0.12) * p;
   float r = length(q);
   float a = atan(q.y, q.x);
   vec3 col = vec3(0.0);
-  float vortex = sin(a * 8.0 - r * 10.0 + u_time * 2.0);
-  col += mix(u_secondary, u_main, vortex * 0.5 + 0.5) * exp(-r * 2.2) * 0.36;
-  float diamond = abs(q.x) + abs(q.y) * 1.35;
-  col += u_third * (1.0 - smoothstep(0.42, 0.5, diamond)) * 0.32;
-  col += u_main * ring(diamond, 0.46 + sin(u_time) * 0.02, 0.02) * 0.62;
-  for (int i = 0; i < 5; i++) {
+  float vortex = sin(a * 9.0 - r * 13.0 + u_time * 2.1);
+  float membrane = fbm(q * 5.2 + vec2(cos(a + u_time), sin(a - u_time)) * 0.12);
+  col += mix(u_secondary, u_main, vortex * 0.5 + 0.5) * exp(-r * 2.25) * (0.28 + membrane * 0.18);
+  col += u_third * pow(max(0.0, 1.0 - r), 2.8) * 0.34;
+  for (int i = 0; i < 7; i++) {
     float fi = float(i);
-    float wing = exp(-sdSegment(p, vec2(0.0, 0.02), vec2(0.7, -0.45 + fi * 0.16)) * (24.0 - fi * 2.0));
-    wing += exp(-sdSegment(p, vec2(0.0, 0.02), vec2(-0.7, -0.45 + fi * 0.16)) * (24.0 - fi * 2.0));
-    col += mix(u_main, u_third, fi / 5.0) * wing * 0.11;
+    float y = -0.52 + fi * 0.16;
+    float wing = exp(-sdSegment(p, vec2(0.0, 0.0), vec2(0.78, y + sin(u_time + fi) * 0.04)) * (18.0 - fi * 1.2));
+    wing += exp(-sdSegment(p, vec2(0.0, 0.0), vec2(-0.78, y - sin(u_time + fi) * 0.04)) * (18.0 - fi * 1.2));
+    col += mix(u_main, u_third, fi / 7.0) * wing * (0.08 + membrane * 0.05);
   }
+  col += vec3(0.85, 0.95, 1.0) * ring(r, 0.18 + sin(u_time * 0.9) * 0.015, 0.018) * 0.34;
   return col * fade;
 }
 
@@ -2374,9 +2461,14 @@ void main() {
   else if (u_scene == 7) col += jhinFx(p, fade);
   else if (u_scene == 8) col += asheFx(p, fade);
   else if (u_scene == 9) col += rammusFx(p, fade);
+  float vignette = 1.0 - smoothstep(0.2, 1.28, length(p));
+  float letter = 1.0 - smoothstep(0.36, 0.5, abs(p.y));
+  float centerBloom = exp(-dot(p, p) * 1.25);
+  col += mix(u_dark, u_main, 0.18) * centerBloom * 0.08 * fade;
+  col *= 0.86 + vignette * 0.28 + letter * 0.06;
   float grain = hash21(gl_FragCoord.xy + floor(u_time * 60.0)) - 0.5;
-  col = col * 1.26 + grain * 0.025 * fade;
-  float alpha = clamp(max(max(col.r, col.g), col.b) * 0.86 + fade * 0.1, 0.0, 0.9);
+  col = col * 1.34 + grain * 0.018 * fade;
+  float alpha = clamp(max(max(col.r, col.g), col.b) * 1.08 + fade * 0.24, 0.0, 0.96);
   gl_FragColor = vec4(col, alpha);
 }
 `;
@@ -3722,8 +3814,8 @@ function drawSharkScene(ctx, width, height, t, profile) {
   const rise = easeOutCubic(clamp((t - 0.06) / 0.54, 0, 1));
   const recoil = smoothstep(0.62, 0.88, t);
   const x = width * (0.52 + Math.sin(t * 7.2) * 0.026);
-  const y = height * (1.02 - rise * 0.46 + recoil * 0.035);
-  const size = Math.min(width, height) * (0.34 + rise * 0.13);
+  const y = height * (0.94 - rise * 0.52 + recoil * 0.035);
+  const size = Math.min(width, height) * (0.38 + rise * 0.17);
 
   ctx.save();
   const water = ctx.createLinearGradient(0, height * 0.42, 0, height);
@@ -4317,15 +4409,72 @@ function drawChampionSignatureScene(ctx, profile, width, height, t) {
   else drawEzrealScene(ctx, width, height, t, profile);
 }
 
+const vfxAccentLayer = {
+  canvas: null,
+  context: null
+};
+
+const vfxLayerOpacities = {
+  samira: { signature: 0.5, action: 0.54 },
+  caitlyn: { signature: 0.36, action: 0.42 },
+  fizz: { signature: 0.58, action: 0.48 },
+  kaisa: { signature: 0.44, action: 0.5 },
+  missfortune: { signature: 0.46, action: 0.52 },
+  ezreal: { signature: 0.48, action: 0.54 },
+  jhin: { signature: 0.5, action: 0.54 },
+  ashe: { signature: 0.48, action: 0.52 },
+  rammus: { signature: 0.48, action: 0.52 },
+  default: { signature: 0.46, action: 0.52 }
+};
+
+function vfxLayerOpacity(profileId, layer, width) {
+  const table = vfxLayerOpacities[profileId] || vfxLayerOpacities.default;
+  const mobileLift = width < 760 ? 0.1 : 0;
+  return Math.min(0.72, (table[layer] || vfxLayerOpacities.default[layer]) + mobileLift);
+}
+
+function drawVfxAccentLayer(ctx, width, height, opacity, renderer) {
+  if (opacity >= 0.98) {
+    renderer(ctx);
+    return;
+  }
+  if (!vfxAccentLayer.canvas) {
+    vfxAccentLayer.canvas = document.createElement("canvas");
+    vfxAccentLayer.context = vfxAccentLayer.canvas.getContext("2d", { alpha: true, desynchronized: true });
+  }
+  const layerContext = vfxAccentLayer.context;
+  const layerCanvas = vfxAccentLayer.canvas;
+  if (!layerContext || !layerCanvas) {
+    renderer(ctx);
+    return;
+  }
+  if (layerCanvas.width !== width || layerCanvas.height !== height) {
+    layerCanvas.width = width;
+    layerCanvas.height = height;
+  }
+  layerContext.setTransform(1, 0, 0, 1, 0, 0);
+  layerContext.clearRect(0, 0, width, height);
+  renderer(layerContext);
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = opacity;
+  ctx.drawImage(layerCanvas, 0, 0);
+  ctx.restore();
+}
+
 function drawUltimateFrame(ctx, profile, width, height, elapsed, duration) {
   const t = clamp(elapsed / duration, 0, 1);
   const stage = cinematicStageFor(profile.id);
   ctx.clearRect(0, 0, width, height);
   drawCinematicBackdrop(ctx, width, height, t, profile);
   drawPremiumMaterialWorld(ctx, width, height, t, profile, stage);
-  drawChampionSignatureScene(ctx, profile, width, height, t);
+  drawVfxAccentLayer(ctx, width, height, vfxLayerOpacity(profile.id, "signature", width), (layerContext) => {
+    drawChampionSignatureScene(layerContext, profile, width, height, t);
+  });
   drawCinematicLensPass(ctx, width, height, t, profile);
-  drawChampionActionCues(ctx, width, height, t, profile, stage, sceneEnvelope(t, 0.94));
+  drawVfxAccentLayer(ctx, width, height, vfxLayerOpacity(profile.id, "action", width), (layerContext) => {
+    drawChampionActionCues(layerContext, width, height, t, profile, stage, sceneEnvelope(t, 0.94));
+  });
   drawCinematicFilmFinish(ctx, width, height, t, profile, stage);
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
@@ -4363,6 +4512,7 @@ function spawnSelectionFx(button, profileId = "default") {
   window.clearTimeout(fxTimer);
   document.querySelectorAll(".selection-fx").forEach((node) => {
     if (node._raf) cancelAnimationFrame(node._raf);
+    if (node._threeStartTimer) window.clearTimeout(node._threeStartTimer);
     if (node._threeDispose) node._threeDispose();
     node.remove();
   });
@@ -4373,6 +4523,7 @@ function spawnSelectionFx(button, profileId = "default") {
   const canvas = document.createElement("canvas");
   fx.className = "selection-fx ultimate-scene";
   fx.dataset.championFx = profile.id;
+  fx.dataset.vfxTier = "shader-first-vfx19";
   fx.setAttribute("aria-hidden", "true");
   shaderCanvas.className = "fx-shader-canvas";
   threeCanvas.className = "fx-three-canvas";
@@ -4395,31 +4546,36 @@ function spawnSelectionFx(button, profileId = "default") {
   let stageHeight = Math.ceil(window.innerHeight);
   let stageDpr = effectPixelRatioFor();
   let threeScene;
+  let threeStartTimer = 0;
   const updateStageSize = () => {
     stageWidth = Math.ceil(window.innerWidth);
     stageHeight = Math.ceil(window.innerHeight);
     stageDpr = effectPixelRatioFor();
   };
   window.addEventListener("resize", updateStageSize, { passive: true });
-  void loadVfx3dModule().then((module) => {
-    if (!module || !fx.isConnected) return;
-    threeScene = module.createChampionVfx3D({
-      canvas: threeCanvas,
-      championId: profile.id,
-      profile,
-      duration
+  threeStartTimer = window.setTimeout(() => {
+    void loadVfx3dModule().then((module) => {
+      if (!module || !fx.isConnected) return;
+      threeScene = module.createChampionVfx3D({
+        canvas: threeCanvas,
+        championId: profile.id,
+        profile,
+        duration
+      });
+      fx._threeDispose = () => {
+        threeScene?.dispose();
+        threeScene = undefined;
+      };
     });
-    fx._threeDispose = () => {
-      threeScene?.dispose();
-      threeScene = undefined;
-    };
-  });
+  }, 320);
+  fx._threeStartTimer = threeStartTimer;
   const render = (now) => {
     const width = stageWidth;
     const height = stageHeight;
     const dpr = stageDpr;
-    const pixelWidth = Math.round(width * dpr);
-    const pixelHeight = Math.round(height * dpr);
+    const twoDDpr = effect2dPixelRatioFor(profile.id, width, dpr);
+    const pixelWidth = Math.round(width * twoDDpr);
+    const pixelHeight = Math.round(height * twoDDpr);
     const elapsed = now - startedAt;
     const frameDelta = now - lastFrameAt;
     lastFrameAt = now;
@@ -4434,6 +4590,7 @@ function spawnSelectionFx(button, profileId = "default") {
         maxMs: Math.round(frameMax * 10) / 10,
         slowFrames,
         dpr,
+        twoDDpr,
         width,
         height,
         three: Boolean(threeScene)
@@ -4457,8 +4614,8 @@ function spawnSelectionFx(button, profileId = "default") {
       context.imageSmoothingQuality = "high";
       last2dDrawAt = -Infinity;
     }
-    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 48;
-    const twoDFrameInterval = profile.id === "fizz" && width > 900 ? 80 : 48;
+    const needsFirst2dDraw = last2dDrawAt < 0 && elapsed > 180;
+    const twoDFrameInterval = width > 900 ? (profile.id === "fizz" ? 160 : 120) : 72;
     const needs2dDraw = last2dDrawAt >= 0 && elapsed - last2dDrawAt >= twoDFrameInterval;
     if (needsFirst2dDraw || needs2dDraw || elapsed > duration - 140) {
       context.setTransform(1, 0, 0, 1, 0, 0);
@@ -4472,6 +4629,7 @@ function spawnSelectionFx(button, profileId = "default") {
   fx._raf = requestAnimationFrame(render);
   fxTimer = window.setTimeout(() => {
     if (fx._raf) cancelAnimationFrame(fx._raf);
+    window.clearTimeout(threeStartTimer);
     window.removeEventListener("resize", updateStageSize);
     if (fx._threeDispose) fx._threeDispose();
     fx.remove();
@@ -4553,10 +4711,10 @@ function renderPicker() {
       button.style.setProperty("--my", "42%");
     });
     button.addEventListener("pointerenter", () => {
-      void loadVfx3dModule();
+      void warmVfx3dRenderer(champion.id);
     });
     button.addEventListener("focus", () => {
-      void loadVfx3dModule();
+      void warmVfx3dRenderer(champion.id);
     });
     button.addEventListener("click", () => {
       button.classList.remove("is-flashing");
@@ -4618,6 +4776,7 @@ renderPicker();
 renderChampion("samira", { animate: false });
 hydratePublicNotes();
 if (!motionQuery.matches) {
+  window.setTimeout(primeCinematicAssets, 220);
   if ("requestIdleCallback" in window) {
     window.requestIdleCallback(primeCinematicAssets, { timeout: 1600 });
   } else {

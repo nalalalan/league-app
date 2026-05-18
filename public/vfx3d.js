@@ -786,7 +786,7 @@ function updateChampionRelic(group, elapsed, progress, preset) {
     mesh.position.set(data.baseX, data.baseY, data.baseZ);
     mesh.rotation.set(data.baseRotX, data.baseRotY, data.baseRotZ);
     mesh.scale.set(data.baseScaleX, data.baseScaleY, data.baseScaleZ);
-    mesh.material.opacity = Math.min(0.92, data.baseOpacity * visibility * shimmer * 1.42);
+    mesh.material.opacity = Math.min(0.72, data.baseOpacity * visibility * shimmer * 0.86);
 
     if (data.role.includes("ring") || data.role === "scope" || data.role === "aperture") {
       const swell = 1 + Math.sin(time * (0.8 + Math.abs(data.spin)) + phase * TAU) * 0.035 + progress * 0.08;
@@ -797,14 +797,14 @@ function updateChampionRelic(group, elapsed, progress, preset) {
       mesh.position.x = data.baseX + Math.sin(time * 2.4 + phase * TAU) * 0.11;
       mesh.position.y = data.baseY + drift * 1.08;
       mesh.scale.setScalar(data.baseScaleX * (0.72 + drift * 0.8));
-      mesh.material.opacity = Math.min(0.78, data.baseOpacity * visibility * (1 - smoothstep(0.72, 1, drift)) * (0.92 + pulse * 0.55) * 1.42);
+      mesh.material.opacity = Math.min(0.58, data.baseOpacity * visibility * (1 - smoothstep(0.72, 1, drift)) * (0.92 + pulse * 0.55) * 0.9);
     } else if (data.role === "blade" || data.role === "fan" || data.role === "curtain-cut") {
       mesh.rotation.z = data.baseRotZ + Math.sin(time * 1.2 + phase * TAU) * 0.08 * data.side;
       mesh.scale.x = data.baseScaleX * (1 + pulse * 0.18);
     } else if (data.role === "beam" || data.role === "muzzle") {
       const flash = smoothstep(0.12, 0.34, progress) * (1 - smoothstep(0.68, 0.92, progress));
       mesh.scale.x = data.baseScaleX * (1 + flash * 1.4 + pulse * 0.18);
-      mesh.material.opacity = Math.min(0.95, data.baseOpacity * visibility * (0.78 + flash * 1.45 + pulse * 0.24) * 1.38);
+      mesh.material.opacity = Math.min(0.76, data.baseOpacity * visibility * (0.78 + flash * 1.45 + pulse * 0.24) * 0.98);
     } else if (data.role.includes("trident")) {
       mesh.position.y = data.baseY + Math.sin(time * 1.2 + phase * TAU) * 0.045;
       mesh.rotation.z = data.baseRotZ + Math.sin(time * 0.9 + phase * TAU) * 0.035;
@@ -829,9 +829,10 @@ function updateChampionRelic(group, elapsed, progress, preset) {
     }
 
     if (mode === 3) {
-      if (data.role === "bubble") mesh.material.opacity = Math.min(mesh.material.opacity, 0.18 * visibility);
-      else if (data.role.includes("trident")) mesh.material.opacity = Math.min(mesh.material.opacity, 0.035 * visibility);
-      else mesh.material.opacity = Math.min(mesh.material.opacity, 0.018 * visibility);
+      if (data.role === "bubble") mesh.material.opacity = Math.min(mesh.material.opacity, 0.24 * visibility);
+      else if (data.role.includes("trident")) mesh.material.opacity = Math.min(mesh.material.opacity, 0.34 * visibility);
+      else if (data.role === "water-ring") mesh.material.opacity = Math.min(mesh.material.opacity, 0.18 * visibility);
+      else mesh.material.opacity = Math.min(mesh.material.opacity, 0.055 * visibility);
     }
   });
 }
@@ -874,8 +875,8 @@ export function createChampionVfx3D({ canvas, championId = "default", profile = 
   const rings = new THREE.Group();
   const beams = new THREE.Group();
   const shards = createShards(colors, preset);
-  const relic = new THREE.Group();
-  root.add(particles, shards);
+  const relic = preset.mode === 3 ? createChampionRelic(colors, preset) : new THREE.Group();
+  root.add(particles, shards, relic);
 
   let disposed = false;
   let lastWidth = 0;
@@ -930,6 +931,7 @@ export function createChampionVfx3D({ canvas, championId = "default", profile = 
       }
     });
     renderer.dispose();
+    if (typeof renderer.forceContextLoss === "function") renderer.forceContextLoss();
   }
 
   return { resize, render, dispose };
