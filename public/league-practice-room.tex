@@ -133,7 +133,7 @@
 \end{center}
 
 \vspace{0.35em}
-\noindent\textbf{Fast multiplayer games can convert practice into threat when social judgment, sensory load, ambiguous damage, and repeated failure are experienced as one continuous demand. This manuscript reports a single-user design study of \href{https://league.aolabs.io}{league.aolabs.io}, a public review room for League of Legends practice. The system does not claim clinical efficacy, population generality, or competitive optimization. It translates a user-provided learning arc into a low-threat review surface: image-based champion selection, champion-specific situation notes, public logs, and a downloadable record. The strongest contribution is a design pattern rather than a gameplay result: make the next repetition easier to start by letting the player choose the current champion and then read only the situations that matter for that champion. The interface treats bots as a practice room, human games as performance, death-with-intent as a valid rep, and situation review as mental practice. This bounded case suggests how personal learning software can support high-repetition play without becoming another source of evaluation pressure.}
+\noindent\textbf{Fast multiplayer games can convert practice into threat when social judgment, sensory load, ambiguous damage, and repeated failure are experienced as one continuous demand. This manuscript reports a single-user design study of \href{https://league.aolabs.io}{league.aolabs.io}, a public review room for League of Legends practice. The system does not claim clinical efficacy, population generality, or competitive optimization. It translates a user-provided learning arc into a low-threat review surface: image-based champion selection, champion-specific situation notes, public logs, raw recording review, and a downloadable record. The strongest contribution is a design pattern rather than a gameplay result: make the next repetition easier to start by letting the player choose the current champion and then read only the situations that matter for that champion. The interface treats bots as a practice room, human games as performance, death-with-intent as a valid rep, and situation review as mental practice. This bounded case suggests how personal learning software can support high-repetition play without becoming another source of evaluation pressure.}
 
 \newpage
 \pagestyle{fancy}
@@ -206,6 +206,12 @@ The champion library is not organized as a tier list. It records fit through the
 
 The same logic applies to other champions. Kai'Sa is not treated as automatically correct because the user reported that walk animation and visual feel affect willingness to repeat games. Ezreal's Q rhythm is useful, even if the character fantasy is wrong. Rammus is retained as a negative fit example because mechanically simple choices can still be poor practice tools if they make the body feel bored or irritated. The public page therefore shows champion imagery as the selection mechanism and reserves text for the selected champion's situations.
 
+\subsection{Raw recordings converted a carry game into one improvement target}
+
+On May 18, 2026, the public page added a generated recordings manifest from the local League of Legends Highlights folder. The first manifest contains 13 \texttt{.webm} recordings from match \texttt{NA1-5563247854}. The set totals 5:58 of video and includes twelve short highlight clips plus one accelerated full-game recording. Champion detection was bounded to the visible replay evidence: sampled frames show Samira in the team list and center the Soul Fighter Samira model and nameplate. No other player champion was treated as source-confirmed for this recording set.
+
+The recording review does not attempt to become a full coaching dashboard. The page gives one current improvement for the detected champion and one feedback note for every recording. For Samira, the review target is reset discipline after the first won exchange: after one kill, ultimate, or E reset, check tower range, fog, enemy crowd control, and numbers before chasing again. This target preserves the positive evidence that kill pressure exists while addressing the climb-relevant cost visible in a high-kill, high-death game.
+
 \subsection{The public log made mindset part of the artifact}
 
 The public log starts with source entries for the seed arc import, the practice-room frame, the current Samira law, and later user-supplied Samira proof-game notes. This is intentionally public. The design choice is that thoughts, panic notes, and mindset rules are not private by default; they are part of the learning artifact. The only excluded material is unrelated sensitive information such as credentials, access tokens, or private third-party identifiers.
@@ -216,13 +222,13 @@ The case suggests that the useful interface for some high-repetition learners is
 
 The work also reframes death and failure. The site does not encourage intentional feeding or fake failure. It uses the rule ``choose the fight; death is allowed; winning is intended.'' That distinction matters. It keeps agency with the learner while preserving the real objective of the game. It also separates practice failure from collapse: a failed engage that tested damage, W timing, or exit timing is a rep; walking in only to die is not.
 
-Several limits are important. First, this is a single-user artifact, not a clinical intervention. The user self-described ADHD/autism traits and supplied a practice narrative, but the site does not diagnose, treat, or generalize to neurodivergent players as a class. Second, the current evidence is artifact-level: source text, distilled rules, a rendered page, and the paper itself. It does not include a controlled comparison, a ranked outcome, or a match-history dataset. Third, the system deliberately avoids Riot API import in version 1. That keeps the artifact focused on review and self-regulation rather than turning it into a stat tracker.
+Several limits are important. First, this is a single-user artifact, not a clinical intervention. The user self-described ADHD/autism traits and supplied a practice narrative, but the site does not diagnose, treat, or generalize to neurodivergent players as a class. Second, the current evidence is artifact-level: source text, distilled rules, local recordings, a rendered page, and the paper itself. It does not include a controlled comparison, a ranked outcome, or a match-history dataset. Third, the system deliberately avoids Riot API import in version 1. That keeps the artifact focused on review and self-regulation rather than turning it into a stat tracker.
 
 \section{Materials and Methods}
 
 \subsection*{Source corpus}
 
-The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. Later May 17 and May 18 prompts added Samira crowd-control, W-blocking, poke-lane, bait-recognition, team-fight, bad-team, normal-game, and proof-game refinements. The implementation treated these texts as the current source of truth for the public situation notes. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
+The seed corpus was the user-provided League learning arc pasted into the implementation thread on May 17, 2026. It described the user's own League practice, including early Caitlyn farming goals, Samira drills, bot-ladder practice, camera and sensory adjustments, death exposure, and champion-fit comparisons. Later May 17 and May 18 prompts added Samira crowd-control, W-blocking, poke-lane, bait-recognition, team-fight, bad-team, normal-game, and proof-game refinements. A May 18 local recording folder then supplied 13 \texttt{.webm} files from match \texttt{NA1-5563247854}. The implementation treated these texts and recordings as the current source of truth for the public situation notes and recording review. Match statistics mentioned in the source were treated as user-supplied examples, not independently verified performance results.
 
 \subsection*{Interface requirements}
 
@@ -234,7 +240,7 @@ Rules were extracted by finding repeated gameplay or mindset triggers in the sou
 
 \subsection*{Public artifact implementation}
 
-The website is served by a small Node application on Railway. It serves the hand-authored page and paper artifacts from the public directory and exposes \texttt{/api/logs} for public note reads and writes. On Railway, persistent storage is provided through the configured volume path, and writes are gated by \texttt{LEAGUE\_WRITE\_TOKEN}. This keeps public notes browser-independent without adding a fake local-only note form or claiming Riot API integration that is not present in version 1.
+The website is served by a small Node application on Railway. It serves the hand-authored page, generated recording manifest, raw recording files, poster frames, and paper artifacts from the public directory and exposes \texttt{/api/logs} for public note reads and writes. A local sync script scans the source Highlights folder, copies new \texttt{.webm} files into the public recording directory, extracts poster frames with \texttt{ffmpeg}, reuses cached feedback for unchanged files, and refreshes the manifest that the browser loads. On Railway, persistent storage is provided through the configured volume path, and writes are gated by \texttt{LEAGUE\_WRITE\_TOKEN}. This keeps public notes browser-independent without adding a fake local-only note form or claiming Riot API integration that is not present in version 1.
 
 \backmattersection{Acknowledgements}
 
@@ -254,7 +260,7 @@ The author owns and operates AO Labs. The site is a personal public artifact and
 
 \backmattersection{Data availability}
 
-The first public data source is the League practice arc supplied in the implementation thread and the public log exposed through \href{https://league.aolabs.io}{league.aolabs.io}. Raw game screenshots were not included in this first version.
+The first public data source is the League practice arc supplied in the implementation thread and the public log exposed through \href{https://league.aolabs.io}{league.aolabs.io}. The current public page also exposes the May 18, 2026 \texttt{NA1-5563247854} recording manifest: twelve short highlight files, one accelerated full-game file, poster frames, per-recording feedback, and one main queue focus. Riot API match history is not imported in this version.
 
 \backmattersection{Code availability}
 

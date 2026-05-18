@@ -6,7 +6,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "sync:recordings": "node tools/sync-recordings.mjs"
   },
   "dependencies": {}
 }

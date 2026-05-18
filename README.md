@@ -19,6 +19,22 @@ Open `http://localhost:3000`.
 - `POST /api/logs` appends a public note. In Railway, set `LEAGUE_WRITE_TOKEN` before enabling writes.
 - `LEAGUE_DATA_DIR` or `RAILWAY_VOLUME_MOUNT_PATH` controls persistent note storage.
 
+## Recordings
+
+New League `.webm` recordings are synced from:
+
+```bash
+C:\Users\phama\Documents\League of Legends\Highlights
+```
+
+Run:
+
+```bash
+npm run sync:recordings
+```
+
+The sync copies recordings into `public/recordings/`, extracts poster frames, and writes `public/recordings/recordings.json`. The page loads that manifest so new recordings can appear without editing `app.js`.
+
 ## Paper
 
 The public paper artifacts are:

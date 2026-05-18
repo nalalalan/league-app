@@ -6,5 +6,6 @@
 *.out
 *.run.xml
 _verification/
+_recording-analysis/
 _local*.log
 _licensed-audio/

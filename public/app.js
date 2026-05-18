@@ -665,6 +665,45 @@ const champions = [
   }
 ];
 
+const recordingReview = {
+  match: "NA1-5563247854",
+  captured: "May 18, 2026, 5:46-5:57 PM ET",
+  totalDuration: "5:57",
+  totalRecordings: 13,
+  mainFeedback: {
+    title: "Samira: E only with an exit",
+    focus: "Before every E, name the exit: lethal reset, Flash, teammate cover, or a clean walk-out path.",
+    rule: "Kill or tower -> crash wave, take objective space, or recall; no second fight unless it wins the map.",
+    nextRep: "Next queue cue: exit before E."
+  },
+  detectedChampions: [
+    {
+      id: "samira",
+      name: "Samira",
+      confidence: "high",
+      recordings: 13,
+      evidence: "Replay side list names Samira on Alan's team; sampled clips center the Soul Fighter Samira model and nameplate.",
+      improvementTitle: "Do not spend E without the walk-out",
+      improvement: "The damage is already there. The Diamond habit is refusing the second fight unless the exit, enemy CC, and objective payoff are already known."
+    }
+  ],
+  recordings: [
+    { title: "highlight 01", duration: "0:06", kind: "highlight", champion: "Samira", feedbackTitle: "E only after the exit exists", feedback: "Hold E until the target is lethal or a reset, Flash, teammate cover, or clean walk-out path is already visible.", src: "/recordings/16-10_NA1-5563247854_01.webm", poster: "/recordings/posters/16-10-na1-5563247854-01.jpg" },
+    { title: "highlight 02", duration: "0:17", kind: "highlight", champion: "Samira", feedbackTitle: "Name the CC before going in", feedback: "Before E/R, identify the one spell that cancels the play; enter only after it is spent, blocked by W, or aimed elsewhere.", src: "/recordings/16-10_NA1-5563247854_02.webm", poster: "/recordings/posters/16-10-na1-5563247854-02.jpg" },
+    { title: "highlight 03", duration: "0:12", kind: "highlight", champion: "Samira", feedbackTitle: "Stop chasing at fog", feedback: "A low target past vision is not free; shove the wave or take plate unless the next enemy position is known.", src: "/recordings/16-10_NA1-5563247854_03.webm", poster: "/recordings/posters/16-10-na1-5563247854-03.jpg" },
+    { title: "highlight 04", duration: "0:16", kind: "highlight", champion: "Samira", feedbackTitle: "Turn bot kills into tempo", feedback: "After the first kill or forced recall, crash wave first, then choose plate, dragon move, reset, or support roam.", src: "/recordings/16-10_NA1-5563247854_04.webm", poster: "/recordings/posters/16-10-na1-5563247854-04.jpg" },
+    { title: "highlight 05", duration: "0:42", kind: "highlight", champion: "Samira", feedbackTitle: "Fight from the edge first", feedback: "Let Q, autos, and W collect cooldowns before entering; Samira should clean the fight, not start it blind.", src: "/recordings/16-10_NA1-5563247854_05.webm", poster: "/recordings/posters/16-10-na1-5563247854-05.jpg" },
+    { title: "highlight 06", duration: "0:01", kind: "highlight", champion: "Samira", feedbackTitle: "Make clips reviewable", feedback: "Keep at least five seconds before and after the fight so the trigger, cooldowns, and exit can be judged.", src: "/recordings/16-10_NA1-5563247854_06.webm", poster: "/recordings/posters/16-10-na1-5563247854-06.jpg" },
+    { title: "highlight 07", duration: "0:13", kind: "highlight", champion: "Samira", feedbackTitle: "Recall with shutdown value", feedback: "After a tower or multi-kill, leave while holding gold; dying after the win gives away the tempo that should climb.", src: "/recordings/16-10_NA1-5563247854_07.webm", poster: "/recordings/posters/16-10-na1-5563247854-07.jpg" },
+    { title: "highlight 08", duration: "0:17", kind: "highlight", champion: "Samira", feedbackTitle: "Count numbers before answering", feedback: "If a teammate dies nearby, count visible enemies before joining; do not spend E to rescue a fight already lost.", src: "/recordings/16-10_NA1-5563247854_08.webm", poster: "/recordings/posters/16-10-na1-5563247854-08.jpg" },
+    { title: "highlight 09", duration: "0:26", kind: "highlight", champion: "Samira", feedbackTitle: "Side farm only with cover", feedback: "Catch the wave, then leave toward teammates; stay side only when mid has priority or three enemies are visible.", src: "/recordings/16-10_NA1-5563247854_09.webm", poster: "/recordings/posters/16-10-na1-5563247854-09.jpg" },
+    { title: "highlight 10", duration: "0:11", kind: "highlight", champion: "Samira", feedbackTitle: "Do not duel without the exit", feedback: "When an enemy catches a wave, pressure the objective first; take the duel only with ult, summoner info, and a walk-out.", src: "/recordings/16-10_NA1-5563247854_10.webm", poster: "/recordings/posters/16-10-na1-5563247854-10.jpg" },
+    { title: "highlight 11", duration: "0:12", kind: "highlight", champion: "Samira", feedbackTitle: "Never be first into choke", feedback: "At jungle walls, hold the edge until enemy CC is used; entering first makes Samira the target instead of the finisher.", src: "/recordings/16-10_NA1-5563247854_11.webm", poster: "/recordings/posters/16-10-na1-5563247854-11.jpg" },
+    { title: "highlight 12", duration: "0:50", kind: "highlight", champion: "Samira", feedbackTitle: "End after the base win", feedback: "At inhib or nexus, kills are only a tool; hit the structure as soon as the fight is won instead of extending.", src: "/recordings/16-10_NA1-5563247854_12.webm", poster: "/recordings/posters/16-10-na1-5563247854-12.jpg" },
+    { title: "full game 8x", duration: "2:09", kind: "full 8x", champion: "Samira", feedbackTitle: "Cut the 10-death pattern", feedback: "16/10 Samira says damage is not the gap; climb by refusing the second fight unless it buys tower, dragon, Baron, or nexus.", src: "/recordings/16-10_NA1-5563247854_13.webm", poster: "/recordings/posters/16-10-na1-5563247854-13.jpg" }
+  ]
+};
+
 const championPicker = document.querySelector("#champion-picker");
 const championPanel = document.querySelector("#champion-panel");
 const championName = document.querySelector("#champion-name");
@@ -673,6 +712,9 @@ const championNote = document.querySelector("#champion-note");
 const situationsSection = document.querySelector(".situations");
 const situationCount = document.querySelector("#situation-count");
 const situationList = document.querySelector("#situation-list");
+const recordingSummary = document.querySelector("#recording-summary");
+const recordingFocus = document.querySelector("#recording-focus");
+const recordingGrid = document.querySelector("#recording-grid");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -1109,6 +1151,88 @@ function writeChampion(champion) {
   championNote.textContent = champion.note;
   situationCount.textContent = `${champion.situations.length} situations`;
   situationList.replaceChildren(...champion.situations.map(situationCard));
+}
+
+function recordingMainCard(review) {
+  const item = review.mainFeedback || {};
+  const article = document.createElement("article");
+  article.className = "recording-main";
+
+  const title = document.createElement("h3");
+  title.textContent = item.title || "One focus";
+
+  const focus = document.createElement("p");
+  focus.className = "recording-main-focus";
+  focus.textContent = item.focus || "Review the newest recordings and choose one repeatable in-game rule.";
+
+  const rule = document.createElement("p");
+  rule.className = "recording-main-rule";
+  rule.textContent = item.rule || "";
+
+  const nextRep = document.createElement("p");
+  nextRep.className = "recording-main-rep";
+  nextRep.textContent = item.nextRep || "";
+
+  article.append(title, focus);
+  if (rule.textContent) article.append(rule);
+  if (nextRep.textContent) article.append(nextRep);
+  return article;
+}
+
+function recordingCard(item) {
+  const article = document.createElement("article");
+  article.className = "recording-card";
+
+  const video = document.createElement("video");
+  video.controls = true;
+  video.preload = "metadata";
+  video.poster = item.poster;
+  video.src = item.src;
+  video.setAttribute("playsinline", "");
+
+  const meta = document.createElement("div");
+  meta.className = "recording-meta";
+
+  const title = document.createElement("h3");
+  title.textContent = item.title;
+
+  const detail = document.createElement("p");
+  detail.textContent = `${item.champion} · ${item.kind} · ${item.duration}`;
+
+  const feedbackTitle = document.createElement("p");
+  feedbackTitle.className = "recording-card-feedback-title";
+  feedbackTitle.textContent = item.feedbackTitle || "Focus";
+
+  const feedback = document.createElement("p");
+  feedback.className = "recording-card-feedback";
+  feedback.textContent = item.feedback || "No feedback generated yet.";
+
+  meta.append(title, detail, feedbackTitle, feedback);
+  article.append(video, meta);
+  return article;
+}
+
+function renderRecordings(review = recordingReview) {
+  if (!recordingSummary || !recordingFocus || !recordingGrid) return;
+  recordingSummary.textContent = `${review.totalRecordings} files · ${review.totalDuration} · ${review.match || "latest"}`;
+  recordingFocus.replaceChildren(recordingMainCard(review));
+  recordingGrid.replaceChildren(...(review.recordings || []).map(recordingCard));
+}
+
+async function hydrateRecordings() {
+  renderRecordings(recordingReview);
+  try {
+    const response = await fetch("/recordings/recordings.json", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!Array.isArray(data.recordings) || data.recordings.length === 0) return;
+    renderRecordings(data);
+  } catch {
+    // Keep the embedded fallback recording review.
+  }
 }
 
 function setPressedChampion(championId) {
@@ -4774,6 +4898,7 @@ async function hydratePublicNotes() {
 
 renderPicker();
 renderChampion("samira", { animate: false });
+hydrateRecordings();
 hydratePublicNotes();
 if (!motionQuery.matches) {
   window.setTimeout(primeCinematicAssets, 220);
