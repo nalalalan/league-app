@@ -685,7 +685,7 @@ const fallbackAudioUrls = {};
 const cinematicImageCache = {};
 let burstTimer = 0;
 let fxTimer = 0;
-const stingerVersion = "20260518-cinematic45";
+const stingerVersion = "20260518-cinematic46";
 const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
@@ -714,6 +714,120 @@ const shaderSceneIds = {
   jhin: 7,
   ashe: 8,
   rammus: 9
+};
+
+const defaultCinematicStage = {
+  focusX: 0.5,
+  focusY: 0.48,
+  zoomStart: 1.1,
+  zoomEnd: 1.22,
+  panX: 0,
+  panY: 0,
+  roll: 0,
+  impacts: [0.16, 0.54, 0.82],
+  material: "aura"
+};
+
+const cinematicStages = {
+  samira: {
+    focusX: 0.44,
+    focusY: 0.45,
+    zoomStart: 1.12,
+    zoomEnd: 1.34,
+    panX: -0.04,
+    panY: 0.02,
+    roll: -0.018,
+    impacts: [0.08, 0.34, 0.58, 0.82],
+    material: "blade"
+  },
+  caitlyn: {
+    focusX: 0.52,
+    focusY: 0.43,
+    zoomStart: 1.08,
+    zoomEnd: 1.24,
+    panX: 0.02,
+    panY: -0.03,
+    roll: 0.006,
+    impacts: [0.14, 0.42, 0.7],
+    material: "scope"
+  },
+  fizz: {
+    focusX: 0.5,
+    focusY: 0.44,
+    zoomStart: 1.1,
+    zoomEnd: 1.28,
+    panX: 0.01,
+    panY: 0.04,
+    roll: -0.012,
+    impacts: [0.08, 0.48, 0.78],
+    material: "water"
+  },
+  kaisa: {
+    focusX: 0.5,
+    focusY: 0.44,
+    zoomStart: 1.08,
+    zoomEnd: 1.3,
+    panX: 0.02,
+    panY: -0.01,
+    roll: 0.014,
+    impacts: [0.12, 0.46, 0.72],
+    material: "void"
+  },
+  missfortune: {
+    focusX: 0.52,
+    focusY: 0.46,
+    zoomStart: 1.1,
+    zoomEnd: 1.27,
+    panX: -0.01,
+    panY: 0.02,
+    roll: 0.008,
+    impacts: [0.12, 0.34, 0.62],
+    material: "gunfire"
+  },
+  ezreal: {
+    focusX: 0.48,
+    focusY: 0.43,
+    zoomStart: 1.1,
+    zoomEnd: 1.32,
+    panX: -0.03,
+    panY: -0.02,
+    roll: -0.018,
+    impacts: [0.1, 0.38, 0.72],
+    material: "arcane"
+  },
+  jhin: {
+    focusX: 0.5,
+    focusY: 0.44,
+    zoomStart: 1.08,
+    zoomEnd: 1.22,
+    panX: 0,
+    panY: -0.03,
+    roll: 0.004,
+    impacts: [0.16, 0.46, 0.78],
+    material: "stage"
+  },
+  ashe: {
+    focusX: 0.5,
+    focusY: 0.43,
+    zoomStart: 1.08,
+    zoomEnd: 1.26,
+    panX: -0.02,
+    panY: -0.02,
+    roll: -0.006,
+    impacts: [0.14, 0.5, 0.78],
+    material: "ice"
+  },
+  rammus: {
+    focusX: 0.52,
+    focusY: 0.52,
+    zoomStart: 1.12,
+    zoomEnd: 1.34,
+    panX: 0.02,
+    panY: 0.05,
+    roll: 0.014,
+    impacts: [0.12, 0.32, 0.56, 0.82],
+    material: "quake"
+  }
 };
 
 function clamp(value, min, max) {
@@ -1439,6 +1553,14 @@ function easeInOutCubic(value) {
   return value < 0.5 ? 4 * value * value * value : 1 - ((-2 * value + 2) ** 3) / 2;
 }
 
+function easeInOutSine(value) {
+  return -(Math.cos(Math.PI * value) - 1) / 2;
+}
+
+function easeOutQuint(value) {
+  return 1 - ((1 - value) ** 5);
+}
+
 function smoothstep(edge0, edge1, value) {
   const x = clamp((value - edge0) / (edge1 - edge0), 0, 1);
   return x * x * (3 - 2 * x);
@@ -1446,6 +1568,21 @@ function smoothstep(edge0, edge1, value) {
 
 function sceneEnvelope(t, outStart = 0.78) {
   return smoothstep(0, 0.08, t) * (1 - smoothstep(outStart, 1, t));
+}
+
+function cinematicStageFor(profileId = "default") {
+  return {
+    ...defaultCinematicStage,
+    ...(cinematicStages[profileId] || {})
+  };
+}
+
+function beatPulse(t, beat, width = 0.055) {
+  return Math.max(0, 1 - Math.abs(t - beat) / width) ** 2.4;
+}
+
+function stageImpactPulse(t, stage, width = 0.06) {
+  return stage.impacts.reduce((sum, beat) => sum + beatPulse(t, beat, width), 0);
 }
 
 function drawRadialGlow(ctx, x, y, radius, stops, alpha = 1) {
@@ -1827,7 +1964,7 @@ void main() {
   vec2 p = (uv - 0.5) * vec2(u_resolution.x / u_resolution.y, 1.0);
   float fade = smoothstep(0.0, 0.05, u_progress) * (1.0 - smoothstep(0.9, 1.0, u_progress));
   vec3 col = baseField(p, fade);
-  col += particleField(p, fade, 1.0);
+  col += particleField(p, fade, 1.0) * 0.38;
   if (u_scene == 1) col += samiraFx(p, fade);
   else if (u_scene == 2) col += caitlynFx(p, fade);
   else if (u_scene == 3) col += fizzFx(p, fade);
@@ -1952,6 +2089,49 @@ function coverImageBox(image, width, height, scale = 1, xOffset = 0, yOffset = 0
   };
 }
 
+function coverImageBoxFocused(image, width, height, scale = 1, focusX = 0.5, focusY = 0.5, xOffset = 0, yOffset = 0) {
+  const ratio = Math.max(width / image.naturalWidth, height / image.naturalHeight) * scale;
+  const drawWidth = image.naturalWidth * ratio;
+  const drawHeight = image.naturalHeight * ratio;
+  let x = width * 0.5 - drawWidth * focusX + xOffset;
+  let y = height * 0.5 - drawHeight * focusY + yOffset;
+  if (drawWidth > width) x = clamp(x, width - drawWidth, 0);
+  if (drawHeight > height) y = clamp(y, height - drawHeight, 0);
+  return {
+    x,
+    y,
+    width: drawWidth,
+    height: drawHeight
+  };
+}
+
+function drawFocusedImage(ctx, image, width, height, options = {}) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
+  const {
+    alpha = 1,
+    composite = "source-over",
+    filter = "none",
+    focusX = 0.5,
+    focusY = 0.5,
+    scale = 1,
+    xOffset = 0,
+    yOffset = 0,
+    rotation = 0
+  } = options;
+  const box = coverImageBoxFocused(image, width, height, scale, focusX, focusY, xOffset, yOffset);
+  ctx.save();
+  ctx.globalCompositeOperation = composite;
+  ctx.globalAlpha = alpha;
+  ctx.filter = filter;
+  if (rotation) {
+    ctx.translate(width * 0.5, height * 0.5);
+    ctx.rotate(rotation);
+    ctx.translate(-width * 0.5, -height * 0.5);
+  }
+  ctx.drawImage(image, box.x, box.y, box.width, box.height);
+  ctx.restore();
+}
+
 function drawCoverImage(ctx, image, width, height, opacity, scale = 1, xOffset = 0, yOffset = 0) {
   if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
   const box = coverImageBox(image, width, height, scale, xOffset, yOffset);
@@ -2027,6 +2207,274 @@ function drawArtworkParallaxRifts(ctx, image, width, height, t, profile) {
     ctx.restore();
   }
   ctx.restore();
+}
+
+function drawArtworkDepthPanels(ctx, image, width, height, t, profile, stage, alpha) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
+  const sweep = easeInOutSine(smoothstep(0.04, 0.9, t));
+  const baseZoom = stage.zoomStart + (stage.zoomEnd - stage.zoomStart) * sweep;
+  ctx.save();
+  for (let index = 0; index < 4; index += 1) {
+    const side = index % 2 ? 1 : -1;
+    const center = width * (0.18 + index * 0.22 + Math.sin(t * 2.4 + index) * 0.018);
+    const panelWidth = width * (0.16 + index * 0.018);
+    const drift = width * (sweep - 0.5) * (0.08 + index * 0.016) * side;
+    const topSkew = height * (0.08 + seededUnit(index, 8.4) * 0.08) * side;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(center - panelWidth * 0.55 + drift + topSkew * 0.25, height * -0.06);
+    ctx.lineTo(center + panelWidth * 0.5 + drift + topSkew, height * -0.06);
+    ctx.lineTo(center + panelWidth * 0.58 + drift - topSkew * 0.3, height * 1.06);
+    ctx.lineTo(center - panelWidth * 0.48 + drift - topSkew, height * 1.06);
+    ctx.closePath();
+    ctx.clip();
+    drawFocusedImage(ctx, image, width, height, {
+      alpha: alpha * (0.045 + index * 0.012),
+      composite: "screen",
+      filter: "blur(.6px) saturate(1.72) contrast(1.18) brightness(.96)",
+      focusX: stage.focusX,
+      focusY: stage.focusY,
+      scale: baseZoom + 0.04 + index * 0.018,
+      xOffset: width * (stage.panX * sweep + side * 0.024 * (1 - sweep)),
+      yOffset: height * (stage.panY * sweep + Math.sin(t * 2.8 + index) * 0.012),
+      rotation: stage.roll * (0.7 + index * 0.12)
+    });
+    const edge = ctx.createLinearGradient(center - panelWidth, 0, center + panelWidth, height);
+    edge.addColorStop(0, `rgba(${profile.main}, 0)`);
+    edge.addColorStop(0.5, `rgba(255, 252, 232, ${0.045 * alpha})`);
+    edge.addColorStop(1, `rgba(${profile.secondary}, 0)`);
+    ctx.globalCompositeOperation = "screen";
+    ctx.fillStyle = edge;
+    ctx.globalAlpha = alpha * 0.38;
+    ctx.fillRect(center - panelWidth + drift, 0, panelWidth * 2, height);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function drawImpactArtEcho(ctx, image, width, height, t, profile, stage, alpha) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) return;
+  stage.impacts.forEach((beat, index) => {
+    const pulse = beatPulse(t, beat, 0.07);
+    if (!pulse) return;
+    const side = index % 2 ? 1 : -1;
+    const offset = easeOutQuint(pulse) * width * 0.024 * side;
+    drawFocusedImage(ctx, image, width, height, {
+      alpha: alpha * pulse * 0.14,
+      composite: "screen",
+      filter: "blur(2.4px) saturate(2.05) contrast(1.24) brightness(1.15)",
+      focusX: stage.focusX,
+      focusY: stage.focusY,
+      scale: stage.zoomEnd + pulse * 0.08,
+      xOffset: width * stage.panX + offset,
+      yOffset: height * stage.panY - pulse * height * 0.012,
+      rotation: stage.roll + side * pulse * 0.012
+    });
+    const cx = width * (0.5 + stage.panX * 0.4 + side * 0.04);
+    const cy = height * (0.5 + stage.panY * 0.34);
+    drawRadialGlow(ctx, cx, cy, Math.max(width, height) * (0.34 + pulse * 0.18), [
+      [0, `rgba(255, 252, 232, ${0.26 * pulse})`],
+      [0.28, `rgba(${profile.main}, ${0.18 * pulse})`],
+      [0.62, `rgba(${profile.secondary}, ${0.08 * pulse})`],
+      [1, `rgba(${profile.third}, 0)`]
+    ], alpha);
+  });
+}
+
+function drawMaterialVeil(ctx, width, height, t, profile, stage, alpha) {
+  const material = stage.material;
+  const sweep = easeInOutSine(smoothstep(0.04, 0.88, t));
+  const impact = Math.min(1, stageImpactPulse(t, stage, 0.08));
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+
+  if (material === "water") {
+    for (let i = 0; i < 18; i += 1) {
+      const y = height * (0.52 + i * 0.03) + Math.sin(t * 18 + i) * (8 + i * 0.6);
+      const waveAlpha = alpha * (0.08 + i * 0.01);
+      drawCurveStreak(ctx, [
+        [-width * 0.12, y],
+        [width * (0.22 + sweep * 0.08), y - height * 0.04],
+        [width * 0.72, y + height * 0.035],
+        [width * 1.12, y - height * 0.02]
+      ], 1.2 + i * 0.18, i % 2 ? "rgba(232,255,253,.5)" : `rgba(${profile.main}, .42)`, waveAlpha, 10);
+    }
+  } else if (material === "scope") {
+    const cx = width * 0.5;
+    const cy = height * 0.49;
+    for (let ring = 0; ring < 5; ring += 1) {
+      drawArcRibbon(ctx, cx, cy, Math.min(width, height) * (0.18 + ring * 0.09 + sweep * 0.025), 0, Math.PI * 2, 1.2 + ring * 0.2, ring % 2 ? `rgba(${profile.third}, .64)` : "rgba(255,250,225,.72)", alpha * (0.28 - ring * 0.034));
+    }
+    drawStreak(ctx, width * (-0.12 + sweep * 0.56), height * 0.24, cx, cy, 3 + impact * 8, "rgba(255,252,232,.86)", alpha * (0.26 + impact * 0.36), 24);
+  } else if (material === "blade") {
+    for (let i = 0; i < 9; i += 1) {
+      const angle = -0.95 + i * 0.23 + Math.sin(t * 4.5) * 0.05;
+      const cx = width * (0.46 + Math.cos(angle) * 0.09);
+      const cy = height * (0.5 + Math.sin(angle) * 0.06);
+      drawStreak(ctx, cx - Math.cos(angle) * width * 0.18, cy - Math.sin(angle) * height * 0.12, cx + Math.cos(angle) * width * 0.22, cy + Math.sin(angle) * height * 0.16, 2.2 + i * 0.42, i % 2 ? `rgba(${profile.secondary}, .72)` : "rgba(255,245,214,.78)", alpha * (0.09 + impact * 0.07), 18);
+    }
+  } else if (material === "void") {
+    const cx = width * 0.5;
+    const cy = height * 0.48;
+    for (let ring = 0; ring < 6; ring += 1) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(t * (0.8 + ring * 0.12) + ring * 0.54);
+      ctx.globalAlpha = alpha * (0.12 + impact * 0.04);
+      ctx.strokeStyle = ring % 2 ? `rgba(${profile.secondary}, .7)` : `rgba(${profile.third}, .54)`;
+      ctx.lineWidth = 1.4 + ring * 0.32;
+      ctx.beginPath();
+      ctx.moveTo(0, -height * (0.12 + ring * 0.025));
+      ctx.lineTo(width * (0.08 + ring * 0.017), 0);
+      ctx.lineTo(0, height * (0.12 + ring * 0.025));
+      ctx.lineTo(-width * (0.08 + ring * 0.017), 0);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
+  } else if (material === "gunfire") {
+    [[0.28, -1], [0.72, 1]].forEach(([xRatio, side], index) => {
+      const x = width * xRatio;
+      const fire = ctx.createLinearGradient(x, height * 0.74, width * (xRatio + side * 0.42), height * 0.18);
+      fire.addColorStop(0, `rgba(255, 252, 220, ${0.42 * alpha})`);
+      fire.addColorStop(0.26, index ? `rgba(${profile.secondary}, ${0.34 * alpha})` : `rgba(${profile.main}, ${0.36 * alpha})`);
+      fire.addColorStop(1, "rgba(255, 252, 220, 0)");
+      ctx.fillStyle = fire;
+      ctx.beginPath();
+      ctx.moveTo(x, height * 0.78);
+      ctx.lineTo(width * (xRatio + side * (0.5 + impact * 0.08)), height * (0.16 - impact * 0.03));
+      ctx.lineTo(width * (0.5 + side * 0.04), height * 0.48);
+      ctx.closePath();
+      ctx.fill();
+    });
+  } else if (material === "arcane") {
+    for (let i = 0; i < 10; i += 1) {
+      const p = (sweep + i * 0.08) % 1;
+      const x = width * (-0.14 + p * 1.28);
+      const y = height * (0.92 - p * 1.05 + Math.sin(t * 8 + i) * 0.028);
+      drawStreak(ctx, x - width * 0.18, y + height * 0.16, x + width * 0.08, y - height * 0.05, 2 + i * 0.3, i % 2 ? `rgba(${profile.secondary}, .62)` : `rgba(${profile.main}, .68)`, alpha * (0.08 + impact * 0.05), 16);
+    }
+  } else if (material === "stage") {
+    const cx = width * 0.5;
+    const top = height * 0.02;
+    for (let i = 0; i < 4; i += 1) {
+      const targetX = width * (0.28 + i * 0.15);
+      const beam = ctx.createLinearGradient(cx, top, targetX, height * 0.74);
+      beam.addColorStop(0, `rgba(255, 239, 196, ${0.2 * alpha})`);
+      beam.addColorStop(0.58, `rgba(${profile.secondary}, ${0.09 * alpha})`);
+      beam.addColorStop(1, "rgba(255,239,196,0)");
+      ctx.fillStyle = beam;
+      ctx.beginPath();
+      ctx.moveTo(cx - width * 0.02, top);
+      ctx.lineTo(targetX + width * 0.07, height * 0.78);
+      ctx.lineTo(targetX - width * 0.07, height * 0.78);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } else if (material === "ice") {
+    for (let i = 0; i < 12; i += 1) {
+      const x = width * (-0.12 + sweep * 1.18 - i * 0.035);
+      const y = height * (0.58 - sweep * 0.18 + Math.sin(i * 0.7 + t * 6) * 0.03);
+      drawStreak(ctx, x - width * 0.26, y + height * 0.04, x + width * 0.1, y - height * 0.02, 1.8 + i * 0.2, i % 2 ? "rgba(250,255,255,.72)" : `rgba(${profile.main}, .68)`, alpha * (0.1 + impact * 0.05), 16);
+    }
+  } else if (material === "quake") {
+    const cx = width * (0.12 + sweep * 0.72);
+    const cy = height * 0.72;
+    for (let ring = 0; ring < 7; ring += 1) {
+      drawArcRibbon(ctx, cx, cy, Math.min(width, height) * (0.06 + ring * 0.055 + impact * 0.08), Math.PI * 0.05, Math.PI * 1.2, 2.4 - ring * 0.18, ring % 2 ? `rgba(${profile.secondary}, .56)` : `rgba(${profile.third}, .48)`, alpha * (0.22 - ring * 0.018));
+    }
+  }
+
+  ctx.restore();
+}
+
+function drawCinematicFilmFinish(ctx, width, height, t, profile, stage) {
+  const alpha = sceneEnvelope(t, 0.94);
+  const impact = Math.min(1, stageImpactPulse(t, stage, 0.075));
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  const matte = ctx.createLinearGradient(0, 0, 0, height);
+  matte.addColorStop(0, `rgba(8, 6, 8, ${0.5 * alpha})`);
+  matte.addColorStop(0.22, "rgba(8,6,8,0)");
+  matte.addColorStop(0.78, "rgba(8,6,8,0)");
+  matte.addColorStop(1, `rgba(8, 6, 8, ${0.62 * alpha})`);
+  ctx.fillStyle = matte;
+  ctx.fillRect(0, 0, width, height);
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = alpha * (0.05 + impact * 0.11);
+  for (let index = 0; index < 18; index += 1) {
+    const y = height * ((seededUnit(index, 4.2) + t * 0.18) % 1);
+    const line = ctx.createLinearGradient(0, y, width, y);
+    line.addColorStop(0, `rgba(${profile.main}, 0)`);
+    line.addColorStop(0.48, `rgba(255, 252, 232, ${0.58})`);
+    line.addColorStop(1, `rgba(${profile.secondary}, 0)`);
+    ctx.fillStyle = line;
+    ctx.fillRect(0, y, width, 1 + seededUnit(index, 7.3) * 1.6);
+  }
+  if (impact > 0) {
+    ctx.globalAlpha = impact * 0.18;
+    ctx.fillStyle = "rgba(255,252,232,.72)";
+    ctx.fillRect(0, 0, width, height);
+  }
+  ctx.restore();
+}
+
+function drawSourceArtCinematicStage(ctx, image, width, height, t, profile) {
+  if (!image?.complete || !image.naturalWidth || !image.naturalHeight) {
+    drawCinematicBackdrop(ctx, width, height, t, profile);
+    return;
+  }
+  const stage = cinematicStageFor(profile.id);
+  const alpha = sceneEnvelope(t, 0.94);
+  const camera = easeInOutSine(smoothstep(0.02, 0.92, t));
+  const impact = Math.min(1, stageImpactPulse(t, stage, 0.07));
+  const shakeX = Math.sin(t * 170 + profile.id.length) * width * 0.006 * impact;
+  const shakeY = Math.cos(t * 137 + profile.id.length) * height * 0.004 * impact;
+  const zoom = stage.zoomStart + (stage.zoomEnd - stage.zoomStart) * camera + impact * 0.036;
+  const panX = width * (stage.panX * camera) + shakeX;
+  const panY = height * (stage.panY * camera) + shakeY;
+
+  ctx.save();
+  ctx.fillStyle = `rgba(${profile.dark}, ${0.82 * alpha})`;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+
+  drawFocusedImage(ctx, image, width, height, {
+    alpha: alpha * 0.5,
+    filter: "blur(30px) saturate(1.65) contrast(1.16) brightness(.35)",
+    focusX: stage.focusX,
+    focusY: stage.focusY,
+    scale: zoom + 0.18,
+    xOffset: panX * 0.42,
+    yOffset: panY * 0.32,
+    rotation: stage.roll * 0.35
+  });
+  drawFocusedImage(ctx, image, width, height, {
+    alpha: alpha * 0.68,
+    filter: "blur(.2px) saturate(1.38) contrast(1.18) brightness(.74)",
+    focusX: stage.focusX,
+    focusY: stage.focusY,
+    scale: zoom,
+    xOffset: panX,
+    yOffset: panY,
+    rotation: stage.roll * camera
+  });
+  drawFocusedImage(ctx, image, width, height, {
+    alpha: alpha * 0.16,
+    composite: "screen",
+    filter: "blur(1.6px) saturate(2.1) contrast(1.25) brightness(1.08)",
+    focusX: stage.focusX,
+    focusY: stage.focusY,
+    scale: zoom + 0.035,
+    xOffset: panX + width * 0.01,
+    yOffset: panY - height * 0.006,
+    rotation: stage.roll * camera
+  });
+
+  drawArtworkDepthPanels(ctx, image, width, height, t, profile, stage, alpha);
+  drawImpactArtEcho(ctx, image, width, height, t, profile, stage, alpha);
+  drawMaterialVeil(ctx, width, height, t, profile, stage, alpha);
+  drawCinematicFilmFinish(ctx, width, height, t, profile, stage);
 }
 
 function drawCinematicLensPass(ctx, width, height, t, profile) {
@@ -2172,7 +2620,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   const recoil = smoothstep(0.62, 0.88, t);
   const x = width * (0.52 + Math.sin(t * 7.2) * 0.026);
   const y = height * (1.02 - rise * 0.46 + recoil * 0.035);
-  const size = Math.min(width, height) * (0.46 + rise * 0.2);
+  const size = Math.min(width, height) * (0.34 + rise * 0.13);
 
   ctx.save();
   const water = ctx.createLinearGradient(0, height * 0.42, 0, height);
@@ -2211,14 +2659,14 @@ function drawSharkScene(ctx, width, height, t, profile) {
 
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = alpha * (0.76 + rise * 0.2);
-  ctx.filter = "blur(1.5px) saturate(1.24) contrast(1.18)";
+  ctx.globalAlpha = alpha * (0.46 + rise * 0.16);
+  ctx.filter = "blur(.8px) saturate(1.18) contrast(1.22)";
   ctx.translate(x - size * 0.12, y - size * 0.03);
   ctx.rotate(-0.2 - rise * 0.2 + Math.sin(t * 5) * 0.025);
   const shark = ctx.createLinearGradient(-size * 1.2, -size * 0.36, size * 1.16, size * 0.34);
   shark.addColorStop(0, "rgba(0, 7, 14, .98)");
-  shark.addColorStop(0.38, "rgba(8, 44, 62, .94)");
-  shark.addColorStop(0.62, "rgba(96, 174, 184, .68)");
+  shark.addColorStop(0.38, "rgba(3, 28, 42, .94)");
+  shark.addColorStop(0.62, "rgba(46, 132, 146, .42)");
   shark.addColorStop(1, "rgba(1, 12, 22, .98)");
   ctx.fillStyle = shark;
   ctx.shadowColor = "rgba(102, 242, 255, .22)";
@@ -2231,7 +2679,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  ctx.globalAlpha = alpha * 0.42;
+  ctx.globalAlpha = alpha * 0.34;
   ctx.fillStyle = "rgba(2, 12, 20, .72)";
   ctx.beginPath();
   ctx.moveTo(-size * 0.94, -size * 0.08);
@@ -2255,7 +2703,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.fill();
 
   ctx.filter = "blur(1.8px)";
-  ctx.globalAlpha = alpha * 0.68;
+  ctx.globalAlpha = alpha * 0.54;
   ctx.fillStyle = "rgba(0, 6, 12, .94)";
   ctx.beginPath();
   ctx.moveTo(size * 0.7, size * 0.04);
@@ -2264,7 +2712,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   ctx.closePath();
   ctx.fill();
   ctx.filter = "blur(.4px)";
-  ctx.globalAlpha = alpha * 0.8;
+  ctx.globalAlpha = alpha * 0.68;
   ctx.strokeStyle = "rgba(234,255,250,.9)";
   ctx.lineWidth = Math.max(1.2, size * 0.008);
   ctx.beginPath();
@@ -2279,7 +2727,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
   for (let tooth = 0; tooth < 9; tooth += 1) {
     const tx = size * (0.54 + tooth * 0.047);
     const ty = size * (0.1 + Math.sin(tooth) * 0.018);
-    ctx.globalAlpha = alpha * (0.22 + rise * 0.2);
+    ctx.globalAlpha = alpha * (0.16 + rise * 0.12);
     ctx.fillStyle = "rgba(238,255,250,.82)";
     ctx.beginPath();
     ctx.moveTo(tx, ty);
@@ -2294,7 +2742,7 @@ function drawSharkScene(ctx, width, height, t, profile) {
     [0, "rgba(151,250,255,.7)"],
     [0.34, `rgba(${profile.main}, .24)`],
     [1, `rgba(${profile.main}, 0)`]
-  ], alpha * 0.72);
+  ], alpha * 0.38);
 }
 
 function drawCaitlynScene(ctx, width, height, t, profile) {
@@ -2757,9 +3205,7 @@ function drawUltimateFrame(ctx, profile, image, width, height, elapsed, duration
   const t = clamp(elapsed / duration, 0, 1);
   ctx.clearRect(0, 0, width, height);
   drawCinematicBackdrop(ctx, width, height, t, profile);
-  drawCoverImage(ctx, image, width, height, 0.46 * (1 - t * 0.2), 1.18 + t * 0.05, Math.sin(t * 4) * 18, Math.cos(t * 3) * 9);
-  drawPortraitProjection(ctx, image, width, height, t, profile);
-  drawArtworkParallaxRifts(ctx, image, width, height, t, profile);
+  drawSourceArtCinematicStage(ctx, image, width, height, t, profile);
   drawCinematicLensPass(ctx, width, height, t, profile);
   ctx.save();
   ctx.globalCompositeOperation = "source-over";
