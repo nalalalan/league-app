@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-19T10:02:38.389Z",
+  "generatedAt": "2026-05-19T10:05:01.366Z",
   "source": "League of Legends Highlights folder",
   "match": "4 matches",
   "matches": [
@@ -14,10 +14,10 @@
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira: kill, crash, reset",
-    "focus": "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
+    "focus": "Conversion is the climb gap: after a won fight, cash out wave crash, tower, dragon, Baron, nexus, or recall.",
     "rule": "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     "nextRep": "Queue cue: kill -> payout -> reset.",
-    "whyTrust": "This is trustworthy because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives.",
+    "whyTrust": "Shutdown deaths erase Samira leads; conversion turns the same mechanics into XP, tempo, and objectives.",
     "pattern": "Across the recordings, the climb value is not finding more damage. It is ending the first winning moment through a map payout before the fight becomes coin-flip again.",
     "checklist": [
       "Name the payout before the commit.",
@@ -98,7 +98,7 @@
       "analysisSource": "manual",
       "analysisVersion": "2026-05-19-narrative-highlight-feedback-v1",
       "sampledFrames": 18,
-      "publicVideoBytes": 25778660,
+      "publicVideoBytes": 25776478,
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
       "poster": "/recordings/posters/auto-na1-5563660362-01.jpg"
     },
