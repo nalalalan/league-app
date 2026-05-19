@@ -2,9 +2,6 @@ import { spawn, execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
-
-const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, "..");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
@@ -18,13 +15,18 @@ const endGraceMs = Number(process.env.LEAGUE_LIVE_END_GRACE_MS || 35000);
 const segmentSeconds = Number(process.env.LEAGUE_LIVE_SEGMENT_SECONDS || 30);
 const fastForwardSpeed = Number(process.env.LEAGUE_LIVE_FAST_FORWARD || 8);
 const minGameSeconds = Number(process.env.LEAGUE_LIVE_MIN_GAME_SECONDS || 90);
-const fps = String(process.env.LEAGUE_LIVE_FPS || 30);
+const fps = String(process.env.LEAGUE_LIVE_FPS || 15);
 const encoderPreference = String(process.env.LEAGUE_LIVE_ENCODER || "auto").toLowerCase();
 const liveCq = String(process.env.LEAGUE_LIVE_CQ || 20);
+const liveCaptureCq = String(process.env.LEAGUE_LIVE_CAPTURE_CQ || 31);
 const x264Crf = String(process.env.LEAGUE_LIVE_CRF || 20);
-const captureBitrate = String(process.env.LEAGUE_LIVE_CAPTURE_BITRATE || "18000k");
-const captureMaxrate = String(process.env.LEAGUE_LIVE_CAPTURE_MAXRATE || "24000k");
-const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "36000k");
+const x264CaptureCrf = String(process.env.LEAGUE_LIVE_CAPTURE_CRF || 32);
+const captureBitrate = String(process.env.LEAGUE_LIVE_CAPTURE_BITRATE || "3500k");
+const captureMaxrate = String(process.env.LEAGUE_LIVE_CAPTURE_MAXRATE || "5000k");
+const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "7000k");
+const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "1280:-2").trim();
+const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
+const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 let encoderProfilePromise;
@@ -41,14 +43,26 @@ async function log(message) {
 }
 
 async function run(command, args, options = {}) {
-  const result = await execFileAsync(command, args, {
-    cwd: appRoot,
-    maxBuffer: 64 * 1024 * 1024,
-    shell: process.platform === "win32" && /\.cmd$/i.test(command),
-    windowsHide: true,
-    ...options
+  return await new Promise((resolve, reject) => {
+    const child = execFile(command, args, {
+      cwd: appRoot,
+      maxBuffer: 64 * 1024 * 1024,
+      shell: process.platform === "win32" && /\.cmd$/i.test(command),
+      windowsHide: true,
+      ...options
+    }, (error, stdout, stderr) => {
+      if (error) {
+        error.stdout = stdout;
+        error.stderr = stderr;
+        reject(error);
+        return;
+      }
+      resolve(stdout || "");
+    });
+    if (/^ffmpeg(?:\.exe)?$/i.test(path.basename(command))) {
+      lowerProcessPriority(child.pid).catch(() => {});
+    }
   });
-  return result.stdout || "";
 }
 
 async function ffmpegEncoders() {
@@ -60,24 +74,26 @@ async function ffmpegEncoders() {
 }
 
 function encoderArgs(profile, purpose = "review") {
+  const isCapture = purpose === "capture";
   if (profile.name === "h264_nvenc") {
     return [
       "-c:v", "h264_nvenc",
-      "-preset", "p5",
-      "-tune", "hq",
+      "-preset", isCapture ? "p1" : "p5",
+      "-tune", isCapture ? "ll" : "hq",
       "-rc", "vbr",
-      "-cq", liveCq,
+      "-cq", isCapture ? liveCaptureCq : liveCq,
       "-b:v", captureBitrate,
       "-maxrate", captureMaxrate,
       "-bufsize", captureBufsize,
       "-pix_fmt", "yuv420p"
     ];
   }
-  const preset = purpose === "capture" ? "ultrafast" : "veryfast";
+  const preset = isCapture ? "ultrafast" : "veryfast";
   return [
     "-c:v", "libx264",
     "-preset", preset,
-    "-crf", x264Crf,
+    "-crf", isCapture ? x264CaptureCrf : x264Crf,
+    "-threads", isCapture ? "1" : "0",
     "-pix_fmt", "yuv420p"
   ];
 }
@@ -122,15 +138,27 @@ async function encoderProfile() {
 
 async function lowerProcessPriority(pid) {
   if (process.platform !== "win32" || !pid) return;
+  const safePriority = /^(Idle|BelowNormal)$/i.test(capturePriority) ? capturePriority : "Idle";
   try {
     await run("powershell.exe", [
       "-NoProfile",
       "-WindowStyle", "Hidden",
       "-Command",
-      `$p = Get-Process -Id ${Number(pid)} -ErrorAction SilentlyContinue; if ($p) { $p.PriorityClass = 'BelowNormal' }`
+      `$p = Get-Process -Id ${Number(pid)} -ErrorAction SilentlyContinue; if ($p) { $p.PriorityClass = '${safePriority}' }`
     ]);
   } catch {
     await log(`Could not lower ffmpeg priority for pid ${pid}; capture continues.`);
+  }
+}
+
+function processIsAlive(pid) {
+  const id = Number(pid);
+  if (!Number.isFinite(id) || id <= 0) return false;
+  try {
+    process.kill(id, 0);
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -141,8 +169,9 @@ async function acquireLock() {
     await handle.writeFile(String(process.pid), "utf8");
     await handle.close();
   } catch {
+    const lockPid = (await fs.readFile(lockPath, "utf8").catch(() => "")).trim();
     const stat = await fs.stat(lockPath).catch(() => null);
-    if (stat && Date.now() - stat.mtimeMs > 24 * 60 * 60 * 1000) {
+    if ((lockPid && !processIsAlive(lockPid)) || (stat && Date.now() - stat.mtimeMs > 24 * 60 * 60 * 1000)) {
       await fs.unlink(lockPath).catch(() => {});
       return acquireLock();
     }
@@ -201,15 +230,22 @@ async function startSession() {
   await fs.mkdir(sessionRoot, { recursive: true });
   const outputPattern = path.join(sessionRoot, "segment-%04d.mkv");
   const encoder = await encoderProfile();
+  const inputTarget = captureWindowTitle ? `title=${captureWindowTitle}` : "desktop";
+  const filters = [];
+  if (captureScale && !/^(0|none|off)$/i.test(captureScale)) {
+    filters.push(`scale=${captureScale}:flags=fast_bilinear`);
+  }
   const args = [
     "-y",
     "-hide_banner",
     "-loglevel", "error",
     "-f", "gdigrab",
     "-framerate", fps,
+    "-rtbufsize", "64M",
     "-draw_mouse", "1",
-    "-i", "desktop",
+    "-i", inputTarget,
     "-an",
+    ...(filters.length ? ["-vf", filters.join(",")] : []),
     ...encoderArgs(encoder, "capture"),
     "-f", "segment",
     "-segment_time", String(segmentSeconds),
@@ -230,15 +266,27 @@ async function startSession() {
     }
   });
   await lowerProcessPriority(child.pid);
-  await log(`Started League screen capture in ${sessionRoot} using ${encoder.label} at ${fps} fps.`);
+  await log(`Started low-impact League window capture in ${sessionRoot} using ${encoder.label} at ${fps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, input ${inputTarget}.`);
   return {
     child,
     sessionRoot,
     encoder: encoder.name,
+    inputTarget,
     startedAt,
     startedMs: startedAt.getTime(),
     lastSeenMs: Date.now()
   };
+}
+
+async function waitForNoGame(reason) {
+  let logged = false;
+  while (await gameIsRunning()) {
+    if (!logged) {
+      await log(`${reason}; waiting because a League game is running.`);
+      logged = true;
+    }
+    await delay(10000);
+  }
 }
 
 async function stopSession(session) {
@@ -341,14 +389,17 @@ async function finalizeSession(session) {
   const importantIndexes = importantSegmentIndexes(segments);
   const processed = [];
   for (const segment of segments) {
+    await waitForNoGame("Post-game video processing paused");
     processed.push(await processSegment(segment, importantIndexes, session.sessionRoot));
   }
   const listPath = path.join(session.sessionRoot, "processed.txt");
   const joinedPath = path.join(session.sessionRoot, "processed.mp4");
   await writeConcatList(listPath, processed.map((item) => item.outputPath));
+  await waitForNoGame("Post-game video join paused");
   await run("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", listPath, "-c", "copy", joinedPath]);
   await fs.mkdir(sourceDir, { recursive: true });
   const encoder = await encoderProfile();
+  await waitForNoGame("Post-game final encode paused");
   await run("ffmpeg", [
     "-y",
     "-hide_banner",
@@ -370,9 +421,13 @@ async function finalizeSession(session) {
     durationSeconds: duration,
     sourceDurationSeconds: elapsedSeconds,
     encoder: encoder.name,
-    videoQuality: encoder.name === "h264_nvenc" ? `CQ ${liveCq}` : `CRF ${x264Crf}`,
+    videoQuality: encoder.name === "h264_nvenc" ? `capture CQ ${liveCaptureCq}, review CQ ${liveCq}` : `capture CRF ${x264CaptureCrf}, review CRF ${x264Crf}`,
     segmentSeconds,
     fastForwardSpeed,
+    captureFps: Number(fps),
+    captureScale,
+    capturePriority,
+    captureInput: session.inputTarget,
     allSegmentsPreserved: true,
     segments: processed.map((item) => ({
       index: item.index,
@@ -386,6 +441,7 @@ async function finalizeSession(session) {
   await log(`Created review clip ${outputPath}`);
 
   if (publishAfterGame) {
+    await waitForNoGame("Publishing paused");
     await log("Publishing updated League recordings.");
     await run(npmBin, ["run", "publish:recordings"]);
   }
