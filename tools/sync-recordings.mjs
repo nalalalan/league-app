@@ -502,7 +502,7 @@ function cachedRecording(existing, fileName, cacheKey) {
     item.analysisVersion === analysisVersion
   ));
   if (!cached) return null;
-  if (manualFeedback(fileName) && cached.analysisSource !== "manual") return null;
+  if (manualFeedback(fileName)) return null;
   if (cached.analysisSource === "fallback" && process.env.OPENAI_API_KEY) return null;
   if (process.env.LEAGUE_FORCE_ANALYSIS === "1") return null;
   return cached;
