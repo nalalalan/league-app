@@ -247,7 +247,7 @@ summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(180px, 280px));
   gap: clamp(10px, 1.4vw, 18px);
-  justify-content: start;
+  justify-content: center;
   align-items: start;
   scrollbar-width: none;
 }
@@ -1713,16 +1713,18 @@ h1 {
   display: grid;
   gap: 10px;
   margin-top: 12px;
+  justify-items: center;
 }
 
 .recording-main {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: 8px 12px;
+  grid-template-columns: 1fr;
+  align-items: start;
+  width: min(760px, 100%);
+  gap: 6px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 14px 16px;
   background: rgba(255, 253, 248, .84);
   box-shadow: var(--shadow);
 }
@@ -1735,14 +1737,15 @@ h1 {
 .recording-meta h3 {
   margin: 0;
   color: #2f2925;
-  font-size: 17px;
+  font-size: 22px;
   line-height: 1.2;
 }
 
 .recording-main-focus {
+  max-width: 58ch;
   margin: 0;
   color: #2d2723;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 760;
   line-height: 1.32;
 }
@@ -1760,10 +1763,18 @@ h1 {
 }
 
 .recording-main-rule {
-  grid-column: 2;
+  grid-column: 1;
   color: var(--muted);
   font-size: 13px;
   font-weight: 650;
+}
+
+.recording-main-why {
+  max-width: 68ch;
+}
+
+.recording-main-limit {
+  display: none;
 }
 
 .recording-meta p,
@@ -3393,27 +3404,31 @@ h1 {
 }
 
 .recording-main {
-  grid-template-columns: minmax(90px, .34fr) minmax(0, 1fr);
-  gap: 5px 14px;
-  padding: 12px 14px;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  width: min(760px, 100%);
+  justify-self: center;
+  padding: 14px 16px;
   background: rgba(255, 253, 248, .9);
   box-shadow: none;
 }
 
 .recording-main h3 {
   align-self: start;
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 860;
 }
 
 .recording-main-focus {
-  font-size: 18px;
+  max-width: 58ch;
+  font-size: 17px;
   font-weight: 860;
 }
 
 .recording-main-rule,
 .recording-main-why {
-  grid-column: 2;
+  grid-column: 1;
+  max-width: 68ch;
   font-size: 13px;
   line-height: 1.38;
 }
@@ -3605,6 +3620,8 @@ h1 {
     grid-row: 1;
     margin: 0 0 4px;
     padding: 0;
+    justify-self: center;
+    width: min(100%, 620px);
   }
 
   .recordings {
