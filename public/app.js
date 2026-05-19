@@ -1651,9 +1651,7 @@ function recordingListCard(item) {
   takeaway.className = "recording-list-takeaway";
   takeaway.textContent = recordingParagraph(item);
 
-  const timeline = recordingTimeline(item);
   copy.append(meta, title, takeaway);
-  if (timeline) copy.append(timeline);
 
   const videoWrap = document.createElement("div");
   videoWrap.className = "recording-list-video";
