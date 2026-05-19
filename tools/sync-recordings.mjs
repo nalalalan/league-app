@@ -163,7 +163,7 @@ function queueLabel(queueId) {
     2010: "Tutorial 2",
     2020: "Tutorial 3"
   };
-  return labels[Number(queueId)] || "Unverified";
+  return labels[Number(queueId)] || "Type unknown";
 }
 
 function shortClock(seconds) {
@@ -269,7 +269,11 @@ async function loadMatchStats(matchIds) {
     if (!itemStats) continue;
     const cs = Number(itemStats.totalMinionsKilled || 0) + Number(itemStats.neutralMinionsKilled || 0);
     const gameLengthSeconds = Number(game.gameDuration || 0);
+    const gameCreationMs = Number(game.gameCreation || 0);
     stats.set(matchId, {
+      matchTimeMs: gameCreationMs || null,
+      gameHappenedAt: gameCreationMs ? new Date(gameCreationMs).toISOString() : "",
+      gameHappenedAtLabel: gameCreationMs ? shortDateTime(new Date(gameCreationMs)) : "",
       gameLength: gameLengthSeconds ? mmss(gameLengthSeconds) : "",
       gameLengthSeconds: gameLengthSeconds || null,
       kills: Number(itemStats.kills || 0),
@@ -505,6 +509,28 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5563660362_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Clean the win",
+      feedback: "You won a 14:28 Co-op AI Beginner Samira game at 3/6/4 with 35 CS; the next jump is making wins cleaner by dying less and keeping wave income stable.",
+      gameDetail: "You won a 14:28 Co-op AI Beginner Samira game at 3/6/4 with 35 CS. The useful read is that you were active enough to finish the game, but deaths and CS were the leak: collect the wave first, enter after the first enemy CC is used, then turn each won fight into tower damage or recall instead of another brawl. That transfers upward because Samira climbs when her all-ins create tempo without handing shutdowns back.",
+      whyTrust: "The hard facts are from League Client match history, and they point to the simplest high-elo habit: same aggression, fewer deaths, better wave income.",
+      focusTag: "cleaner wins",
+      evidence: "League Client match history: Co-op vs AI Beginner, Samira, win, 14:28, 3/6/4, 35 CS.",
+      pattern: "The win happened, but the scoreline says the next gain is clean conversion rather than more fighting.",
+      diamondRule: "Wave first; dash after the opening is real; leave when the payout is taken.",
+      drill: "Next game: before each fight, check wave, enemy CC, then payout.",
+      nuance: [
+        "A 14:28 win means you can close the game when ahead.",
+        "Six deaths in a bot win is the part that will punish you harder in ranked.",
+        "35 CS is the floor to raise because Samira needs items before the risky resets are worth it."
+      ],
+      reviewLimit: "The auto video attached to this match was captured before the recorder was fixed and does not show reliable League gameplay, so this summary is based on League Client match history instead of invented visual detail.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "16-10_NA1-5563352800_01.webm") {
     return {
       champion: "Samira",
@@ -1032,9 +1058,9 @@ async function main() {
       matchId: parts.matchId,
       score: parts.score,
       clipNumber: parts.clipNumber,
-      matchTimeMs: replayMeta.matchTimeMs || stat.mtimeMs,
-      gameHappenedAt: replayMeta.gameHappenedAt || recordedDate.toISOString(),
-      gameHappenedAtLabel: replayMeta.gameHappenedAtLabel || shortDateTime(recordedDate),
+      matchTimeMs: matchStats.matchTimeMs || replayMeta.matchTimeMs || stat.mtimeMs,
+      gameHappenedAt: matchStats.gameHappenedAt || replayMeta.gameHappenedAt || recordedDate.toISOString(),
+      gameHappenedAtLabel: matchStats.gameHappenedAtLabel || replayMeta.gameHappenedAtLabel || shortDateTime(recordedDate),
       recordedAt: recordedDate.toISOString(),
       recordedAtLabel: shortDateTime(recordedDate),
       recordedAtTimeLabel: shortTime(recordedDate),
@@ -1055,7 +1081,7 @@ async function main() {
       deaths: Number.isFinite(matchStats.deaths) ? matchStats.deaths : null,
       assists: Number.isFinite(matchStats.assists) ? matchStats.assists : null,
       cs: Number.isFinite(matchStats.cs) ? matchStats.cs : null,
-      statsSource: matchStats.statsSource || "Unverified",
+      statsSource: matchStats.statsSource || "",
       kind: isFullReview ? "full review" : "highlight",
       reviewPhase: phase,
       champion: clean(analysis.champion, "Unknown"),
