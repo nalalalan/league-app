@@ -1066,16 +1066,18 @@ summary {
   object-fit: cover;
   object-position: center center;
   filter: saturate(.98) contrast(1.01);
+  transform-origin: 50% 50%;
   transform: translateZ(12px) scale(var(--portrait-scale));
   transition: transform .34s cubic-bezier(.18, .72, .2, 1), filter .3s ease;
 }
 
 .portrait-button[data-champion="samira"] img {
-  object-position: 50% 42%;
+  object-position: 50% 36%;
 }
 
 .portrait-button[data-champion="fizz"] img {
-  object-position: 50% 4%;
+  object-position: 50% 0%;
+  transform-origin: 50% 0%;
 }
 
 .portrait-ambient {
@@ -1238,9 +1240,9 @@ summary {
 .portrait-button[data-champion="fizz"] {
   --bubble-a: rgba(121, 232, 255, .72);
   --bubble-b: rgba(255, 151, 212, .58);
-  --portrait-scale: 1.36;
-  --portrait-hover-scale: 1.39;
-  --portrait-selected-scale: 1.37;
+  --portrait-scale: 1.25;
+  --portrait-hover-scale: 1.29;
+  --portrait-selected-scale: 1.26;
 }
 
 .portrait-button[data-champion="samira"] {
