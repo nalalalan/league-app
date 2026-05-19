@@ -1520,15 +1520,41 @@ function recordingPreviewButton(item, review) {
   return button;
 }
 
-function recordingInfoMetric(label, value) {
-  const metric = document.createElement("div");
-  metric.className = "recording-list-metric";
-  const name = document.createElement("span");
-  name.textContent = label;
-  const text = document.createElement("strong");
-  text.textContent = value || "unverified";
-  metric.append(name, text);
-  return metric;
+const recordingDateFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
+});
+
+function compactRecordingDate(item) {
+  const source = item.gameHappenedAt || item.recordedAt;
+  const date = source ? new Date(source) : null;
+  if (date && !Number.isNaN(date.getTime())) {
+    return recordingDateFormatter.format(date).replace(",", "");
+  }
+  return (item.gameHappenedAtLabel || item.recordedAtLabel || "time unverified")
+    .replace(/May\s+(\d+),\s+2026,\s+/i, "5/$1 ")
+    .replace(/,\s*2026/i, "");
+}
+
+function compactGameType(value) {
+  return (value || "type unverified")
+    .replace(/Co-op vs AI/i, "Co-op AI")
+    .replace(/\bBeginner\b/i, "beginner")
+    .replace(/\bIntermediate\b/i, "intermediate");
+}
+
+function recordingFact(value) {
+  const fact = document.createElement("span");
+  fact.className = "recording-list-fact";
+  fact.textContent = value || "unverified";
+  return fact;
+}
+
+function recordingParagraph(item) {
+  return item.feedback || item.pattern || item.whyTrust || "No feedback generated yet.";
 }
 
 function recordingListCard(item) {
@@ -1539,13 +1565,13 @@ function recordingListCard(item) {
   copy.className = "recording-list-copy";
 
   const meta = document.createElement("div");
-  meta.className = "recording-list-metrics";
+  meta.className = "recording-list-facts";
   meta.append(
-    recordingInfoMetric("game", item.gameHappenedAtLabel || item.recordedAtLabel),
-    recordingInfoMetric("type", item.gameType || item.kind),
-    recordingInfoMetric("timestamp", item.clipWindow || item.clipTimestamp || item.timestamp),
-    recordingInfoMetric("champion", item.champion || "Unknown"),
-    recordingInfoMetric("length", item.duration)
+    recordingFact(`Game ${compactRecordingDate(item)}`),
+    recordingFact(compactGameType(item.gameType || item.kind)),
+    recordingFact(item.clipWindow || item.clipTimestamp || item.timestamp),
+    recordingFact(item.champion || "Unknown"),
+    recordingFact(item.duration)
   );
 
   const title = document.createElement("h3");
@@ -1553,19 +1579,9 @@ function recordingListCard(item) {
 
   const takeaway = document.createElement("p");
   takeaway.className = "recording-list-takeaway";
-  takeaway.textContent = item.feedback || item.pattern || "No feedback generated yet.";
-
-  const detail = document.createElement("p");
-  detail.className = "recording-list-description";
-  detail.textContent = item.pattern && item.pattern !== item.feedback ? item.pattern : item.whyTrust || "";
-
-  const drill = document.createElement("p");
-  drill.className = "recording-list-drill";
-  drill.textContent = item.drill ? `Rep: ${item.drill}` : "";
+  takeaway.textContent = recordingParagraph(item);
 
   copy.append(meta, title, takeaway);
-  if (detail.textContent) copy.append(detail);
-  if (drill.textContent) copy.append(drill);
 
   const videoWrap = document.createElement("div");
   videoWrap.className = "recording-list-video";
