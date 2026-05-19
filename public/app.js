@@ -1583,17 +1583,155 @@ function recordingLesson(item) {
   return item.feedback || item.diamondRule || item.drill || item.feedbackTitle || "Review the clip and choose one cleaner next action.";
 }
 
-function recordingTimeline(item) {
-  const events = Array.isArray(item.timeline) ? item.timeline.filter(hasText).slice(0, 6) : [];
-  if (!events.length) return null;
-  const list = document.createElement("ol");
-  list.className = "recording-list-timeline";
-  for (const event of events) {
-    const li = document.createElement("li");
-    li.textContent = event;
-    list.append(li);
+function recordingEvidence(item) {
+  return item.eventEvidence || item.evidence || "";
+}
+
+function stripCoachPrefix(text) {
+  const cleaned = String(text || "")
+    .replace(/^Mistake:\s*/i, "")
+    .replace(/\s*Fix:\s*/i, " ")
+    .replace(/^Good:\s*/i, "")
+    .trim();
+  return cleaned.replace(/(^|[.!?]\s+)([a-z])/g, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`);
+}
+
+function displayCritique(item) {
+  const byFile = {
+    "auto_NA1-5563660362_01.mp4": "The throw risk is drifting sideways after the base is already open; stand behind the first body in and hit the structure as soon as space is made.",
+    "16-10_NA1-5563352800_01.webm": "The leak is accepting another fight after the first win; cash out wave, tower, reset, or end before touching another champion.",
+    "16-10_NA1-5563301586_01.webm": "The leak is playing the wave when one auto or spell kills Samira; give the wave and recall before the lane turns into a death timer."
+  };
+  if (byFile[item.file]) return byFile[item.file];
+  return stripCoachPrefix(recordingLesson(item))
+    .replace(/^You\s+/i, "The leak is ")
+    .replace(/^Your\s+/i, "The leak is ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function displayPraise(item) {
+  const byFile = {
+    "auto_NA1-5563660362_01.mp4": "The strong part is regrouping toward the base and finishing instead of letting the push dissolve.",
+    "16-10_NA1-5563352800_01.webm": "The strong part is turning one bot-side win into turret pressure instead of only chasing kills.",
+    "16-10_NA1-5563301586_01.webm": "The strong part is getting back into the game later and converting pressure into the ending push."
+  };
+  if (byFile[item.file]) return byFile[item.file];
+  return stripCoachPrefix(item.goodThing || "")
+    .replace(/^You\s+/i, "The strong part is that you ")
+    .replace(/^The good part was real:\s*/i, "The strong part is ")
+    .replace(/^The useful positive sign is that\s*/i, "The strong part is that ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function storySentences(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g)?.map(cleanStorySentence) || [];
+}
+
+function cleanStorySentence(sentence) {
+  const cleaned = String(sentence || "")
+    .replace(/^\s*Honest read:\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return cleaned.replace(/^([a-z])/, (_, letter) => letter.toUpperCase());
+}
+
+function sentenceMatches(sentence, patterns) {
+  return patterns.some((pattern) => pattern.test(sentence));
+}
+
+function critiqueInsertIndex(sentences) {
+  const firstEventIndex = sentences.findIndex((sentence) => /^\s*(Around|At|By)\b/i.test(sentence));
+  const searchFrom = firstEventIndex >= 0 ? firstEventIndex : 0;
+  const index = sentences.findIndex((sentence, sentenceIndex) => (
+    sentenceIndex >= searchFrom &&
+    !/^\s*Honest read:/i.test(sentence) &&
+    sentenceMatches(sentence, [
+    /\bmistake\b/i,
+    /\brisk/i,
+    /\bbad habit\b/i,
+    /\b31\s*HP\b/i,
+    /\bone-hit\b/i,
+    /\blethal\b/i,
+    /\blow-health\b/i,
+    /\bchase/i,
+    /\bsideways\b/i,
+    /\btoo eager\b/i,
+    /\bgets pulled\b/i,
+    /\bonly correct\b/i,
+    /\bnot yours\b/i,
+    /\bturns into\b/i
+  ])));
+  if (index >= 0) return index + 1;
+  return Math.min(2, sentences.length);
+}
+
+function praiseInsertIndex(sentences) {
+  const index = sentences.findIndex((sentence) => (
+    sentenceMatches(sentence, [
+      /\bgood version\b/i,
+      /\bwin happens\b/i,
+      /\bgame ends\b/i,
+      /\bteam is ending\b/i,
+      /\bturned\b/i,
+      /\bconverted\b/i,
+      /\bturret\b/i,
+      /\bstructure/i,
+      /\bfinish/i,
+      /\bpressure\b/i
+    ])
+  ));
+  if (index >= 0) return index + 1;
+  return Math.min(sentences.length, Math.max(1, sentences.length - 1));
+}
+
+function appendStoryText(paragraph, text) {
+  if (!hasText(text)) return;
+  if (paragraph.childNodes.length) paragraph.append(document.createTextNode(" "));
+  paragraph.append(document.createTextNode(text.trim()));
+}
+
+function appendStorySpan(paragraph, text, className) {
+  if (!hasText(text)) return;
+  if (paragraph.childNodes.length) paragraph.append(document.createTextNode(" "));
+  const span = document.createElement("span");
+  span.className = className;
+  span.textContent = text.trim();
+  paragraph.append(span);
+}
+
+function recordingStoryParagraph(item) {
+  const paragraph = document.createElement("p");
+  paragraph.className = "recording-list-story";
+  appendStoryText(paragraph, [
+    compactGameType(item.gameType || item.kind),
+    item.champion || "Unknown",
+    compactRecordingDate(item),
+    compactGameLength(item)
+  ].join(" | ") + ".");
+  const sentences = storySentences(recordingParagraph(item));
+  const critique = displayCritique(item);
+  const praise = displayPraise(item);
+  const critiqueIndex = critiqueInsertIndex(sentences);
+  const praiseIndex = praise ? praiseInsertIndex(sentences) : -1;
+  sentences.forEach((sentence, index) => {
+    appendStoryText(paragraph, sentence);
+    if (index + 1 === critiqueIndex) appendStorySpan(paragraph, critique, "recording-story-critique");
+    if (index + 1 === praiseIndex) appendStorySpan(paragraph, praise, "recording-story-praise");
+  });
+  if (!sentences.length) {
+    appendStorySpan(paragraph, critique, "recording-story-critique");
+    appendStorySpan(paragraph, praise, "recording-story-praise");
   }
-  return list;
+  const evidence = recordingEvidence(item);
+  if (hasText(evidence) && !paragraph.textContent.includes(evidence)) {
+    appendStoryText(paragraph, `The clip shows it: ${evidence}`);
+  }
+  return paragraph;
 }
 
 function secondsForRecording(item) {
@@ -1641,29 +1779,10 @@ function recordingListCard(item) {
   const copy = document.createElement("div");
   copy.className = "recording-list-copy";
 
-  const meta = document.createElement("div");
-  meta.className = "recording-list-facts";
-  meta.textContent = [
-    compactGameType(item.gameType || item.kind),
-    item.champion || "Unknown",
-    compactRecordingDate(item),
-    compactGameLength(item)
-  ].join(" | ");
-
   const title = document.createElement("h3");
   title.textContent = item.feedbackTitle || "Focus";
 
-  const lesson = document.createElement("p");
-  lesson.className = "recording-list-lesson";
-  const lessonText = document.createElement("strong");
-  lessonText.textContent = recordingLesson(item);
-  lesson.append(lessonText);
-
-  const takeaway = document.createElement("p");
-  takeaway.className = "recording-list-takeaway";
-  takeaway.textContent = recordingParagraph(item);
-
-  copy.append(meta, title, lesson, takeaway);
+  copy.append(title, recordingStoryParagraph(item));
 
   const videoWrap = document.createElement("div");
   videoWrap.className = "recording-list-video";
