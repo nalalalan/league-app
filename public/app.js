@@ -1351,7 +1351,7 @@ function recordingMainCard(review) {
 
   const why = document.createElement("p");
   why.className = "recording-main-why";
-  why.textContent = item.whyTrust ? `Why: ${item.whyTrust}` : "";
+  why.textContent = item.whyTrust || "";
 
   const limit = document.createElement("p");
   limit.className = "recording-main-limit";
