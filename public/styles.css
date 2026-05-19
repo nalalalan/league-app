@@ -1075,7 +1075,7 @@ summary {
 }
 
 .portrait-button[data-champion="fizz"] img {
-  object-position: 50% 19%;
+  object-position: 50% 4%;
 }
 
 .portrait-ambient {
@@ -1238,9 +1238,9 @@ summary {
 .portrait-button[data-champion="fizz"] {
   --bubble-a: rgba(121, 232, 255, .72);
   --bubble-b: rgba(255, 151, 212, .58);
-  --portrait-scale: 1.24;
-  --portrait-hover-scale: 1.27;
-  --portrait-selected-scale: 1.25;
+  --portrait-scale: 1.36;
+  --portrait-hover-scale: 1.39;
+  --portrait-selected-scale: 1.37;
 }
 
 .portrait-button[data-champion="samira"] {

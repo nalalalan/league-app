@@ -5418,21 +5418,7 @@ function renderPicker() {
     for (let ambientIndex = 0; ambientIndex < 5; ambientIndex += 1) {
       ambient.append(document.createElement("i"));
     }
-    const copy = document.createElement("span");
-    copy.className = "portrait-copy";
-    const name = document.createElement("span");
-    name.className = "portrait-name";
-    name.textContent = champion.name;
-    const person = document.createElement("span");
-    person.className = "portrait-person";
-    person.textContent = champion.person || champion.skin || "";
-    const snippet = document.createElement("span");
-    snippet.className = "portrait-snippet";
-    snippet.textContent = champion.snippet || "";
-    copy.append(name);
-    if (person.textContent) copy.append(person);
-    if (snippet.textContent) copy.append(snippet);
-    button.append(img, ambient, copy);
+    button.append(img, ambient);
     button.addEventListener("pointermove", (event) => {
       const rect = button.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
