@@ -109,9 +109,11 @@ summary {
 
 .paper-strip strong {
   display: block;
+  max-width: 46ch;
   color: var(--ink);
   font-size: clamp(16px, 2vw, 23px);
   line-height: 1.08;
+  text-wrap: balance;
 }
 
 .paper-strip p {
@@ -3668,8 +3670,9 @@ h1 {
 
 @media (max-width: 430px) {
   .paper-strip strong {
+    max-width: 29ch;
     font-size: 16px;
-    line-height: 1.15;
+    line-height: 1.18;
   }
 
   .recording-main {
