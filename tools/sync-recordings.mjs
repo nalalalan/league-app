@@ -18,9 +18,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-18-deep-recording-feedback-v7";
+const analysisVersion = "2026-05-18-readable-evidence-feedback-v8";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
-const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 32 * 1024 * 1024);
+const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
+const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 
 function clean(value, fallback = "") {
@@ -359,10 +360,13 @@ async function extractFrame(input, output, second, width = 640) {
 async function encodePublicVideo(input, output, sourceStat) {
   await fs.mkdir(path.dirname(output), { recursive: true });
   const attempts = [
-    { crf: "31", maxrate: "1200k", bufsize: "2400k" },
-    { crf: "34", maxrate: "850k", bufsize: "1700k" },
-    { crf: "37", maxrate: "650k", bufsize: "1300k" },
-    { crf: "40", maxrate: "480k", bufsize: "960k" }
+    { crf: "20", maxrate: "9000k", bufsize: "18000k", audio: "128k" },
+    { crf: "22", maxrate: "6500k", bufsize: "13000k", audio: "128k" },
+    { crf: "24", maxrate: "4200k", bufsize: "8400k", audio: "96k" },
+    { crf: "26", maxrate: "2800k", bufsize: "5600k", audio: "96k" },
+    { crf: "28", maxrate: "1900k", bufsize: "3800k", audio: "80k" },
+    { crf: "30", maxrate: "1400k", bufsize: "2800k", audio: "80k" },
+    { crf: "32", maxrate: "1050k", bufsize: "2100k", audio: "64k" }
   ];
   for (const attempt of attempts) {
     await run("ffmpeg", [
@@ -376,9 +380,8 @@ async function encodePublicVideo(input, output, sourceStat) {
       "-crf", attempt.crf,
       "-maxrate", attempt.maxrate,
       "-bufsize", attempt.bufsize,
-      "-vf", "scale=1280:-2",
       "-c:a", "aac",
-      "-b:a", "64k",
+      "-b:a", attempt.audio,
       "-movflags", "+faststart",
       output
     ]);
@@ -441,6 +444,17 @@ async function ensurePublicVideo(sourcePath, destPath, sourceStat) {
     }
     return bytes;
   }
+  if (
+    current &&
+    sourceStat.size > largeRecordingBytes &&
+    current.size < Math.min(targetPublicVideoBytes * 0.55, sourceStat.size * minPublicVideoRatio)
+  ) {
+    const bytes = await encodePublicVideo(sourcePath, destPath, sourceStat);
+    if (await exists(alternatePath)) {
+      await fs.unlink(alternatePath);
+    }
+    return bytes;
+  }
   if (await exists(alternatePath)) {
     await fs.unlink(alternatePath);
   }
@@ -497,6 +511,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Name payout before E/R",
       feedback: "Before dashing in, name the payout: wave, tower, dragon, recall, or nexus; if none is real, hold the dash.",
+      gameDetail: "This Samira game turned early bot pressure into a double kill, then into turret, inhibitor, and nexus pressure. The closest high-elo rep is not more damage; it is deciding the payout before each dash so a won fight becomes structure, dragon, recall, or end before shutdown gold comes back.",
       whyTrust: "The newest storyboard shows the carry pattern working when kills become bot tower, inhibitor, and nexus pressure; this is the same mechanic that transfers from beginner bots into ranked.",
       focusTag: "payout before dash",
       evidence: "Manual storyboard review of the May 18 8:10 PM game: early bot pressure, double-kill conversion, turret take, inhibitor take, and nexus pressure.",
@@ -519,6 +534,7 @@ function manualFeedback(file) {
     confidence: "high",
     feedbackTitle: "Reset before lethal HP",
     feedback: "When lane health drops to one Ashe auto or spell, give the wave and recall; dying for the crash delays the item that makes the next fight easy.",
+    gameDetail: "This Samira game had an early lethal-HP stay where Ashe could finish the lane, then looked cleaner later once items and teammates were involved. The closest high-elo rep is resetting the moment one auto or spell kills Samira, because protecting item timing keeps the later tower, inhibitor, and nexus conversion alive.",
     whyTrust: "The reviewed frames show Samira around 60 HP under the bot wave before Ashe finishes the kill, while later fights work because the lead is converted with items and teammates nearby.",
     focusTag: "lethal hp reset",
     evidence: "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
@@ -544,6 +560,7 @@ function fallbackFeedback(file, duration, context = {}) {
       confidence: "low",
       feedbackTitle: "Make clips reviewable",
       feedback: "Keep at least five seconds before and after the fight so the trigger, cooldowns, and exit can be judged.",
+      gameDetail: "The clip is too short to show the setup, so the review cannot honestly separate a good death, a late dash, or a missed exit. The high-elo rep is evidence quality first: record enough before and after the fight so the next review can judge the decision, not just the result.",
       whyTrust: "The advice is low-confidence on gameplay and high-confidence on review quality because a one-second clip hides the decision that caused the outcome.",
       focusTag: "recording context",
       evidence: "The recording is shorter than three seconds.",
@@ -561,6 +578,7 @@ function fallbackFeedback(file, duration, context = {}) {
       confidence: "medium",
       feedbackTitle: "16/10 means conversion gap",
       feedback: "The full-game read says damage is enough; the high-elo rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
+      gameDetail: "This full review shows Samira can already create kills, so the climb gap is what happens right after the first win. The high-elo rep is converting the won fight into wave, tower, objective, nexus, or recall before the next fight gives shutdown gold back.",
       whyTrust: "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
       focusTag: "overstay control",
       evidence: "Match-level Samira read from sampled replay frames and side-list evidence.",
@@ -576,6 +594,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Ask for the payout first",
       feedback: "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end.",
+      gameDetail: "The useful question in this clip is not whether Samira can win the fight; it is what the fight buys immediately after. The high-elo rep is naming the payout before the commit so pressure becomes a wave crash, plate, tower, objective move, recall, or end.",
       whyTrust: "High-elo ADCs climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
       pattern: "The fight needs a planned map payout before the commit.",
       diamondRule: "Commit only when the win has an immediate conversion path.",
@@ -586,6 +605,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Name the CC before going in",
       feedback: "Before E/R, identify the one spell that cancels the play; enter only after it is spent, blocked by W, or aimed elsewhere.",
+      gameDetail: "This clip is about the spell that can stop Samira before the reset starts. The high-elo rep is entering only after that crowd-control spell is spent, blocked, or aimed elsewhere, which keeps aggression while removing the easiest shutdown path.",
       whyTrust: "This is the highest-value check because one untracked stun, root, knock-up, or hook turns Samira's whole reset plan off.",
       pattern: "The dangerous moment is entering before the enemy's fight-stopping spell is accounted for.",
       diamondRule: "No full commit until the one spell that stops Samira is gone or aimed elsewhere.",
@@ -596,6 +616,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Stop chasing at fog",
       feedback: "A low target past vision is not free; shove the wave or take plate unless the next enemy position is known.",
+      gameDetail: "The low target is tempting, but fog removes the information needed to know whether the next dash is a reset or a bait. The high-elo rep is stopping at vision loss and taking wave or plate unless enemy positions are known.",
       whyTrust: "The rule is trustworthy because fog removes the information Samira needs to decide whether the next E is a reset or a bait.",
       pattern: "Chasing past fog turns a won trade into an information gamble.",
       diamondRule: "Stop at fog unless the next enemy positions are known.",
@@ -606,6 +627,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Turn bot kills into tempo",
       feedback: "After the first kill or forced recall, crash wave first, then choose plate, dragon move, reset, or support roam.",
+      gameDetail: "The lane win matters only if the enemy loses minions, plates, tempo, or map space after it. The high-elo rep is touching the wave before looking for more fighting, because the crash makes every next option safer.",
       whyTrust: "This is how a won lane becomes rank progress: the enemy loses minions and map space even if no second kill happens.",
       pattern: "Lane wins need to become minion loss, plate pressure, or objective tempo.",
       diamondRule: "Crash before chasing the second reward.",
@@ -616,6 +638,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Fight from the edge first",
       feedback: "Let Q, autos, and W collect cooldowns before entering; Samira should clean the fight, not start it blind.",
+      gameDetail: "This clip points to Samira's best entry shape: use the edge of the fight to collect cooldown information, then dash when the reset path is real. The high-elo rep is staying aggressive while delaying the full commit by one beat.",
       whyTrust: "This lowers anxiety without lowering aggression because edge play gathers real cooldown evidence before the all-in.",
       pattern: "The edge of the fight gives Samira information without spending the dash.",
       diamondRule: "Fight the first second from range, then enter after the enemy spends tools.",
@@ -626,6 +649,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Do not review one-second clips",
       feedback: "This moment needs pre-fight context; future highlight capture should include the decision before the kill screen.",
+      gameDetail: "The important decision happened before the visible moment, so the clip cannot support a confident mechanics diagnosis. The high-elo rep is making the reviewable window longer so the next note can tie the mistake to positioning, cooldowns, or wave state.",
       whyTrust: "The feedback is about evidence quality, not blame; better clips make the review less guessy and easier to trust.",
       pattern: "The recording starts after the important decision.",
       diamondRule: "Review needs the setup, not only the outcome.",
@@ -636,6 +660,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Protect the shutdown",
       feedback: "After a tower or multi-kill, leave with the shutdown value instead of retesting the fight.",
+      gameDetail: "Once Samira has the payout, the risk changes: another fight is no longer worth the same as the gold already held. The high-elo rep is leaving with shutdown value unless the next objective is already free.",
       whyTrust: "This is worth practicing because it does not ask for less carry pressure; it keeps the carry gold from being handed back.",
       pattern: "The risk shifts after Samira has gold; the next death is more expensive than the next kill is valuable.",
       diamondRule: "Protect shutdown gold after the first payout.",
@@ -646,6 +671,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Count before helping",
       feedback: "If a teammate dies nearby, count visible enemies before spending E to rescue a fight.",
+      gameDetail: "This moment is about the rescue instinct that can pull Samira into a fight already lost on numbers. The high-elo rep is counting visible enemies before using E toward trouble, because skipping a bad rescue protects carry gold.",
       whyTrust: "Counting visible enemies gives anxiety a concrete check; if the numbers are bad, skipping the rescue is discipline, not fear.",
       pattern: "Rescue instincts can drag Samira into a fight that is already numerically lost.",
       diamondRule: "Count visible enemies before answering a teammate death.",
@@ -656,6 +682,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Leave after the wave",
       feedback: "Catching side farm is fine; leave toward teammates unless mid has priority or three enemies are visible.",
+      gameDetail: "Side farm is useful income until it disconnects the fed carry from the next map play. The high-elo rep is taking the wave, then immediately pathing back through safe vision unless enemy positions are visible.",
       whyTrust: "This turns side farm into safe income instead of isolation, which is the difference between carrying with gold and dying with gold.",
       pattern: "Side farm is useful until it isolates the fed carry from the next map play.",
       diamondRule: "Catch the wave, then leave unless the enemy positions are visible.",
@@ -666,6 +693,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Objective before duel",
       feedback: "When an enemy catches a wave, pressure the objective first; take the duel only with ult, summoner info, and a walk-out.",
+      gameDetail: "The side duel can look like the game, but objective pressure forces the enemy to answer on worse terms. The high-elo rep is making the map ask the question first, then dueling only when ult, summoners, and exit are known.",
       whyTrust: "Objectives force the enemy to answer on your terms; random duels make the game hinge on mechanics under uncertainty.",
       pattern: "A side duel can distract from the objective that would make the enemy respond.",
       diamondRule: "Objective pressure before isolated duels.",
@@ -676,6 +704,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Second in at chokes",
       feedback: "Hold the edge until enemy CC is used so Samira stays the finisher instead of the target.",
+      gameDetail: "Chokes punish the first champion in, especially when the enemy still has the spell that stops Samira. The high-elo rep is being second in at jungle walls so the dash starts after the first cooldown exchange.",
       whyTrust: "This preserves the aggression while removing the single easiest way enemies stop Samira.",
       pattern: "Chokes punish the first champion in; Samira gets more value as the second entry.",
       diamondRule: "Second in at jungle walls unless the enemy CC is already gone.",
@@ -686,6 +715,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Hit the structure",
       feedback: "At inhib or nexus, the high-elo rep is ending as soon as the structure is available.",
+      gameDetail: "Once the base structure is available, kills are only a way to clear space for hitting it. The high-elo rep is moving the cursor to the structure first, because structure damage is the lowest-variance conversion of the won fight.",
       whyTrust: "This is reliable because structures are guaranteed progress; extra fighting after the base is open adds variance without adding win condition.",
       pattern: "Base fights become lower value once the structure is open.",
       diamondRule: "Hit the structure as soon as the fight is won.",
@@ -754,7 +784,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "Visible page copy should be concise and operational. Avoid phrases like 'you should' or broad coaching.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter in Challenger","drill":"one next-game repetition","nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","gameDetail":"one concise paragraph: what happened, what improves, why it matters for very high elo","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter in Challenger","drill":"one next-game repetition","nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -787,6 +817,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
       confidence: clean(parsed.confidence, "low").toLowerCase(),
       feedbackTitle: clean(parsed.feedbackTitle, "Focus"),
       feedback: clean(parsed.feedback, "Review the clip and choose one safer next action."),
+      gameDetail: clean(parsed.gameDetail, `${clean(parsed.pattern, "The recording points to one repeatable decision pattern.")} ${clean(parsed.feedback, "Choose one safer next action.")}`),
       whyTrust: clean(parsed.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
       focusTag: clean(parsed.focusTag, "review"),
       evidence: clean(parsed.evidence, "Generated from sampled replay frames."),
@@ -1031,6 +1062,7 @@ async function main() {
       confidence: clean(analysis.confidence, "low"),
       feedbackTitle: clean(analysis.feedbackTitle, "Focus"),
       feedback: clean(analysis.feedback, "Review the clip and choose one safer next action."),
+      gameDetail: clean(analysis.gameDetail, `${clean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${clean(analysis.feedback, "Choose one safer next action.")} ${clean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`),
       whyTrust: clean(analysis.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
       focusTag: clean(analysis.focusTag, "review"),
       evidence: clean(analysis.evidence, "Generated from sampled replay frames."),

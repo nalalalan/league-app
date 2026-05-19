@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#eee7dd">
     <title>league.aolabs.io</title>
-    <meta name="description" content="A public AO Labs review room for League situations, champion-specific rules, mindset notes, and practice logs.">
+    <meta name="description" content="A public AO Labs recording review room for Samira and Fizz practice.">
     <link rel="canonical" href="https://league.aolabs.io/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="AO Labs">
     <meta property="og:title" content="league.aolabs.io">
-    <meta property="og:description" content="A public AO Labs review room for League situations, champion-specific rules, mindset notes, and practice logs.">
+    <meta property="og:description" content="A public AO Labs recording review room for Samira and Fizz practice.">
     <meta property="og:url" content="https://league.aolabs.io/">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="league.aolabs.io">
-    <meta name="twitter:description" content="A public AO Labs review room for League situations, champion-specific rules, mindset notes, and practice logs.">
+    <meta name="twitter:description" content="A public AO Labs recording review room for Samira and Fizz practice.">
     <link rel="icon" href="/icon.svg?v=20260517-league-mark2" type="image/svg+xml">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="apple-touch-icon" href="/icon.svg?v=20260517-league-mark2">
@@ -23,8 +23,8 @@
     <link rel="stylesheet" href="https://aolabs.io/suite-header.css?v=20260516-suite-bloom">
     <link rel="modulepreload" href="/vfx3d.js?v=20260518-world-vfx24">
     <link rel="modulepreload" href="/vendor/three.module.min.js">
-    <link rel="stylesheet" href="/styles.css?v=20260518-compact-recordings2">
-    <script src="/app.js?v=20260518-compact-recordings2" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20260518-samira-fizz-art5">
+    <script src="/app.js?v=20260518-samira-fizz-art5" defer></script>
   </head>
   <body>
     <header class="suite-topbar" aria-label="league navigation">
@@ -60,7 +60,7 @@
         </div>
       </section>
 
-      <section class="recordings" aria-labelledby="recordings-title">
+      <section class="recordings" id="recordings" aria-labelledby="recordings-title">
         <div class="recording-focus" id="recording-focus"></div>
         <div class="plain-head recording-head">
           <h2 id="recordings-title">recordings</h2>
@@ -69,13 +69,14 @@
         <div class="recording-grid" id="recording-grid"></div>
       </section>
 
-      <section class="situations" aria-labelledby="situations-title">
+      <details class="situations situations-archive">
+        <summary>archived situations</summary>
         <div class="plain-head">
           <h2 id="situations-title">situations</h2>
           <p id="situation-count"></p>
         </div>
         <div class="situation-list" id="situation-list"></div>
-      </section>
+      </details>
 
       <details class="notes-panel">
         <summary>public notes</summary>

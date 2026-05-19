@@ -19,9 +19,15 @@ const segmentSeconds = Number(process.env.LEAGUE_LIVE_SEGMENT_SECONDS || 30);
 const fastForwardSpeed = Number(process.env.LEAGUE_LIVE_FAST_FORWARD || 8);
 const minGameSeconds = Number(process.env.LEAGUE_LIVE_MIN_GAME_SECONDS || 90);
 const fps = String(process.env.LEAGUE_LIVE_FPS || 30);
-const crf = String(process.env.LEAGUE_LIVE_CRF || 26);
+const encoderPreference = String(process.env.LEAGUE_LIVE_ENCODER || "auto").toLowerCase();
+const liveCq = String(process.env.LEAGUE_LIVE_CQ || 20);
+const x264Crf = String(process.env.LEAGUE_LIVE_CRF || 20);
+const captureBitrate = String(process.env.LEAGUE_LIVE_CAPTURE_BITRATE || "18000k");
+const captureMaxrate = String(process.env.LEAGUE_LIVE_CAPTURE_MAXRATE || "24000k");
+const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "36000k");
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
+let encoderProfilePromise;
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -43,6 +49,89 @@ async function run(command, args, options = {}) {
     ...options
   });
   return result.stdout || "";
+}
+
+async function ffmpegEncoders() {
+  try {
+    return await run("ffmpeg", ["-hide_banner", "-encoders"]);
+  } catch {
+    return "";
+  }
+}
+
+function encoderArgs(profile, purpose = "review") {
+  if (profile.name === "h264_nvenc") {
+    return [
+      "-c:v", "h264_nvenc",
+      "-preset", "p5",
+      "-tune", "hq",
+      "-rc", "vbr",
+      "-cq", liveCq,
+      "-b:v", captureBitrate,
+      "-maxrate", captureMaxrate,
+      "-bufsize", captureBufsize,
+      "-pix_fmt", "yuv420p"
+    ];
+  }
+  const preset = purpose === "capture" ? "ultrafast" : "veryfast";
+  return [
+    "-c:v", "libx264",
+    "-preset", preset,
+    "-crf", x264Crf,
+    "-pix_fmt", "yuv420p"
+  ];
+}
+
+async function encoderWorks(profile) {
+  const testPath = path.join(analysisRoot, `encoder-test-${profile.name}.mp4`);
+  await fs.mkdir(analysisRoot, { recursive: true });
+  try {
+    await run("ffmpeg", [
+      "-y",
+      "-hide_banner",
+      "-loglevel", "error",
+      "-f", "lavfi",
+      "-i", "color=size=320x180:rate=30:duration=0.2",
+      "-frames:v", "6",
+      ...encoderArgs(profile, "review"),
+      "-an",
+      testPath
+    ]);
+    return true;
+  } catch {
+    return false;
+  } finally {
+    await fs.unlink(testPath).catch(() => {});
+  }
+}
+
+async function encoderProfile() {
+  if (!encoderProfilePromise) {
+    encoderProfilePromise = (async () => {
+      const encoders = await ffmpegEncoders();
+      const wantsNvenc = encoderPreference === "auto" || encoderPreference === "nvenc" || encoderPreference === "h264_nvenc";
+      if (wantsNvenc && /\bh264_nvenc\b/i.test(encoders)) {
+        const nvenc = { name: "h264_nvenc", label: `NVIDIA hardware H.264, CQ ${liveCq}` };
+        if (await encoderWorks(nvenc)) return nvenc;
+      }
+      return { name: "libx264", label: `CPU H.264 fallback, CRF ${x264Crf}` };
+    })();
+  }
+  return encoderProfilePromise;
+}
+
+async function lowerProcessPriority(pid) {
+  if (process.platform !== "win32" || !pid) return;
+  try {
+    await run("powershell.exe", [
+      "-NoProfile",
+      "-WindowStyle", "Hidden",
+      "-Command",
+      `$p = Get-Process -Id ${Number(pid)} -ErrorAction SilentlyContinue; if ($p) { $p.PriorityClass = 'BelowNormal' }`
+    ]);
+  } catch {
+    await log(`Could not lower ffmpeg priority for pid ${pid}; capture continues.`);
+  }
 }
 
 async function acquireLock() {
@@ -111,6 +200,7 @@ async function startSession() {
   const sessionRoot = path.join(captureRoot, stamp(startedAt));
   await fs.mkdir(sessionRoot, { recursive: true });
   const outputPattern = path.join(sessionRoot, "segment-%04d.mkv");
+  const encoder = await encoderProfile();
   const args = [
     "-y",
     "-hide_banner",
@@ -120,10 +210,7 @@ async function startSession() {
     "-draw_mouse", "1",
     "-i", "desktop",
     "-an",
-    "-c:v", "libx264",
-    "-preset", "veryfast",
-    "-crf", crf,
-    "-pix_fmt", "yuv420p",
+    ...encoderArgs(encoder, "capture"),
     "-f", "segment",
     "-segment_time", String(segmentSeconds),
     "-reset_timestamps", "1",
@@ -137,10 +224,17 @@ async function startSession() {
   child.stderr.on("data", (chunk) => {
     fs.appendFile(path.join(sessionRoot, "ffmpeg.log"), chunk).catch(() => {});
   });
-  await log(`Started League screen capture in ${sessionRoot}`);
+  child.once("exit", (code, signal) => {
+    if (code || signal) {
+      fs.appendFile(path.join(sessionRoot, "ffmpeg.log"), `\nffmpeg exited with code ${code ?? ""} signal ${signal ?? ""}\n`).catch(() => {});
+    }
+  });
+  await lowerProcessPriority(child.pid);
+  await log(`Started League screen capture in ${sessionRoot} using ${encoder.label} at ${fps} fps.`);
   return {
     child,
     sessionRoot,
+    encoder: encoder.name,
     startedAt,
     startedMs: startedAt.getTime(),
     lastSeenMs: Date.now()
@@ -190,6 +284,7 @@ function importantSegmentIndexes(segments) {
 async function processSegment(segment, importantIndexes, sessionRoot) {
   const isImportant = importantIndexes.has(segment.index);
   const speed = isImportant ? 1 : Math.max(1, fastForwardSpeed);
+  const encoder = await encoderProfile();
   const outputPath = path.join(sessionRoot, `processed-${String(segment.index).padStart(4, "0")}.mp4`);
   await run("ffmpeg", [
     "-y",
@@ -198,10 +293,7 @@ async function processSegment(segment, importantIndexes, sessionRoot) {
     "-i", segment.filePath,
     "-vf", `setpts=PTS/${speed},fps=${fps}`,
     "-an",
-    "-c:v", "libx264",
-    "-preset", "veryfast",
-    "-crf", "29",
-    "-pix_fmt", "yuv420p",
+    ...encoderArgs(encoder, "review"),
     "-movflags", "+faststart",
     outputPath
   ]);
@@ -256,15 +348,13 @@ async function finalizeSession(session) {
   await writeConcatList(listPath, processed.map((item) => item.outputPath));
   await run("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", listPath, "-c", "copy", joinedPath]);
   await fs.mkdir(sourceDir, { recursive: true });
+  const encoder = await encoderProfile();
   await run("ffmpeg", [
     "-y",
     "-hide_banner",
     "-loglevel", "error",
     "-i", joinedPath,
-    "-c:v", "libx264",
-    "-preset", "veryfast",
-    "-crf", "29",
-    "-pix_fmt", "yuv420p",
+    ...encoderArgs(encoder, "review"),
     "-an",
     "-movflags", "+faststart",
     outputPath
@@ -279,6 +369,8 @@ async function finalizeSession(session) {
     outputPath,
     durationSeconds: duration,
     sourceDurationSeconds: elapsedSeconds,
+    encoder: encoder.name,
+    videoQuality: encoder.name === "h264_nvenc" ? `CQ ${liveCq}` : `CRF ${x264Crf}`,
     segmentSeconds,
     fastForwardSpeed,
     allSegmentsPreserved: true,

@@ -372,8 +372,8 @@ const champions = [
   {
     id: "samira",
     name: "Samira",
-    skin: "Soul Fighter Samira",
-    image: `${imageBase}/Samira_30.jpg`,
+    skin: "sword Samira",
+    image: "/assets/champions/samira-user-final.png",
     focus: "Recording review is the current queue plan.",
     note: "Samira can mash in, but she cannot always leave. Her escape is killing, resetting, lifestealing, blocking the real spell, or using Flash.",
     situations: [
@@ -512,8 +512,8 @@ const champions = [
   {
     id: "fizz",
     name: "Fizz",
-    skin: "Little Devil Fizz",
-    image: `${imageBase}/Fizz_16.jpg`,
+    skin: "shark Fizz",
+    image: "/assets/champions/fizz-shark.png",
     focus: "Mark, enter, stab, dodge, leave.",
     note: "Fizz is the reference loop because every button has a body job and a clean exit shape.",
     situations: [
@@ -665,6 +665,9 @@ const champions = [
   }
 ];
 
+const pageChampionIds = ["samira", "fizz"];
+const pageChampions = champions.filter((champion) => pageChampionIds.includes(champion.id));
+
 const recordingReview = {
   match: "NA1-5563247854",
   captured: "May 18, 2026, 5:46-5:57 PM ET",
@@ -714,6 +717,8 @@ const championNote = document.querySelector("#champion-note");
 const situationsSection = document.querySelector(".situations");
 const situationCount = document.querySelector("#situation-count");
 const situationList = document.querySelector("#situation-list");
+const recordingsSection = document.querySelector(".recordings");
+const recordingTitle = document.querySelector("#recordings-title");
 const recordingSummary = document.querySelector("#recording-summary");
 const recordingFocus = document.querySelector("#recording-focus");
 const recordingGrid = document.querySelector("#recording-grid");
@@ -723,6 +728,7 @@ const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 let currentChampionId = "";
 let activeRecordingFile = "";
+let recordingReviewData = recordingReview;
 let championAtmosphere;
 let swapTimer = 0;
 let settleTimer = 0;
@@ -743,6 +749,10 @@ const stingerUrls = Object.fromEntries(champions.map((champion) => [
   champion.id,
   `/audio/${champion.id}.mp3?v=${stingerVersion}`
 ]));
+
+function soundProfileId(profileId = "default") {
+  return profileId === "samira" ? "jhin" : profileId;
+}
 
 const visualDurations = {
   samira: 760,
@@ -917,6 +927,10 @@ function fxProfileFor(profileId = "default") {
 
 function championById(championId) {
   return champions.find((champion) => champion.id === championId) || champions[0];
+}
+
+function pageChampionById(championId) {
+  return pageChampions.find((champion) => champion.id === championId) || pageChampions[0];
 }
 
 function ensureChampionAtmosphere() {
@@ -1112,10 +1126,10 @@ function warmUltimateShader() {
 function scheduleVfxWarmQueue() {
   if (motionQuery.matches || vfxWarmQueueStarted) return;
   vfxWarmQueueStarted = true;
-  const activeId = currentChampionId || champions[0]?.id;
+  const activeId = currentChampionId || pageChampions[0]?.id;
   const ids = [
     activeId,
-    ...champions.map((champion) => champion.id).filter((championId) => championId !== activeId)
+    ...pageChampions.map((champion) => champion.id).filter((championId) => championId !== activeId)
   ].filter(Boolean);
   ids.forEach((championId, index) => {
     window.setTimeout(() => {
@@ -1130,11 +1144,11 @@ function primeCinematicAssets() {
   void loadVfx3dModule();
   void warmUltimateShader();
   void warmCinematicCanvases();
-  void warmVfx3dRenderer(currentChampionId || champions[0]?.id);
+  void warmVfx3dRenderer(currentChampionId || pageChampions[0]?.id);
   window.setTimeout(scheduleVfxWarmQueue, 700);
 }
 
-function warmVfx3dRenderer(championId = currentChampionId || champions[0]?.id) {
+function warmVfx3dRenderer(championId = currentChampionId || pageChampions[0]?.id) {
   if (motionQuery.matches || !("WebGLRenderingContext" in window)) return Promise.resolve();
   const champion = championById(championId);
   if (!champion?.id) return Promise.resolve();
@@ -1305,8 +1319,8 @@ function writeChampion(champion) {
   championName.textContent = champion.name;
   championFocus.textContent = "";
   championNote.textContent = "";
-  situationCount.textContent = `${champion.situations.length} situations`;
-  situationList.replaceChildren(...champion.situations.map(situationCard));
+  if (situationCount) situationCount.textContent = `${champion.situations.length} archived`;
+  if (situationList) situationList.replaceChildren(...champion.situations.map(situationCard));
   updateChampionAtmosphere(champion, {
     burst: Boolean(currentChampionId && champion.id !== currentChampionId),
     reset: !currentChampionId
@@ -1552,7 +1566,45 @@ function statLine(item) {
 }
 
 function recordingParagraph(item) {
-  return item.feedback || item.pattern || item.whyTrust || "No feedback generated yet.";
+  return item.gameDetail || item.pattern || item.feedback || item.whyTrust || "No feedback generated yet.";
+}
+
+function secondsForRecording(item) {
+  if (Number.isFinite(Number(item.durationSeconds))) return Number(item.durationSeconds);
+  const match = String(item.duration || "").match(/^(\d+):(\d{2})$/);
+  return match ? Number(match[1]) * 60 + Number(match[2]) : 0;
+}
+
+function durationLabel(seconds) {
+  const rounded = Math.max(0, Math.round(Number(seconds) || 0));
+  return `${Math.floor(rounded / 60)}:${String(rounded % 60).padStart(2, "0")}`;
+}
+
+function championId(value) {
+  const normalized = String(value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  return pageChampionIds.includes(normalized) ? normalized : normalized;
+}
+
+function recordingsForChampion(review, selectedChampionId) {
+  return sortedRecordings(review.recordings || [])
+    .filter((item) => championId(item.champion) === selectedChampionId);
+}
+
+function recordingEmptyCard(champion) {
+  const article = document.createElement("article");
+  article.className = "recording-empty";
+
+  const title = document.createElement("h3");
+  title.textContent = `${champion.name} recordings`;
+
+  const copy = document.createElement("p");
+  copy.textContent = `No ${champion.name} recordings yet.`;
+
+  const detail = document.createElement("p");
+  detail.textContent = "New games appear here after the Highlights folder updates.";
+
+  article.append(title, copy, detail);
+  return article;
 }
 
 function recordingListCard(item) {
@@ -1641,11 +1693,41 @@ function recordingTable(review) {
   return wrapper;
 }
 
-function renderRecordings(review = recordingReview) {
+function renderRecordings(review = recordingReview, selectedChampionId = currentChampionId || "samira") {
   if (!recordingSummary || !recordingFocus || !recordingGrid) return;
-  recordingSummary.textContent = `${review.totalRecordings} recordings - ${review.totalDuration} - ${review.match || "latest"}`;
-  recordingFocus.replaceChildren(recordingMainCard(review));
-  recordingGrid.replaceChildren(recordingList(review));
+  const champion = pageChampionById(selectedChampionId);
+  const championRecordings = recordingsForChampion(review, champion.id);
+  if (recordingTitle) recordingTitle.textContent = `${champion.name} recordings`;
+  if (page) page.dataset.recordingChampion = champion.id;
+
+  if (!championRecordings.length) {
+    recordingSummary.textContent = "0 recordings";
+    recordingFocus.replaceChildren(recordingMainCard({
+      detectedChampions: [{ name: champion.name }],
+      mainFeedback: {
+        focus: `No ${champion.name} recordings yet.`,
+        rule: `New ${champion.name} games will appear after the Highlights folder updates.`,
+        whyTrust: "No footage, no feedback.",
+        reviewLimit: ""
+      }
+    }));
+    recordingGrid.replaceChildren(recordingEmptyCard(champion));
+    return;
+  }
+
+  const totalSeconds = championRecordings.reduce((sum, item) => sum + secondsForRecording(item), 0);
+  const matches = [...new Set(championRecordings.map((item) => item.matchId).filter(Boolean))];
+  const championReview = {
+    ...review,
+    totalRecordings: championRecordings.length,
+    totalDuration: durationLabel(totalSeconds),
+    match: matches.length === 1 ? matches[0] : `${matches.length} matches`,
+    detectedChampions: [{ name: champion.name }],
+    recordings: championRecordings
+  };
+  recordingSummary.textContent = `${championReview.totalRecordings} recordings - ${championReview.totalDuration} - ${championReview.match}`;
+  recordingFocus.replaceChildren(recordingMainCard(championReview));
+  recordingGrid.replaceChildren(recordingList(championReview));
 }
 
 function renderRecordingLoading() {
@@ -1663,17 +1745,21 @@ async function hydrateRecordings() {
       cache: "no-store"
     });
     if (!response.ok) {
-      renderRecordings(recordingReview);
+      recordingReviewData = recordingReview;
+      renderRecordings(recordingReviewData, currentChampionId || "samira");
       return;
     }
     const data = await response.json();
     if (!Array.isArray(data.recordings) || data.recordings.length === 0) {
-      renderRecordings(recordingReview);
+      recordingReviewData = recordingReview;
+      renderRecordings(recordingReviewData, currentChampionId || "samira");
       return;
     }
-    renderRecordings(data);
+    recordingReviewData = data;
+    renderRecordings(recordingReviewData, currentChampionId || "samira");
   } catch {
-    renderRecordings(recordingReview);
+    recordingReviewData = recordingReview;
+    renderRecordings(recordingReviewData, currentChampionId || "samira");
   }
 }
 
@@ -2514,9 +2600,10 @@ function playPremiumMaterialFoley(profileId = "default") {
 }
 
 function playSelectSound(profileId = "default") {
-  const stingerUrl = stingerUrls[profileId];
+  const soundId = soundProfileId(profileId);
+  const stingerUrl = stingerUrls[soundId];
   if (!stingerUrl || !window.Audio) {
-    playSynthSelectSound(profileId);
+    playSynthSelectSound(soundId);
     return;
   }
 
@@ -2532,13 +2619,13 @@ function playSelectSound(profileId = "default") {
     if (playback?.catch) {
       playback.catch(() => {
         if (activeStinger === audio) activeStinger = undefined;
-        playSynthSelectSound(profileId);
+        playSynthSelectSound(soundId);
       });
     }
-    playChampionFoley(profileId);
-    playPremiumMaterialFoley(profileId);
+    playChampionFoley(soundId);
+    playPremiumMaterialFoley(soundId);
   } catch {
-    playSynthSelectSound(profileId);
+    playSynthSelectSound(soundId);
   }
 }
 
@@ -5102,7 +5189,7 @@ function warmCinematicCanvases() {
     if (!context) return;
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = "high";
-    for (const champion of champions) {
+    for (const champion of pageChampions) {
       const duration = visualDurations[champion.id] || 3800;
       const profile = fxProfileFor(champion.id);
       drawUltimateFrame(context, profile, canvas.width, canvas.height, duration * 0.38, duration);
@@ -5248,7 +5335,7 @@ function animateChampionSwap(champion) {
   window.clearTimeout(swapTimer);
   window.clearTimeout(settleTimer);
 
-  const panels = [championPanel, situationsSection];
+  const panels = [championPanel, recordingsSection].filter(Boolean);
   panels.forEach((panel) => {
     panel.setAttribute("aria-busy", "true");
     panel.classList.remove("is-entering");
@@ -5259,6 +5346,7 @@ function animateChampionSwap(champion) {
   swapTimer = window.setTimeout(() => {
     writeChampion(champion);
     currentChampionId = champion.id;
+    renderRecordings(recordingReviewData, champion.id);
 
     void championPanel.offsetWidth;
     panels.forEach((panel) => {
@@ -5274,14 +5362,30 @@ function animateChampionSwap(champion) {
   }, delay);
 }
 
+function championIdFromLocation() {
+  const params = new URLSearchParams(window.location.search);
+  const value = String(params.get("champion") || window.location.hash.replace(/^#/, "") || "samira").trim().toLowerCase();
+  return pageChampionIds.includes(value) ? value : "samira";
+}
+
+function setChampionRoute(championId, replace = false) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("champion", championId);
+  url.hash = "";
+  const method = replace ? "replaceState" : "pushState";
+  window.history[method]({ championId }, "", url);
+}
+
 function renderChampion(championId, options = {}) {
-  const champion = championById(championId);
+  const champion = pageChampionById(championId);
+  if (options.updateRoute) setChampionRoute(champion.id, Boolean(options.replaceRoute));
   applyFxProfileVars(page, fxProfileFor(champion.id));
   setPressedChampion(champion.id);
 
   if (!options.animate || !currentChampionId || champion.id === currentChampionId) {
     writeChampion(champion);
     currentChampionId = champion.id;
+    renderRecordings(recordingReviewData, champion.id);
     return;
   }
 
@@ -5289,7 +5393,7 @@ function renderChampion(championId, options = {}) {
 }
 
 function renderPicker() {
-  championPicker.replaceChildren(...champions.map((champion, index) => {
+  championPicker.replaceChildren(...pageChampions.map((champion, index) => {
     const button = document.createElement("button");
     button.className = "portrait-button";
     button.type = "button";
@@ -5331,7 +5435,7 @@ function renderPicker() {
       playSelectSound(champion.id);
       spawnSelectionFx(button, champion.id);
       window.setTimeout(() => button.classList.remove("is-flashing"), (visualDurations[champion.id] || 760) + 280);
-      renderChampion(champion.id, { animate: true });
+      renderChampion(champion.id, { animate: true, updateRoute: true });
     });
     return button;
   }));
@@ -5381,9 +5485,12 @@ async function hydratePublicNotes() {
 }
 
 renderPicker();
-renderChampion("samira", { animate: false });
+renderChampion(championIdFromLocation(), { animate: false, updateRoute: true, replaceRoute: true });
 hydrateRecordings();
 hydratePublicNotes();
+window.addEventListener("popstate", () => {
+  renderChampion(championIdFromLocation(), { animate: true });
+});
 if (!motionQuery.matches) {
   window.setTimeout(primeCinematicAssets, 220);
   if ("requestIdleCallback" in window) {
