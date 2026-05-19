@@ -1695,6 +1695,11 @@ function secondsFromTimestamp(text) {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+function isNarrativeClockTimestamp(source, index, length) {
+  const after = String(source || "").slice(index + length, index + length + 8);
+  return !/^\s*(?:AM|PM)\b/i.test(after);
+}
+
 function clampSeekSeconds(seconds, duration) {
   if (!Number.isFinite(seconds)) return null;
   if (!Number.isFinite(duration) || duration <= 0) return Math.max(0, seconds);
@@ -1707,6 +1712,7 @@ function timestampSecondsInText(text) {
   const timestampPattern = /\b\d{1,2}:[0-5]\d\b/g;
   let match;
   while ((match = timestampPattern.exec(source)) !== null) {
+    if (!isNarrativeClockTimestamp(source, match.index, match[0].length)) continue;
     const seconds = secondsFromTimestamp(match[0]);
     if (Number.isFinite(seconds)) timestamps.push(seconds);
   }
@@ -1726,10 +1732,54 @@ function recordingClockAnchors(item) {
     .filter((seconds) => Number.isFinite(seconds));
 }
 
+function normalizedClockVideoAnchor(anchor) {
+  if (!anchor) return null;
+  const clock = secondsFromTimestamp(anchor.clock || anchor.timestamp || anchor.gameClock);
+  const videoSeconds = Number(anchor.videoSeconds ?? anchor.video ?? anchor.seekSeconds);
+  if (!Number.isFinite(clock) || !Number.isFinite(videoSeconds)) return null;
+  return { clockSeconds: clock, videoSeconds };
+}
+
+function recordingClockVideoAnchors(item) {
+  return (Array.isArray(item?.clockAnchors) ? item.clockAnchors : [])
+    .map(normalizedClockVideoAnchor)
+    .filter(Boolean)
+    .sort((a, b) => a.clockSeconds - b.clockSeconds || a.videoSeconds - b.videoSeconds);
+}
+
+function interpolateClockSeek(clockSeconds, item, duration) {
+  const anchors = recordingClockVideoAnchors(item);
+  if (!anchors.length) return null;
+  if (anchors.length === 1) return clampSeekSeconds(anchors[0].videoSeconds, duration);
+
+  const interpolate = (left, right) => {
+    const clockSpan = right.clockSeconds - left.clockSeconds;
+    if (!Number.isFinite(clockSpan) || Math.abs(clockSpan) < 0.001) return null;
+    const ratio = (clockSeconds - left.clockSeconds) / clockSpan;
+    return clampSeekSeconds(left.videoSeconds + ratio * (right.videoSeconds - left.videoSeconds), duration);
+  };
+
+  if (clockSeconds <= anchors[0].clockSeconds) {
+    return interpolate(anchors[0], anchors[1]) ?? clampSeekSeconds(anchors[0].videoSeconds, duration);
+  }
+  for (let index = 1; index < anchors.length; index += 1) {
+    if (clockSeconds <= anchors[index].clockSeconds) {
+      return interpolate(anchors[index - 1], anchors[index]) ?? clampSeekSeconds(anchors[index].videoSeconds, duration);
+    }
+  }
+  return interpolate(anchors[anchors.length - 2], anchors[anchors.length - 1]) ?? clampSeekSeconds(anchors.at(-1).videoSeconds, duration);
+}
+
 function seekSecondsForStoryTimestamp(timestamp, item) {
   const clockSeconds = secondsFromTimestamp(timestamp);
   if (!Number.isFinite(clockSeconds)) return null;
   const duration = secondsForRecording(item);
+  const anchoredSeek = interpolateClockSeek(clockSeconds, item, duration);
+  if (Number.isFinite(anchoredSeek)) return anchoredSeek;
+  const clipStart = Number(item?.clipTimestampSeconds);
+  if (Number.isFinite(clipStart) && clipStart > 0 && clockSeconds >= clipStart) {
+    return clampSeekSeconds(clockSeconds - clipStart, duration);
+  }
   const anchors = recordingClockAnchors(item);
   if (Number.isFinite(duration) && duration > 0 && anchors.length >= 2) {
     const minClock = Math.min(...anchors);
@@ -1764,6 +1814,7 @@ function appendTextWithTimestampLinks(container, text, item) {
   let lastIndex = 0;
   let match;
   while ((match = timestampPattern.exec(source)) !== null) {
+    if (!isNarrativeClockTimestamp(source, match.index, match[0].length)) continue;
     if (match.index > lastIndex) {
       container.append(document.createTextNode(source.slice(lastIndex, match.index)));
     }
@@ -1825,7 +1876,10 @@ function recordingStoryParagraph(item) {
     appendStorySpan(paragraph, praise, "recording-story-praise", timestampOptions);
   }
   const evidence = recordingEvidence(item);
-  if (hasText(evidence) && !paragraph.textContent.includes(evidence)) {
+  const existingTimes = new Set(timestampSecondsInText(paragraph.textContent));
+  const evidenceTimes = timestampSecondsInText(evidence);
+  const hasNewEvidenceTime = evidenceTimes.some((seconds) => !existingTimes.has(seconds));
+  if (hasText(evidence) && !paragraph.textContent.includes(evidence) && (!evidenceTimes.length || hasNewEvidenceTime)) {
     appendStoryText(paragraph, `The clip shows it: ${evidence}`, timestampOptions);
   }
   return paragraph;

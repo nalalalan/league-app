@@ -472,6 +472,18 @@ function cleanList(value, maxItems = 5) {
     .slice(0, maxItems);
 }
 
+function cleanClockAnchors(value) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((anchor) => {
+      const clock = clean(anchor?.clock || anchor?.timestamp || anchor?.gameClock || "");
+      const videoSeconds = Number(anchor?.videoSeconds ?? anchor?.video ?? anchor?.seekSeconds);
+      if (!clock || !Number.isFinite(videoSeconds)) return null;
+      return { clock, videoSeconds: Math.round(videoSeconds * 1000) / 1000 };
+    })
+    .filter(Boolean);
+}
+
 async function readExistingManifest() {
   try {
     return JSON.parse(await fs.readFile(manifestPath, "utf8"));
@@ -516,19 +528,29 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "You drift after base opens",
       feedback: "Mistake: you chase sideways after the base is already open. Fix: stand behind the first body in and hit the structure as soon as space is made.",
-      gameDetail: "Honest read: this was a won beginner-bot game, but the mistake still matters because it is exactly how a free end turns into a throw in harder games. Around 12:06 the base door is already open and teammates are in front, so Samira's job is not to start a fresh fight. Around 13:06 the camera gets pulled toward Mordekaiser in mid; that is only correct if it immediately routes back into the open base. By 14:18 the game ends because the team returns to structures. The lesson is simple: once base is open, every champion target is secondary unless that target is physically blocking the structure.",
+      gameDetail: "Honest read: the useful footage starts after a desktop-capture section, and the lesson is still clear. Around 12:10 Samira is low below the enemy base entrance while allies are already fighting inside the cracked base; the next valuable movement is backward-to-safe or forward-to-structure with the team, not a solo side angle. Around 13:05 the map slows down: Mordekaiser walks away mid, an ally is channeling recall, and Samira is full HP with the lane already open, which is exactly the moment to choose wave/base route before another target appears. Around 13:15 the camera follows Mordekaiser again and Samira casts Q/Flair into him from close range; the spell connects, but the important part is that the fight is sideways while the open base is still the real payout. Around 14:19 the clean version finally shows up: multiple enemies are dead, minions are in the base, Samira is behind the front body, and the team is hitting the ending area instead of wandering after another duel.",
       whyTrust: "The win came from returning to the open base, not from a cleaner combo. Your damage was not the limiting factor; target discipline was.",
-      eventEvidence: "12:06 base was already open; 13:06 the camera followed a mid-lane Mordekaiser target; 14:18 the win came from returning to structures.",
+      eventEvidence: "12:10 low Samira below the open enemy base entrance; 13:15 Q/Flair into Mordekaiser during a sideways mid fight; 14:19 team and minions are back inside the base to end.",
       goodThing: "You did group back toward the base and finish the game instead of letting the push fully dissolve.",
       focusTag: "end the push",
-      evidence: "Review clip frames with visible game clock: base pressure near 12:06, Mordekaiser catch around 13:06, final base push around 14:18.",
+      evidence: "Review clip frames with visible game clock: base pressure near 12:10, Mordekaiser Q/Flair around 13:15, final base push around 14:19.",
       pattern: "The winning pressure was already available. The mistake is treating a nearby champion like the win condition after the actual win condition is already open.",
       diamondRule: "If a base structure is available, a chase is wrong unless it directly removes the body blocking the structure.",
       drill: "Next game: when inhibitor or nexus is open, say front line, structure, no chase.",
       timeline: [
-        "12:06 - Base door is open; Samira has teammates in front and does not need to start.",
-        "13:06 - Mordekaiser crossing mid is a distraction unless it keeps the base route alive.",
-        "14:18 - The game ends when the push returns to structure pressure."
+        "12:10 - Samira is low below the enemy base entrance while allies are already inside the cracked base.",
+        "13:15 - Samira Q/Flair follows Mordekaiser mid instead of immediately routing the open lane back to base.",
+        "14:19 - The team has minions inside the base and Samira is behind the first body, which is the clean ending shape."
+      ],
+      clockAnchors: [
+        { clock: "11:51", videoSeconds: 9.300 },
+        { clock: "12:10", videoSeconds: 27.800 },
+        { clock: "13:05", videoSeconds: 83.300 },
+        { clock: "13:15", videoSeconds: 92.500 },
+        { clock: "13:52", videoSeconds: 129.500 },
+        { clock: "14:01", videoSeconds: 138.800 },
+        { clock: "14:10", videoSeconds: 148.000 },
+        { clock: "14:19", videoSeconds: 157.300 }
       ],
       nuance: [
         "The most useful footage is the late-game base decision, not the scoreboard line.",
@@ -546,9 +568,9 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "You re-fight after winning",
       feedback: "Mistake: you keep playing for another fight after the first win. Fix: cash out wave, tower, reset, or end before touching another champion.",
-      gameDetail: "Honest read: this is improved, but still too eager after the good part happens. Around 1:24 Samira fights near the friendly bot tower while Jinx and Braum can still answer, so the value is controlling the wave, not proving the fight longer. Around 7:58 you get the good version: bot pressure becomes turret. Around 10:32 to 12:44 the bad habit returns: low-health extended fighting replaces the clean cashout/reset. The lesson is simple: the first win is the job; the second fight is only allowed after the payout is locked.",
+      gameDetail: "Honest read: this is improved, but the same leak keeps coming back after the good moment. Around 1:24 Samira is fighting under the friendly bot tower with Jinx and Braum still on screen; the movement is forward into a contested lane pocket while the safer value is to thin the wave, hold the tower line, and make them walk into you. Around 7:58 the good version happens: the bot push is already under enemy tower, the wave is with you, and the won pressure turns into turret damage instead of another random chase. Around 10:32 Samira is low in bot lane while Braum and Jinx can still answer, so every extra step forward is a shutdown invitation unless the next click is reset or structure. Around 12:44 the punishment is visible: the fight is still extended near the enemy side, crowd control lands, and the screen shows a shutdown instead of a clean cashout. The lesson is not to fight less; it is to make the first won fight buy the wave, turret, reset, or end before accepting the second one.",
       whyTrust: "The same game shows both sides: turret conversion is the right version, and the later low-health re-fight is how stronger opponents get shutdown gold back.",
-      eventEvidence: "1:24 early bot fight near friendly tower; 7:58 bot pressure became turret; 10:32-12:44 low-health fighting kept going instead of a clean cashout.",
+      eventEvidence: "1:24 contested fight under friendly bot tower; 7:58 won bot push becomes turret damage; 10:32 low-health lane stay; 12:44 crowd control and shutdown punish the extended fight.",
       goodThing: "The good part was real: you turned one bot-side win into turret pressure instead of only chasing kills.",
       focusTag: "payout before dash",
       evidence: "Manual storyboard review of the May 18 8:10 PM game: early bot pressure, double-kill conversion, turret take, inhibitor take, and nexus pressure.",
@@ -559,6 +581,36 @@ function manualFeedback(file) {
         "1:24 - Early bot fight is still near friendly tower with both lane enemies able to answer.",
         "7:58 - Bot pressure becomes turret, which is the good conversion.",
         "10:32-12:44 - Low-health extended fighting replaces the clean cashout/reset."
+      ],
+      clockAnchors: [
+        { clock: "0:19", videoSeconds: 4.000 },
+        { clock: "1:09", videoSeconds: 20.902 },
+        { clock: "1:24", videoSeconds: 35.816 },
+        { clock: "1:26", videoSeconds: 37.805 },
+        { clock: "1:42", videoSeconds: 54.707 },
+        { clock: "2:20", videoSeconds: 71.610 },
+        { clock: "3:00", videoSeconds: 88.512 },
+        { clock: "3:35", videoSeconds: 105.415 },
+        { clock: "4:08", videoSeconds: 122.317 },
+        { clock: "4:42", videoSeconds: 139.220 },
+        { clock: "5:16", videoSeconds: 156.122 },
+        { clock: "6:11", videoSeconds: 173.025 },
+        { clock: "7:06", videoSeconds: 189.927 },
+        { clock: "7:39", videoSeconds: 206.830 },
+        { clock: "7:58", videoSeconds: 216.100 },
+        { clock: "8:15", videoSeconds: 223.732 },
+        { clock: "8:47", videoSeconds: 240.635 },
+        { clock: "9:31", videoSeconds: 257.537 },
+        { clock: "10:05", videoSeconds: 274.440 },
+        { clock: "10:32", videoSeconds: 288.269 },
+        { clock: "10:38", videoSeconds: 291.342 },
+        { clock: "11:38", videoSeconds: 308.245 },
+        { clock: "11:54", videoSeconds: 325.147 },
+        { clock: "12:08", videoSeconds: 342.050 },
+        { clock: "12:42", videoSeconds: 358.952 },
+        { clock: "12:44", videoSeconds: 359.946 },
+        { clock: "13:16", videoSeconds: 375.855 },
+        { clock: "14:25", videoSeconds: 392.757 }
       ],
       nuance: [
         "At 3:40 the bot fight becomes a double kill because Samira stays near the wave and ally pressure.",
@@ -577,9 +629,9 @@ function manualFeedback(file) {
     confidence: "high",
     feedbackTitle: "You stay when one hit kills you",
     feedback: "Mistake: you keep playing the wave when one auto or spell kills you. Fix: give the wave and recall before the lane turns into a death timer.",
-    gameDetail: "Honest read: this is not a mechanics issue; it is a greed/fear issue. At 2:43 Samira is under bot tower with 31 HP while Ashe is still in range and the enemy wave is coming. At 3:27 Samira is still on the map at lethal health instead of already resetting. The later game proves damage is not the problem: by 4:57 Samira is back in the fight, and by 14:28 the team is ending. The lesson is simple: one-hit HP means the wave is not yours anymore; recall and make the next fight start with HP and item tempo.",
+    gameDetail: "Honest read: this is not a mechanics issue; it is a health-gate issue. At 2:43 Samira is under bot tower with the enemy wave arriving, Ashe still visible to the right, and enough missing HP that the lane should already be treated as dangerous instead of playable. At 3:27 the real mistake is clearer: Samira is still beside the bot wave at lethal health, the camera and movement are staying with minions, and the recall path has not been taken even though one clean enemy touch can turn the wave into a death timer. At 4:57 the good version is visible after the reset: Samira is back on the map with enough HP to walk forward, Q/auto from range, and choose the next trade instead of begging not to be hit. By 14:28 the team is ending with Samira alive around the base fight, which proves the champion damage is not the blocker. The blocker is staying in lane after the health bar says the next decision should be recall.",
     whyTrust: "This is not vague advice: the reviewed frames show the exact one-hit-health lane stay, and removing that habit protects the aggression that already works later.",
-    eventEvidence: "2:43 Samira was under bot tower at 31 HP with Ashe still in range; 3:27 Samira was still on the map at lethal health; 14:28 the later team ending worked.",
+    eventEvidence: "2:43 Samira is under bot tower with Ashe still visible and the wave arriving; 3:27 Samira is still in lane at lethal health; 4:57 reset gives enough HP to re-enter; 14:28 the later team ending works.",
     goodThing: "After the bad early health decision, you still got back into the game and converted later pressure into the ending push.",
     focusTag: "lethal hp reset",
     evidence: "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
@@ -587,9 +639,40 @@ function manualFeedback(file) {
     diamondRule: "Below one enemy auto or spell, the wave is no longer the objective; reset first, then play the next item spike.",
     drill: "At low HP, say one hit kills me and recall unless the enemy bot lane is dead or fully gone.",
     timeline: [
-      "2:43 - Samira is under bot tower at 31 HP with Ashe still able to threaten lane.",
+      "2:43 - Samira is under bot tower with Ashe still visible and the wave arriving.",
       "3:27 - Samira is still in lane at lethal health instead of already reset.",
+      "4:57 - Samira is back with enough HP to re-enter and choose the next trade.",
       "14:28 - The later ending works, which makes the early health-gate mistake the cleaner thing to remove."
+    ],
+    clockAnchors: [
+      { clock: "0:57", videoSeconds: 4.000 },
+      { clock: "1:20", videoSeconds: 26.561 },
+      { clock: "1:42", videoSeconds: 49.123 },
+      { clock: "2:05", videoSeconds: 71.684 },
+      { clock: "2:27", videoSeconds: 94.246 },
+      { clock: "2:43", videoSeconds: 109.941 },
+      { clock: "2:50", videoSeconds: 116.807 },
+      { clock: "3:13", videoSeconds: 139.368 },
+      { clock: "3:27", videoSeconds: 153.726 },
+      { clock: "3:35", videoSeconds: 161.930 },
+      { clock: "4:21", videoSeconds: 184.491 },
+      { clock: "4:44", videoSeconds: 207.053 },
+      { clock: "4:57", videoSeconds: 220.385 },
+      { clock: "5:06", videoSeconds: 229.614 },
+      { clock: "5:51", videoSeconds: 252.175 },
+      { clock: "6:13", videoSeconds: 274.737 },
+      { clock: "6:36", videoSeconds: 297.298 },
+      { clock: "7:43", videoSeconds: 319.860 },
+      { clock: "8:09", videoSeconds: 342.421 },
+      { clock: "8:42", videoSeconds: 364.982 },
+      { clock: "9:04", videoSeconds: 387.544 },
+      { clock: "9:53", videoSeconds: 410.105 },
+      { clock: "11:18", videoSeconds: 432.667 },
+      { clock: "12:57", videoSeconds: 455.228 },
+      { clock: "13:20", videoSeconds: 477.789 },
+      { clock: "14:13", videoSeconds: 500.351 },
+      { clock: "14:28", videoSeconds: 505.800 },
+      { clock: "14:45", videoSeconds: 522.912 }
     ],
     nuance: [
       "At 2:43 the wave is not worth more than the death timer.",
@@ -927,7 +1010,7 @@ async function summarizeRecordings(recordings, detectedChampions) {
     focus: "Honest read: your biggest leak is not damage. It is refusing to cash out: staying at lethal HP, re-fighting after winning, and chasing sideways when structure is already open.",
     rule: "If the next action does not create HP safety, wave crash, turret, or nexus pressure, do not take it.",
     nextRep: "Next game: cash out before the second fight.",
-    whyTrust: "The clips show the same leak in three forms: 31 HP lane stay, low-health re-fight, and open-base drift. That is specific enough to practice immediately.",
+    whyTrust: "The clips show the same leak in three forms: lethal-HP lane stay, low-health re-fight, and open-base drift. That is specific enough to practice immediately.",
     pattern: "You already find fights. The coachable problem is making the second decision boring enough to actually win: reset, crash, hit tower, hit nexus, then fight again only if it protects that payout.",
     checklist: ["One-hit HP means recall.", "First win becomes wave or structure.", "Open base means no sideways chase."],
     reviewLimit: "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
@@ -1139,6 +1222,7 @@ async function main() {
       diamondRule: clean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
       drill: clean(analysis.drill, "Name the payout before committing."),
       timeline: cleanList(analysis.timeline, 6),
+      clockAnchors: cleanClockAnchors(analysis.clockAnchors),
       nuance: cleanList(analysis.nuance, 5),
       reviewLimit: clean(analysis.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
       analysisSource: analysis.analysisSource || "cache",
