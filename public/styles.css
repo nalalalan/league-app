@@ -1939,6 +1939,22 @@ h1 {
   line-height: 1.38;
 }
 
+.recording-list-timeline {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+  color: #4d433c;
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.34;
+}
+
+.recording-list-timeline li::marker {
+  color: #8a7462;
+  font-weight: 850;
+}
+
 .recording-list-description,
 .recording-list-drill {
   color: var(--muted);
@@ -3699,7 +3715,8 @@ h1 {
   .recording-main-focus,
   .recording-main-rule,
   .recording-main-why,
-  .recording-list-takeaway {
+  .recording-list-takeaway,
+  .recording-list-timeline {
     overflow-wrap: anywhere;
   }
 

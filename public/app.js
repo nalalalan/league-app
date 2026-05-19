@@ -1576,6 +1576,19 @@ function recordingParagraph(item) {
   return item.gameDetail || item.pattern || item.feedback || item.whyTrust || "No feedback generated yet.";
 }
 
+function recordingTimeline(item) {
+  const events = Array.isArray(item.timeline) ? item.timeline.filter(hasText).slice(0, 6) : [];
+  if (!events.length) return null;
+  const list = document.createElement("ol");
+  list.className = "recording-list-timeline";
+  for (const event of events) {
+    const li = document.createElement("li");
+    li.textContent = event;
+    list.append(li);
+  }
+  return list;
+}
+
 function secondsForRecording(item) {
   if (Number.isFinite(Number(item.durationSeconds))) return Number(item.durationSeconds);
   const match = String(item.duration || "").match(/^(\d+):(\d{2})$/);
@@ -1638,7 +1651,9 @@ function recordingListCard(item) {
   takeaway.className = "recording-list-takeaway";
   takeaway.textContent = recordingParagraph(item);
 
+  const timeline = recordingTimeline(item);
   copy.append(meta, title, takeaway);
+  if (timeline) copy.append(timeline);
 
   const videoWrap = document.createElement("div");
   videoWrap.className = "recording-list-video";
