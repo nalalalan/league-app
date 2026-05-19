@@ -18,7 +18,7 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-18-readable-evidence-feedback-v8";
+const analysisVersion = "2026-05-19-timestamped-event-feedback-v1";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -514,22 +514,30 @@ function manualFeedback(file) {
       champion: "Samira",
       confidence: "high",
       feedbackTitle: "Clean the win",
-      feedback: "You won a 14:28 Co-op AI Beginner Samira game at 3/6/4 with 35 CS; the next jump is making wins cleaner by dying less and keeping wave income stable.",
-      gameDetail: "Chronology from verified data: the game started at 2:05 AM ET as Samira in Co-op AI Beginner and ended 14:28 later as a win. The match record has no timestamped fight timeline, and this auto video was captured before the recorder fix, so the reliable specifics are the end-state events: level 12, 3/6/4, 35 CS, 9,647 gold, 11,340 champion damage, 46,456 total damage, 1,249 turret/objective damage, 3 wards placed, no turret or inhibitor kill credit, no first blood, and no multi-kill. The read is that you helped end the game through fighting, but the next cleaner win needs more wave income and more structure damage before another brawl.",
-      whyTrust: "The hard facts are from League Client match history, and they point to the simplest repeatable habit: same aggression, fewer deaths, better wave income.",
+      feedback: "The early lane pressure was real; the next jump is making that same pressure cleaner by farming the wave before another dive or chase.",
+      gameDetail: "Visible clock review: at 00:35 Samira was level 3 walking bot at 0/0/0 and 0 CS; at 01:18 the team was up 1-0 while Samira had 3 CS and Jinx was low under bot outer; at 01:52 Samira was 0/0/1, level 4, casting Q/Flair under bot outer with allied minions taking turret shots; at 04:22-04:47 the push continued around bot outer at 0/1/3 with CS rising from 9 to 12; at 05:20 Samira was back at fountain at 0/2/3 and 12 CS. The game still ended as a 14:28 win at 3/6/4 and 35 CS, but the visible pattern is early pressure turning messy because the wave income stayed low while fights continued.",
+      whyTrust: "The timestamps come from the game clock and the final line comes from League Client match history; both point to the same simple fix: keep the aggression, but make the wave pay first.",
       focusTag: "cleaner wins",
-      evidence: "League Client match history: Co-op vs AI Beginner, Samira, win, 14:28, 3/6/4, 35 CS.",
-      pattern: "The win happened, but the scoreline says the next gain is clean conversion rather than more fighting.",
+      evidence: "Raw capture frames with visible game clock plus League Client match history: Co-op AI Beginner, Samira, win, 14:28, 3/6/4, 35 CS.",
+      pattern: "The strongest clue is not damage shortage. It is bot-lane pressure happening while CS and death count move the wrong direction, so the next cleaner version is wave first, tower second, chase last.",
       diamondRule: "Wave first; dash after the opening is real; leave when the payout is taken.",
       drill: "Next game: before each fight, check wave, enemy CC, then payout.",
-      nuance: [
-        "2:05 AM ET start, 14:28 win.",
-        "Final line: level 12, 3/6/4, 35 CS, 9,647 gold.",
-        "Damage line: 11,340 to champions, 1,249 to turrets/objectives.",
-        "Event flags: no first blood, no turret kill credit, no inhibitor kill credit, no multi-kill.",
-        "Vision line: 3 wards placed, 6 vision score."
+      timeline: [
+        "00:35 - Samira level 3 walks toward bot lane at 0/0/0 and 0 CS.",
+        "01:18 - Team leads 1-0; Samira has 3 CS while Jinx is low under enemy bot outer.",
+        "01:52 - Samira is 0/0/1, level 4, casting Q/Flair under bot outer with allied minions tanking.",
+        "04:22 - Samira is level 6 at 0/1/3 and 9 CS, hitting the bot-side turret wave while the game is 4-3.",
+        "04:47 - The same push continues at 0/1/3 and 12 CS; the lane is still under enemy bot outer.",
+        "05:20 - Samira is back at fountain at 0/2/3 and 12 CS while the game is 5-5."
       ],
-      reviewLimit: "The auto video attached to this match was captured before the recorder was fixed and does not show reliable League gameplay, so this summary is based on League Client match history instead of invented visual detail.",
+      nuance: [
+        "00:35 starts clean: full health, bot pathing, no score yet.",
+        "01:52 shows useful pressure, but it is already a turret-under-wave situation.",
+        "04:22-04:47 shows the push still active, but CS is only 9-12.",
+        "05:20 shows the cost: two deaths and only 12 CS before the first major reset.",
+        "Final line: 14:28 win, level 12, 3/6/4, 35 CS, 9,647 gold, 11,340 champion damage."
+      ],
+      reviewLimit: "Timeline events use visible raw-capture frames with game-clock timestamps plus final League Client match history; unseen seconds are not treated as proven.",
       analysisSource: "manual"
     };
   }
@@ -762,6 +770,7 @@ function fallbackFeedback(file, duration, context = {}) {
     pattern: fallback.pattern || "The recording points to one repeatable decision leak.",
     diamondRule: fallback.diamondRule || "Convert the first win before taking the next fight.",
     drill: fallback.drill || "Name the payout before committing.",
+    timeline: fallback.timeline || [],
     nuance: fallback.nuance || ["Conservative analysis until the model can read the sampled frames."],
     reviewLimit: fallback.reviewLimit || "Conservative read until a full model pass is available.",
     analysisSource: "fallback"
@@ -807,12 +816,13 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
     "Give exactly one highest-value improvement for this recording, plus a fuller read of the nuance behind it. The top advice must stay direct, narrow, and playable in the next queue.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty.",
+    "For specific game events, include the visible game-clock timestamp from the top right when it is visible. Do not invent timestamps for unseen moments.",
     "Prioritize repeatable habits: wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "Visible page copy should be concise and operational. Avoid phrases like 'you should' or broad coaching.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","gameDetail":"one concise paragraph: what happened, what improves, why it matters for stronger games","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter in Challenger","drill":"one next-game repetition","nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","gameDetail":"one concise paragraph with timestamped specifics when visible: what happened, what improves, why it matters for stronger games","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame"],"nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -852,6 +862,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
       pattern: clean(parsed.pattern, "The recording points to one repeatable decision pattern."),
       diamondRule: clean(parsed.diamondRule, "Convert the first winning moment before taking the next fight."),
       drill: clean(parsed.drill, "Name the payout before committing."),
+      timeline: cleanList(parsed.timeline, 6),
       nuance: cleanList(parsed.nuance, 5),
       reviewLimit: clean(parsed.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
       sampledFrames: framePaths.length,
@@ -1097,6 +1108,7 @@ async function main() {
       pattern: clean(analysis.pattern, "The recording points to one repeatable decision pattern."),
       diamondRule: clean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
       drill: clean(analysis.drill, "Name the payout before committing."),
+      timeline: cleanList(analysis.timeline, 6),
       nuance: cleanList(analysis.nuance, 5),
       reviewLimit: clean(analysis.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
       analysisSource: analysis.analysisSource || "cache",
