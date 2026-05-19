@@ -9,7 +9,8 @@ Set-Location $Root
 
 "[$((Get-Date).ToString("o"))] start League recording publish" | Add-Content -LiteralPath $LogPath
 
-& npm.cmd run publish:recordings *>> $LogPath
+$Command = "npm.cmd run publish:recordings >> `"$LogPath`" 2>&1"
+& cmd.exe /d /c $Command
 $ExitCode = $LASTEXITCODE
 
 "[$((Get-Date).ToString("o"))] done League recording publish exit=$ExitCode" | Add-Content -LiteralPath $LogPath
