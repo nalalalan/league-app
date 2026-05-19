@@ -1520,6 +1520,68 @@ function recordingPreviewButton(item, review) {
   return button;
 }
 
+function recordingInfoMetric(label, value) {
+  const metric = document.createElement("div");
+  metric.className = "recording-list-metric";
+  const name = document.createElement("span");
+  name.textContent = label;
+  const text = document.createElement("strong");
+  text.textContent = value || "unverified";
+  metric.append(name, text);
+  return metric;
+}
+
+function recordingListCard(item) {
+  const article = document.createElement("article");
+  article.className = "recording-list-card";
+
+  const copy = document.createElement("div");
+  copy.className = "recording-list-copy";
+
+  const meta = document.createElement("div");
+  meta.className = "recording-list-metrics";
+  meta.append(
+    recordingInfoMetric("game", item.gameHappenedAtLabel || item.recordedAtLabel),
+    recordingInfoMetric("type", item.gameType || item.kind),
+    recordingInfoMetric("timestamp", item.clipWindow || item.clipTimestamp || item.timestamp),
+    recordingInfoMetric("champion", item.champion || "Unknown"),
+    recordingInfoMetric("length", item.duration)
+  );
+
+  const title = document.createElement("h3");
+  title.textContent = item.feedbackTitle || "Focus";
+
+  const takeaway = document.createElement("p");
+  takeaway.className = "recording-list-takeaway";
+  takeaway.textContent = item.feedback || item.pattern || "No feedback generated yet.";
+
+  const detail = document.createElement("p");
+  detail.className = "recording-list-description";
+  detail.textContent = item.pattern && item.pattern !== item.feedback ? item.pattern : item.whyTrust || "";
+
+  const drill = document.createElement("p");
+  drill.className = "recording-list-drill";
+  drill.textContent = item.drill ? `Rep: ${item.drill}` : "";
+
+  copy.append(meta, title, takeaway);
+  if (detail.textContent) copy.append(detail);
+  if (drill.textContent) copy.append(drill);
+
+  const videoWrap = document.createElement("div");
+  videoWrap.className = "recording-list-video";
+  videoWrap.append(recordingVideo(item));
+
+  article.append(copy, videoWrap);
+  return article;
+}
+
+function recordingList(review) {
+  const list = document.createElement("div");
+  list.className = "recording-list";
+  list.append(...sortedRecordings(review.recordings || []).map(recordingListCard));
+  return list;
+}
+
 function recordingTable(review) {
   const wrapper = document.createElement("div");
   wrapper.className = "recording-table-wrap";
@@ -1566,21 +1628,16 @@ function recordingTable(review) {
 }
 
 function renderRecordings(review = recordingReview) {
-  if (!recordingSummary || !recordingFocus || !recordingGrid || !recordingPreview) return;
-  const items = sortedRecordings(review.recordings || []);
-  const active = items.find((item) => item.file === activeRecordingFile) || items[0];
-  activeRecordingFile = active?.file || "";
+  if (!recordingSummary || !recordingFocus || !recordingGrid) return;
   recordingSummary.textContent = `${review.totalRecordings} recordings - ${review.totalDuration} - ${review.match || "latest"}`;
   recordingFocus.replaceChildren(recordingMainCard(review));
-  recordingPreview.replaceChildren(recordingPreviewCard(active));
-  recordingGrid.replaceChildren(recordingTable(review));
+  recordingGrid.replaceChildren(recordingList(review));
 }
 
 function renderRecordingLoading() {
-  if (!recordingSummary || !recordingFocus || !recordingGrid || !recordingPreview) return;
+  if (!recordingSummary || !recordingFocus || !recordingGrid) return;
   recordingSummary.textContent = "loading current recordings";
   recordingGrid.replaceChildren();
-  recordingPreview.replaceChildren();
   recordingFocus.replaceChildren();
 }
 

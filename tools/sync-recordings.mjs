@@ -21,6 +21,7 @@ const timeZone = "America/New_York";
 const analysisVersion = "2026-05-18-deep-recording-feedback-v7";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 32 * 1024 * 1024);
+const sourceVideoPattern = /\.(webm|mp4)$/i;
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -100,7 +101,7 @@ function capturedRange(files) {
 }
 
 function recordingParts(file) {
-  const match = file.match(/^([^_]+)_(NA1-\d+)_(\d+)\.webm$/i);
+  const match = file.match(/^([^_]+)_(NA1-\d+)_(\d+)\.(webm|mp4)$/i);
   if (!match) {
     return {
       score: "",
@@ -237,7 +238,7 @@ async function loadCaptureMetadata(matchIds) {
     for (const line of text.split(/\r?\n/)) {
       if (!line.includes("Beginning Video Capture")) continue;
       const secondsMatch = line.match(/^(\d{6}\.\d+)/);
-      const fileMatch = line.match(/Highlights[\\/]+([^:]+?\.webm)\b/i);
+      const fileMatch = line.match(/Highlights[\\/]+([^:]+?\.(?:webm|mp4))\b/i);
       if (!secondsMatch || !fileMatch) continue;
       const seconds = Number(secondsMatch[1]);
       capture.set(fileMatch[1], {
@@ -866,7 +867,7 @@ async function main() {
   await fs.mkdir(analysisRoot, { recursive: true });
   const existing = await readExistingManifest();
   const sourceEntries = (await Promise.all((await fs.readdir(sourceDir, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".webm"))
+    .filter((entry) => entry.isFile() && sourceVideoPattern.test(entry.name))
     .map(async (entry) => {
       const sourcePath = path.join(sourceDir, entry.name);
       return {

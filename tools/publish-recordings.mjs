@@ -12,6 +12,7 @@ const statePath = path.join(analysisRoot, "source-state.json");
 const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Documents\\League of Legends\\Highlights";
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 const railwayBin = process.platform === "win32" ? "railway.cmd" : "railway";
+const sourceVideoPattern = /\.(webm|mp4)$/i;
 const publishPaths = [
   "public/recordings",
   "public/app.js",
@@ -44,7 +45,7 @@ async function sourceState() {
   const entries = await fs.readdir(sourceDir, { withFileTypes: true });
   const files = [];
   for (const entry of entries) {
-    if (!entry.isFile() || !entry.name.toLowerCase().endsWith(".webm")) continue;
+    if (!entry.isFile() || !sourceVideoPattern.test(entry.name)) continue;
     const absolute = path.join(sourceDir, entry.name);
     const stat = await fs.stat(absolute);
     files.push({

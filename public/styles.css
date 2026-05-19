@@ -64,6 +64,32 @@ a {
   text-decoration: none;
 }
 
+.suite-topbar,
+.suite-brand-cluster,
+.suite-app-brand,
+.suite-app-name,
+.paper-strip,
+.paper-strip > div,
+.page,
+.plain-head,
+.recording-focus,
+.recording-grid,
+.recording-list,
+.recording-list-card,
+.recording-list-copy,
+.recording-list-video {
+  min-width: 0;
+}
+
+.suite-app-name,
+.paper-strip *,
+.plain-head *,
+.recording-main *,
+.recording-list-card * {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
 button,
 summary {
   font: inherit;
@@ -1544,6 +1570,99 @@ h1 {
 
 .recording-grid {
   display: block;
+}
+
+.recording-list {
+  display: grid;
+  gap: 12px;
+}
+
+.recording-list-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, .72fr);
+  gap: 14px;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 253, 248, .94);
+  box-shadow: var(--shadow);
+}
+
+.recording-list-copy {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+}
+
+.recording-list-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.recording-list-metric {
+  display: grid;
+  gap: 2px;
+  border-top: 1px solid rgba(104, 87, 68, .12);
+  padding-top: 7px;
+  min-width: 0;
+}
+
+.recording-list-metric span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.recording-list-metric strong {
+  color: #342d28;
+  font-size: 12px;
+  font-weight: 820;
+  line-height: 1.24;
+  overflow-wrap: anywhere;
+}
+
+.recording-list-card h3 {
+  margin: 0;
+  color: #2f2925;
+  font-size: 21px;
+  line-height: 1.14;
+}
+
+.recording-list-takeaway,
+.recording-list-description,
+.recording-list-drill {
+  margin: 0;
+  color: #443b35;
+  font-size: 14px;
+  font-weight: 610;
+  line-height: 1.42;
+}
+
+.recording-list-description,
+.recording-list-drill {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 680;
+}
+
+.recording-list-video {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.recording-list-video video {
+  display: block;
+  width: 100%;
+  min-height: 230px;
+  max-height: 330px;
+  aspect-ratio: 16 / 10;
+  border-radius: 6px;
+  background: #15110e;
+  object-fit: contain;
 }
 
 .recording-table-wrap {
@@ -3100,6 +3219,7 @@ h1 {
   }
 
   .recording-main,
+  .recording-list-card,
   .recording-preview-card {
     grid-template-columns: 1fr;
   }
@@ -3111,6 +3231,15 @@ h1 {
 
   .recording-preview-metas {
     grid-template-columns: 1fr;
+  }
+
+  .recording-list-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .recording-list-video video {
+    min-height: 0;
+    max-height: none;
   }
 
   .recording-table {

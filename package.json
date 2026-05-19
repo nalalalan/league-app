@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node server.js",
     "sync:recordings": "node tools/sync-recordings.mjs",
-    "publish:recordings": "node tools/publish-recordings.mjs"
+    "publish:recordings": "node tools/publish-recordings.mjs",
+    "watch:league": "node tools/league-live-recorder.mjs"
   },
   "dependencies": {}
 }
