@@ -1567,8 +1567,10 @@ function compactGameType(value) {
 }
 
 function statLine(item) {
-  if (item.kda && Number.isFinite(Number(item.cs))) return [`KDA ${item.kda}`, `${item.cs} CS`];
-  return ["KDA/CS unverified"];
+  const stats = [];
+  if (item.kda) stats.push(`KDA ${item.kda}`);
+  if (Number.isFinite(Number(item.cs))) stats.push(`${item.cs} CS`);
+  return stats;
 }
 
 function recordingParagraph(item) {

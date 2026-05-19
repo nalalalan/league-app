@@ -245,9 +245,10 @@ summary {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(180px, 280px));
   gap: clamp(10px, 1.4vw, 18px);
   justify-content: start;
+  align-items: start;
   scrollbar-width: none;
 }
 
@@ -1015,7 +1016,10 @@ summary {
   --portrait-scale: 1.01;
   --portrait-hover-scale: 1.045;
   --portrait-selected-scale: 1.035;
-  height: clamp(230px, 24vw, 360px);
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  max-height: 390px;
   border: 1px solid rgba(104, 87, 68, .24);
   border-radius: 10px;
   padding: 0;
@@ -1074,12 +1078,15 @@ summary {
 }
 
 .portrait-button[data-champion="samira"] img {
-  object-position: 50% 36%;
+  object-position: 50% 22%;
 }
 
 .portrait-button[data-champion="fizz"] img {
-  object-position: 50% 0%;
-  transform-origin: 50% 0%;
+  --portrait-scale: 1.08;
+  --portrait-hover-scale: 1.115;
+  --portrait-selected-scale: 1.095;
+  object-position: 50% 18%;
+  transform-origin: 50% 18%;
 }
 
 .portrait-ambient {
@@ -3197,14 +3204,16 @@ h1 {
 @media (max-width: 900px) {
   .portrait-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
     gap: 10px;
     overflow: visible;
     padding-bottom: 0;
   }
 
   .portrait-button {
-    height: clamp(180px, 40vw, 300px);
+    aspect-ratio: 3 / 4;
+    height: auto;
+    max-height: 320px;
   }
 
   .portrait-name {
@@ -3258,7 +3267,10 @@ h1 {
   }
 
   .portrait-button {
-    height: clamp(260px, 78vw, 360px);
+    width: min(100%, 300px);
+    aspect-ratio: 3 / 4;
+    height: auto;
+    justify-self: start;
   }
 
   .portrait-copy {
