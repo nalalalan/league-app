@@ -717,10 +717,12 @@ const situationList = document.querySelector("#situation-list");
 const recordingSummary = document.querySelector("#recording-summary");
 const recordingFocus = document.querySelector("#recording-focus");
 const recordingGrid = document.querySelector("#recording-grid");
+const recordingPreview = document.querySelector("#recording-preview");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 let currentChampionId = "";
+let activeRecordingFile = "";
 let championAtmosphere;
 let swapTimer = 0;
 let settleTimer = 0;
@@ -1321,11 +1323,15 @@ function recordingMainCard(review) {
 
   const focus = document.createElement("p");
   focus.className = "recording-main-focus";
-  focus.textContent = item.title || item.focus || "Review the recordings and choose one repeatable in-game rule.";
+  focus.textContent = item.focus || item.title || "Name the payout before the dash.";
 
   const rule = document.createElement("p");
   rule.className = "recording-main-rule";
-  rule.textContent = item.rule || item.nextRep || "";
+  rule.textContent = item.rule || item.nextRep || "Before E/R: wave, tower, dragon, recall, or nexus. If none is real, hold the dash.";
+
+  const why = document.createElement("p");
+  why.className = "recording-main-why";
+  why.textContent = item.whyTrust ? `Why: ${item.whyTrust}` : "";
 
   const limit = document.createElement("p");
   limit.className = "recording-main-limit";
@@ -1333,6 +1339,7 @@ function recordingMainCard(review) {
 
   article.append(title, focus);
   if (rule.textContent) article.append(rule);
+  if (why.textContent) article.append(why);
   if (limit.textContent) article.append(limit);
   return article;
 }
@@ -1340,11 +1347,11 @@ function recordingMainCard(review) {
 function recordingDeepDetails(item) {
   const hasNuance = Array.isArray(item.nuance) && item.nuance.length > 0;
   const rows = [
-    ["Rule", item.diamondRule],
-    ["Queue rep", item.drill],
-    ["Basis", item.whyTrust],
-    ["Evidence", item.evidence],
-    ["Limit", item.reviewLimit]
+    ["rule", item.diamondRule],
+    ["rep", item.drill],
+    ["why", item.whyTrust],
+    ["evidence", item.evidence],
+    ["limit", item.reviewLimit]
   ].filter(([, value]) => hasText(value));
 
   if (!hasNuance && rows.length === 0) return null;
@@ -1353,7 +1360,7 @@ function recordingDeepDetails(item) {
   details.className = "recording-deep";
 
   const summary = document.createElement("summary");
-  summary.textContent = "basis + nuance";
+  summary.textContent = "more";
   details.append(summary);
 
   for (const [label, value] of rows) {
@@ -1371,7 +1378,7 @@ function recordingDeepDetails(item) {
     const block = document.createElement("div");
     block.className = "recording-deep-row";
     const strong = document.createElement("strong");
-    strong.textContent = "Nuance";
+    strong.textContent = "nuance";
     const list = document.createElement("ul");
     for (const point of item.nuance) {
       const li = document.createElement("li");
@@ -1444,6 +1451,75 @@ function recordingDetailCell(item) {
   return detail;
 }
 
+function recordingPreviewMeta(label, value) {
+  const row = document.createElement("div");
+  row.className = "recording-preview-meta";
+  const key = document.createElement("span");
+  key.textContent = label;
+  const text = document.createElement("strong");
+  text.textContent = value || "unverified";
+  row.append(key, text);
+  return row;
+}
+
+function recordingPreviewCard(item) {
+  const article = document.createElement("article");
+  article.className = "recording-preview-card";
+  if (!item) return article;
+
+  const videoWrap = document.createElement("div");
+  videoWrap.className = "recording-preview-video";
+  videoWrap.append(recordingVideo(item));
+
+  const copy = document.createElement("div");
+  copy.className = "recording-preview-copy";
+
+  const title = document.createElement("h3");
+  title.textContent = item.champion || "Recording";
+
+  const meta = document.createElement("div");
+  meta.className = "recording-preview-metas";
+  meta.append(
+    recordingPreviewMeta("game", item.gameHappenedAtLabel || item.recordedAtLabel),
+    recordingPreviewMeta("type", item.gameType || item.kind),
+    recordingPreviewMeta("time", item.clipWindow || item.clipTimestamp || item.timestamp),
+    recordingPreviewMeta("length", item.duration)
+  );
+
+  const takeaway = document.createElement("p");
+  takeaway.className = "recording-preview-takeaway";
+  takeaway.textContent = item.feedbackTitle || "Focus";
+
+  const description = document.createElement("p");
+  description.className = "recording-preview-description";
+  description.textContent = item.feedback || item.pattern || "No feedback generated yet.";
+
+  const why = document.createElement("p");
+  why.className = "recording-preview-why";
+  why.textContent = item.whyTrust ? `Why: ${item.whyTrust}` : "";
+
+  copy.append(title, meta, takeaway, description);
+  if (why.textContent) copy.append(why);
+  article.append(videoWrap, copy);
+  return article;
+}
+
+function setActiveRecording(item, review) {
+  if (!item || !recordingPreview || !recordingGrid) return;
+  activeRecordingFile = item.file || "";
+  recordingPreview.replaceChildren(recordingPreviewCard(item));
+  recordingGrid.replaceChildren(recordingTable(review));
+}
+
+function recordingPreviewButton(item, review) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "recording-preview-button";
+  button.textContent = item.file === activeRecordingFile ? "viewing" : "preview";
+  button.addEventListener("click", () => setActiveRecording(item, review));
+  return button;
+}
+
 function recordingTable(review) {
   const wrapper = document.createElement("div");
   wrapper.className = "recording-table-wrap";
@@ -1453,7 +1529,7 @@ function recordingTable(review) {
 
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
-  ["game", "type", "timestamp", "video", "champion", "length", "takeaway", "description"].forEach((label) => {
+  ["game", "type", "timestamp", "champion", "length", "takeaway", "detail", "video"].forEach((label) => {
     const th = document.createElement("th");
     th.scope = "col";
     th.textContent = label;
@@ -1464,7 +1540,8 @@ function recordingTable(review) {
   const tbody = document.createElement("tbody");
   for (const item of sortedRecordings(review.recordings || [])) {
     const row = document.createElement("tr");
-    const gameSub = [item.matchId, item.score].filter(Boolean).join(" · ");
+    if (item.file === activeRecordingFile) row.className = "is-active";
+    const gameSub = [item.matchId, item.score].filter(Boolean).join(" - ");
     const typeSub = item.queueId ? `queue ${item.queueId}` : item.gameTypeSource || "not found in logs";
     const timestampPrimary = item.clipWindow || item.clipTimestamp || item.timestamp || "unverified";
     const timestampSub = item.recordedAtTimeLabel ? `saved ${item.recordedAtTimeLabel}` : item.recordedAtLabel || "";
@@ -1474,11 +1551,11 @@ function recordingTable(review) {
       tableCell("game", recordingTextStack(item.gameHappenedAtLabel || item.recordedAtLabel, gameSub)),
       tableCell("type", recordingTextStack(item.gameType || item.kind || "unverified", typeSub)),
       tableCell("timestamp", recordingTextStack(timestampPrimary, timestampSub)),
-      tableCell("video", recordingVideo(item)),
       tableCell("champion", recordingTextStack(item.champion || "Unknown", championSub)),
       tableCell("length", recordingTextStack(item.duration || "")),
       tableCell("takeaway", recordingTextStack(item.feedbackTitle || "Focus", item.drill || "")),
-      tableCell("description", recordingDetailCell(item))
+      tableCell("detail", recordingDetailCell(item)),
+      tableCell("video", recordingPreviewButton(item, review))
     );
     tbody.append(row);
   }
@@ -1489,16 +1566,21 @@ function recordingTable(review) {
 }
 
 function renderRecordings(review = recordingReview) {
-  if (!recordingSummary || !recordingFocus || !recordingGrid) return;
-  recordingSummary.textContent = `${review.totalRecordings} recordings · ${review.totalDuration} · ${review.match || "latest"}`;
-  recordingGrid.replaceChildren(recordingTable(review));
+  if (!recordingSummary || !recordingFocus || !recordingGrid || !recordingPreview) return;
+  const items = sortedRecordings(review.recordings || []);
+  const active = items.find((item) => item.file === activeRecordingFile) || items[0];
+  activeRecordingFile = active?.file || "";
+  recordingSummary.textContent = `${review.totalRecordings} recordings - ${review.totalDuration} - ${review.match || "latest"}`;
   recordingFocus.replaceChildren(recordingMainCard(review));
+  recordingPreview.replaceChildren(recordingPreviewCard(active));
+  recordingGrid.replaceChildren(recordingTable(review));
 }
 
 function renderRecordingLoading() {
-  if (!recordingSummary || !recordingFocus || !recordingGrid) return;
+  if (!recordingSummary || !recordingFocus || !recordingGrid || !recordingPreview) return;
   recordingSummary.textContent = "loading current recordings";
   recordingGrid.replaceChildren();
+  recordingPreview.replaceChildren();
   recordingFocus.replaceChildren();
 }
 

@@ -12,11 +12,27 @@ const statePath = path.join(analysisRoot, "source-state.json");
 const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Documents\\League of Legends\\Highlights";
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 const railwayBin = process.platform === "win32" ? "railway.cmd" : "railway";
+const publishPaths = [
+  "public/recordings",
+  "public/app.js",
+  "public/index.html",
+  "public/styles.css",
+  "public/league-practice-room.pdf",
+  "public/league-practice-room.tex",
+  "tools/sync-recordings.mjs",
+  "tools/publish-recordings.mjs"
+];
+
+function commandNeedsShell(command) {
+  return process.platform === "win32" && /\.cmd$/i.test(command);
+}
 
 async function run(command, args, options = {}) {
   const result = await execFileAsync(command, args, {
     cwd: appRoot,
     maxBuffer: 64 * 1024 * 1024,
+    shell: commandNeedsShell(command),
+    windowsHide: true,
     ...options
   });
   if (result.stdout) process.stdout.write(result.stdout);
@@ -81,9 +97,9 @@ async function main() {
     return;
   }
 
-  await run("git", ["pull", "--rebase", "origin", "main"]);
-  await run("git", ["add", "public/recordings"]);
+  await run("git", ["add", "--", ...publishPaths]);
   await run("git", ["commit", "-m", `Update League recordings ${new Date().toISOString().slice(0, 10)}`]);
+  await run("git", ["pull", "--rebase", "origin", "main"]);
   await run("git", ["push", "origin", "main"]);
   await run(railwayBin, ["up", "--detach", "--message", "Update League recordings"]);
   await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");

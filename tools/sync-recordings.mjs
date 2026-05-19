@@ -434,6 +434,28 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "16-10_NA1-5563352800_01.webm") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Name payout before E/R",
+      feedback: "Before dashing in, name the payout: wave, tower, dragon, recall, or nexus; if none is real, hold the dash.",
+      whyTrust: "The newest storyboard shows the carry pattern working when kills become bot tower, inhibitor, and nexus pressure; this is the same mechanic that transfers from beginner bots into ranked.",
+      focusTag: "payout before dash",
+      evidence: "Manual storyboard review of the May 18 8:10 PM game: early bot pressure, double-kill conversion, turret take, inhibitor take, and nexus pressure.",
+      pattern: "The damage is already there. The Challenger-shaped rep is making every Samira all-in start with a named payout and end before shutdown gold is handed back.",
+      diamondRule: "No E/R commit until the payout and exit are named.",
+      drill: "Say one word before E/R: wave, tower, dragon, recall, or nexus.",
+      nuance: [
+        "At 3:35 the bot fight becomes a double kill because Samira stays near the wave and ally pressure.",
+        "At 7:39 the won lane becomes turret gold instead of more random fighting.",
+        "At 13:16 the pressure becomes inhibitor, then nexus pressure.",
+        "Beginner bot games can reward extra fighting, so the ranked-transfer skill is converting first and fighting second."
+      ],
+      reviewLimit: "Manual review used sampled replay frames and log timing, not raw inputs or full cooldown telemetry.",
+      analysisSource: "manual"
+    };
+  }
   if (file !== "16-10_NA1-5563301586_01.webm") return null;
   return {
     champion: "Samira",
@@ -675,7 +697,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "Visible page copy should be concise and operational. Avoid phrases like 'you should' or broad coaching.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would matter in Diamond","drill":"one next-game repetition","nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter in Challenger","drill":"one next-game repetition","nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -727,7 +749,17 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
 
 async function summarizeRecordings(recordings, detectedChampions) {
   const latest = recordings.at(-1);
-  const fallback = latest?.focusTag === "lethal hp reset" ? {
+  const simplePayoutFocus = {
+    title: "Samira",
+    focus: "Name the payout before the dash.",
+    rule: "Before E/R: wave, tower, dragon, recall, or nexus. If none is real, hold the dash.",
+    nextRep: "Queue cue: payout first.",
+    whyTrust: "The newest recording already shows kills turning into turret, inhibitor, and nexus pressure; repeating that without handing shutdowns back is the ranked-transfer skill.",
+    pattern: "The damage is already enough for beginner bots. Challenger-level Samira is not more fighting; it is choosing the fight that creates a map payout, then leaving or ending cleanly.",
+    checklist: ["Name the payout.", "Enter second if CC is unknown.", "After the payout, reset or hit the next structure."],
+    reviewLimit: "Main read combines manual storyboard review, replay timing, and visible frame evidence."
+  };
+  const fallback = latest?.focusTag === "payout before dash" ? simplePayoutFocus : latest?.focusTag === "lethal hp reset" ? {
     title: "Samira: reset before lethal HP",
     focus: "The new game already shows better conversion later; the next climb rep is leaving lane when one enemy auto or spell kills Samira.",
     rule: "Below lethal HP, the wave is no longer the objective: recall unless the enemy bot lane is dead or fully gone.",
