@@ -1731,7 +1731,7 @@ function renderRecordings(review = recordingReview, selectedChampionId = current
     detectedChampions: [{ name: champion.name }],
     recordings: championRecordings
   };
-  recordingSummary.textContent = `${championReview.totalRecordings} recordings - ${championReview.totalDuration} - ${championReview.match}`;
+  recordingSummary.textContent = `${championReview.totalRecordings} rec | ${championReview.totalDuration} | ${championReview.match}`;
   recordingFocus.replaceChildren(recordingMainCard(championReview));
   recordingGrid.replaceChildren(recordingList(championReview));
 }

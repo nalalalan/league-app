@@ -1643,6 +1643,13 @@ h1 {
   font-weight: 680;
 }
 
+.recording-head p {
+  flex: 0 1 auto;
+  text-align: right;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
 .situation-list {
   display: grid;
   gap: 12px;
