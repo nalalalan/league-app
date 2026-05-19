@@ -3004,6 +3004,12 @@ h1 {
   font-weight: 680;
 }
 
+.paper-strip strong,
+.recording-main *,
+.recording-preview-card * {
+  overflow-wrap: anywhere;
+}
+
 .recording-head {
   margin-top: 2px;
 }
@@ -3084,6 +3090,15 @@ h1 {
 }
 
 @media (max-width: 820px) {
+  .paper-strip {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .paper-button {
+    justify-self: start;
+  }
+
   .recording-main,
   .recording-preview-card {
     grid-template-columns: 1fr;
