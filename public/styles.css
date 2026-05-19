@@ -1245,7 +1245,6 @@ summary {
 .portrait-button[data-champion="samira"] .portrait-name {
   font-family: "aespa", "Aespa", "Audiowide", "Orbitron", "Arial Black", system-ui, sans-serif;
   color: #fff8fb;
-  text-transform: uppercase;
   text-shadow:
     0 1px 0 rgba(138, 56, 122, .62),
     0 8px 18px rgba(0, 0, 0, .42),
