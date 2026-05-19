@@ -448,17 +448,6 @@ async function ensurePublicVideo(sourcePath, destPath, sourceStat) {
     }
     return bytes;
   }
-  if (
-    current &&
-    sourceStat.size > largeRecordingBytes &&
-    current.size < Math.min(targetPublicVideoBytes * 0.55, sourceStat.size * minPublicVideoRatio)
-  ) {
-    const bytes = await encodePublicVideo(sourcePath, destPath, sourceStat);
-    if (await exists(alternatePath)) {
-      await fs.unlink(alternatePath);
-    }
-    return bytes;
-  }
   if (await exists(alternatePath)) {
     await fs.unlink(alternatePath);
   }
@@ -489,6 +478,18 @@ async function readExistingManifest() {
   } catch {
     return null;
   }
+}
+
+function stableManifest(manifest) {
+  if (!manifest) return null;
+  return {
+    ...manifest,
+    generatedAt: ""
+  };
+}
+
+function sameManifestContent(a, b) {
+  return JSON.stringify(stableManifest(a)) === JSON.stringify(stableManifest(b));
 }
 
 function cacheKeyFor(stat) {
@@ -1151,8 +1152,12 @@ async function main() {
     detectedChampions,
     recordings: displayRecordings
   };
-  await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
-  console.log(`Wrote ${path.relative(appRoot, manifestPath)} with ${recordings.length} recordings.`);
+  if (sameManifestContent(manifest, existing)) {
+    console.log(`${path.relative(appRoot, manifestPath)} already has ${recordings.length} current recordings.`);
+  } else {
+    await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+    console.log(`Wrote ${path.relative(appRoot, manifestPath)} with ${recordings.length} recordings.`);
+  }
 }
 
 main().catch((error) => {

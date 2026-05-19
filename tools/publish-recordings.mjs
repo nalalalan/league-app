@@ -42,7 +42,7 @@ function shellArg(arg) {
 
 async function run(command, args, options = {}) {
   const useShell = commandNeedsShell(command);
-  const result = await execFileAsync(command, args, {
+  const result = await execFileAsync(command, useShell ? args.map(shellArg) : args, {
     cwd: appRoot,
     maxBuffer: 64 * 1024 * 1024,
     shell: useShell,
