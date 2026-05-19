@@ -9,7 +9,9 @@ const dataRoot = process.env.LEAGUE_DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT
 const notesPath = path.join(dataRoot, "public-notes.json");
 const writeToken = (process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const isRailway = Boolean(process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_SERVICE_ID);
-const recordingMediaBase = (process.env.LEAGUE_RECORDING_MEDIA_BASE || "https://nalalalan.github.io/league-app/recordings").replace(/\/+$/, "");
+const recordingMediaBase = (process.env.LEAGUE_RECORDING_MEDIA_BASE || "").replace(/\/+$/, "");
+const recordingWebmMediaBase = (process.env.LEAGUE_RECORDING_WEBM_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/nalalalan/league-app@main/public/recordings").replace(/\/+$/, "");
+const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "https://raw.githubusercontent.com/nalalalan/league-app/main/public/recordings").replace(/\/+$/, "");
 
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -105,8 +107,10 @@ function cleanText(value, maxLength) {
 }
 
 function recordingMediaRedirect(pathname) {
-  if (!/^\/recordings\/[^/]+\.(webm|mp4)$/i.test(pathname)) return "";
-  return `${recordingMediaBase}/${encodeURIComponent(path.basename(pathname))}`;
+  const match = pathname.match(/^\/recordings\/[^/]+\.(webm|mp4)$/i);
+  if (!match) return "";
+  const base = recordingMediaBase || (match[1].toLowerCase() === "webm" ? recordingWebmMediaBase : recordingMp4MediaBase);
+  return `${base}/${encodeURIComponent(path.basename(pathname))}`;
 }
 
 async function handleApi(req, res, url) {
