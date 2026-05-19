@@ -3374,6 +3374,8 @@ h1 {
   width: 100%;
   min-width: 0;
   margin-top: 0;
+  box-sizing: border-box;
+  padding-inline: clamp(10px, 1.6vw, 22px);
 }
 
 .recordings > *,
@@ -3625,6 +3627,13 @@ h1 {
   .recording-grid {
     grid-column: 1 / -1;
     grid-row: 4;
+  }
+
+  .recording-focus,
+  .recording-head,
+  .recording-grid {
+    width: min(100%, calc(100% - clamp(24px, 3vw, 52px)));
+    justify-self: center;
   }
 
   .situations,

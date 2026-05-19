@@ -1,5 +1,6 @@
 import { spawn, execFile } from "node:child_process";
 import fs from "node:fs/promises";
+import https from "node:https";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -8,6 +9,7 @@ const analysisRoot = path.join(appRoot, "_recording-analysis");
 const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Documents\\League of Legends\\Highlights";
 const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(sourceDir), "Replays");
 const captureRoot = process.env.LEAGUE_AUTO_CAPTURE_DIR || path.join(path.dirname(sourceDir), "AO Labs Live Captures");
+const leagueLockfile = process.env.LEAGUE_LOCKFILE || "C:\\Riot Games\\League of Legends\\lockfile";
 const lockPath = path.join(analysisRoot, "league-live-recorder.lock");
 const logPath = path.join(analysisRoot, "league-live-recorder.log");
 const pollMs = Number(process.env.LEAGUE_LIVE_POLL_MS || 5000);
@@ -208,10 +210,77 @@ async function latestReplay(startMs, endMs) {
     if (stat.mtimeMs < startMs - 10 * 60 * 1000 || stat.mtimeMs > endMs + 10 * 60 * 1000) continue;
     candidates.push({
       matchId: entry.name.replace(/\.rofl$/i, ""),
-      mtimeMs: stat.mtimeMs
+      mtimeMs: stat.mtimeMs,
+      matchSource: "League replay file"
     });
   }
   return candidates.sort((a, b) => b.mtimeMs - a.mtimeMs)[0] || null;
+}
+
+async function leagueClientCredentials() {
+  const text = (await fs.readFile(leagueLockfile, "utf8").catch(() => "")).trim();
+  const parts = text.split(":");
+  const port = Number(parts[2]);
+  const password = parts[3];
+  if (!Number.isFinite(port) || !password) return null;
+  return { port, password };
+}
+
+async function localLeagueJson(endpoint) {
+  const credentials = await leagueClientCredentials();
+  if (!credentials) return null;
+  return await new Promise((resolve) => {
+    let settled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+    const request = https.request({
+      hostname: "127.0.0.1",
+      port: credentials.port,
+      path: endpoint,
+      method: "GET",
+      rejectUnauthorized: false,
+      auth: `riot:${credentials.password}`,
+      timeout: 3000
+    }, (response) => {
+      let body = "";
+      response.setEncoding("utf8");
+      response.on("data", (chunk) => {
+        body += chunk;
+      });
+      response.on("end", () => {
+        try {
+          finish(JSON.parse(body));
+        } catch {
+          finish(null);
+        }
+      });
+    });
+    request.on("error", () => finish(null));
+    request.on("timeout", () => {
+      request.destroy();
+      finish(null);
+    });
+    request.end();
+  });
+}
+
+async function latestLocalMatch(startMs, endMs) {
+  const history = await localLeagueJson("/lol-match-history/v1/products/lol/current-summoner/matches?begIndex=0&endIndex=10");
+  const games = Array.isArray(history?.games?.games) ? history.games.games : [];
+  const windowStart = startMs - 20 * 60 * 1000;
+  const windowEnd = endMs + 10 * 60 * 1000;
+  const candidates = games
+    .map((game) => ({
+      matchId: `NA1-${game.gameId}`,
+      gameCreationMs: Number(game.gameCreation) || 0
+    }))
+    .filter((game) => /^NA1-\d+$/i.test(game.matchId))
+    .filter((game) => game.gameCreationMs >= windowStart && game.gameCreationMs <= windowEnd)
+    .sort((a, b) => b.gameCreationMs - a.gameCreationMs);
+  return candidates[0] ? { matchId: candidates[0].matchId, matchSource: "League Client match history" } : null;
 }
 
 async function probeDuration(filePath) {
@@ -384,7 +453,7 @@ async function finalizeSession(session) {
     return;
   }
 
-  const replay = await latestReplay(session.startedMs, session.endedMs);
+  const replay = await latestReplay(session.startedMs, session.endedMs) || await latestLocalMatch(session.startedMs, session.endedMs);
   const outputPath = await nextOutputPath(replay?.matchId);
   const importantIndexes = importantSegmentIndexes(segments);
   const processed = [];
@@ -415,6 +484,7 @@ async function finalizeSession(session) {
     createdAt: new Date().toISOString(),
     source: "AO Labs League live recorder",
     matchId: replay?.matchId || "",
+    matchSource: replay?.matchSource || "",
     startedAt: session.startedAt.toISOString(),
     endedAt: session.endedAt.toISOString(),
     outputPath,
