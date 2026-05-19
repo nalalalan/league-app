@@ -683,7 +683,7 @@ const recordingReview = {
     focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     nextRep: "Queue cue: kill -> payout -> reset.",
-    whyTrust: "This is high-elo-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
+    whyTrust: "This is trustworthy because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
   },
   detectedChampions: [
     {
@@ -693,7 +693,7 @@ const recordingReview = {
       recordings: 13,
       evidence: "Replay side list names Samira on Alan's team; sampled clips center the Soul Fighter Samira model and nameplate.",
       improvementTitle: "Convert the first win",
-      improvement: "The damage is already there. The high-elo habit is turning the first kill into XP, tempo, structure damage, objective setup, or a clean reset before another fight."
+      improvement: "The damage is already there. The repeatable habit is turning the first kill into XP, tempo, structure damage, objective setup, or a clean reset before another fight."
     }
   ],
   recordings: [
