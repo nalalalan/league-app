@@ -9,7 +9,8 @@
     "start": "node server.js",
     "sync:recordings": "node tools/sync-recordings.mjs",
     "publish:recordings": "node tools/publish-recordings.mjs",
-    "watch:league": "node tools/league-live-recorder.mjs"
+    "watch:league": "node tools/league-live-recorder.mjs",
+    "install:league-automation": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/install-league-automation.ps1"
   },
   "dependencies": {}
 }

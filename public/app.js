@@ -682,7 +682,7 @@ const recordingReview = {
     title: "Samira: kill, crash, reset",
     focus: "Conversion is the climb gap: after a won fight, cash out wave crash, tower, dragon, Baron, nexus, or recall.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
-    nextRep: "Queue cue: kill -> payout -> reset.",
+    nextRep: "Next game: kill -> payout -> reset.",
     whyTrust: "Shutdown deaths erase Samira leads; conversion turns the same mechanics into XP, tempo, and objectives."
   },
   detectedChampions: [
@@ -1579,6 +1579,10 @@ function recordingParagraph(item) {
   return item.gameDetail || item.pattern || item.feedback || item.whyTrust || "No feedback generated yet.";
 }
 
+function recordingLesson(item) {
+  return item.feedback || item.diamondRule || item.drill || item.feedbackTitle || "Review the clip and choose one cleaner next action.";
+}
+
 function recordingTimeline(item) {
   const events = Array.isArray(item.timeline) ? item.timeline.filter(hasText).slice(0, 6) : [];
   if (!events.length) return null;
@@ -1649,11 +1653,17 @@ function recordingListCard(item) {
   const title = document.createElement("h3");
   title.textContent = item.feedbackTitle || "Focus";
 
+  const lesson = document.createElement("p");
+  lesson.className = "recording-list-lesson";
+  const lessonText = document.createElement("strong");
+  lessonText.textContent = recordingLesson(item);
+  lesson.append(lessonText);
+
   const takeaway = document.createElement("p");
   takeaway.className = "recording-list-takeaway";
   takeaway.textContent = recordingParagraph(item);
 
-  copy.append(meta, title, takeaway);
+  copy.append(meta, title, lesson, takeaway);
 
   const videoWrap = document.createElement("div");
   videoWrap.className = "recording-list-video";

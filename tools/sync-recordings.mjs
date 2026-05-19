@@ -18,7 +18,7 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-19-narrative-highlight-feedback-v1";
+const analysisVersion = "2026-05-19-specific-ranked-blockers-v3";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -515,7 +515,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Stop leaving the open base",
       feedback: "The mistake risk is getting pulled into side targets after base is open; stay behind the first body in and convert the open lane.",
-      gameDetail: "The latest clip is not a mechanics problem; it is a base discipline problem. Around 12:06 the base door is already open and the team has bodies in front, so Samira does not need to start the fight. Around 13:06 the camera follows a mid-lane Mordekaiser tag, which is fine only because the group stays pointed back toward base; in harder games, that same sideways target becomes the throw if it turns into a chase. By 14:18 the win happens because the team returns to structures. Master blocker: after base is open, every target is only worth taking if it protects the next structure hit.",
+      gameDetail: "The latest clip is not a mechanics problem; it is a base discipline problem. Around 12:06 the base door is already open and the team has bodies in front, so Samira does not need to start the fight. Around 13:06 the camera follows a mid-lane Mordekaiser tag, which is fine only because the group stays pointed back toward base; in harder games, that same sideways target becomes the throw if it turns into a chase. By 14:18 the win happens because the team returns to structures. The lesson is simple: after base is open, every target is only worth taking if it protects the next structure hit.",
       whyTrust: "The visible win comes from returning to the open base, not from a cleaner combo; that means the controllable skill is structure discipline after the first fight is already won.",
       focusTag: "end the push",
       evidence: "Review clip frames with visible game clock: base pressure near 12:06, Mordekaiser catch around 13:06, final base push around 14:18.",
@@ -543,7 +543,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Cash out before the re-fight",
       feedback: "The mistake is letting low-health post-kill lane states turn into another fight instead of taking turret, wave, or reset.",
-      gameDetail: "This one shows improvement and the leak. Around 1:24 Samira is fighting near the friendly bot tower with Jinx and Braum still in range, so the safe value is wave control first, not proving the fight longer. Around 7:58 the good version appears: the bot win becomes turret. The Master-blocking part is around 10:32 to 12:44, where Samira is low, Braum/Gragas tools are still relevant, and the camera keeps following the extended fight instead of making cashout or reset automatic. The fix is not less aggression; it is first win, then payout, then leave unless the next structure is free.",
+      gameDetail: "This one shows improvement and the leak. Around 1:24 Samira is fighting near the friendly bot tower with Jinx and Braum still in range, so the safe value is wave control first, not proving the fight longer. Around 7:58 the good version appears: the bot win becomes turret. The risky part is around 10:32 to 12:44, where Samira is low, Braum/Gragas tools are still relevant, and the camera keeps following the extended fight instead of making cashout or reset automatic. The fix is not less aggression; it is first win, then payout, then leave unless the next structure is free.",
       whyTrust: "The same game shows both sides: the turret take is the right conversion, while the later low-health re-fight is exactly how better players get shutdown gold back from Samira.",
       focusTag: "payout before dash",
       evidence: "Manual storyboard review of the May 18 8:10 PM game: early bot pressure, double-kill conversion, turret take, inhibitor take, and nexus pressure.",
@@ -572,7 +572,7 @@ function manualFeedback(file) {
     confidence: "high",
     feedbackTitle: "Lethal HP is not a wave contest",
     feedback: "The clearest mistake is staying in lane at one-hit health instead of giving the wave and resetting.",
-    gameDetail: "The mistake is early and concrete: at 2:43 Samira is under bot tower with 31 HP while Ashe is still in range and the enemy wave is coming. At 3:27 Samira is still on the map at lethal health instead of already being reset with a safer item timing. The later game proves the damage is not the issue: by 4:57 Samira is back in the fight, and by 14:28 the team is ending. Master blocker: one-hit health turns every good mechanic into a coin flip; reset first so the next fight starts with HP and item tempo.",
+    gameDetail: "The mistake is early and concrete: at 2:43 Samira is under bot tower with 31 HP while Ashe is still in range and the enemy wave is coming. At 3:27 Samira is still on the map at lethal health instead of already being reset with a safer item timing. The later game proves the damage is not the issue: by 4:57 Samira is back in the fight, and by 14:28 the team is ending. The lesson is simple: one-hit health turns every good mechanic into a coin flip; reset first so the next fight starts with HP and item tempo.",
     whyTrust: "This is not vague advice: the reviewed frames show a real one-hit-health lane stay, and removing that single habit protects the later aggression that already works.",
     focusTag: "lethal hp reset",
     evidence: "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
@@ -822,15 +822,15 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
     "Give exactly one highest-value improvement for this recording, plus the specific visible mistake moments that make the advice trustworthy. The top advice must stay direct, narrow, and playable in the next queue.",
-    "Write gameDetail like a short game-story recap, not a stat audit: one compact paragraph, two or three notable visible moments where the decision got risky, at most three light timestamps, no K/D/A, no CS count, no numbered timeline, and one final Master-focus sentence.",
+    "Write gameDetail like a short game-story recap, not a stat audit: one compact paragraph, two or three notable visible moments where the decision got risky, at most three light timestamps, no K/D/A, no CS count, no numbered timeline, and one final simple lesson sentence.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty.",
     "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
-    "Prioritize repeatable habits that block Master-level climb: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
+    "Prioritize repeatable habits that stop the gameplay from transferring to harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "Visible page copy should be concise and operational. Avoid phrases like 'you should' or broad coaching.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","gameDetail":"one concise narrative paragraph with notable visible moments and one Master-focus sentence","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","gameDetail":"one concise narrative paragraph with notable visible moments and one simple lesson sentence","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -888,7 +888,7 @@ async function summarizeRecordings(recordings, detectedChampions) {
     title: "Samira",
     focus: "Name the payout before the dash.",
     rule: "Before E/R: wave, tower, dragon, recall, or nexus. If none is real, hold the dash.",
-    nextRep: "Queue cue: payout first.",
+    nextRep: "Next game: payout first.",
     whyTrust: "The newest recording already shows kills turning into turret, inhibitor, and nexus pressure; repeating that without handing shutdowns back is the ranked-transfer skill.",
     pattern: "The damage is already enough for beginner bots. Samira is not more fighting; it is choosing the fight that creates a map payout, then leaving or ending cleanly.",
     checklist: ["Name the payout.", "Enter second if CC is unknown.", "After the payout, reset or hit the next structure."],
@@ -898,16 +898,16 @@ async function summarizeRecordings(recordings, detectedChampions) {
     title: "Samira: reset before lethal HP",
     focus: "The new game already shows better conversion later; the next climb rep is leaving lane when one enemy auto or spell kills Samira.",
     rule: "Below lethal HP, the wave is no longer the objective: recall unless the enemy bot lane is dead or fully gone.",
-    nextRep: "Queue cue: one hit kills me -> reset.",
+    nextRep: "Next game: one hit kills me -> reset.",
     whyTrust: "This targets the visible early death without nerfing the later aggression that produced kills, turret pressure, inhibitor pressure, and the win.",
     pattern: "The latest recording is not a damage problem. It shows a lane health-gate problem early, followed by much better conversion once Samira has items and teammates nearby.",
     checklist: ["At low HP, count enemy autos before minions.", "Give the crash if one hit kills Samira.", "Return with the item, then convert kills into structures."],
     reviewLimit: "Main read combines generated clip review with manual storyboard review of the newest full recording."
   } : {
     title: "Samira: fix the second decision",
-    focus: "The Master blocker in these clips is the second decision after contact: staying at lethal HP, re-entering before payout, or chasing away from the open structure.",
+    focus: "The repeat mistake is the second decision after contact: staying at lethal HP, re-entering before payout, or chasing away from the open structure.",
     rule: "One hit kills me means reset. Won fight means wave or structure before chase.",
-    nextRep: "Queue cue: HP gate, payout, structure.",
+    nextRep: "Next game: HP gate, payout, structure.",
     whyTrust: "Those exact leaks show up in the visible frames: 2:43 and 3:27 in the 6/4/2 game, 10:32-12:44 in the 8/3/2 game, and 12:06-14:18 in the latest base push.",
     pattern: "Across the recordings, Samira already has enough damage to win fights. The rank leak is the moment after contact, when a safe reset, wave crash, turret, or nexus route gets delayed by one more tempting fight.",
     checklist: ["Lethal HP means reset.", "First win becomes wave or structure.", "Open base means no sideways chase."],
@@ -925,7 +925,7 @@ async function summarizeRecordings(recordings, detectedChampions) {
     "Do not summarize everything. Choose the single improvement with the highest climb value from the recordings and explain the evidence behind it.",
     "Include whyTrust: one concrete reason Alan should trust and try this focus even if skeptical or anxious.",
     "Avoid phrases like 'you should'. Return only JSON:",
-    '{"title":"short title","focus":"one sentence","rule":"one in-game rule","nextRep":"one tiny queue cue","whyTrust":"one concrete reason to trust the focus","pattern":"fuller read of the cross-recording pattern","checklist":["3 tiny checks for the next queue"],"reviewLimit":"short limit of the evidence"}',
+    '{"title":"short title","focus":"one sentence","rule":"one in-game rule","nextRep":"one tiny next-game check","whyTrust":"one concrete reason to trust the focus","pattern":"fuller read of the cross-recording pattern","checklist":["3 tiny checks for the next queue"],"reviewLimit":"short limit of the evidence"}',
     `Detected champions: ${detectedChampions.map((item) => item.name).join(", ") || "unknown"}.`,
     notes
   ].join("\n");

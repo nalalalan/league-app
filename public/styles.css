@@ -1963,6 +1963,17 @@ h1 {
   line-height: 1.38;
 }
 
+.recording-list-lesson {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.36;
+}
+
+.recording-list-lesson strong {
+  font-weight: 900;
+}
+
 .recording-list-timeline {
   display: grid;
   gap: 4px;
