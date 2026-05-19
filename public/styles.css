@@ -3446,30 +3446,31 @@ h1 {
 .recording-main {
   grid-template-columns: 1fr;
   gap: 6px;
-  width: min(760px, 100%);
+  width: min(620px, 100%);
   justify-self: center;
-  padding: 14px 16px;
+  padding: 12px 14px;
   background: rgba(255, 253, 248, .9);
   box-shadow: none;
 }
 
 .recording-main h3 {
   align-self: start;
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 860;
 }
 
 .recording-main-focus {
-  max-width: 58ch;
-  font-size: 17px;
+  max-width: none;
+  font-size: 15px;
   font-weight: 860;
+  line-height: 1.28;
 }
 
 .recording-main-rule,
 .recording-main-why {
   grid-column: 1;
-  max-width: 68ch;
-  font-size: 13px;
+  max-width: none;
+  font-size: 12px;
   line-height: 1.38;
 }
 

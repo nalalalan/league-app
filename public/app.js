@@ -680,10 +680,10 @@ const recordingReview = {
   reviewBasis: "Recording review is ordered as a queue plan with one feedback note per file.",
   mainFeedback: {
     title: "Samira: kill, crash, reset",
-    focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
+    focus: "Conversion is the climb gap: after a won fight, cash out wave crash, tower, dragon, Baron, nexus, or recall.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     nextRep: "Queue cue: kill -> payout -> reset.",
-    whyTrust: "This is trustworthy because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
+    whyTrust: "Shutdown deaths erase Samira leads; conversion turns the same mechanics into XP, tempo, and objectives."
   },
   detectedChampions: [
     {

@@ -894,10 +894,10 @@ async function summarizeRecordings(recordings, detectedChampions) {
     reviewLimit: "Main read combines generated clip review with manual storyboard review of the newest full recording."
   } : {
     title: "Samira: kill, crash, reset",
-    focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
+    focus: "Conversion is the climb gap: after a won fight, cash out wave crash, tower, dragon, Baron, nexus, or recall.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     nextRep: "Queue cue: kill -> payout -> reset.",
-    whyTrust: "This is trustworthy because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives.",
+    whyTrust: "Shutdown deaths erase Samira leads; conversion turns the same mechanics into XP, tempo, and objectives.",
     pattern: "Across the recordings, the climb value is not finding more damage. It is ending the first winning moment through a map payout before the fight becomes coin-flip again.",
     checklist: ["Name the payout before the commit.", "Crash or reset after the first win.", "Take the second fight only with numbers, CC, and exit known."],
     reviewLimit: "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
