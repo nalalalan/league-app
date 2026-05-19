@@ -1425,7 +1425,7 @@ function recordingTextStack(primary, secondary = "", className = "") {
   const stack = document.createElement("div");
   stack.className = `recording-cell-stack${className ? ` ${className}` : ""}`;
   const strong = document.createElement("strong");
-  strong.textContent = primary || "unverified";
+  strong.textContent = primary || "unknown";
   stack.append(strong);
   if (secondary) {
     const span = document.createElement("span");
@@ -1476,7 +1476,7 @@ function recordingPreviewMeta(label, value) {
   const key = document.createElement("span");
   key.textContent = label;
   const text = document.createElement("strong");
-  text.textContent = value || "unverified";
+  text.textContent = value || "unknown";
   row.append(key, text);
   return row;
 }
@@ -1553,7 +1553,7 @@ function compactRecordingDate(item) {
   if (date && !Number.isNaN(date.getTime())) {
     return recordingDateFormatter.format(date).replace(",", "");
   }
-  return (item.gameHappenedAtLabel || item.recordedAtLabel || "time unverified")
+  return (item.gameHappenedAtLabel || item.recordedAtLabel || "time unknown")
     .replace(/May\s+(\d+),\s+2026,\s+/i, "5/$1 ")
     .replace(/,\s*2026/i, "");
 }
@@ -1678,13 +1678,13 @@ function recordingTable(review) {
     if (item.file === activeRecordingFile) row.className = "is-active";
     const gameSub = [item.matchId, item.score].filter(Boolean).join(" - ");
     const typeSub = item.queueId ? `queue ${item.queueId}` : item.gameTypeSource || "not found in logs";
-    const timestampPrimary = item.clipWindow || item.clipTimestamp || item.timestamp || "unverified";
+    const timestampPrimary = item.clipWindow || item.clipTimestamp || item.timestamp || "unknown";
     const timestampSub = item.recordedAtTimeLabel ? `saved ${item.recordedAtTimeLabel}` : item.recordedAtLabel || "";
     const championSub = item.confidence ? `${item.confidence} confidence` : "";
 
     row.append(
       tableCell("game", recordingTextStack(item.gameHappenedAtLabel || item.recordedAtLabel, gameSub)),
-      tableCell("type", recordingTextStack(item.gameType || item.kind || "unverified", typeSub)),
+      tableCell("type", recordingTextStack(item.gameType || item.kind || "unknown", typeSub)),
       tableCell("timestamp", recordingTextStack(timestampPrimary, timestampSub)),
       tableCell("champion", recordingTextStack(item.champion || "Unknown", championSub)),
       tableCell("length", recordingTextStack(item.duration || "")),
