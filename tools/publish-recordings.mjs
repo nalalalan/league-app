@@ -34,11 +34,18 @@ function commandNeedsShell(command) {
   return process.platform === "win32" && /\.cmd$/i.test(command);
 }
 
+function shellArg(arg) {
+  const value = String(arg);
+  if (!/[\s"]/u.test(value)) return value;
+  return `"${value.replace(/"/g, '\\"')}"`;
+}
+
 async function run(command, args, options = {}) {
+  const useShell = commandNeedsShell(command);
   const result = await execFileAsync(command, args, {
     cwd: appRoot,
     maxBuffer: 64 * 1024 * 1024,
-    shell: commandNeedsShell(command),
+    shell: useShell,
     windowsHide: true,
     ...options
   });
