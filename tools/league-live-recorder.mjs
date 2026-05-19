@@ -16,7 +16,7 @@ const logPath = path.join(analysisRoot, "league-live-recorder.log");
 const pollMs = Number(process.env.LEAGUE_LIVE_POLL_MS || 5000);
 const endGraceMs = Number(process.env.LEAGUE_LIVE_END_GRACE_MS || 35000);
 const segmentSeconds = Number(process.env.LEAGUE_LIVE_SEGMENT_SECONDS || 30);
-const maxClipSeconds = Number(process.env.LEAGUE_LIVE_MAX_CLIP_SECONDS || 360);
+const fastForwardSpeed = Number(process.env.LEAGUE_LIVE_FAST_FORWARD || 8);
 const minGameSeconds = Number(process.env.LEAGUE_LIVE_MIN_GAME_SECONDS || 90);
 const fps = String(process.env.LEAGUE_LIVE_FPS || 30);
 const crf = String(process.env.LEAGUE_LIVE_CRF || 26);
@@ -170,24 +170,47 @@ async function writeConcatList(listPath, files) {
   await fs.writeFile(listPath, `${text}\n`, "utf8");
 }
 
-function chooseSegments(segments) {
+function importantSegmentIndexes(segments) {
   const usable = segments.filter((item) => item.size > 160 * 1024);
-  if (!usable.length) return segments.slice(0, Math.max(1, Math.floor(maxClipSeconds / segmentSeconds)));
+  if (!usable.length) return new Set(segments.map((item) => item.index));
   const median = [...usable].sort((a, b) => a.size - b.size)[Math.floor(usable.length / 2)]?.size || 1;
   const top = [...usable]
     .sort((a, b) => b.size - a.size)
     .filter((item, index) => index < 8 || item.size > median * 1.12);
   const byIndex = new Map(segments.map((item) => [item.index, item]));
-  const selected = new Map();
+  const selected = new Set();
   for (const item of top) {
     for (const index of [item.index - 1, item.index, item.index + 1]) {
-      if (byIndex.has(index)) selected.set(index, byIndex.get(index));
+      if (byIndex.has(index)) selected.add(index);
     }
   }
-  const cap = Math.max(1, Math.floor(maxClipSeconds / segmentSeconds));
-  return [...selected.values()]
-    .sort((a, b) => a.index - b.index)
-    .slice(0, cap);
+  return selected;
+}
+
+async function processSegment(segment, importantIndexes, sessionRoot) {
+  const isImportant = importantIndexes.has(segment.index);
+  const speed = isImportant ? 1 : Math.max(1, fastForwardSpeed);
+  const outputPath = path.join(sessionRoot, `processed-${String(segment.index).padStart(4, "0")}.mp4`);
+  await run("ffmpeg", [
+    "-y",
+    "-hide_banner",
+    "-loglevel", "error",
+    "-i", segment.filePath,
+    "-vf", `setpts=PTS/${speed},fps=${fps}`,
+    "-an",
+    "-c:v", "libx264",
+    "-preset", "veryfast",
+    "-crf", "29",
+    "-pix_fmt", "yuv420p",
+    "-movflags", "+faststart",
+    outputPath
+  ]);
+  return {
+    ...segment,
+    outputPath,
+    speed,
+    important: isImportant
+  };
 }
 
 async function nextOutputPath(matchId) {
@@ -216,17 +239,21 @@ async function finalizeSession(session) {
     segments.push({ filePath, size: stat.size, index });
   }
   segments.sort((a, b) => a.index - b.index);
-  const selected = chooseSegments(segments);
-  if (!selected.length) {
+  if (!segments.length) {
     await log("No usable segments were created.");
     return;
   }
 
   const replay = await latestReplay(session.startedMs, session.endedMs);
   const outputPath = await nextOutputPath(replay?.matchId);
-  const listPath = path.join(session.sessionRoot, "selected.txt");
-  const joinedPath = path.join(session.sessionRoot, "selected.mkv");
-  await writeConcatList(listPath, selected.map((item) => item.filePath));
+  const importantIndexes = importantSegmentIndexes(segments);
+  const processed = [];
+  for (const segment of segments) {
+    processed.push(await processSegment(segment, importantIndexes, session.sessionRoot));
+  }
+  const listPath = path.join(session.sessionRoot, "processed.txt");
+  const joinedPath = path.join(session.sessionRoot, "processed.mp4");
+  await writeConcatList(listPath, processed.map((item) => item.outputPath));
   await run("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", listPath, "-c", "copy", joinedPath]);
   await fs.mkdir(sourceDir, { recursive: true });
   await run("ffmpeg", [
@@ -251,8 +278,16 @@ async function finalizeSession(session) {
     endedAt: session.endedAt.toISOString(),
     outputPath,
     durationSeconds: duration,
+    sourceDurationSeconds: elapsedSeconds,
     segmentSeconds,
-    selectedSegments: selected.map((item) => ({ index: item.index, size: item.size })),
+    fastForwardSpeed,
+    allSegmentsPreserved: true,
+    segments: processed.map((item) => ({
+      index: item.index,
+      size: item.size,
+      speed: item.speed,
+      important: item.important
+    })),
     inputPolicy: "Screen and mouse cursor are recorded. Raw keyboard text is not logged."
   };
   await fs.writeFile(path.join(session.sessionRoot, "review-clip.json"), `${JSON.stringify(sidecar, null, 2)}\n`, "utf8");

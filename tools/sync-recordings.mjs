@@ -82,6 +82,30 @@ function shortTime(value) {
   }).format(value);
 }
 
+async function localLeagueJson(endpoint) {
+  const lockPath = process.env.LEAGUE_LOCKFILE || "C:\\Riot Games\\League of Legends\\lockfile";
+  const lock = clean(await readTextSafe(lockPath));
+  const parts = lock.split(":");
+  if (parts.length < 5) return null;
+  const port = parts[2];
+  const password = parts[3];
+  try {
+    const { stdout } = await execFileAsync("curl.exe", [
+      "-k",
+      "-s",
+      "-u", `riot:${password}`,
+      `https://127.0.0.1:${port}${endpoint}`
+    ], {
+      windowsHide: true,
+      maxBuffer: 32 * 1024 * 1024
+    });
+    if (!stdout || !stdout.trim().startsWith("{")) return null;
+    return JSON.parse(stdout);
+  } catch {
+    return null;
+  }
+}
+
 function reviewPhase(index, total) {
   if (total <= 0) return "current form";
   if (index >= Math.max(0, total - 3)) return "current form";
@@ -227,6 +251,37 @@ async function loadQueueMetadata(matchIds) {
   return queues;
 }
 
+async function loadMatchStats(matchIds) {
+  const current = await localLeagueJson("/lol-summoner/v1/current-summoner");
+  const currentPuuid = clean(current?.puuid);
+  if (!currentPuuid) return new Map();
+  const stats = new Map();
+  for (const matchId of matchIds) {
+    const numericId = matchId.replace(/^NA1-/i, "");
+    const game = await localLeagueJson(`/lol-match-history/v1/games/${numericId}`);
+    if (!game?.participants?.length) continue;
+    const participantId = game.participantIdentities
+      ?.find((identity) => clean(identity?.player?.puuid) === currentPuuid)
+      ?.participantId;
+    const participant = game.participants.find((item) => item.participantId === participantId);
+    const itemStats = participant?.stats;
+    if (!itemStats) continue;
+    const cs = Number(itemStats.totalMinionsKilled || 0) + Number(itemStats.neutralMinionsKilled || 0);
+    const gameLengthSeconds = Number(game.gameDuration || 0);
+    stats.set(matchId, {
+      gameLength: gameLengthSeconds ? mmss(gameLengthSeconds) : "",
+      gameLengthSeconds: gameLengthSeconds || null,
+      kills: Number(itemStats.kills || 0),
+      deaths: Number(itemStats.deaths || 0),
+      assists: Number(itemStats.assists || 0),
+      kda: `${Number(itemStats.kills || 0)}/${Number(itemStats.deaths || 0)}/${Number(itemStats.assists || 0)}`,
+      cs,
+      statsSource: "League Client match history"
+    });
+  }
+  return stats;
+}
+
 async function loadCaptureMetadata(matchIds) {
   const capture = new Map();
   const logRoot = path.join(leagueLogsRoot, "GameLogs");
@@ -256,7 +311,8 @@ async function loadRecordingMetadata(matchIds) {
     loadQueueMetadata(matchIds),
     loadCaptureMetadata(matchIds)
   ]);
-  return { replayTimes, queues, captureTimes };
+  const matchStats = await loadMatchStats(matchIds);
+  return { replayTimes, queues, captureTimes, matchStats };
 }
 
 async function exists(filePath) {
@@ -894,6 +950,7 @@ async function main() {
       gameType: "Unverified",
       gameTypeSource: "No queue id found in local logs"
     };
+    const matchStats = recordingMetadata.matchStats.get(parts.matchId) || {};
     const captureMeta = recordingMetadata.captureTimes.get(name) || {};
     const phase = reviewPhase(index, sourceEntries.length);
     const sequenceLabel = `${index + 1} of ${sourceEntries.length}`;
@@ -960,6 +1017,14 @@ async function main() {
       title: shortTitle,
       duration: mmss(duration),
       durationSeconds: Math.round(duration * 1000) / 1000,
+      gameLength: matchStats.gameLength || "",
+      gameLengthSeconds: matchStats.gameLengthSeconds || null,
+      kda: matchStats.kda || "",
+      kills: Number.isFinite(matchStats.kills) ? matchStats.kills : null,
+      deaths: Number.isFinite(matchStats.deaths) ? matchStats.deaths : null,
+      assists: Number.isFinite(matchStats.assists) ? matchStats.assists : null,
+      cs: Number.isFinite(matchStats.cs) ? matchStats.cs : null,
+      statsSource: matchStats.statsSource || "Unverified",
       kind: isFullReview ? "full review" : "highlight",
       reviewPhase: phase,
       champion: clean(analysis.champion, "Unknown"),

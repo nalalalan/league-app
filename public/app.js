@@ -1546,11 +1546,9 @@ function compactGameType(value) {
     .replace(/\bIntermediate\b/i, "intermediate");
 }
 
-function recordingFact(value) {
-  const fact = document.createElement("span");
-  fact.className = "recording-list-fact";
-  fact.textContent = value || "unverified";
-  return fact;
+function statLine(item) {
+  if (item.kda && Number.isFinite(Number(item.cs))) return [`KDA ${item.kda}`, `${item.cs} CS`];
+  return ["KDA/CS unverified"];
 }
 
 function recordingParagraph(item) {
@@ -1566,13 +1564,13 @@ function recordingListCard(item) {
 
   const meta = document.createElement("div");
   meta.className = "recording-list-facts";
-  meta.append(
-    recordingFact(`Game ${compactRecordingDate(item)}`),
-    recordingFact(compactGameType(item.gameType || item.kind)),
-    recordingFact(item.clipWindow || item.clipTimestamp || item.timestamp),
-    recordingFact(item.champion || "Unknown"),
-    recordingFact(item.duration)
-  );
+  meta.textContent = [
+    compactGameType(item.gameType || item.kind),
+    item.champion || "Unknown",
+    compactRecordingDate(item),
+    item.gameLength || item.duration,
+    ...statLine(item)
+  ].join(" | ");
 
   const title = document.createElement("h3");
   title.textContent = item.feedbackTitle || "Focus";
