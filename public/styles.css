@@ -1015,7 +1015,7 @@ summary {
   --portrait-scale: 1.01;
   --portrait-hover-scale: 1.045;
   --portrait-selected-scale: 1.035;
-  height: clamp(360px, 38vw, 560px);
+  height: clamp(230px, 24vw, 360px);
   border: 1px solid rgba(104, 87, 68, .24);
   border-radius: 10px;
   padding: 0;
@@ -1806,8 +1806,8 @@ h1 {
 
 .recording-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 
 .recording-empty {
@@ -1839,27 +1839,27 @@ h1 {
 
 .recording-list-card {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  align-items: start;
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
+  grid-template-columns: minmax(250px, .42fr) minmax(520px, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 253, 248, .92);
+  box-shadow: var(--shadow);
 }
 
 .recording-list-copy {
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
   height: fit-content;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 12px;
-  background: rgba(255, 253, 248, .94);
-  box-shadow: var(--shadow);
+  border: 0;
+  border-radius: 0;
+  padding: 2px 4px 2px 2px;
+  background: transparent;
+  box-shadow: none;
 }
 
 .recording-list-facts {
@@ -1902,16 +1902,16 @@ h1 {
 .recording-list-card h3 {
   margin: 0;
   color: #2f2925;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.12;
 }
 
 .recording-list-takeaway {
   margin: 0;
   color: #443b35;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 610;
-  line-height: 1.42;
+  line-height: 1.38;
 }
 
 .recording-list-description,
@@ -1929,9 +1929,9 @@ h1 {
 .recording-list-video video {
   display: block;
   width: 100%;
-  min-height: 300px;
-  max-height: 480px;
-  aspect-ratio: 16 / 10;
+  min-height: 340px;
+  max-height: 600px;
+  aspect-ratio: 16 / 9;
   border-radius: 6px;
   background: #15110e;
   object-fit: contain;
@@ -3197,7 +3197,7 @@ h1 {
   }
 
   .portrait-button {
-    height: clamp(250px, 58vw, 390px);
+    height: clamp(180px, 40vw, 300px);
   }
 
   .portrait-name {
@@ -3251,7 +3251,7 @@ h1 {
   }
 
   .portrait-button {
-    height: clamp(330px, 102vw, 440px);
+    height: clamp(260px, 78vw, 360px);
   }
 
   .portrait-copy {
