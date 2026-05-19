@@ -902,7 +902,7 @@ async function summarizeRecordings(recordings, detectedChampions) {
     checklist: ["Name the payout before the commit.", "Crash or reset after the first win.", "Take the second fight only with numbers, CC, and exit known."],
     reviewLimit: "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
   };
-  if (!process.env.OPENAI_API_KEY || !recordings.length) return fallback;
+  if (!recordings.length || detectedChampions.some((item) => championId(item.name) === "samira")) return fallback;
   const notes = recordings.map((item, index) => (
     `${index + 1}. ${item.title} [${item.reviewPhase || "baseline"}] (${item.champion}, ${item.duration}): ${item.feedbackTitle} - ${item.feedback}. Pattern: ${item.pattern || ""} Rule: ${item.diamondRule || ""}`
   )).join("\n");
