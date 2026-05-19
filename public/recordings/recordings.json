@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-19T15:45:45.351Z",
+  "generatedAt": "2026-05-19T16:01:09.002Z",
   "source": "League of Legends Highlights folder",
   "match": "4 matches",
   "matches": [
@@ -98,7 +98,7 @@
       "analysisSource": "manual",
       "analysisVersion": "2026-05-19-specific-ranked-blockers-v3",
       "sampledFrames": 18,
-      "publicVideoBytes": 25774633,
+      "publicVideoBytes": 25777049,
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
       "poster": "/recordings/posters/auto-na1-5563660362-01.jpg"
     },
