@@ -1565,11 +1565,14 @@ function compactGameType(value) {
     .replace(/\bIntermediate\b/i, "intermediate");
 }
 
-function statLine(item) {
-  const stats = [];
-  if (item.kda) stats.push(`KDA ${item.kda}`);
-  if (Number.isFinite(Number(item.cs))) stats.push(`${item.cs} CS`);
-  return stats;
+function compactGameLength(item) {
+  const seconds = Number(item.gameLengthSeconds);
+  if (Number.isFinite(seconds) && seconds > 0) {
+    return `${Math.max(1, Math.round(seconds / 60))} min game`;
+  }
+  if (hasText(item.gameLength)) return `${item.gameLength} game`;
+  if (hasText(item.duration)) return `${item.duration} clip`;
+  return "length unknown";
 }
 
 function recordingParagraph(item) {
@@ -1640,8 +1643,7 @@ function recordingListCard(item) {
     compactGameType(item.gameType || item.kind),
     item.champion || "Unknown",
     compactRecordingDate(item),
-    item.gameLength || item.duration,
-    ...statLine(item)
+    compactGameLength(item)
   ].join(" | ");
 
   const title = document.createElement("h3");
@@ -1745,7 +1747,7 @@ function renderRecordings(review = recordingReview, selectedChampionId = current
     detectedChampions: [{ name: champion.name }],
     recordings: championRecordings
   };
-  recordingSummary.textContent = `${championReview.totalRecordings} rec | ${championReview.totalDuration} | ${championReview.match}`;
+  recordingSummary.textContent = "latest clips first";
   recordingFocus.replaceChildren(recordingMainCard(championReview));
   recordingGrid.replaceChildren(recordingList(championReview));
 }
