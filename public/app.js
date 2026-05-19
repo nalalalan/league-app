@@ -1515,7 +1515,7 @@ function recordingPreviewCard(item) {
 
   const why = document.createElement("p");
   why.className = "recording-preview-why";
-  why.textContent = item.whyTrust ? `Why: ${item.whyTrust}` : "";
+  why.textContent = item.whyTrust || "";
 
   copy.append(title, meta, takeaway, description);
   if (why.textContent) copy.append(why);
