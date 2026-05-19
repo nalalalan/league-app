@@ -98,7 +98,7 @@ async function main() {
     return;
   }
 
-  await run("git", ["add", "--", ...publishPaths]);
+  await run("git", ["add", "-f", "--", ...publishPaths]);
   await run("git", ["commit", "-m", `Update League recordings ${new Date().toISOString().slice(0, 10)}`]);
   await run("git", ["pull", "--rebase", "origin", "main"]);
   await run("git", ["push", "origin", "main"]);

@@ -9,3 +9,5 @@ _verification/
 _recording-analysis/
 _local*.log
 _licensed-audio/
+public/recordings/*.mp4
+public/recordings/*.webm

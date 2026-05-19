@@ -9,6 +9,7 @@ const dataRoot = process.env.LEAGUE_DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT
 const notesPath = path.join(dataRoot, "public-notes.json");
 const writeToken = (process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const isRailway = Boolean(process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_SERVICE_ID);
+const recordingMediaBase = (process.env.LEAGUE_RECORDING_MEDIA_BASE || "https://nalalalan.github.io/league-app/recordings").replace(/\/+$/, "");
 
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -103,6 +104,11 @@ function cleanText(value, maxLength) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
+function recordingMediaRedirect(pathname) {
+  if (!/^\/recordings\/[^/]+\.(webm|mp4)$/i.test(pathname)) return "";
+  return `${recordingMediaBase}/${encodeURIComponent(path.basename(pathname))}`;
+}
+
 async function handleApi(req, res, url) {
   if (url.pathname === "/api/health" && req.method === "GET") {
     sendJson(res, 200, {
@@ -175,6 +181,15 @@ http.createServer(async (req, res) => {
   }
   fs.readFile(filePath, (err, data) => {
     if (err) {
+      const redirect = recordingMediaRedirect(pathname);
+      if (redirect) {
+        res.writeHead(302, {
+          Location: redirect,
+          "Cache-Control": "public, max-age=300"
+        });
+        res.end();
+        return;
+      }
       send(res, 404, "Not found");
       return;
     }
