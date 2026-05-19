@@ -375,7 +375,7 @@ const champions = [
     skin: "Ningning Samira",
     person: "Ningning",
     snippet: "Life's Too Short",
-    image: "/assets/champions/samira-ningning-cat.png",
+    image: "/assets/champions/samira-ningning-life-short.webp",
     focus: "Recording review is the current queue plan.",
     note: "Samira can mash in, but she cannot always leave. Her escape is killing, resetting, lifestealing, blocking the real spell, or using Flash.",
     situations: [
@@ -517,7 +517,7 @@ const champions = [
     skin: "Hanni Fizz",
     person: "Hanni",
     snippet: "Cookie",
-    image: "/assets/champions/fizz-hanni.png",
+    image: "/assets/champions/fizz-hanni-pham.jpg",
     focus: "Mark, enter, stab, dodge, leave.",
     note: "Fizz is the reference loop because every button has a body job and a clean exit shape.",
     situations: [
@@ -5434,7 +5434,13 @@ function renderPicker() {
     for (let ambientIndex = 0; ambientIndex < 5; ambientIndex += 1) {
       ambient.append(document.createElement("i"));
     }
-    button.append(img, ambient);
+    const copy = document.createElement("span");
+    copy.className = "portrait-copy";
+    const name = document.createElement("span");
+    name.className = "portrait-name";
+    name.textContent = champion.name;
+    copy.append(name);
+    button.append(img, ambient, copy);
     button.addEventListener("pointermove", (event) => {
       const rect = button.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
