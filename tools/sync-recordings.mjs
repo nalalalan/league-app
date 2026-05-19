@@ -14,6 +14,8 @@ const posterRoot = path.join(recordingRoot, "posters");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(recordingRoot, "recordings.json");
 const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Documents\\League of Legends\\Highlights";
+const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(sourceDir), "Replays");
+const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
 const analysisVersion = "2026-05-18-deep-recording-feedback-v7";
@@ -95,6 +97,165 @@ function capturedRange(files) {
     return `${shortDate(first)}, ${shortTime(first)}-${shortTime(last)} ET`;
   }
   return `${shortDateTime(first)} to ${shortDateTime(last)} ET`;
+}
+
+function recordingParts(file) {
+  const match = file.match(/^([^_]+)_(NA1-\d+)_(\d+)\.webm$/i);
+  if (!match) {
+    return {
+      score: "",
+      matchId: "",
+      numericMatchId: "",
+      clipNumber: 0
+    };
+  }
+  return {
+    score: match[1],
+    matchId: match[2],
+    numericMatchId: match[2].replace(/^NA1-/i, ""),
+    clipNumber: Number(match[3]) || 0
+  };
+}
+
+function queueLabel(queueId) {
+  const labels = {
+    400: "Draft Pick",
+    420: "Ranked Solo",
+    430: "Blind Pick",
+    440: "Ranked Flex",
+    450: "ARAM",
+    480: "Swiftplay",
+    490: "Quickplay",
+    830: "Co-op vs AI Intro",
+    840: "Co-op vs AI Beginner",
+    850: "Co-op vs AI Intermediate",
+    870: "Co-op vs AI Intro",
+    880: "Co-op vs AI Beginner",
+    890: "Co-op vs AI Intermediate",
+    900: "ARURF",
+    2000: "Tutorial 1",
+    2010: "Tutorial 2",
+    2020: "Tutorial 3"
+  };
+  return labels[Number(queueId)] || "Unverified";
+}
+
+function shortClock(seconds) {
+  if (!Number.isFinite(seconds)) return "";
+  return mmss(seconds);
+}
+
+async function recentFiles(root, predicate, maxFiles = 36) {
+  const found = [];
+  async function walk(dir) {
+    let entries = [];
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const filePath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        await walk(filePath);
+      } else if (predicate(entry.name, filePath)) {
+        const stat = await fs.stat(filePath).catch(() => null);
+        if (stat) found.push({ filePath, stat });
+      }
+    }
+  }
+  await walk(root);
+  return found
+    .sort((a, b) => b.stat.mtimeMs - a.stat.mtimeMs)
+    .slice(0, maxFiles);
+}
+
+async function readTextSafe(filePath) {
+  try {
+    return await fs.readFile(filePath, "utf8");
+  } catch {
+    return "";
+  }
+}
+
+async function loadReplayTimes(matchIds) {
+  const times = new Map();
+  for (const matchId of matchIds) {
+    const replayPath = path.join(replayDir, `${matchId}.rofl`);
+    const stat = await fs.stat(replayPath).catch(() => null);
+    if (stat) {
+      times.set(matchId, {
+        matchTimeMs: stat.mtimeMs,
+        gameHappenedAt: new Date(stat.mtimeMs).toISOString(),
+        gameHappenedAtLabel: shortDateTime(new Date(stat.mtimeMs))
+      });
+    }
+  }
+  return times;
+}
+
+async function loadQueueMetadata(matchIds) {
+  const numericIds = new Map(matchIds.map((matchId) => [matchId.replace(/^NA1-/i, ""), matchId]));
+  const queues = new Map();
+  const logRoot = path.join(leagueLogsRoot, "LeagueClient Logs");
+  const logs = await recentFiles(logRoot, (name) => /LeagueClient(?:Ux)?\.log$/i.test(name), 12);
+  for (const { filePath } of logs) {
+    const text = await readTextSafe(filePath);
+    if (!text) continue;
+    for (const [numericId, matchId] of numericIds) {
+      if (queues.has(matchId) || !text.includes(numericId)) continue;
+      const escaped = numericId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const patterns = [
+        new RegExp(`gameId["':=\\s]+${escaped}[\\s\\S]{0,500}?queueId["':=\\s]+(\\d+)`, "i"),
+        new RegExp(`queueId["':=\\s]+(\\d+)[\\s\\S]{0,500}?gameId["':=\\s]+${escaped}`, "i")
+      ];
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match) {
+          const queueId = Number(match[1]);
+          queues.set(matchId, {
+            queueId,
+            gameType: queueLabel(queueId),
+            gameTypeSource: "LeagueClient log"
+          });
+          break;
+        }
+      }
+    }
+  }
+  return queues;
+}
+
+async function loadCaptureMetadata(matchIds) {
+  const capture = new Map();
+  const logRoot = path.join(leagueLogsRoot, "GameLogs");
+  const logs = await recentFiles(logRoot, (name) => /_r3dlog\.txt$/i.test(name), 48);
+  for (const { filePath } of logs) {
+    const text = await readTextSafe(filePath);
+    if (!text) continue;
+    if (!matchIds.some((matchId) => text.includes(`${matchId}.rofl`))) continue;
+    for (const line of text.split(/\r?\n/)) {
+      if (!line.includes("Beginning Video Capture")) continue;
+      const secondsMatch = line.match(/^(\d{6}\.\d+)/);
+      const fileMatch = line.match(/Highlights[\\/]+([^:]+?\.webm)\b/i);
+      if (!secondsMatch || !fileMatch) continue;
+      const seconds = Number(secondsMatch[1]);
+      capture.set(fileMatch[1], {
+        clipTimestampSeconds: seconds,
+        clipTimestamp: shortClock(seconds)
+      });
+    }
+  }
+  return capture;
+}
+
+async function loadRecordingMetadata(matchIds) {
+  const [replayTimes, queues, captureTimes] = await Promise.all([
+    loadReplayTimes(matchIds),
+    loadQueueMetadata(matchIds),
+    loadCaptureMetadata(matchIds)
+  ]);
+  return { replayTimes, queues, captureTimes };
 }
 
 async function exists(filePath) {
@@ -320,7 +481,7 @@ function fallbackFeedback(file, duration, context = {}) {
       champion: "Samira",
       confidence: "medium",
       feedbackTitle: "16/10 means conversion gap",
-      feedback: "The full-game read says damage is enough; the Diamond rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
+      feedback: "The full-game read says damage is enough; the high-elo rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
       whyTrust: "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
       focusTag: "overstay control",
       evidence: "Match-level Samira read from sampled replay frames and side-list evidence.",
@@ -336,7 +497,7 @@ function fallbackFeedback(file, duration, context = {}) {
     {
       feedbackTitle: "Ask for the payout first",
       feedback: "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end.",
-      whyTrust: "Diamond ADCs climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
+      whyTrust: "High-elo ADCs climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
       pattern: "The fight needs a planned map payout before the commit.",
       diamondRule: "Commit only when the win has an immediate conversion path.",
       drill: "Name the payout before pressing the engage button.",
@@ -445,7 +606,7 @@ function fallbackFeedback(file, duration, context = {}) {
     },
     {
       feedbackTitle: "Hit the structure",
-      feedback: "At inhib or nexus, the Diamond rep is ending as soon as the structure is available.",
+      feedback: "At inhib or nexus, the high-elo rep is ending as soon as the structure is available.",
       whyTrust: "This is reliable because structures are guaranteed progress; extra fighting after the base is open adds variance without adding win condition.",
       pattern: "Base fights become lower value once the structure is open.",
       diamondRule: "Hit the structure as soon as the fight is won.",
@@ -501,7 +662,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
   const frameList = frameTimes.map((time, index) => `${index + 1}:${mmss(time)}`).join(", ");
 
   const prompt = [
-    "Analyze these League of Legends replay frames extremely carefully for Alan, currently around Silver 4 and trying to climb toward Diamond.",
+    "Analyze these League of Legends replay frames extremely carefully for Alan, currently around Silver 4 and trying to build Challenger-level decision quality.",
     "Images are chronological sampled frames from the recording. Read them in order and use every visible clue: followed champion, team list/nameplate, health bars, minimap shape when visible, wave state, structure/objective context, fight numbers, target selection, spacing, fog, recalls, base state, and obvious crowd-control or cooldown evidence.",
     "The player champion is usually the champion the replay camera follows most. Use the side list/nameplate when visible. If uncertain, say low confidence and state the limit.",
     "Use capture order internally to distinguish earlier leak evidence from later implementation attempts, but do not mention recency weighting in visible output.",
@@ -509,7 +670,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
     "Give exactly one highest-value improvement for this recording, plus a fuller read of the nuance behind it. The top advice must stay direct, narrow, and playable in the next queue.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty.",
-    "Prioritize Diamond-relevant habits: wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
+    "Prioritize high-elo habits: wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "Visible page copy should be concise and operational. Avoid phrases like 'you should' or broad coaching.",
@@ -580,7 +741,7 @@ async function summarizeRecordings(recordings, detectedChampions) {
     focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     nextRep: "Queue cue: kill -> payout -> reset.",
-    whyTrust: "This is Diamond-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives.",
+    whyTrust: "This is high-elo-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives.",
     pattern: "Across the recordings, the climb value is not finding more damage. It is ending the first winning moment through a map payout before the fight becomes coin-flip again.",
     checklist: ["Name the payout before the commit.", "Crash or reset after the first win.", "Take the second fight only with numbers, CC, and exit known."],
     reviewLimit: "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
@@ -591,7 +752,7 @@ async function summarizeRecordings(recordings, detectedChampions) {
   )).join("\n");
   const prompt = [
     "Given these deeply analyzed League recording feedback notes, produce one simple focus for Alan's next queue.",
-    "He is around Silver 4 and wants Diamond. Keep the summary narrow enough to remember while playing.",
+    "He is around Silver 4 and wants Challenger-level advice. Keep the summary narrow enough to remember while playing.",
     "Use capture order internally to distinguish earlier leak evidence from implementation attempts. Do not mention recency weighting in visible output.",
     "If the newer clips show an earlier rule being attempted, choose the next simple constraint that preserves the improvement instead of repeating only the old leak.",
     "Do not summarize everything. Choose the single improvement with the highest climb value from the recordings and explain the evidence behind it.",
@@ -682,6 +843,8 @@ async function main() {
         stat: await fs.stat(sourcePath)
       };
     }))).sort((a, b) => a.stat.mtimeMs - b.stat.mtimeMs || a.name.localeCompare(b.name));
+  const sourceMatchIds = [...new Set(sourceEntries.map((entry) => recordingParts(entry.name).matchId).filter(Boolean))];
+  const recordingMetadata = await loadRecordingMetadata(sourceMatchIds);
 
   const sourceStats = [];
   const recordings = [];
@@ -692,6 +855,13 @@ async function main() {
   for (let index = 0; index < sourceEntries.length; index += 1) {
     const entry = sourceEntries[index];
     const { name, sourcePath, stat } = entry;
+    const parts = recordingParts(name);
+    const replayMeta = recordingMetadata.replayTimes.get(parts.matchId) || {};
+    const queueMeta = recordingMetadata.queues.get(parts.matchId) || {
+      gameType: "Unverified",
+      gameTypeSource: "No queue id found in local logs"
+    };
+    const captureMeta = recordingMetadata.captureTimes.get(name) || {};
     const phase = reviewPhase(index, sourceEntries.length);
     const sequenceLabel = `${index + 1} of ${sourceEntries.length}`;
     sourceStats.push(stat);
@@ -728,11 +898,32 @@ async function main() {
       ? `full review ${String(++fullGameCount).padStart(2, "0")}`
       : `highlight ${String(++highlightCount).padStart(2, "0")}`;
     const fingerprint = crypto.createHash("sha1").update(`${name}:${cacheKey}`).digest("hex").slice(0, 12);
+    const recordedDate = new Date(stat.mtimeMs);
+    const clipStart = Number(captureMeta.clipTimestampSeconds);
+    const clipWindow = Number.isFinite(clipStart)
+      ? `${shortClock(clipStart)}-${shortClock(clipStart + duration)}`
+      : "";
     recordings.push({
       file: name,
       publicFile: destName,
       cacheKey,
       fingerprint,
+      matchId: parts.matchId,
+      score: parts.score,
+      clipNumber: parts.clipNumber,
+      matchTimeMs: replayMeta.matchTimeMs || stat.mtimeMs,
+      gameHappenedAt: replayMeta.gameHappenedAt || recordedDate.toISOString(),
+      gameHappenedAtLabel: replayMeta.gameHappenedAtLabel || shortDateTime(recordedDate),
+      recordedAt: recordedDate.toISOString(),
+      recordedAtLabel: shortDateTime(recordedDate),
+      recordedAtTimeLabel: shortTime(recordedDate),
+      clipTimestampSeconds: Number.isFinite(clipStart) ? Math.round(clipStart * 1000) / 1000 : null,
+      clipTimestamp: captureMeta.clipTimestamp || "",
+      clipWindow,
+      timestamp: captureMeta.clipTimestamp || "",
+      queueId: queueMeta.queueId || null,
+      gameType: queueMeta.gameType,
+      gameTypeSource: queueMeta.gameTypeSource,
       title: shortTitle,
       duration: mmss(duration),
       durationSeconds: Math.round(duration * 1000) / 1000,
@@ -763,6 +954,12 @@ async function main() {
   const detectedChampions = aggregateChampions(recordings);
   const mainFeedback = await summarizeRecordings(recordings, detectedChampions);
   const matches = [...new Set(recordings.map((item) => item.file.match(/NA1-\d+/)?.[0]).filter(Boolean))];
+  const displayRecordings = [...recordings].sort((a, b) => (
+    (b.matchTimeMs || 0) - (a.matchTimeMs || 0) ||
+    (b.durationSeconds || 0) - (a.durationSeconds || 0) ||
+    (b.clipNumber || 0) - (a.clipNumber || 0) ||
+    a.file.localeCompare(b.file)
+  ));
   const manifest = {
     generatedAt: new Date().toISOString(),
     source: "League of Legends Highlights folder",
@@ -771,10 +968,10 @@ async function main() {
     captured: capturedRange(sourceStats),
     totalDuration: mmss(totalSeconds),
     totalRecordings: recordings.length,
-    reviewBasis: "Recording review is ordered as a queue plan with one feedback note per file.",
+    reviewBasis: "Newest match first; recordings inside a match are sorted by length.",
     mainFeedback,
     detectedChampions,
-    recordings
+    recordings: displayRecordings
   };
   await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
   console.log(`Wrote ${path.relative(appRoot, manifestPath)} with ${recordings.length} recordings.`);

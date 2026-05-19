@@ -676,7 +676,7 @@ const recordingReview = {
     focus: "The climb gap is conversion, not damage: every won fight must become wave crash, tower, dragon, Baron, nexus, or a recall with gold.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     nextRep: "Queue cue: kill -> payout -> reset.",
-    whyTrust: "This is Diamond-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
+    whyTrust: "This is high-elo-shaped because deaths with shutdown gold erase the leads Samira creates; conversion turns the same mechanics into XP, tempo, and objectives."
   },
   detectedChampions: [
     {
@@ -686,7 +686,7 @@ const recordingReview = {
       recordings: 13,
       evidence: "Replay side list names Samira on Alan's team; sampled clips center the Soul Fighter Samira model and nameplate.",
       improvementTitle: "Convert the first win",
-      improvement: "The damage is already there. The Diamond habit is turning the first kill into XP, tempo, structure damage, objective setup, or a clean reset before another fight."
+      improvement: "The damage is already there. The high-elo habit is turning the first kill into XP, tempo, structure damage, objective setup, or a clean reset before another fight."
     }
   ],
   recordings: [
@@ -1301,8 +1301,8 @@ function hasText(value) {
 
 function writeChampion(champion) {
   championName.textContent = champion.name;
-  championFocus.textContent = champion.focus;
-  championNote.textContent = champion.note;
+  championFocus.textContent = "";
+  championNote.textContent = "";
   situationCount.textContent = `${champion.situations.length} situations`;
   situationList.replaceChildren(...champion.situations.map(situationCard));
   updateChampionAtmosphere(champion, {
@@ -1317,35 +1317,15 @@ function recordingMainCard(review) {
   article.className = "recording-main";
 
   const title = document.createElement("h3");
-  title.textContent = item.title || "One focus";
+  title.textContent = (review.detectedChampions || []).map((champion) => champion.name).filter(Boolean).join(", ") || "recording focus";
 
   const focus = document.createElement("p");
   focus.className = "recording-main-focus";
-  focus.textContent = item.focus || "Review the recordings and choose one repeatable in-game rule.";
+  focus.textContent = item.title || item.focus || "Review the recordings and choose one repeatable in-game rule.";
 
   const rule = document.createElement("p");
   rule.className = "recording-main-rule";
-  rule.textContent = item.rule || "";
-
-  const why = document.createElement("p");
-  why.className = "recording-main-why";
-  why.textContent = trustLine(item.whyTrust);
-
-  const nextRep = document.createElement("p");
-  nextRep.className = "recording-main-rep";
-  nextRep.textContent = item.nextRep || "";
-
-  const pattern = document.createElement("p");
-  pattern.className = "recording-main-pattern";
-  pattern.textContent = item.pattern || "";
-
-  const checklist = document.createElement("ul");
-  checklist.className = "recording-main-checklist";
-  for (const check of item.checklist || []) {
-    const li = document.createElement("li");
-    li.textContent = check;
-    checklist.append(li);
-  }
+  rule.textContent = item.rule || item.nextRep || "";
 
   const limit = document.createElement("p");
   limit.className = "recording-main-limit";
@@ -1353,10 +1333,6 @@ function recordingMainCard(review) {
 
   article.append(title, focus);
   if (rule.textContent) article.append(rule);
-  if (why.textContent) article.append(why);
-  if (nextRep.textContent) article.append(nextRep);
-  if (pattern.textContent) article.append(pattern);
-  if (checklist.children.length) article.append(checklist);
   if (limit.textContent) article.append(limit);
   return article;
 }
@@ -1364,9 +1340,9 @@ function recordingMainCard(review) {
 function recordingDeepDetails(item) {
   const hasNuance = Array.isArray(item.nuance) && item.nuance.length > 0;
   const rows = [
-    ["Pattern", item.pattern],
-    ["Diamond rule", item.diamondRule],
+    ["Rule", item.diamondRule],
     ["Queue rep", item.drill],
+    ["Basis", item.whyTrust],
     ["Evidence", item.evidence],
     ["Limit", item.reviewLimit]
   ].filter(([, value]) => hasText(value));
@@ -1377,7 +1353,7 @@ function recordingDeepDetails(item) {
   details.className = "recording-deep";
 
   const summary = document.createElement("summary");
-  summary.textContent = "full read";
+  summary.textContent = "basis + nuance";
   details.append(summary);
 
   for (const [label, value] of rows) {
@@ -1409,66 +1385,142 @@ function recordingDeepDetails(item) {
   return details;
 }
 
-function recordingCard(item) {
-  const article = document.createElement("article");
-  article.className = "recording-card";
-
+function recordingVideo(item) {
   const video = document.createElement("video");
   video.controls = true;
   video.preload = "metadata";
   video.poster = item.poster;
   video.src = item.src;
   video.setAttribute("playsinline", "");
+  return video;
+}
 
-  const meta = document.createElement("div");
-  meta.className = "recording-meta";
+function recordingTextStack(primary, secondary = "", className = "") {
+  const stack = document.createElement("div");
+  stack.className = `recording-cell-stack${className ? ` ${className}` : ""}`;
+  const strong = document.createElement("strong");
+  strong.textContent = primary || "unverified";
+  stack.append(strong);
+  if (secondary) {
+    const span = document.createElement("span");
+    span.textContent = secondary;
+    stack.append(span);
+  }
+  return stack;
+}
 
-  const title = document.createElement("h3");
-  title.textContent = item.title;
+function tableCell(label, ...children) {
+  const td = document.createElement("td");
+  td.dataset.label = label;
+  td.append(...children.filter(Boolean));
+  return td;
+}
 
-  const detail = document.createElement("p");
-  detail.textContent = `${item.champion} · ${item.kind} · ${item.duration}`;
+function sortedRecordings(items = []) {
+  return [...items].sort((a, b) => (
+    (b.matchTimeMs || 0) - (a.matchTimeMs || 0) ||
+    (b.durationSeconds || 0) - (a.durationSeconds || 0) ||
+    (b.clipNumber || 0) - (a.clipNumber || 0) ||
+    String(a.file || "").localeCompare(String(b.file || ""))
+  ));
+}
 
-  const feedbackTitle = document.createElement("p");
-  feedbackTitle.className = "recording-card-feedback-title";
-  feedbackTitle.textContent = item.feedbackTitle || "Focus";
+function recordingDetailCell(item) {
+  const detail = document.createElement("div");
+  detail.className = "recording-table-detail";
 
-  const feedback = document.createElement("p");
-  feedback.className = "recording-card-feedback";
-  feedback.textContent = item.feedback || "No feedback generated yet.";
+  const description = document.createElement("p");
+  description.textContent = item.feedback || item.pattern || "No feedback generated yet.";
+  detail.append(description);
 
-  const why = document.createElement("p");
-  why.className = "recording-card-why";
-  why.textContent = trustLine(item.whyTrust || "This rule is tied to a repeated Samira risk pattern, not a vague style preference.");
+  if (hasText(item.pattern) && item.pattern !== item.feedback) {
+    const pattern = document.createElement("p");
+    pattern.textContent = item.pattern;
+    detail.append(pattern);
+  }
 
-  meta.append(title, detail, feedbackTitle, feedback);
-  if (why.textContent) meta.append(why);
   const deep = recordingDeepDetails(item);
-  if (deep) meta.append(deep);
-  article.append(video, meta);
-  return article;
+  if (deep) detail.append(deep);
+  return detail;
+}
+
+function recordingTable(review) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "recording-table-wrap";
+
+  const table = document.createElement("table");
+  table.className = "recording-table";
+
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  ["game", "type", "timestamp", "video", "champion", "length", "takeaway", "description"].forEach((label) => {
+    const th = document.createElement("th");
+    th.scope = "col";
+    th.textContent = label;
+    headerRow.append(th);
+  });
+  thead.append(headerRow);
+
+  const tbody = document.createElement("tbody");
+  for (const item of sortedRecordings(review.recordings || [])) {
+    const row = document.createElement("tr");
+    const gameSub = [item.matchId, item.score].filter(Boolean).join(" · ");
+    const typeSub = item.queueId ? `queue ${item.queueId}` : item.gameTypeSource || "not found in logs";
+    const timestampPrimary = item.clipWindow || item.clipTimestamp || item.timestamp || "unverified";
+    const timestampSub = item.recordedAtTimeLabel ? `saved ${item.recordedAtTimeLabel}` : item.recordedAtLabel || "";
+    const championSub = item.confidence ? `${item.confidence} confidence` : "";
+
+    row.append(
+      tableCell("game", recordingTextStack(item.gameHappenedAtLabel || item.recordedAtLabel, gameSub)),
+      tableCell("type", recordingTextStack(item.gameType || item.kind || "unverified", typeSub)),
+      tableCell("timestamp", recordingTextStack(timestampPrimary, timestampSub)),
+      tableCell("video", recordingVideo(item)),
+      tableCell("champion", recordingTextStack(item.champion || "Unknown", championSub)),
+      tableCell("length", recordingTextStack(item.duration || "")),
+      tableCell("takeaway", recordingTextStack(item.feedbackTitle || "Focus", item.drill || "")),
+      tableCell("description", recordingDetailCell(item))
+    );
+    tbody.append(row);
+  }
+
+  table.append(thead, tbody);
+  wrapper.append(table);
+  return wrapper;
 }
 
 function renderRecordings(review = recordingReview) {
   if (!recordingSummary || !recordingFocus || !recordingGrid) return;
-  recordingSummary.textContent = `${review.totalRecordings} files · ${review.totalDuration} · ${review.match || "latest"}`;
+  recordingSummary.textContent = `${review.totalRecordings} recordings · ${review.totalDuration} · ${review.match || "latest"}`;
+  recordingGrid.replaceChildren(recordingTable(review));
   recordingFocus.replaceChildren(recordingMainCard(review));
-  recordingGrid.replaceChildren(...(review.recordings || []).map(recordingCard));
+}
+
+function renderRecordingLoading() {
+  if (!recordingSummary || !recordingFocus || !recordingGrid) return;
+  recordingSummary.textContent = "loading current recordings";
+  recordingGrid.replaceChildren();
+  recordingFocus.replaceChildren();
 }
 
 async function hydrateRecordings() {
-  renderRecordings(recordingReview);
+  renderRecordingLoading();
   try {
     const response = await fetch("/recordings/recordings.json", {
       headers: { Accept: "application/json" },
       cache: "no-store"
     });
-    if (!response.ok) return;
+    if (!response.ok) {
+      renderRecordings(recordingReview);
+      return;
+    }
     const data = await response.json();
-    if (!Array.isArray(data.recordings) || data.recordings.length === 0) return;
+    if (!Array.isArray(data.recordings) || data.recordings.length === 0) {
+      renderRecordings(recordingReview);
+      return;
+    }
     renderRecordings(data);
   } catch {
-    // Keep the embedded fallback recording review.
+    renderRecordings(recordingReview);
   }
 }
 
