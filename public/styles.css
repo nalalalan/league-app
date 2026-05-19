@@ -1969,6 +1969,37 @@ h1 {
   color: #2d7a43;
 }
 
+.recording-time-link {
+  display: inline;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 900;
+  line-height: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.recording-time-link:hover,
+.recording-time-link:focus-visible {
+  color: #7b4d22;
+  outline: none;
+}
+
+.recording-story-critique .recording-time-link:hover,
+.recording-story-critique .recording-time-link:focus-visible {
+  color: #7e201c;
+}
+
+.recording-story-praise .recording-time-link:hover,
+.recording-story-praise .recording-time-link:focus-visible {
+  color: #1f6133;
+}
+
 .recording-list-description,
 .recording-list-drill {
   color: var(--muted);

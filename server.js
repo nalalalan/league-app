@@ -115,6 +115,65 @@ function recordingMediaRedirect(pathname) {
   return `${base}/${encodeURIComponent(path.basename(pathname))}`;
 }
 
+function parseRangeHeader(rangeHeader, size) {
+  const match = String(rangeHeader || "").match(/^bytes=(\d*)-(\d*)$/);
+  if (!match) return null;
+  let start = match[1] === "" ? null : Number(match[1]);
+  let end = match[2] === "" ? null : Number(match[2]);
+  if (start === null && end === null) return null;
+  if (start === null) {
+    const suffixLength = Math.min(Number(end), size);
+    start = size - suffixLength;
+    end = size - 1;
+  } else {
+    end = end === null ? size - 1 : end;
+  }
+  if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < start || start >= size) {
+    return null;
+  }
+  return { start, end: Math.min(end, size - 1) };
+}
+
+function sendStaticFile(req, res, filePath, stat) {
+  const type = types[path.extname(filePath)] || "application/octet-stream";
+  const baseHeaders = {
+    "Content-Type": type,
+    "Accept-Ranges": "bytes",
+    "Cache-Control": "public, max-age=300"
+  };
+  const range = parseRangeHeader(req.headers.range, stat.size);
+  if (req.headers.range && !range) {
+    res.writeHead(416, {
+      ...baseHeaders,
+      "Content-Range": `bytes */${stat.size}`
+    });
+    res.end();
+    return;
+  }
+  if (range) {
+    res.writeHead(206, {
+      ...baseHeaders,
+      "Content-Length": range.end - range.start + 1,
+      "Content-Range": `bytes ${range.start}-${range.end}/${stat.size}`
+    });
+    if (req.method === "HEAD") {
+      res.end();
+      return;
+    }
+    fs.createReadStream(filePath, range).pipe(res);
+    return;
+  }
+  res.writeHead(200, {
+    ...baseHeaders,
+    "Content-Length": stat.size
+  });
+  if (req.method === "HEAD") {
+    res.end();
+    return;
+  }
+  fs.createReadStream(filePath).pipe(res);
+}
+
 async function handleApi(req, res, url) {
   if (url.pathname === "/api/health" && req.method === "GET") {
     sendJson(res, 200, {
@@ -185,7 +244,7 @@ http.createServer(async (req, res) => {
     send(res, 403, "Forbidden");
     return;
   }
-  fs.readFile(filePath, (err, data) => {
+  fs.stat(filePath, (err, stat) => {
     if (err) {
       const redirect = recordingMediaRedirect(pathname);
       if (redirect) {
@@ -199,8 +258,11 @@ http.createServer(async (req, res) => {
       send(res, 404, "Not found");
       return;
     }
-    res.writeHead(200, { "Content-Type": types[path.extname(filePath)] || "application/octet-stream" });
-    res.end(data);
+    if (!stat.isFile()) {
+      send(res, 404, "Not found");
+      return;
+    }
+    sendStaticFile(req, res, filePath, stat);
   });
 }).listen(port, () => {
   console.log(`league.aolabs.io local server listening on http://localhost:${port}`);

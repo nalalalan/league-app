@@ -1689,18 +1689,114 @@ function praiseInsertIndex(sentences) {
   return Math.min(sentences.length, Math.max(1, sentences.length - 1));
 }
 
-function appendStoryText(paragraph, text) {
-  if (!hasText(text)) return;
-  if (paragraph.childNodes.length) paragraph.append(document.createTextNode(" "));
-  paragraph.append(document.createTextNode(text.trim()));
+function secondsFromTimestamp(text) {
+  const match = String(text || "").match(/^(\d{1,2}):([0-5]\d)$/);
+  if (!match) return null;
+  return Number(match[1]) * 60 + Number(match[2]);
 }
 
-function appendStorySpan(paragraph, text, className) {
+function clampSeekSeconds(seconds, duration) {
+  if (!Number.isFinite(seconds)) return null;
+  if (!Number.isFinite(duration) || duration <= 0) return Math.max(0, seconds);
+  return Math.min(Math.max(0, seconds), Math.max(0, duration - 0.25));
+}
+
+function timestampSecondsInText(text) {
+  const source = String(text || "");
+  const timestamps = [];
+  const timestampPattern = /\b\d{1,2}:[0-5]\d\b/g;
+  let match;
+  while ((match = timestampPattern.exec(source)) !== null) {
+    const seconds = secondsFromTimestamp(match[0]);
+    if (Number.isFinite(seconds)) timestamps.push(seconds);
+  }
+  return timestamps;
+}
+
+function recordingClockAnchors(item) {
+  const sources = [
+    ...(Array.isArray(item?.timeline) ? item.timeline : []),
+    item?.gameDetail,
+    item?.pattern,
+    item?.eventEvidence,
+    item?.evidence
+  ];
+  return sources
+    .flatMap(timestampSecondsInText)
+    .filter((seconds) => Number.isFinite(seconds));
+}
+
+function seekSecondsForStoryTimestamp(timestamp, item) {
+  const clockSeconds = secondsFromTimestamp(timestamp);
+  if (!Number.isFinite(clockSeconds)) return null;
+  const duration = secondsForRecording(item);
+  const anchors = recordingClockAnchors(item);
+  if (Number.isFinite(duration) && duration > 0 && anchors.length >= 2) {
+    const minClock = Math.min(...anchors);
+    const maxClock = Math.max(...anchors);
+    if (maxClock > minClock && maxClock > duration + 5) {
+      const ratio = (clockSeconds - minClock) / (maxClock - minClock);
+      return clampSeekSeconds(ratio * duration, duration);
+    }
+  }
+  return clampSeekSeconds(clockSeconds, duration);
+}
+
+function appendTimestampButton(container, timestamp, item) {
+  const seconds = seekSecondsForStoryTimestamp(timestamp, item);
+  if (!Number.isFinite(seconds)) {
+    container.append(document.createTextNode(timestamp));
+    return;
+  }
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "recording-time-link";
+  button.dataset.seekSeconds = String(Math.round(seconds * 1000) / 1000);
+  button.dataset.clockTimestamp = timestamp;
+  button.textContent = timestamp;
+  button.setAttribute("aria-label", `Play this recording from ${timestamp}`);
+  container.append(button);
+}
+
+function appendTextWithTimestampLinks(container, text, item) {
+  const source = String(text || "");
+  const timestampPattern = /\b\d{1,2}:[0-5]\d\b/g;
+  let lastIndex = 0;
+  let match;
+  while ((match = timestampPattern.exec(source)) !== null) {
+    if (match.index > lastIndex) {
+      container.append(document.createTextNode(source.slice(lastIndex, match.index)));
+    }
+    appendTimestampButton(container, match[0], item);
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < source.length) {
+    container.append(document.createTextNode(source.slice(lastIndex)));
+  }
+}
+
+function appendStoryText(paragraph, text, options = {}) {
+  if (!hasText(text)) return;
+  if (paragraph.childNodes.length) paragraph.append(document.createTextNode(" "));
+  const cleaned = text.trim();
+  if (options.linkTimestamps) {
+    appendTextWithTimestampLinks(paragraph, cleaned, options.item);
+  } else {
+    paragraph.append(document.createTextNode(cleaned));
+  }
+}
+
+function appendStorySpan(paragraph, text, className, options = {}) {
   if (!hasText(text)) return;
   if (paragraph.childNodes.length) paragraph.append(document.createTextNode(" "));
   const span = document.createElement("span");
   span.className = className;
-  span.textContent = text.trim();
+  const cleaned = text.trim();
+  if (options.linkTimestamps) {
+    appendTextWithTimestampLinks(span, cleaned, options.item);
+  } else {
+    span.textContent = cleaned;
+  }
   paragraph.append(span);
 }
 
@@ -1718,20 +1814,53 @@ function recordingStoryParagraph(item) {
   const praise = displayPraise(item);
   const critiqueIndex = critiqueInsertIndex(sentences);
   const praiseIndex = praise ? praiseInsertIndex(sentences) : -1;
+  const timestampOptions = { linkTimestamps: true, item };
   sentences.forEach((sentence, index) => {
-    appendStoryText(paragraph, sentence);
-    if (index + 1 === critiqueIndex) appendStorySpan(paragraph, critique, "recording-story-critique");
-    if (index + 1 === praiseIndex) appendStorySpan(paragraph, praise, "recording-story-praise");
+    appendStoryText(paragraph, sentence, timestampOptions);
+    if (index + 1 === critiqueIndex) appendStorySpan(paragraph, critique, "recording-story-critique", timestampOptions);
+    if (index + 1 === praiseIndex) appendStorySpan(paragraph, praise, "recording-story-praise", timestampOptions);
   });
   if (!sentences.length) {
-    appendStorySpan(paragraph, critique, "recording-story-critique");
-    appendStorySpan(paragraph, praise, "recording-story-praise");
+    appendStorySpan(paragraph, critique, "recording-story-critique", timestampOptions);
+    appendStorySpan(paragraph, praise, "recording-story-praise", timestampOptions);
   }
   const evidence = recordingEvidence(item);
   if (hasText(evidence) && !paragraph.textContent.includes(evidence)) {
-    appendStoryText(paragraph, `The clip shows it: ${evidence}`);
+    appendStoryText(paragraph, `The clip shows it: ${evidence}`, timestampOptions);
   }
   return paragraph;
+}
+
+function seekRecordingVideo(button) {
+  const seconds = Number(button?.dataset?.seekSeconds);
+  const card = button?.closest(".recording-list-card");
+  const video = card?.querySelector("video");
+  if (!Number.isFinite(seconds) || !video) return;
+  const seekTarget = () => clampSeekSeconds(seconds, Number(video.duration)) ?? Math.max(0, seconds);
+  const applySeek = () => {
+    const target = seekTarget();
+    video.dataset.lastRequestedSeekSeconds = String(Math.round(target * 1000) / 1000);
+    video.currentTime = target;
+    return target;
+  };
+  const playFromTimestamp = () => {
+    const target = applySeek();
+    window.setTimeout(() => {
+      if (Math.abs(video.currentTime - target) > 1) applySeek();
+    }, 120);
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        video.controls = true;
+      });
+    }
+  };
+  if (video.readyState === 0) {
+    video.addEventListener("loadedmetadata", playFromTimestamp, { once: true });
+    video.load();
+    return;
+  }
+  playFromTimestamp();
 }
 
 function secondsForRecording(item) {
@@ -5646,6 +5775,13 @@ async function hydratePublicNotes() {
     // Keep the static fallback note.
   }
 }
+
+document.addEventListener("click", (event) => {
+  const button = event.target.closest?.(".recording-time-link");
+  if (!button) return;
+  event.preventDefault();
+  seekRecordingVideo(button);
+});
 
 renderPicker();
 renderChampion(championIdFromLocation(), { animate: false, updateRoute: true, replaceRoute: true });
