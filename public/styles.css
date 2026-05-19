@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cherry+Bomb+One&display=swap");
+
 :root {
   color-scheme: light;
   --bg: #eee7dd;
@@ -1222,9 +1224,32 @@ summary {
 }
 
 .portrait-name {
+  display: inline-block;
+  width: fit-content;
   font-size: clamp(24px, 3.2vw, 44px);
   font-weight: 900;
   line-height: .95;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.portrait-button[data-champion="fizz"] .portrait-name {
+  font-family: "NewJeans", "Cherry Bomb One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  color: #fffdfb;
+  text-shadow:
+    0 2px 0 rgba(18, 111, 145, .55),
+    0 8px 18px rgba(0, 0, 0, .38),
+    0 0 20px rgba(95, 226, 255, .42);
+}
+
+.portrait-button[data-champion="samira"] .portrait-name {
+  font-family: "aespa", "Aespa", "Audiowide", "Orbitron", "Arial Black", system-ui, sans-serif;
+  color: #fff8fb;
+  text-transform: uppercase;
+  text-shadow:
+    0 1px 0 rgba(138, 56, 122, .62),
+    0 8px 18px rgba(0, 0, 0, .42),
+    0 0 22px rgba(255, 151, 219, .42);
 }
 
 .portrait-person {
