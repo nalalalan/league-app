@@ -18,7 +18,7 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-19-timestamped-event-feedback-v1";
+const analysisVersion = "2026-05-19-narrative-highlight-feedback-v1";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -513,31 +513,27 @@ function manualFeedback(file) {
     return {
       champion: "Samira",
       confidence: "high",
-      feedbackTitle: "Clean the win",
-      feedback: "The early lane pressure was real; the next jump is making that same pressure cleaner by farming the wave before another dive or chase.",
-      gameDetail: "Visible clock review: at 00:35 Samira was level 3 walking bot at 0/0/0 and 0 CS; at 01:18 the team was up 1-0 while Samira had 3 CS and Jinx was low under bot outer; at 01:52 Samira was 0/0/1, level 4, casting Q/Flair under bot outer with allied minions taking turret shots; at 04:22-04:47 the push continued around bot outer at 0/1/3 with CS rising from 9 to 12; at 05:20 Samira was back at fountain at 0/2/3 and 12 CS. The game still ended as a 14:28 win at 3/6/4 and 35 CS, but the visible pattern is early pressure turning messy because the wave income stayed low while fights continued.",
-      whyTrust: "The timestamps come from the game clock and the final line comes from League Client match history; both point to the same simple fix: keep the aggression, but make the wave pay first.",
-      focusTag: "cleaner wins",
-      evidence: "Raw capture frames with visible game clock plus League Client match history: Co-op AI Beginner, Samira, win, 14:28, 3/6/4, 35 CS.",
-      pattern: "The strongest clue is not damage shortage. It is bot-lane pressure happening while CS and death count move the wrong direction, so the next cleaner version is wave first, tower second, chase last.",
-      diamondRule: "Wave first; dash after the opening is real; leave when the payout is taken.",
-      drill: "Next game: before each fight, check wave, enemy CC, then payout.",
+      feedbackTitle: "Finish with the push",
+      feedback: "The win condition showed up when the team was already breaking base; stay attached to that push, hit what ends the game, and skip the extra chase.",
+      gameDetail: "Around 12:06, the clip jumps to your team already inside the enemy base: Garen is in front, Samira is low but close enough to add damage, and the red side is trying to hold the inhibitor doorway. The useful middle beat is around 13:06, where Samira turns on Mordekaiser crossing mid instead of wandering into a random side fight; after the reset, the map is still collapsing for them. By about 14:18, your team is back in their base with the frontline on the structure and enemy death timers on the side of the screen, so the game ends right after. Master focus: when the base is already cracked, the carry job is boring and lethal: stay close to the same push, hit the structure when the door opens, and only chase if the chase directly protects the end.",
+      whyTrust: "This is based on the actual visible base-push sequence, not the scoreboard: the game ends because the team keeps returning to the same open base pressure.",
+      focusTag: "end the push",
+      evidence: "Review clip frames with visible game clock: base pressure near 12:06, Mordekaiser catch around 13:06, final base push around 14:18.",
+      pattern: "The strongest clue is that the winning pressure was already available. The cleaner version is not more fighting; it is staying attached to the lane and structure that can end.",
+      diamondRule: "When base is open, structure first; chase only if it protects the end.",
+      drill: "Next game: when an inhibitor or nexus route is open, say structure first before pressing E forward.",
       timeline: [
-        "00:35 - Samira level 3 walks toward bot lane at 0/0/0 and 0 CS.",
-        "01:18 - Team leads 1-0; Samira has 3 CS while Jinx is low under enemy bot outer.",
-        "01:52 - Samira is 0/0/1, level 4, casting Q/Flair under bot outer with allied minions tanking.",
-        "04:22 - Samira is level 6 at 0/1/3 and 9 CS, hitting the bot-side turret wave while the game is 4-3.",
-        "04:47 - The same push continues at 0/1/3 and 12 CS; the lane is still under enemy bot outer.",
-        "05:20 - Samira is back at fountain at 0/2/3 and 12 CS while the game is 5-5."
+        "12:06 - Your team is already in the enemy base, pressuring the red inhibitor doorway.",
+        "13:06 - Samira turns toward Mordekaiser crossing mid and tags him instead of drifting away from the push.",
+        "14:18 - The last push reaches the base again with your frontline on the structure, and the game ends right after."
       ],
       nuance: [
-        "00:35 starts clean: full health, bot pathing, no score yet.",
-        "01:52 shows useful pressure, but it is already a turret-under-wave situation.",
-        "04:22-04:47 shows the push still active, but CS is only 9-12.",
-        "05:20 shows the cost: two deaths and only 12 CS before the first major reset.",
-        "Final line: 14:28 win, level 12, 3/6/4, 35 CS, 9,647 gold, 11,340 champion damage."
+        "The most useful footage is late-game base pressure, not the scoreboard line.",
+        "The team wins by returning to the same open base route instead of scattering.",
+        "Samira's cleanest role here is staying close enough to cash out structure pressure.",
+        "The recording still contains desktop-capture segments from before the window-only recorder fix."
       ],
-      reviewLimit: "Timeline events use visible raw-capture frames with game-clock timestamps plus final League Client match history; unseen seconds are not treated as proven.",
+      reviewLimit: "The clip has desktop-capture segments mixed with game footage, so the narrative only claims the visible game moments.",
       analysisSource: "manual"
     };
   }
@@ -815,14 +811,15 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
     "Give exactly one highest-value improvement for this recording, plus a fuller read of the nuance behind it. The top advice must stay direct, narrow, and playable in the next queue.",
+    "Write gameDetail like a short game-story recap, not a stat audit: one compact paragraph, one or two notable visible moments, at most three light timestamps, no repeated K/D/A or CS unless it explains the story, and one final Master-focus sentence.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty.",
-    "For specific game events, include the visible game-clock timestamp from the top right when it is visible. Do not invent timestamps for unseen moments.",
+    "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
     "Prioritize repeatable habits: wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "Visible page copy should be concise and operational. Avoid phrases like 'you should' or broad coaching.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","gameDetail":"one concise paragraph with timestamped specifics when visible: what happened, what improves, why it matters for stronger games","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame"],"nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"one specific sentence","gameDetail":"one concise narrative paragraph with notable visible moments and one Master-focus sentence","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
