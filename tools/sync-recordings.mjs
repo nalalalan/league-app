@@ -478,7 +478,7 @@ function sampleTimesFor(duration) {
 function cleanList(value, maxItems = 5) {
   const values = Array.isArray(value) ? value : String(value || "").split(/\n+|;\s*/);
   return values
-    .map((item) => clean(String(item).replace(/^[-*\d.]+\s*/, "")))
+    .map((item) => clean(String(item).replace(/^\s*(?:[-*]\s+|\d+[.)]\s*)/, "")))
     .filter(Boolean)
     .slice(0, maxItems);
 }
