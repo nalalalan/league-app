@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-19T06:52:24.052Z",
+  "generatedAt": "2026-05-19T06:57:29.119Z",
   "source": "League of Legends Highlights folder",
   "match": "4 matches",
   "matches": [
@@ -91,7 +91,7 @@
       "analysisSource": "fallback",
       "analysisVersion": "2026-05-18-readable-evidence-feedback-v8",
       "sampledFrames": 18,
-      "publicVideoBytes": 25779571,
+      "publicVideoBytes": 25776824,
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
       "poster": "/recordings/posters/auto-na1-5563660362-01.jpg"
     },

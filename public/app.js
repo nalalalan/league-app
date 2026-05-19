@@ -1368,7 +1368,6 @@ function recordingDeepDetails(item) {
   const hasNuance = Array.isArray(item.nuance) && item.nuance.length > 0;
   const rows = [
     ["rule", item.diamondRule],
-    ["rep", item.drill],
     ["why", item.whyTrust],
     ["evidence", item.evidence],
     ["limit", item.reviewLimit]
@@ -1560,7 +1559,7 @@ function compactRecordingDate(item) {
 }
 
 function compactGameType(value) {
-  return (value || "type unverified")
+  return (value || "type unknown")
     .replace(/Co-op vs AI/i, "Co-op AI")
     .replace(/\bBeginner\b/i, "beginner")
     .replace(/\bIntermediate\b/i, "intermediate");
