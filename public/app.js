@@ -372,8 +372,10 @@ const champions = [
   {
     id: "samira",
     name: "Samira",
-    skin: "sword Samira",
-    image: "/assets/champions/samira-user-final.png",
+    skin: "Ningning Samira",
+    person: "Ningning",
+    snippet: "Life's Too Short",
+    image: "/assets/champions/samira-ningning-cat.png",
     focus: "Recording review is the current queue plan.",
     note: "Samira can mash in, but she cannot always leave. Her escape is killing, resetting, lifestealing, blocking the real spell, or using Flash.",
     situations: [
@@ -512,8 +514,10 @@ const champions = [
   {
     id: "fizz",
     name: "Fizz",
-    skin: "shark Fizz",
-    image: "/assets/champions/fizz-shark.png",
+    skin: "Hanni Fizz",
+    person: "Hanni",
+    snippet: "Cookie",
+    image: "/assets/champions/fizz-hanni.png",
     focus: "Mark, enter, stab, dodge, leave.",
     note: "Fizz is the reference loop because every button has a body job and a clean exit shape.",
     situations: [
@@ -751,7 +755,9 @@ const stingerUrls = Object.fromEntries(champions.map((champion) => [
 ]));
 
 function soundProfileId(profileId = "default") {
-  return profileId === "samira" ? "jhin" : profileId;
+  if (profileId === "samira") return "missfortune";
+  if (profileId === "fizz") return "caitlyn";
+  return profileId;
 }
 
 const visualDurations = {
@@ -2622,8 +2628,8 @@ function playSelectSound(profileId = "default") {
         playSynthSelectSound(soundId);
       });
     }
-    playChampionFoley(soundId);
-    playPremiumMaterialFoley(soundId);
+    playChampionFoley(profileId);
+    playPremiumMaterialFoley(profileId);
   } catch {
     playSynthSelectSound(soundId);
   }
@@ -5406,7 +5412,27 @@ function renderPicker() {
     img.alt = "";
     img.loading = "eager";
     img.decoding = "async";
-    button.append(img);
+    const ambient = document.createElement("span");
+    ambient.className = "portrait-ambient";
+    ambient.setAttribute("aria-hidden", "true");
+    for (let ambientIndex = 0; ambientIndex < 5; ambientIndex += 1) {
+      ambient.append(document.createElement("i"));
+    }
+    const copy = document.createElement("span");
+    copy.className = "portrait-copy";
+    const name = document.createElement("span");
+    name.className = "portrait-name";
+    name.textContent = champion.name;
+    const person = document.createElement("span");
+    person.className = "portrait-person";
+    person.textContent = champion.person || champion.skin || "";
+    const snippet = document.createElement("span");
+    snippet.className = "portrait-snippet";
+    snippet.textContent = champion.snippet || "";
+    copy.append(name);
+    if (person.textContent) copy.append(person);
+    if (snippet.textContent) copy.append(snippet);
+    button.append(img, ambient, copy);
     button.addEventListener("pointermove", (event) => {
       const rect = button.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
