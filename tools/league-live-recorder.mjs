@@ -20,6 +20,8 @@ const minGameSeconds = Number(process.env.LEAGUE_LIVE_MIN_GAME_SECONDS || 90);
 const minCaptureSegmentBytes = Number(process.env.LEAGUE_LIVE_MIN_SEGMENT_BYTES || 160 * 1024);
 const minCaptureCoverage = Number(process.env.LEAGUE_LIVE_MIN_CAPTURE_COVERAGE || 0.6);
 const maxCaptureRestarts = Number(process.env.LEAGUE_LIVE_MAX_CAPTURE_RESTARTS || 20);
+const captureStallMs = Number(process.env.LEAGUE_LIVE_CAPTURE_STALL_MS || 45000);
+const minCaptureGrowthBytes = Number(process.env.LEAGUE_LIVE_MIN_GROWTH_BYTES || 64 * 1024);
 const fps = String(process.env.LEAGUE_LIVE_FPS || 10);
 const encoderPreference = String(process.env.LEAGUE_LIVE_ENCODER || "auto").toLowerCase();
 const liveCq = String(process.env.LEAGUE_LIVE_CQ || 20);
@@ -32,6 +34,7 @@ const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "7000k"
 const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "1280:-2").trim();
 const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
+const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "auto").trim().toLowerCase();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 let encoderProfilePromise;
@@ -296,6 +299,62 @@ async function probeDuration(filePath) {
   return Number(stdout.trim()) || 0;
 }
 
+function captureModes() {
+  if (/^(title|window|window-title)$/i.test(captureModePreference)) return ["title"];
+  if (/^(region|window-region)$/i.test(captureModePreference)) return ["region"];
+  return ["title", "region"];
+}
+
+async function leagueWindowRect() {
+  if (process.platform !== "win32") return null;
+  const script = `
+$ErrorActionPreference = 'SilentlyContinue'
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public static class LeagueWindowCaptureNative {
+  [StructLayout(LayoutKind.Sequential)]
+  public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
+  [DllImport("user32.dll")]
+  public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+}
+"@
+$p = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -eq 'League of Legends' -and $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+if (-not $p) { '{}'; exit 0 }
+$r = New-Object LeagueWindowCaptureNative+RECT
+[void][LeagueWindowCaptureNative]::GetWindowRect($p.MainWindowHandle, [ref]$r)
+[pscustomobject]@{
+  left = $r.Left
+  top = $r.Top
+  right = $r.Right
+  bottom = $r.Bottom
+  width = ($r.Right - $r.Left)
+  height = ($r.Bottom - $r.Top)
+  title = $p.MainWindowTitle
+} | ConvertTo-Json -Compress
+`;
+  const stdout = await run("powershell.exe", [
+    "-NoProfile",
+    "-WindowStyle", "Hidden",
+    "-Command", script
+  ]).catch(() => "");
+  try {
+    const rect = JSON.parse(stdout.trim() || "{}");
+    const width = Number(rect.width);
+    const height = Number(rect.height);
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width < 320 || height < 240) return null;
+    return {
+      left: Math.max(0, Math.round(Number(rect.left) || 0)),
+      top: Math.max(0, Math.round(Number(rect.top) || 0)),
+      width: Math.round(width),
+      height: Math.round(height),
+      title: String(rect.title || "")
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function nextSegmentIndex(sessionRoot) {
   const entries = await fs.readdir(sessionRoot, { withFileTypes: true }).catch(() => []);
   const indexes = entries
@@ -304,11 +363,44 @@ async function nextSegmentIndex(sessionRoot) {
   return indexes.length ? Math.max(...indexes) + 1 : 0;
 }
 
-async function startCaptureChild(sessionRoot, startNumber = 0) {
+async function segmentFootprint(sessionRoot) {
+  const entries = await fs.readdir(sessionRoot, { withFileTypes: true }).catch(() => []);
+  let bytes = 0;
+  let count = 0;
+  for (const entry of entries) {
+    if (!entry.isFile() || !/^segment-\d+\.mkv$/i.test(entry.name)) continue;
+    const stat = await fs.stat(path.join(sessionRoot, entry.name)).catch(() => null);
+    if (!stat) continue;
+    bytes += stat.size;
+    count += 1;
+  }
+  return { bytes, count };
+}
+
+async function startCaptureChild(sessionRoot, startNumber = 0, mode = "title") {
   const outputPattern = path.join(sessionRoot, "segment-%04d.mkv");
   const encoder = await encoderProfile();
-  const inputTarget = captureWindowTitle ? `title=${captureWindowTitle}` : "desktop";
   const filters = [];
+  let inputTarget = captureWindowTitle ? `title=${captureWindowTitle}` : "desktop";
+  let inputArgs = ["-i", inputTarget];
+  let captureMode = mode;
+  if (mode === "region") {
+    const rect = await leagueWindowRect();
+    if (rect) {
+      inputTarget = `desktop region ${rect.left},${rect.top} ${rect.width}x${rect.height}`;
+      inputArgs = [
+        "-offset_x", String(rect.left),
+        "-offset_y", String(rect.top),
+        "-video_size", `${rect.width}x${rect.height}`,
+        "-i", "desktop"
+      ];
+    } else {
+      captureMode = "title";
+      inputTarget = captureWindowTitle ? `title=${captureWindowTitle}` : "desktop";
+      inputArgs = ["-i", inputTarget];
+      await log("Could not resolve League window rectangle; using title capture for this segment.");
+    }
+  }
   if (captureScale && !/^(0|none|off)$/i.test(captureScale)) {
     filters.push(`scale=${captureScale}:flags=fast_bilinear`);
   }
@@ -320,7 +412,7 @@ async function startCaptureChild(sessionRoot, startNumber = 0) {
     "-framerate", fps,
     "-rtbufsize", "64M",
     "-draw_mouse", "1",
-    "-i", inputTarget,
+    ...inputArgs,
     "-an",
     ...(filters.length ? ["-vf", filters.join(",")] : []),
     ...encoderArgs(encoder, "capture"),
@@ -349,28 +441,47 @@ async function startCaptureChild(sessionRoot, startNumber = 0) {
     }
   });
   await lowerProcessPriority(child.pid);
-  await log(`Started low-impact League window capture in ${sessionRoot} using ${encoder.label} at ${fps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, input ${inputTarget}, segment ${startNumber}.`);
-  return { child, encoder: encoder.name, inputTarget };
+  await log(`Started low-impact League window capture in ${sessionRoot} using ${encoder.label} at ${fps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, mode ${captureMode}, input ${inputTarget}, segment ${startNumber}.`);
+  return { child, encoder: encoder.name, inputTarget, captureMode };
 }
 
 async function startSession() {
   const startedAt = new Date();
   const sessionRoot = path.join(captureRoot, stamp(startedAt));
   await fs.mkdir(sessionRoot, { recursive: true });
-  const capture = await startCaptureChild(sessionRoot, 0);
+  const modes = captureModes();
+  const capture = await startCaptureChild(sessionRoot, 0, modes[0]);
   return {
     sessionRoot,
     child: capture.child,
     encoder: capture.encoder,
     inputTarget: capture.inputTarget,
+    captureMode: capture.captureMode,
+    captureModes: modes,
     startedAt,
     startedMs: startedAt.getTime(),
     lastSeenMs: Date.now(),
+    lastSegmentBytes: 0,
+    lastSegmentGrowthMs: Date.now(),
     captureRestarts: 0
   };
 }
 
 async function restartCaptureIfNeeded(session) {
+  const footprint = await segmentFootprint(session.sessionRoot);
+  if (footprint.bytes > session.lastSegmentBytes + minCaptureGrowthBytes) {
+    session.lastSegmentBytes = footprint.bytes;
+    session.lastSegmentGrowthMs = Date.now();
+  }
+  if (!session.child?.exited && Date.now() - session.lastSegmentGrowthMs > captureStallMs) {
+    await log(`League capture has not produced new video data for ${Math.round(captureStallMs / 1000)}s; restarting capture.`);
+    session.child.kill("SIGTERM");
+    await Promise.race([
+      new Promise((resolve) => session.child.once("exit", resolve)),
+      delay(5000)
+    ]);
+    session.child.exited = true;
+  }
   if (!session?.child?.exited) return;
   if (session.captureRestarts >= maxCaptureRestarts) {
     await log("League capture stopped too many times during the same game; keeping existing segments and waiting for game end.");
@@ -378,11 +489,16 @@ async function restartCaptureIfNeeded(session) {
   }
   session.captureRestarts += 1;
   const startNumber = await nextSegmentIndex(session.sessionRoot);
-  await log(`League window capture stopped while game is still running; restarting capture at segment ${startNumber}.`);
-  const capture = await startCaptureChild(session.sessionRoot, startNumber);
+  const modes = session.captureModes?.length ? session.captureModes : captureModes();
+  const mode = modes[Math.min(session.captureRestarts, modes.length - 1)] || modes[0] || "title";
+  await log(`League window capture stopped while game is still running; restarting capture at segment ${startNumber} with ${mode} mode.`);
+  const capture = await startCaptureChild(session.sessionRoot, startNumber, mode);
   session.child = capture.child;
   session.encoder = capture.encoder;
   session.inputTarget = capture.inputTarget;
+  session.captureMode = capture.captureMode;
+  session.lastSegmentBytes = footprint.bytes;
+  session.lastSegmentGrowthMs = Date.now();
 }
 
 async function waitForNoGame(reason) {
