@@ -541,6 +541,7 @@ async function startSession() {
     pausedForForeground: false,
     foregroundPauseMs: 0,
     foregroundPauseStartedMs: null,
+    resumeAfterForegroundPause: false,
     captureRestarts: 0
   };
 }
@@ -575,6 +576,7 @@ async function restartCaptureIfNeeded(session) {
       session.foregroundPauseMs += Date.now() - Number(session.foregroundPauseStartedMs || Date.now());
       session.foregroundPauseStartedMs = null;
       session.pausedForForeground = false;
+      session.resumeAfterForegroundPause = true;
       session.child.exited = true;
       await log("League window is foreground again; resuming capture.");
     }
@@ -594,15 +596,24 @@ async function restartCaptureIfNeeded(session) {
     session.child.exited = true;
   }
   if (!session?.child?.exited) return;
-  if (session.captureRestarts >= maxCaptureRestarts) {
+  const resumeAfterForegroundPause = Boolean(session.resumeAfterForegroundPause);
+  session.resumeAfterForegroundPause = false;
+  if (!resumeAfterForegroundPause && session.captureRestarts >= maxCaptureRestarts) {
     await log("League capture stopped too many times during the same game; keeping existing segments and waiting for game end.");
     return;
   }
-  session.captureRestarts += 1;
+  if (!resumeAfterForegroundPause) {
+    session.captureRestarts += 1;
+  }
   const startNumber = await nextSegmentIndex(session.sessionRoot);
   const modes = session.captureModes?.length ? session.captureModes : captureModes();
-  const mode = modes[Math.min(session.captureRestarts, modes.length - 1)] || modes[0] || "title";
-  await log(`League window capture stopped while game is still running; restarting capture at segment ${startNumber} with ${mode} mode.`);
+  const mode = resumeAfterForegroundPause
+    ? session.captureMode || modes[0] || "region"
+    : modes[Math.min(session.captureRestarts, modes.length - 1)] || modes[0] || "title";
+  const restartReason = resumeAfterForegroundPause
+    ? "League window is foreground again; capture is resuming"
+    : "League window capture stopped while game is still running; restarting capture";
+  await log(`${restartReason} at segment ${startNumber} with ${mode} mode.`);
   const capture = await startCaptureChild(session.sessionRoot, startNumber, mode);
   session.child = capture.child;
   session.encoder = capture.encoder;
