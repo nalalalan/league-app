@@ -45,6 +45,8 @@ npm run publish:recordings
 
 The publish command skips work when the source folder has not changed. When new recordings exist, it syncs them, commits `public/recordings`, pushes `main`, and starts a Railway deploy. Cached fallback notes are kept during normal automatic publishes so old clips do not slow down the post-game update; set `LEAGUE_RETRY_FALLBACK=1` for an explicit retry pass.
 
+The live recorder is intended to run without Codex in the loop. It watches for the League game process, captures only while the League game window is foreground, pauses instead of recording browser/desktop content, writes a sidecar next to each auto clip, rejects incomplete or DPI-cropped captures before publish, then lets the publisher sync and deploy the recording. Offline checks handle capture validity and media prep; OpenAI is used only for the coaching narrative after the clip passes those checks.
+
 ## Paper
 
 The public paper artifacts are:

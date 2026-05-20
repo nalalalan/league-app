@@ -374,11 +374,41 @@ async function probeVideoHealth(filePath) {
   };
 }
 
-function isBrokenAutoCapture(name, health) {
-  return /^auto_/i.test(name) &&
-    health?.duration > 300 &&
-    health.bytesPerSecond > 0 &&
-    health.bytesPerSecond < minAutoBytesPerSecond;
+async function readJsonSafe(filePath) {
+  try {
+    return JSON.parse(await fs.readFile(filePath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function screenSize(value) {
+  const match = String(value || "").match(/(\d+)\s*x\s*(\d+)/i);
+  return match ? { width: Number(match[1]), height: Number(match[2]) } : null;
+}
+
+function autoCaptureRejectReason(name, health, sidecar) {
+  if (!/^auto_/i.test(name)) return "";
+  if (health?.duration > 300 && health.bytesPerSecond > 0 && health.bytesPerSecond < minAutoBytesPerSecond) {
+    return `${Math.round(health.duration)}s but only ${Math.round(health.bytesPerSecond)} bytes/s`;
+  }
+  if (!sidecar) return "";
+  if (sidecar.validForPublish === false) return "recorder sidecar marked it invalid";
+  const rect = sidecar.captureRect || {};
+  const logical = screenSize(rect.logicalScreen);
+  const physical = screenSize(rect.physicalScreen);
+  const width = Number(rect.width || 0);
+  const height = Number(rect.height || 0);
+  const scaledDesktop = logical && physical && physical.width > logical.width + 8 && physical.height > logical.height + 8;
+  if (scaledDesktop && width <= logical.width + 16 && height <= logical.height + 16) {
+    return `DPI-scaled crop risk ${width}x${height} on physical ${physical.width}x${physical.height}`;
+  }
+  const pauseSeconds = Number(sidecar.foregroundPauseSeconds || 0);
+  const sourceSeconds = Number(sidecar.sourceDurationSeconds || health?.duration || 0);
+  if (sourceSeconds > 0 && pauseSeconds > Math.max(90, sourceSeconds * 0.35)) {
+    return `${Math.round(pauseSeconds)}s foreground pause during ${Math.round(sourceSeconds)}s game`;
+  }
+  return "";
 }
 
 async function extractFrame(input, output, second, width = 640) {
@@ -1191,17 +1221,20 @@ async function main() {
       const sourcePath = path.join(sourceDir, entry.name);
       const stat = await fs.stat(sourcePath);
       const health = await probeVideoHealth(sourcePath).catch(() => null);
+      const sidecar = await readJsonSafe(`${sourcePath}.json`);
       return {
         name: entry.name,
         sourcePath,
         stat,
-        health
+        health,
+        sidecar
       };
     }));
   const sourceEntries = discoveredEntries
     .filter((entry) => {
-      if (!isBrokenAutoCapture(entry.name, entry.health)) return true;
-      console.log(`Skipping broken auto capture ${entry.name}: ${Math.round(entry.health.duration)}s but only ${Math.round(entry.health.bytesPerSecond)} bytes/s.`);
+      const rejectReason = autoCaptureRejectReason(entry.name, entry.health, entry.sidecar);
+      if (!rejectReason) return true;
+      console.log(`Skipping invalid auto capture ${entry.name}: ${rejectReason}.`);
       return false;
     })
     .sort((a, b) => a.stat.mtimeMs - b.stat.mtimeMs || a.name.localeCompare(b.name));
