@@ -17,6 +17,9 @@ const endGraceMs = Number(process.env.LEAGUE_LIVE_END_GRACE_MS || 35000);
 const segmentSeconds = Number(process.env.LEAGUE_LIVE_SEGMENT_SECONDS || 30);
 const fastForwardSpeed = Number(process.env.LEAGUE_LIVE_FAST_FORWARD || 8);
 const minGameSeconds = Number(process.env.LEAGUE_LIVE_MIN_GAME_SECONDS || 90);
+const minCaptureSegmentBytes = Number(process.env.LEAGUE_LIVE_MIN_SEGMENT_BYTES || 160 * 1024);
+const minCaptureCoverage = Number(process.env.LEAGUE_LIVE_MIN_CAPTURE_COVERAGE || 0.6);
+const maxCaptureRestarts = Number(process.env.LEAGUE_LIVE_MAX_CAPTURE_RESTARTS || 20);
 const fps = String(process.env.LEAGUE_LIVE_FPS || 10);
 const encoderPreference = String(process.env.LEAGUE_LIVE_ENCODER || "auto").toLowerCase();
 const liveCq = String(process.env.LEAGUE_LIVE_CQ || 20);
@@ -293,10 +296,15 @@ async function probeDuration(filePath) {
   return Number(stdout.trim()) || 0;
 }
 
-async function startSession() {
-  const startedAt = new Date();
-  const sessionRoot = path.join(captureRoot, stamp(startedAt));
-  await fs.mkdir(sessionRoot, { recursive: true });
+async function nextSegmentIndex(sessionRoot) {
+  const entries = await fs.readdir(sessionRoot, { withFileTypes: true }).catch(() => []);
+  const indexes = entries
+    .map((entry) => entry.isFile() ? Number(entry.name.match(/^segment-(\d+)\.mkv$/i)?.[1]) : NaN)
+    .filter((index) => Number.isFinite(index));
+  return indexes.length ? Math.max(...indexes) + 1 : 0;
+}
+
+async function startCaptureChild(sessionRoot, startNumber = 0) {
   const outputPattern = path.join(sessionRoot, "segment-%04d.mkv");
   const encoder = await encoderProfile();
   const inputTarget = captureWindowTitle ? `title=${captureWindowTitle}` : "desktop";
@@ -320,6 +328,7 @@ async function startSession() {
     "-f", "segment",
     "-segment_time", String(segmentSeconds),
     "-segment_format", "matroska",
+    "-segment_start_number", String(startNumber),
     "-reset_timestamps", "1",
     outputPattern
   ];
@@ -332,21 +341,48 @@ async function startSession() {
     fs.appendFile(path.join(sessionRoot, "ffmpeg.log"), chunk).catch(() => {});
   });
   child.once("exit", (code, signal) => {
+    child.exited = true;
+    child.exitCode = code;
+    child.exitSignal = signal;
     if (code || signal) {
       fs.appendFile(path.join(sessionRoot, "ffmpeg.log"), `\nffmpeg exited with code ${code ?? ""} signal ${signal ?? ""}\n`).catch(() => {});
     }
   });
   await lowerProcessPriority(child.pid);
-  await log(`Started low-impact League window capture in ${sessionRoot} using ${encoder.label} at ${fps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, input ${inputTarget}.`);
+  await log(`Started low-impact League window capture in ${sessionRoot} using ${encoder.label} at ${fps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, input ${inputTarget}, segment ${startNumber}.`);
+  return { child, encoder: encoder.name, inputTarget };
+}
+
+async function startSession() {
+  const startedAt = new Date();
+  const sessionRoot = path.join(captureRoot, stamp(startedAt));
+  await fs.mkdir(sessionRoot, { recursive: true });
+  const capture = await startCaptureChild(sessionRoot, 0);
   return {
-    child,
     sessionRoot,
-    encoder: encoder.name,
-    inputTarget,
+    child: capture.child,
+    encoder: capture.encoder,
+    inputTarget: capture.inputTarget,
     startedAt,
     startedMs: startedAt.getTime(),
-    lastSeenMs: Date.now()
+    lastSeenMs: Date.now(),
+    captureRestarts: 0
   };
+}
+
+async function restartCaptureIfNeeded(session) {
+  if (!session?.child?.exited) return;
+  if (session.captureRestarts >= maxCaptureRestarts) {
+    await log("League capture stopped too many times during the same game; keeping existing segments and waiting for game end.");
+    return;
+  }
+  session.captureRestarts += 1;
+  const startNumber = await nextSegmentIndex(session.sessionRoot);
+  await log(`League window capture stopped while game is still running; restarting capture at segment ${startNumber}.`);
+  const capture = await startCaptureChild(session.sessionRoot, startNumber);
+  session.child = capture.child;
+  session.encoder = capture.encoder;
+  session.inputTarget = capture.inputTarget;
 }
 
 async function waitForNoGame(reason) {
@@ -454,6 +490,12 @@ async function finalizeSession(session) {
     await log("No usable segments were created.");
     return;
   }
+  const usableSegments = segments.filter((item) => item.size >= minCaptureSegmentBytes);
+  const estimatedCoverageSeconds = usableSegments.length * segmentSeconds;
+  if (estimatedCoverageSeconds < elapsedSeconds * minCaptureCoverage) {
+    await log(`Capture incomplete: ${usableSegments.length}/${segments.length} usable segments cover about ${estimatedCoverageSeconds}s of ${elapsedSeconds}s. Not creating a misleading auto review clip.`);
+    return;
+  }
 
   const replay = await latestReplay(session.startedMs, session.endedMs) || await latestLocalMatch(session.startedMs, session.endedMs);
   const outputPath = await nextOutputPath(replay?.matchId);
@@ -538,6 +580,7 @@ async function main() {
     }
     if (running && session) {
       session.lastSeenMs = Date.now();
+      await restartCaptureIfNeeded(session);
     }
     if (!running && session && Date.now() - session.lastSeenMs > endGraceMs) {
       const current = session;

@@ -24,10 +24,12 @@ const publishPaths = [
   "public/league-practice-room.pdf",
   "public/league-practice-room.tex",
   "tools/sync-recordings.mjs",
+  "tools/league-live-recorder.mjs",
   "tools/publish-recordings.mjs",
   "tools/publish-recordings.ps1",
   "tools/install-live-recorder-task.ps1",
-  "tools/install-league-automation.ps1"
+  "tools/install-league-automation.ps1",
+  "README.md"
 ];
 
 function commandNeedsShell(command) {
@@ -148,6 +150,7 @@ async function gitPorcelain() {
 
 async function needsAnalysisRetry() {
   if (!process.env.OPENAI_API_KEY) return false;
+  if (process.env.LEAGUE_RETRY_FALLBACK !== "1" && process.env.LEAGUE_FORCE_ANALYSIS !== "1") return false;
   try {
     const manifest = JSON.parse(await fs.readFile(path.join(appRoot, "public", "recordings", "recordings.json"), "utf8"));
     const hasFallback = Array.isArray(manifest.recordings) && manifest.recordings.some((item) => item.analysisSource === "fallback");

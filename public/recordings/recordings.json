@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T04:35:48.811Z",
+  "generatedAt": "2026-05-20T05:21:59.119Z",
   "source": "League of Legends Highlights folder",
   "match": "5 matches",
   "matches": [
@@ -10,96 +10,35 @@
     "NA1-5564259818"
   ],
   "captured": "May 18, 2026, 5:46 PM to May 20, 2026, 12:31 AM ET",
-  "totalDuration": "40:44",
-  "totalRecordings": 18,
+  "totalDuration": "25:17",
+  "totalRecordings": 17,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
-    "title": "Samira: stop giving wins back",
-    "focus": "Honest read: your biggest leak is not damage. It is refusing to cash out: staying at lethal HP, re-fighting after winning, and chasing sideways when structure is already open.",
-    "rule": "If the next action does not create HP safety, wave crash, turret, or nexus pressure, do not take it.",
-    "nextRep": "Next game: cash out before the second fight.",
-    "whyTrust": "The clips show the same leak in three forms: lethal-HP lane stay, low-health re-fight, and open-base drift. That is specific enough to practice immediately.",
-    "pattern": "You already find fights. The coachable problem is making the second decision boring enough to actually win: reset, crash, hit tower, hit nexus, then fight again only if it protects that payout.",
+    "title": "Samira: all-in only when it pays",
+    "focus": "The newest clip is the good version: the penta works because the fight is already inside their base, with allies and minions pushing toward nexus.",
+    "rule": "Only take the full Samira all-in when the reset path and the payout point the same direction.",
+    "nextRep": "Next game: before E/R, ask whether the reset moves toward tower, nexus, objective, or safety.",
+    "whyTrust": "The penta clip shows real cleanup mechanics, but the condition that made it reliable was the map: enemy base open, defenders trapped, allies and minions in front.",
+    "pattern": "Earlier games showed the leak: extra fights after the win. The newest highlight shows the upgrade: when the fight is already a finish, staying in and cleaning is exactly the right job.",
     "checklist": [
-      "One-hit HP means recall.",
-      "First win becomes wave or structure.",
-      "Open base means no sideways chase."
+      "Base or objective must be real.",
+      "Allies/minions in front.",
+      "Each reset moves toward payout."
     ],
-    "reviewLimit": "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
+    "reviewLimit": "The newest Riot highlight is only about 22 seconds, so this summary trusts the visible base-fight cleanup and does not invent the lane setup."
   },
   "detectedChampions": [
     {
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 18,
+      "recordings": 17,
       "evidence": "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
       "improvementTitle": "Ask for the payout first",
       "improvement": "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end."
     }
   ],
   "recordings": [
-    {
-      "file": "auto_NA1-5564259818_01.mp4",
-      "publicFile": "auto_NA1-5564259818_01.mp4",
-      "cacheKey": "831703:1779251517562",
-      "fingerprint": "c13d0116046a",
-      "matchId": "NA1-5564259818",
-      "score": "auto",
-      "clipNumber": 1,
-      "matchTimeMs": 1779250431730,
-      "gameHappenedAt": "2026-05-20T04:13:51.730Z",
-      "gameHappenedAtLabel": "May 20, 2026, 12:13 AM",
-      "recordedAt": "2026-05-20T04:31:57.561Z",
-      "recordedAtLabel": "May 20, 2026, 12:31 AM",
-      "recordedAtTimeLabel": "12:31 AM",
-      "clipTimestampSeconds": null,
-      "clipTimestamp": "",
-      "clipWindow": "",
-      "timestamp": "",
-      "queueId": 880,
-      "gameType": "Co-op vs AI Beginner",
-      "gameTypeSource": "LeagueClient log",
-      "title": "full review 05",
-      "duration": "15:27",
-      "durationSeconds": 927,
-      "gameLength": "14:52",
-      "gameLengthSeconds": 892,
-      "kda": "18/3/2",
-      "kills": 18,
-      "deaths": 3,
-      "assists": 2,
-      "cs": 65,
-      "statsSource": "League Client match history",
-      "kind": "full review",
-      "reviewPhase": "current form",
-      "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "16/10 means conversion gap",
-      "feedback": "The full-game read says damage is enough; the next useful rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
-      "gameDetail": "This full review shows Samira can already create kills, so the climb gap is what happens right after the first win. The next useful rep is converting the won fight into wave, tower, objective, nexus, or recall before the next fight gives shutdown gold back.",
-      "eventEvidence": "The full-game result shows high kill creation with too many deaths, which points to conversion and shutdown protection rather than raw damage.",
-      "goodThing": "You are finding fights and creating damage pressure; the fix is cashing those wins out cleaner.",
-      "whyTrust": "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
-      "focusTag": "overstay control",
-      "evidence": "Match-level Samira read from sampled replay frames and side-list evidence.",
-      "pattern": "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
-      "diamondRule": "After a won fight, take the guaranteed payout before looking for the next fight.",
-      "drill": "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
-      "timeline": [],
-      "clockAnchors": [],
-      "nuance": [
-        "High kills only matter when the map state changes.",
-        "Shutdown deaths after a win erase the lead Samira already created."
-      ],
-      "reviewLimit": "Conservative read until a full model pass is available.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 24,
-      "publicVideoBytes": 659266,
-      "src": "/recordings/auto_NA1-5564259818_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5564259818-01.jpg"
-    },
     {
       "file": "16-10_NA1-5564259818_01.webm",
       "publicFile": "16-10_NA1-5564259818_01.webm",
@@ -135,25 +74,59 @@
       "kind": "highlight",
       "reviewPhase": "current form",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Ask for the payout first",
-      "feedback": "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end.",
-      "gameDetail": "The useful question in this clip is not whether Samira can win the fight; it is what the fight buys immediately after. The next useful rep is naming the payout before the commit so pressure becomes a wave crash, plate, tower, objective move, recall, or end.",
-      "eventEvidence": "Evidence is limited to sampled replay context until a full model pass is available.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "Strong ADC games climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
-      "focusTag": "commit timing",
-      "evidence": "Tied to one repeatable Samira decision from sampled replay context.",
-      "pattern": "The fight needs a planned map payout before the commit.",
-      "diamondRule": "Commit only when the win has an immediate conversion path.",
-      "drill": "Name the payout before pressing the engage button.",
-      "timeline": [],
-      "clockAnchors": [],
-      "nuance": [
-        "A good-looking kill is still low value if the wave or objective stays unchanged."
+      "confidence": "high",
+      "feedbackTitle": "Finish-window all-in",
+      "feedback": "Mistake: over-learning this clip would make you throw; the same dash is bad if it starts without wave, teammate body, or nexus pressure. Fix: full send only when every reset moves toward the payout.",
+      "gameDetail": "At 14:21 the fight is already in their base, not in river or a side lane: allies and minions are in front, enemy defenders are packed near nexus, and Samira is close enough to chain resets without walking into fog. At 14:27 the first two kills land and the play becomes a real cleanup instead of a random chase. At 14:33 the chain reaches triple, at 14:38 the quadra happens beside the nexus area, and at 14:41 the penta lands because the fight never leaves the ending window. Learn this exactly: the all-in is good when the map is already ending; outside that condition, cash out first.",
+      "eventEvidence": "14:21 fight starts inside the enemy base with multiple enemy defenders still alive; 14:27 double kill; 14:33 triple; 14:38 quadra near nexus; 14:41 penta as the base remains open.",
+      "goodThing": "The strong part is the finish discipline: once the enemy line collapses, Samira stays with the ally/minion push and cleans through the defenders instead of drifting sideways.",
+      "whyTrust": "The penta is not random: the clip shows the conditions that made it valid, with allies and minions already in base and every reset moving toward nexus.",
+      "focusTag": "finish-only all-in",
+      "evidence": "Manual storyboard review of the May 20 highlight: visible base fight from 14:21 to 14:41, double/triple/quadra/penta sequence, and enemy base already open.",
+      "pattern": "Samira's best-looking fight here works because the map already gives the exit and the payout. The dangerous habit would be copying the same depth when the fight is not already a base finish.",
+      "diamondRule": "All-in only when the reset path and the payout are the same direction.",
+      "drill": "Before E/R, ask: does every reset move me toward nexus, tower, dragon, Baron, or safety?",
+      "timeline": [
+        "14:21 - Samira is already inside the enemy base with several defenders alive and allied pressure in front.",
+        "14:27 - The first two kills land, turning the base fight into a cleanup instead of a loose chase.",
+        "14:33 - The reset chain reaches triple while the wave and allies still hold the base area.",
+        "14:38 - The quadra happens near nexus instead of in a side lane or fog pocket.",
+        "14:41 - The penta lands with the enemy base open, which is the correct payoff condition."
       ],
-      "reviewLimit": "Conservative read until a full model pass is available.",
-      "analysisSource": "fallback",
+      "clockAnchors": [
+        {
+          "clock": "14:21",
+          "videoSeconds": 0.9
+        },
+        {
+          "clock": "14:27",
+          "videoSeconds": 6.7
+        },
+        {
+          "clock": "14:30",
+          "videoSeconds": 9.6
+        },
+        {
+          "clock": "14:33",
+          "videoSeconds": 12.5
+        },
+        {
+          "clock": "14:38",
+          "videoSeconds": 18.3
+        },
+        {
+          "clock": "14:41",
+          "videoSeconds": 21.2
+        }
+      ],
+      "nuance": [
+        "The clip starts after the decision to enter, so it cannot prove whether the first click was disciplined.",
+        "The visible reason the play works is base geometry plus allies and minions, not just raw damage.",
+        "The penta is good evidence that the cleanup mechanics are there.",
+        "The next improvement is knowing when not to copy this same depth outside a finish window."
+      ],
+      "reviewLimit": "The Riot highlight is only about 22 seconds, so the review claims the visible base fight and does not invent the earlier setup.",
+      "analysisSource": "manual",
       "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
       "sampledFrames": 8,
       "publicVideoBytes": 10628274,
@@ -293,7 +266,7 @@
       "cs": 62,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "implementation",
+      "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "You re-fight after winning",
@@ -836,7 +809,7 @@
       "cs": 128,
       "statsSource": "League Client match history",
       "kind": "highlight",
-      "reviewPhase": "baseline",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "medium",
       "feedbackTitle": "Leave after the wave",

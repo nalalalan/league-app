@@ -43,7 +43,7 @@ Run:
 npm run publish:recordings
 ```
 
-The publish command skips work when the source folder has not changed. When new recordings exist, it syncs them, commits `public/recordings`, pushes `main`, and starts a Railway deploy.
+The publish command skips work when the source folder has not changed. When new recordings exist, it syncs them, commits `public/recordings`, pushes `main`, and starts a Railway deploy. Cached fallback notes are kept during normal automatic publishes so old clips do not slow down the post-game update; set `LEAGUE_RETRY_FALLBACK=1` for an explicit retry pass.
 
 ## Paper
 

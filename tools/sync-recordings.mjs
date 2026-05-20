@@ -22,6 +22,7 @@ const analysisVersion = "2026-05-19-direct-coach-evidence-v2";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
+const minAutoBytesPerSecond = Number(process.env.LEAGUE_MIN_AUTO_BYTES_PER_SECOND || 5000);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 
 function clean(value, fallback = "") {
@@ -348,6 +349,38 @@ async function probeDuration(filePath) {
   return Number(stdout.trim()) || 0;
 }
 
+async function probeVideoHealth(filePath) {
+  const stdout = await run("ffprobe", [
+    "-v", "error",
+    "-show_entries", "format=duration,size,bit_rate:stream=codec_type,width,height,nb_frames,duration,bit_rate",
+    "-of", "json",
+    filePath
+  ]);
+  const parsed = JSON.parse(stdout);
+  const duration = Number(parsed?.format?.duration) || 0;
+  const size = Number(parsed?.format?.size) || 0;
+  const bitRate = Number(parsed?.format?.bit_rate) || 0;
+  const video = Array.isArray(parsed?.streams)
+    ? parsed.streams.find((stream) => stream.codec_type === "video")
+    : null;
+  return {
+    duration,
+    size,
+    bitRate,
+    bytesPerSecond: duration > 0 ? size / duration : 0,
+    width: Number(video?.width) || 0,
+    height: Number(video?.height) || 0,
+    frames: Number(video?.nb_frames) || 0
+  };
+}
+
+function isBrokenAutoCapture(name, health) {
+  return /^auto_/i.test(name) &&
+    health?.duration > 300 &&
+    health.bytesPerSecond > 0 &&
+    health.bytesPerSecond < minAutoBytesPerSecond;
+}
+
 async function extractFrame(input, output, second, width = 640) {
   await fs.mkdir(path.dirname(output), { recursive: true });
   await run("ffmpeg", [
@@ -516,12 +549,52 @@ function cachedRecording(existing, fileName, cacheKey) {
   ));
   if (!cached) return null;
   if (manualFeedback(fileName)) return null;
-  if (cached.analysisSource === "fallback" && process.env.OPENAI_API_KEY) return null;
+  if (cached.analysisSource === "fallback" && process.env.LEAGUE_RETRY_FALLBACK === "1" && process.env.OPENAI_API_KEY) return null;
   if (process.env.LEAGUE_FORCE_ANALYSIS === "1") return null;
   return cached;
 }
 
 function manualFeedback(file) {
+  if (file === "16-10_NA1-5564259818_01.webm") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Finish-window all-in",
+      feedback: "Mistake: over-learning this clip would make you throw; the same dash is bad if it starts without wave, teammate body, or nexus pressure. Fix: full send only when every reset moves toward the payout.",
+      gameDetail: "At 14:21 the fight is already in their base, not in river or a side lane: allies and minions are in front, enemy defenders are packed near nexus, and Samira is close enough to chain resets without walking into fog. At 14:27 the first two kills land and the play becomes a real cleanup instead of a random chase. At 14:33 the chain reaches triple, at 14:38 the quadra happens beside the nexus area, and at 14:41 the penta lands because the fight never leaves the ending window. Learn this exactly: the all-in is good when the map is already ending; outside that condition, cash out first.",
+      whyTrust: "The penta is not random: the clip shows the conditions that made it valid, with allies and minions already in base and every reset moving toward nexus.",
+      eventEvidence: "14:21 fight starts inside the enemy base with multiple enemy defenders still alive; 14:27 double kill; 14:33 triple; 14:38 quadra near nexus; 14:41 penta as the base remains open.",
+      goodThing: "The strong part is the finish discipline: once the enemy line collapses, Samira stays with the ally/minion push and cleans through the defenders instead of drifting sideways.",
+      focusTag: "finish-only all-in",
+      evidence: "Manual storyboard review of the May 20 highlight: visible base fight from 14:21 to 14:41, double/triple/quadra/penta sequence, and enemy base already open.",
+      pattern: "Samira's best-looking fight here works because the map already gives the exit and the payout. The dangerous habit would be copying the same depth when the fight is not already a base finish.",
+      diamondRule: "All-in only when the reset path and the payout are the same direction.",
+      drill: "Before E/R, ask: does every reset move me toward nexus, tower, dragon, Baron, or safety?",
+      timeline: [
+        "14:21 - Samira is already inside the enemy base with several defenders alive and allied pressure in front.",
+        "14:27 - The first two kills land, turning the base fight into a cleanup instead of a loose chase.",
+        "14:33 - The reset chain reaches triple while the wave and allies still hold the base area.",
+        "14:38 - The quadra happens near nexus instead of in a side lane or fog pocket.",
+        "14:41 - The penta lands with the enemy base open, which is the correct payoff condition."
+      ],
+      clockAnchors: [
+        { clock: "14:21", videoSeconds: 0.9 },
+        { clock: "14:27", videoSeconds: 6.7 },
+        { clock: "14:30", videoSeconds: 9.6 },
+        { clock: "14:33", videoSeconds: 12.5 },
+        { clock: "14:38", videoSeconds: 18.3 },
+        { clock: "14:41", videoSeconds: 21.2 }
+      ],
+      nuance: [
+        "The clip starts after the decision to enter, so it cannot prove whether the first click was disciplined.",
+        "The visible reason the play works is base geometry plus allies and minions, not just raw damage.",
+        "The penta is good evidence that the cleanup mechanics are there.",
+        "The next improvement is knowing when not to copy this same depth outside a finish window."
+      ],
+      reviewLimit: "The Riot highlight is only about 22 seconds, so the review claims the visible base fight and does not invent the earlier setup.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5563660362_01.mp4") {
     return {
       champion: "Samira",
@@ -996,7 +1069,16 @@ async function summarizeRecordings(recordings, detectedChampions) {
     checklist: ["Name the payout.", "Enter second if CC is unknown.", "After the payout, reset or hit the next structure."],
     reviewLimit: "Main read combines manual storyboard review, replay timing, and visible frame evidence."
   };
-  const fallback = latest?.focusTag === "payout before dash" ? simplePayoutFocus : latest?.focusTag === "lethal hp reset" ? {
+  const fallback = latest?.focusTag === "finish-only all-in" ? {
+    title: "Samira: all-in only when it pays",
+    focus: "The newest clip is the good version: the penta works because the fight is already inside their base, with allies and minions pushing toward nexus.",
+    rule: "Only take the full Samira all-in when the reset path and the payout point the same direction.",
+    nextRep: "Next game: before E/R, ask whether the reset moves toward tower, nexus, objective, or safety.",
+    whyTrust: "The penta clip shows real cleanup mechanics, but the condition that made it reliable was the map: enemy base open, defenders trapped, allies and minions in front.",
+    pattern: "Earlier games showed the leak: extra fights after the win. The newest highlight shows the upgrade: when the fight is already a finish, staying in and cleaning is exactly the right job.",
+    checklist: ["Base or objective must be real.", "Allies/minions in front.", "Each reset moves toward payout."],
+    reviewLimit: "The newest Riot highlight is only about 22 seconds, so this summary trusts the visible base-fight cleanup and does not invent the lane setup."
+  } : latest?.focusTag === "payout before dash" ? simplePayoutFocus : latest?.focusTag === "lethal hp reset" ? {
     title: "Samira: reset before lethal HP",
     focus: "The new game already shows better conversion later; the next climb rep is leaving lane when one enemy auto or spell kills Samira.",
     rule: "Below lethal HP, the wave is no longer the objective: recall unless the enemy bot lane is dead or fully gone.",
@@ -1103,16 +1185,26 @@ async function main() {
   await fs.mkdir(posterRoot, { recursive: true });
   await fs.mkdir(analysisRoot, { recursive: true });
   const existing = await readExistingManifest();
-  const sourceEntries = (await Promise.all((await fs.readdir(sourceDir, { withFileTypes: true }))
+  const discoveredEntries = await Promise.all((await fs.readdir(sourceDir, { withFileTypes: true }))
     .filter((entry) => entry.isFile() && sourceVideoPattern.test(entry.name))
     .map(async (entry) => {
       const sourcePath = path.join(sourceDir, entry.name);
+      const stat = await fs.stat(sourcePath);
+      const health = await probeVideoHealth(sourcePath).catch(() => null);
       return {
         name: entry.name,
         sourcePath,
-        stat: await fs.stat(sourcePath)
+        stat,
+        health
       };
-    }))).sort((a, b) => a.stat.mtimeMs - b.stat.mtimeMs || a.name.localeCompare(b.name));
+    }));
+  const sourceEntries = discoveredEntries
+    .filter((entry) => {
+      if (!isBrokenAutoCapture(entry.name, entry.health)) return true;
+      console.log(`Skipping broken auto capture ${entry.name}: ${Math.round(entry.health.duration)}s but only ${Math.round(entry.health.bytesPerSecond)} bytes/s.`);
+      return false;
+    })
+    .sort((a, b) => a.stat.mtimeMs - b.stat.mtimeMs || a.name.localeCompare(b.name));
   const sourceMatchIds = [...new Set(sourceEntries.map((entry) => recordingParts(entry.name).matchId).filter(Boolean))];
   const recordingMetadata = await loadRecordingMetadata(sourceMatchIds);
 
@@ -1144,7 +1236,7 @@ async function main() {
     const cached = cachedRecording(existing, name, cacheKey);
 
     const publicVideoBytes = await ensurePublicVideo(sourcePath, destPath, stat);
-    const duration = await probeDuration(sourcePath);
+    const duration = Number(entry.health?.duration) || await probeDuration(sourcePath);
     totalSeconds += duration;
     if (!(await exists(posterPath)) || !cached) {
       await extractFrame(sourcePath, posterPath, Math.max(0.2, duration * 0.5), 640);
