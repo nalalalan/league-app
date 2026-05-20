@@ -2123,9 +2123,9 @@ function statusAgeLabel(seconds) {
 
 function fallbackRecordingStatusLabel(status) {
   const labels = {
-    watching: "watching for League",
+    watching: "recorder ready",
     waiting: "waiting for League window",
-    recording: "recording League window",
+    recording: "recording",
     paused: "capture paused",
     processing: "processing review",
     publishing: "publishing review",

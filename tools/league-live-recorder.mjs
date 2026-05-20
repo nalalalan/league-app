@@ -104,7 +104,7 @@ async function publishRecorderStatus(status, fields = {}, options = {}) {
 
 function sessionStatusFields(session, detail = "") {
   return {
-    label: "recording League window",
+    label: "recording",
     detail,
     mode: session.captureMode || captureModePreference,
     startedAt: session.startedAt?.toISOString?.() || "",
@@ -606,7 +606,7 @@ async function startSession() {
     resumeAfterForegroundPause: false,
     captureRestarts: 0
   };
-  await publishRecorderStatus("recording", sessionStatusFields(session, "Capture is active. The finished review will publish after the game ends."), { force: true });
+  await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { force: true });
   return session;
 }
 
@@ -644,10 +644,10 @@ async function restartCaptureIfNeeded(session) {
       session.resumeAfterForegroundPause = true;
       session.child.exited = true;
       await log("League window is foreground again; resuming capture.");
-      await publishRecorderStatus("recording", sessionStatusFields(session, "League is foreground again. Capture is resuming."), { force: true });
+      await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { force: true });
     }
   }
-  await publishRecorderStatus("recording", sessionStatusFields(session, "Capture is active. The finished review will publish after the game ends."), { throttleMs: 30000 });
+  await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { throttleMs: 30000 });
   const footprint = await segmentFootprint(session.sessionRoot);
   if (footprint.bytes > session.lastSegmentBytes + minCaptureGrowthBytes) {
     session.lastSegmentBytes = footprint.bytes;
@@ -689,7 +689,7 @@ async function restartCaptureIfNeeded(session) {
   session.captureRect = capture.captureRect;
   session.lastSegmentBytes = footprint.bytes;
   session.lastSegmentGrowthMs = Date.now();
-  await publishRecorderStatus("recording", sessionStatusFields(session, "Capture restarted and is active."), { force: true });
+  await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { force: true });
 }
 
 async function waitForNoGame(reason) {
@@ -705,7 +705,7 @@ async function waitForNoGame(reason) {
 
 async function stopSession(session) {
   await log("Stopping League screen capture.");
-  await publishRecorderStatus("processing", sessionStatusFields(session, "Game ended. Building the review clip now."), { force: true });
+  await publishRecorderStatus("processing", sessionStatusFields(session, "Building review clip."), { force: true });
   session.endedAt = new Date();
   session.endedMs = session.endedAt.getTime();
   if (session.pausedForForeground && session.foregroundPauseStartedMs) {
@@ -875,16 +875,16 @@ async function finalizeSession(session) {
     await waitForNoGame("Publishing paused");
     await log("Publishing updated League recordings.");
     await publishRecorderStatus("publishing", {
-      ...sessionStatusFields(session, "Review clip created. Publishing to league.aolabs.io now."),
+      ...sessionStatusFields(session, "Uploading review."),
       matchId: replay?.matchId || ""
     }, { force: true });
     await run(npmBin, ["run", "publish:recordings"]);
     await publishRecorderStatus("published", {
-      ...sessionStatusFields(session, "Review clip handed to the publisher. It should appear after the deploy finishes."),
+      ...sessionStatusFields(session, "Review sent to site."),
       matchId: replay?.matchId || ""
     }, { force: true });
   } else {
-    await publishRecorderStatus("published", sessionStatusFields(session, "Review clip created locally. Auto-publish is disabled."), { force: true });
+    await publishRecorderStatus("published", sessionStatusFields(session, "Review clip created locally."), { force: true });
   }
 }
 
@@ -900,8 +900,8 @@ async function main() {
 
   await log("League live recorder is watching for game process.");
   await publishRecorderStatus("watching", {
-    label: "watching for League",
-    detail: "Recorder is running. It will switch to recording when the game process starts.",
+    label: "recorder ready",
+    detail: "waiting for League",
     mode: captureModePreference
   }, { force: true });
   let session = null;
@@ -914,7 +914,7 @@ async function main() {
         await log(`Capture waiting: ${error.message}`);
         await publishRecorderStatus("waiting", {
           label: "waiting for League window",
-          detail: "Game process is running, but capture has not started yet.",
+          detail: "game found; window not captured yet",
           mode: captureModePreference
         }, { force: true });
       }
@@ -936,8 +936,8 @@ async function main() {
     }
     if (!running && !session) {
       await publishRecorderStatus("watching", {
-        label: "watching for League",
-        detail: "Recorder is running. It will switch to recording when the game process starts.",
+        label: "recorder ready",
+        detail: "waiting for League",
         mode: captureModePreference
       }, { throttleMs: 60000 });
     }
