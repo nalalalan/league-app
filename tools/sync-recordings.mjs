@@ -818,15 +818,15 @@ function fallbackFeedback(file, duration, context = {}) {
       feedback: "The full-game read says damage is enough; the next useful rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
       gameDetail: "This full review shows Samira can already create kills, so the climb gap is what happens right after the first win. The next useful rep is converting the won fight into wave, tower, objective, nexus, or recall before the next fight gives shutdown gold back.",
       whyTrust: "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
-      eventEvidence: "The full-game result shows high kill creation with too many deaths, which points to conversion and shutdown protection rather than raw damage.",
+      eventEvidence: "",
       goodThing: "You are finding fights and creating damage pressure; the fix is cashing those wins out cleaner.",
       focusTag: "overstay control",
-      evidence: "Match-level Samira read from sampled replay frames and side-list evidence.",
+      evidence: "",
       pattern: "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
       diamondRule: "After a won fight, take the guaranteed payout before looking for the next fight.",
       drill: "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
       nuance: ["High kills only matter when the map state changes.", "Shutdown deaths after a win erase the lead Samira already created."],
-      reviewLimit: "Conservative read until a full model pass is available.",
+      reviewLimit: "",
       analysisSource: "fallback"
     };
   }
@@ -970,15 +970,15 @@ function fallbackFeedback(file, duration, context = {}) {
     confidence: "medium",
     ...fallback,
     whyTrust: fallback.whyTrust || "This rule is tied to the repeated recording pattern, not a vague style preference.",
-    eventEvidence: fallback.eventEvidence || "Evidence is limited to sampled replay context until a full model pass is available.",
+    eventEvidence: fallback.eventEvidence || "",
     goodThing: fallback.goodThing || "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-    evidence: "Tied to one repeatable Samira decision from sampled replay context.",
+    evidence: fallback.eventEvidence || "",
     pattern: fallback.pattern || "The recording points to one repeatable decision leak.",
     diamondRule: fallback.diamondRule || "Convert the first win before taking the next fight.",
     drill: fallback.drill || "Name the payout before committing.",
     timeline: fallback.timeline || [],
     nuance: fallback.nuance || ["Conservative analysis until the model can read the sampled frames."],
-    reviewLimit: fallback.reviewLimit || "Conservative read until a full model pass is available.",
+    reviewLimit: fallback.reviewLimit || "",
     analysisSource: "fallback"
   };
 }

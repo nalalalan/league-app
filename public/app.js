@@ -1355,7 +1355,7 @@ function recordingMainCard(review) {
 
   const limit = document.createElement("p");
   limit.className = "recording-main-limit";
-  limit.textContent = item.reviewLimit || "";
+  limit.textContent = isGenericEvidence(item.reviewLimit) ? "" : item.reviewLimit || "";
 
   article.append(title, focus);
   if (rule.textContent) article.append(rule);
@@ -1369,8 +1369,8 @@ function recordingDeepDetails(item) {
   const rows = [
     ["rule", item.diamondRule],
     ["why", item.whyTrust],
-    ["evidence", item.evidence],
-    ["limit", item.reviewLimit]
+    ["evidence", recordingEvidence(item)],
+    ["limit", isGenericEvidence(item.reviewLimit) ? "" : item.reviewLimit]
   ].filter(([, value]) => hasText(value));
 
   if (!hasNuance && rows.length === 0) return null;
@@ -1584,7 +1584,21 @@ function recordingLesson(item) {
 }
 
 function recordingEvidence(item) {
-  return item.eventEvidence || item.evidence || "";
+  const evidence = item.eventEvidence || item.evidence || "";
+  if (isGenericEvidence(evidence)) return "";
+  return evidence;
+}
+
+function isGenericEvidence(text) {
+  const value = String(text || "").trim().toLowerCase();
+  if (!value) return true;
+  return [
+    "evidence is limited to sampled replay context",
+    "tied to one repeatable samira decision",
+    "generated from sampled replay frames",
+    "match-level samira read from sampled replay frames",
+    "conservative read until"
+  ].some((phrase) => value.includes(phrase));
 }
 
 function stripCoachPrefix(text) {
