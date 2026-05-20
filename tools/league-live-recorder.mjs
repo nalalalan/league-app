@@ -36,8 +36,14 @@ const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim(
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
 const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "title").trim().toLowerCase();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
+const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || "https://league.aolabs.io/api/recording-status").trim();
+const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
+const statusPath = path.join(analysisRoot, "recording-status.json");
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 let encoderProfilePromise;
+let lastStatusKey = "";
+let lastStatusPostMs = 0;
+let lastStatusErrorMs = 0;
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -48,6 +54,62 @@ async function log(message) {
   await fs.mkdir(analysisRoot, { recursive: true });
   await fs.appendFile(logPath, line, "utf8");
   process.stdout.write(line);
+}
+
+async function publishRecorderStatus(status, fields = {}, options = {}) {
+  const payload = {
+    status,
+    updatedAt: new Date().toISOString(),
+    mode: captureModePreference,
+    ...fields
+  };
+  await fs.mkdir(analysisRoot, { recursive: true });
+  await fs.writeFile(statusPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8").catch(() => {});
+
+  const key = JSON.stringify({
+    status: payload.status,
+    label: payload.label,
+    detail: payload.detail,
+    mode: payload.mode,
+    matchId: payload.matchId,
+    startedAt: payload.startedAt
+  });
+  const throttleMs = Number(options.throttleMs ?? 15000);
+  if (!options.force && key === lastStatusKey && Date.now() - lastStatusPostMs < throttleMs) return;
+  lastStatusKey = key;
+  lastStatusPostMs = Date.now();
+  if (!statusEndpoint || !statusToken) return;
+
+  try {
+    const response = await fetch(statusEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-League-Status-Token": statusToken
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3500)
+    });
+    if (!response.ok && Date.now() - lastStatusErrorMs > 120000) {
+      lastStatusErrorMs = Date.now();
+      await log(`Recording status update returned HTTP ${response.status}; capture continues.`);
+    }
+  } catch (error) {
+    if (Date.now() - lastStatusErrorMs > 120000) {
+      lastStatusErrorMs = Date.now();
+      await log(`Recording status update failed; capture continues.`);
+    }
+  }
+}
+
+function sessionStatusFields(session, detail = "") {
+  return {
+    label: "recording League window",
+    detail,
+    mode: session.captureMode || captureModePreference,
+    startedAt: session.startedAt?.toISOString?.() || "",
+    matchId: ""
+  };
 }
 
 async function run(command, args, options = {}) {
@@ -525,7 +587,7 @@ async function startSession() {
   const sessionRoot = path.join(captureRoot, stamp(startedAt));
   const modes = captureModes();
   const capture = await startCaptureChild(sessionRoot, 0, modes[0]);
-  return {
+  const session = {
     sessionRoot,
     child: capture.child,
     encoder: capture.encoder,
@@ -544,6 +606,8 @@ async function startSession() {
     resumeAfterForegroundPause: false,
     captureRestarts: 0
   };
+  await publishRecorderStatus("recording", sessionStatusFields(session, "Capture is active. The finished review will publish after the game ends."), { force: true });
+  return session;
 }
 
 async function stopCaptureChild(child, graceMs = 5000) {
@@ -565,6 +629,7 @@ async function restartCaptureIfNeeded(session) {
     if (!rect?.isForeground) {
       if (!session.pausedForForeground) {
         await log("League window is not foreground; pausing capture so desktop/browser content is not recorded.");
+        await publishRecorderStatus("paused", sessionStatusFields(session, "Region fallback is paused while League is not foreground."), { force: true });
         session.pausedForForeground = true;
         session.foregroundPauseStartedMs = Date.now();
       }
@@ -579,8 +644,10 @@ async function restartCaptureIfNeeded(session) {
       session.resumeAfterForegroundPause = true;
       session.child.exited = true;
       await log("League window is foreground again; resuming capture.");
+      await publishRecorderStatus("recording", sessionStatusFields(session, "League is foreground again. Capture is resuming."), { force: true });
     }
   }
+  await publishRecorderStatus("recording", sessionStatusFields(session, "Capture is active. The finished review will publish after the game ends."), { throttleMs: 30000 });
   const footprint = await segmentFootprint(session.sessionRoot);
   if (footprint.bytes > session.lastSegmentBytes + minCaptureGrowthBytes) {
     session.lastSegmentBytes = footprint.bytes;
@@ -622,6 +689,7 @@ async function restartCaptureIfNeeded(session) {
   session.captureRect = capture.captureRect;
   session.lastSegmentBytes = footprint.bytes;
   session.lastSegmentGrowthMs = Date.now();
+  await publishRecorderStatus("recording", sessionStatusFields(session, "Capture restarted and is active."), { force: true });
 }
 
 async function waitForNoGame(reason) {
@@ -637,6 +705,7 @@ async function waitForNoGame(reason) {
 
 async function stopSession(session) {
   await log("Stopping League screen capture.");
+  await publishRecorderStatus("processing", sessionStatusFields(session, "Game ended. Building the review clip now."), { force: true });
   session.endedAt = new Date();
   session.endedMs = session.endedAt.getTime();
   if (session.pausedForForeground && session.foregroundPauseStartedMs) {
@@ -710,6 +779,7 @@ async function finalizeSession(session) {
   const expectedForegroundSeconds = Math.max(minGameSeconds, elapsedSeconds - foregroundPauseSeconds);
   if (elapsedSeconds < minGameSeconds) {
     await log(`Capture was ${elapsedSeconds}s, below ${minGameSeconds}s; keeping raw segments only.`);
+    await publishRecorderStatus("blocked", sessionStatusFields(session, `Capture was ${elapsedSeconds}s, below the ${minGameSeconds}s minimum. No review clip was created.`), { force: true });
     return;
   }
   const entries = await fs.readdir(session.sessionRoot, { withFileTypes: true });
@@ -725,12 +795,14 @@ async function finalizeSession(session) {
   segments.sort((a, b) => a.index - b.index);
   if (!segments.length) {
     await log("No usable segments were created.");
+    await publishRecorderStatus("blocked", sessionStatusFields(session, "No usable video segments were created. No review clip was published."), { force: true });
     return;
   }
   const usableSegments = segments.filter((item) => item.size >= minCaptureSegmentBytes);
   const estimatedCoverageSeconds = usableSegments.reduce((sum, item) => sum + (Number(item.duration) || segmentSeconds), 0);
   if (estimatedCoverageSeconds < expectedForegroundSeconds * minCaptureCoverage) {
     await log(`Capture incomplete: ${usableSegments.length}/${segments.length} usable segments cover about ${Math.round(estimatedCoverageSeconds)}s of ${expectedForegroundSeconds}s foreground time (${elapsedSeconds}s game, ${foregroundPauseSeconds}s paused). Not creating a misleading auto review clip.`);
+    await publishRecorderStatus("blocked", sessionStatusFields(session, "Capture looked incomplete, so it was rejected instead of publishing a misleading review."), { force: true });
     return;
   }
 
@@ -802,7 +874,17 @@ async function finalizeSession(session) {
   if (publishAfterGame) {
     await waitForNoGame("Publishing paused");
     await log("Publishing updated League recordings.");
+    await publishRecorderStatus("publishing", {
+      ...sessionStatusFields(session, "Review clip created. Publishing to league.aolabs.io now."),
+      matchId: replay?.matchId || ""
+    }, { force: true });
     await run(npmBin, ["run", "publish:recordings"]);
+    await publishRecorderStatus("published", {
+      ...sessionStatusFields(session, "Review clip handed to the publisher. It should appear after the deploy finishes."),
+      matchId: replay?.matchId || ""
+    }, { force: true });
+  } else {
+    await publishRecorderStatus("published", sessionStatusFields(session, "Review clip created locally. Auto-publish is disabled."), { force: true });
   }
 }
 
@@ -817,6 +899,11 @@ async function main() {
   });
 
   await log("League live recorder is watching for game process.");
+  await publishRecorderStatus("watching", {
+    label: "watching for League",
+    detail: "Recorder is running. It will switch to recording when the game process starts.",
+    mode: captureModePreference
+  }, { force: true });
   let session = null;
   while (true) {
     const running = await gameIsRunning();
@@ -825,6 +912,11 @@ async function main() {
         session = await startSession();
       } catch (error) {
         await log(`Capture waiting: ${error.message}`);
+        await publishRecorderStatus("waiting", {
+          label: "waiting for League window",
+          detail: "Game process is running, but capture has not started yet.",
+          mode: captureModePreference
+        }, { force: true });
       }
     }
     if (running && session) {
@@ -839,7 +931,15 @@ async function main() {
         await finalizeSession(current);
       } catch (error) {
         await log(`Finalize failed: ${error.message}`);
+        await publishRecorderStatus("error", sessionStatusFields(current, "Post-game processing failed. Check recorder log."), { force: true });
       }
+    }
+    if (!running && !session) {
+      await publishRecorderStatus("watching", {
+        label: "watching for League",
+        detail: "Recorder is running. It will switch to recording when the game process starts.",
+        mode: captureModePreference
+      }, { throttleMs: 60000 });
     }
     await delay(pollMs);
   }
@@ -847,6 +947,11 @@ async function main() {
 
 main().catch(async (error) => {
   await log(`Live recorder failed: ${error.stack || error.message}`);
+  await publishRecorderStatus("error", {
+    label: "recorder error",
+    detail: "The live recorder stopped unexpectedly.",
+    mode: captureModePreference
+  }, { force: true }).catch(() => {});
   await releaseLock();
   process.exitCode = 1;
 });

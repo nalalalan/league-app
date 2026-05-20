@@ -12,6 +12,8 @@ const isRailway = Boolean(process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY
 const recordingMediaBase = (process.env.LEAGUE_RECORDING_MEDIA_BASE || "").replace(/\/+$/, "");
 const recordingWebmMediaBase = (process.env.LEAGUE_RECORDING_WEBM_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/nalalalan/league-app@main/public/recordings").replace(/\/+$/, "");
 const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "https://raw.githubusercontent.com/nalalalan/league-app/main/public/recordings").replace(/\/+$/, "");
+const statusToken = (process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
+const recordingStatusPath = path.join(dataRoot, "recording-status.json");
 
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -104,8 +106,49 @@ async function saveNotes(notes) {
   await fsp.writeFile(notesPath, JSON.stringify(notes, null, 2) + "\n", "utf8");
 }
 
+async function loadRecordingStatus() {
+  try {
+    return JSON.parse(await fsp.readFile(recordingStatusPath, "utf8"));
+  } catch {
+    return {
+      status: "unknown",
+      label: "recorder status unavailable",
+      detail: "No live recorder heartbeat has reached the site yet.",
+      updatedAt: ""
+    };
+  }
+}
+
+async function saveRecordingStatus(status) {
+  await fsp.mkdir(dataRoot, { recursive: true });
+  await fsp.writeFile(recordingStatusPath, JSON.stringify(status, null, 2) + "\n", "utf8");
+}
+
 function cleanText(value, maxLength) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
+function cleanStatus(value) {
+  const status = cleanText(value, 32).toLowerCase();
+  return /^(watching|waiting|recording|paused|processing|publishing|published|blocked|error|unknown)$/.test(status)
+    ? status
+    : "unknown";
+}
+
+function publicRecordingStatus(raw) {
+  const updatedMs = Date.parse(raw.updatedAt || raw.serverReceivedAt || "");
+  const ageSeconds = Number.isFinite(updatedMs) ? Math.max(0, Math.round((Date.now() - updatedMs) / 1000)) : null;
+  return {
+    status: cleanStatus(raw.status),
+    label: cleanText(raw.label, 80) || "recorder status",
+    detail: cleanText(raw.detail, 180),
+    mode: cleanText(raw.mode, 40),
+    matchId: cleanText(raw.matchId, 40),
+    startedAt: cleanText(raw.startedAt, 40),
+    updatedAt: cleanText(raw.updatedAt || raw.serverReceivedAt, 40),
+    ageSeconds,
+    stale: ageSeconds === null || ageSeconds > 180
+  };
 }
 
 function recordingMediaRedirect(pathname) {
@@ -218,6 +261,37 @@ async function handleApi(req, res, url) {
     const notes = [note, ...(await loadNotes())].slice(0, 200);
     await saveNotes(notes);
     sendJson(res, 201, { note });
+    return true;
+  }
+
+  if (url.pathname === "/api/recording-status" && req.method === "GET") {
+    sendJson(res, 200, publicRecordingStatus(await loadRecordingStatus()));
+    return true;
+  }
+
+  if (url.pathname === "/api/recording-status" && req.method === "POST") {
+    if (isRailway && !statusToken) {
+      sendJson(res, 503, { error: "Recording status token is not configured" });
+      return true;
+    }
+    const headerToken = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "") || String(req.headers["x-league-status-token"] || "");
+    if (statusToken && headerToken !== statusToken) {
+      sendJson(res, 401, { error: "Unauthorized" });
+      return true;
+    }
+    const payload = await readJsonBody(req);
+    const status = {
+      status: cleanStatus(payload.status),
+      label: cleanText(payload.label, 80),
+      detail: cleanText(payload.detail, 180),
+      mode: cleanText(payload.mode, 40),
+      matchId: cleanText(payload.matchId, 40),
+      startedAt: cleanText(payload.startedAt, 40),
+      updatedAt: cleanText(payload.updatedAt, 40) || new Date().toISOString(),
+      serverReceivedAt: new Date().toISOString()
+    };
+    await saveRecordingStatus(status);
+    sendJson(res, 200, { ok: true, status: publicRecordingStatus(status) });
     return true;
   }
 

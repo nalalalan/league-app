@@ -727,6 +727,7 @@ const recordingSummary = document.querySelector("#recording-summary");
 const recordingFocus = document.querySelector("#recording-focus");
 const recordingGrid = document.querySelector("#recording-grid");
 const recordingPreview = document.querySelector("#recording-preview");
+const recordingLiveStatus = document.querySelector("#recording-live-status");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -2108,6 +2109,74 @@ async function hydrateRecordings() {
   } catch {
     recordingReviewData = recordingReview;
     renderRecordings(recordingReviewData, currentChampionId || "samira");
+  }
+}
+
+function statusAgeLabel(seconds) {
+  const value = Number(seconds);
+  if (!Number.isFinite(value)) return "";
+  if (value < 5) return "now";
+  if (value < 60) return `${Math.round(value)}s ago`;
+  const minutes = Math.round(value / 60);
+  return `${minutes}m ago`;
+}
+
+function fallbackRecordingStatusLabel(status) {
+  const labels = {
+    watching: "watching for League",
+    waiting: "waiting for League window",
+    recording: "recording League window",
+    paused: "capture paused",
+    processing: "processing review",
+    publishing: "publishing review",
+    published: "review handed off",
+    blocked: "capture rejected",
+    error: "recorder error",
+    unknown: "recorder status unavailable"
+  };
+  return labels[status] || labels.unknown;
+}
+
+function renderRecordingLiveStatus(data = {}) {
+  if (!recordingLiveStatus) return;
+  const status = String(data.status || "unknown").toLowerCase();
+  const stale = Boolean(data.stale);
+  const visibleStatus = stale ? "unknown" : status;
+  const label = stale ? "status stale" : (data.label || fallbackRecordingStatusLabel(visibleStatus));
+  const age = statusAgeLabel(data.ageSeconds);
+  const detail = stale
+    ? (age ? `last update ${age}` : "no recent heartbeat")
+    : (data.detail || (age ? `updated ${age}` : ""));
+  recordingLiveStatus.hidden = false;
+  recordingLiveStatus.className = `recording-live-status is-${visibleStatus}`;
+  recordingLiveStatus.innerHTML = `
+    <span class="recording-live-dot" aria-hidden="true"></span>
+    <span class="recording-live-copy">
+      <strong></strong>
+      <span></span>
+    </span>
+  `;
+  recordingLiveStatus.querySelector("strong").textContent = label;
+  recordingLiveStatus.querySelector(".recording-live-copy span").textContent = detail;
+  recordingLiveStatus.title = [label, detail, data.mode ? `mode ${data.mode}` : ""].filter(Boolean).join(" | ");
+}
+
+async function hydrateRecordingLiveStatus() {
+  if (!recordingLiveStatus) return;
+  try {
+    const response = await fetch("/api/recording-status", {
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+    if (!response.ok) throw new Error("status unavailable");
+    renderRecordingLiveStatus(await response.json());
+  } catch {
+    renderRecordingLiveStatus({
+      status: "unknown",
+      label: "recorder status unavailable",
+      detail: "site could not read the recorder heartbeat",
+      stale: true
+    });
   }
 }
 
@@ -5854,6 +5923,8 @@ document.addEventListener("click", (event) => {
 renderPicker();
 renderChampion(championIdFromLocation(), { animate: false, updateRoute: true, replaceRoute: true });
 hydrateRecordings();
+hydrateRecordingLiveStatus();
+window.setInterval(hydrateRecordingLiveStatus, 15000);
 hydratePublicNotes();
 window.addEventListener("popstate", () => {
   renderChampion(championIdFromLocation(), { animate: true });

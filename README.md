@@ -47,6 +47,8 @@ The publish command skips work when the source folder has not changed. When new 
 
 The live recorder is intended to run without Codex in the loop. It watches for the League game process, captures the League game window by title so normal alt-tabbing does not remove large parts of the match, writes a sidecar next to each auto clip, rejects incomplete or DPI-cropped captures before publish, then lets the publisher sync and deploy the recording. Region capture remains available as an explicit fallback and pauses instead of recording browser/desktop content. Offline checks handle capture validity and media prep; OpenAI is used only for the coaching narrative after the clip passes those checks.
 
+The site exposes a compact recorder heartbeat at `/api/recording-status`. The local recorder posts `watching`, `recording`, `processing`, `publishing`, `published`, `blocked`, or `error` so the recordings header can show whether a game is being captured before the final review appears.
+
 ## Paper
 
 The public paper artifacts are:

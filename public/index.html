@@ -23,8 +23,8 @@
     <link rel="stylesheet" href="https://aolabs.io/suite-header.css?v=20260516-suite-bloom">
     <link rel="modulepreload" href="/vfx3d.js?v=20260518-world-vfx24">
     <link rel="modulepreload" href="/vendor/three.module.min.js">
-    <link rel="stylesheet" href="/styles.css?v=20260519-timestamp-anchors2">
-    <script src="/app.js?v=20260520-no-generic-evidence" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20260520-recorder-status">
+    <script src="/app.js?v=20260520-recorder-status" defer></script>
   </head>
   <body>
     <header class="suite-topbar" aria-label="league navigation">
@@ -63,8 +63,17 @@
       <section class="recordings" id="recordings" aria-labelledby="recordings-title">
         <div class="recording-focus" id="recording-focus"></div>
         <div class="plain-head recording-head">
-          <h2 id="recordings-title">recordings</h2>
-          <p id="recording-summary"></p>
+          <div class="recording-head-title">
+            <h2 id="recordings-title">recordings</h2>
+            <p id="recording-summary"></p>
+          </div>
+          <div class="recording-live-status is-unknown" id="recording-live-status" hidden>
+            <span class="recording-live-dot" aria-hidden="true"></span>
+            <span class="recording-live-copy">
+              <strong>recorder status</strong>
+              <span>checking</span>
+            </span>
+          </div>
         </div>
         <div class="recording-grid" id="recording-grid"></div>
       </section>

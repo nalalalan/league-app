@@ -7,6 +7,7 @@
 *.run.xml
 _verification/
 _recording-analysis/
+data/
 _local*.log
 _licensed-audio/
 public/recordings/*.mp4

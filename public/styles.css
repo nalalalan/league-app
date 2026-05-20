@@ -1682,6 +1682,92 @@ h1 {
   line-height: 1.25;
 }
 
+.recording-head-title {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.recording-head-title p {
+  text-align: left;
+}
+
+.recording-live-status {
+  display: inline-grid;
+  grid-template-columns: 9px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-width: 190px;
+  max-width: min(320px, 44vw);
+  border: 1px solid rgba(104, 87, 68, .18);
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: rgba(255, 253, 248, .72);
+  color: #4a4039;
+  box-shadow: 0 8px 22px rgba(87, 69, 45, .08);
+}
+
+.recording-live-status[hidden] {
+  display: none;
+}
+
+.recording-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #9b8d7d;
+  box-shadow: 0 0 0 4px rgba(155, 141, 125, .12);
+}
+
+.recording-live-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.recording-live-copy strong,
+.recording-live-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recording-live-copy strong {
+  color: #2f2925;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.recording-live-copy span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 720;
+  line-height: 1.05;
+}
+
+.recording-live-status.is-recording .recording-live-dot {
+  background: #2d7a43;
+  box-shadow: 0 0 0 4px rgba(45, 122, 67, .14), 0 0 18px rgba(45, 122, 67, .28);
+}
+
+.recording-live-status.is-processing .recording-live-dot,
+.recording-live-status.is-publishing .recording-live-dot {
+  background: #b06a1d;
+  box-shadow: 0 0 0 4px rgba(176, 106, 29, .14), 0 0 18px rgba(176, 106, 29, .22);
+}
+
+.recording-live-status.is-blocked .recording-live-dot,
+.recording-live-status.is-error .recording-live-dot {
+  background: #a7342d;
+  box-shadow: 0 0 0 4px rgba(167, 52, 45, .13);
+}
+
+.recording-live-status.is-published .recording-live-dot {
+  background: #4c6f9f;
+  box-shadow: 0 0 0 4px rgba(76, 111, 159, .14);
+}
+
 .situation-list {
   display: grid;
   gap: 12px;
@@ -3319,6 +3405,15 @@ h1 {
   .paper-strip {
     grid-template-columns: 1fr;
     gap: 9px;
+  }
+
+  .recording-head {
+    align-items: start;
+  }
+
+  .recording-live-status {
+    width: 100%;
+    max-width: 100%;
   }
 
   .paper-button {

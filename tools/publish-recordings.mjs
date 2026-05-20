@@ -23,6 +23,7 @@ const publishPaths = [
   "public/styles.css",
   "public/league-practice-room.pdf",
   "public/league-practice-room.tex",
+  "server.js",
   "tools/sync-recordings.mjs",
   "tools/league-live-recorder.mjs",
   "tools/publish-recordings.mjs",
