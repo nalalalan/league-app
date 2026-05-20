@@ -9,6 +9,7 @@ $RecorderTaskName = "AO Labs League live recorder"
 $PublisherTaskName = "AO Labs League recording publisher"
 $RecorderScript = Join-Path $AppRoot "tools\league-live-recorder.mjs"
 $PublisherScript = Join-Path $AppRoot "tools\publish-recordings.ps1"
+$RecorderLaunchCommand = "`$env:LEAGUE_LIVE_CAPTURE_MODE='region'; & '$Node' '$RecorderScript'"
 
 function Quote-Vbs([string]$Value) {
   return $Value.Replace('"', '""')
@@ -52,8 +53,8 @@ $LongRunningSettings = New-ScheduledTaskSettingsSet `
   -ExecutionTimeLimit (New-TimeSpan -Seconds 0)
 
 $RecorderAction = New-ScheduledTaskAction `
-  -Execute $Node `
-  -Argument "`"$RecorderScript`"" `
+  -Execute $PowerShell `
+  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$RecorderLaunchCommand`"" `
   -WorkingDirectory $AppRoot
 
 $RecorderTrigger = New-ScheduledTaskTrigger -AtLogOn
@@ -65,7 +66,7 @@ $RecorderTaskOk = Try-RegisterTask `
   -Description "Watches for League of Legends games, captures the League window at low priority, creates one review clip, and hands it to league.aolabs.io."
 
 if (-not $RecorderTaskOk) {
-  $RecorderCommand = "`"$Node`" `"$RecorderScript`""
+  $RecorderCommand = "`"$PowerShell`" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$RecorderLaunchCommand`""
   $RecorderStartup = Install-StartupVbs -Name "AO Labs League live recorder" -Command $RecorderCommand -WorkingDirectory $AppRoot
   Write-Host "Installed startup recorder: $RecorderStartup"
 }
@@ -111,7 +112,7 @@ if ($RecorderTaskOk) {
     Where-Object { $_.CommandLine -match [regex]::Escape($RecorderScript) } |
     Select-Object -First 1
   if (-not $ExistingRecorder) {
-    Start-Process -FilePath $Node -ArgumentList "`"$RecorderScript`"" -WorkingDirectory $AppRoot -WindowStyle Hidden
+    Start-Process -FilePath $PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$RecorderLaunchCommand`"" -WorkingDirectory $AppRoot -WindowStyle Hidden
   }
 }
 
