@@ -34,7 +34,7 @@ const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "7000k"
 const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "1920:-2").trim();
 const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
-const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "auto").trim().toLowerCase();
+const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "title").trim().toLowerCase();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 let encoderProfilePromise;
@@ -792,7 +792,7 @@ async function finalizeSession(session) {
       important: item.important
     })),
     validForPublish: true,
-    privacyPolicy: "Region capture starts only while the League game window is foreground; capture pauses instead of recording desktop/browser content.",
+    privacyPolicy: "Default capture records the League game window by title so alt-tabbing does not stop the match recording. Region capture is only an explicit fallback and pauses instead of recording desktop/browser content.",
     inputPolicy: "Screen and mouse cursor are recorded. Raw keyboard text is not logged."
   };
   await fs.writeFile(path.join(session.sessionRoot, "review-clip.json"), `${JSON.stringify(sidecar, null, 2)}\n`, "utf8");
