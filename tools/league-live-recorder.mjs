@@ -316,8 +316,10 @@ async function startSession() {
     "-an",
     ...(filters.length ? ["-vf", filters.join(",")] : []),
     ...encoderArgs(encoder, "capture"),
+    "-force_key_frames", `expr:gte(t,n_forced*${segmentSeconds})`,
     "-f", "segment",
     "-segment_time", String(segmentSeconds),
+    "-segment_format", "matroska",
     "-reset_timestamps", "1",
     outputPattern
   ];
