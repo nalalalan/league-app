@@ -2123,6 +2123,16 @@ function fallbackRecordingStatusLabel(status) {
   return labels[status] || labels.unknown;
 }
 
+function recordingEtaLabel(data = {}, status = "") {
+  if (!["processing", "publishing"].includes(status)) return "";
+  const seconds = Number(data.etaSeconds);
+  if (!Number.isFinite(seconds) || seconds <= 0) return "";
+  if (seconds < 45) return "ETA under 1m";
+  if (seconds < 90) return "ETA ~1m";
+  if (seconds < 60 * 60) return `ETA ~${Math.ceil(seconds / 60)}m`;
+  return "ETA ~1h";
+}
+
 function renderRecordingLiveStatus(data = {}) {
   if (!recordingLiveStatus) return;
   const status = String(data.status || "unknown").toLowerCase();
@@ -2135,9 +2145,10 @@ function renderRecordingLiveStatus(data = {}) {
   const age = statusAgeLabel(data.ageSeconds);
   const progress = Number.isFinite(Number(data.progress)) ? Math.max(0, Math.min(100, Number(data.progress))) : 0;
   const showProgress = ["waiting", "recording", "paused", "processing", "publishing", "published"].includes(visibleStatus);
+  const eta = stale ? "" : recordingEtaLabel(data, visibleStatus);
   const detail = stale
     ? [data.detail, age ? `last update ${age}` : "heartbeat delayed"].filter(Boolean).join(" | ")
-    : (data.detail || (age ? `updated ${age}` : ""));
+    : ([data.detail || (age ? `updated ${age}` : ""), eta].filter(Boolean).join(" | "));
   recordingLiveStatus.hidden = false;
   recordingLiveStatus.className = `recording-live-status is-${visibleStatus}`;
   recordingLiveStatus.style.setProperty("--status-progress", `${progress}%`);
@@ -2152,7 +2163,7 @@ function renderRecordingLiveStatus(data = {}) {
   recordingLiveStatus.querySelector("strong").textContent = label;
   recordingLiveStatus.querySelector(".recording-live-copy span").textContent = detail;
   recordingLiveStatus.querySelector(".recording-live-progress").hidden = !showProgress;
-  recordingLiveStatus.title = [label, detail, data.mode ? `mode ${data.mode}` : ""].filter(Boolean).join(" | ");
+  recordingLiveStatus.title = [label, detail, data.etaBasis, data.mode ? `mode ${data.mode}` : ""].filter(Boolean).join(" | ");
 }
 
 async function hydrateRecordingLiveStatus() {

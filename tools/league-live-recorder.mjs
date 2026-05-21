@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import https from "node:https";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { clearEtaFields, etaFields } from "./league-post-game-eta.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, "..");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
@@ -63,6 +64,17 @@ function holdIdleStatus(status, fields = {}) {
     fields: { ...fields },
     untilMs: Date.now() + postGameStatusHoldMs
   };
+}
+
+async function etaFor(stage, fallbackSeconds, startedAt, context = {}) {
+  return await etaFields({
+    analysisRoot,
+    sourceDir,
+    stage,
+    fallbackSeconds,
+    startedAt,
+    context
+  });
 }
 
 async function log(message) {
@@ -870,9 +882,14 @@ async function waitForNoGame(reason) {
 
 async function stopSession(session) {
   await log("Stopping League screen capture.");
-  await publishRecorderStatus("processing", { ...sessionStatusFields(session, "Building review clip."), progress: 70 }, { force: true });
   session.endedAt = new Date();
   session.endedMs = session.endedAt.getTime();
+  const sourceDurationSeconds = Math.round((session.endedMs - session.startedMs) / 1000);
+  await publishRecorderStatus("processing", {
+    ...sessionStatusFields(session, "Building review clip."),
+    progress: 70,
+    ...(await etaFor("post_game_total", 14 * 60, session.endedAt.toISOString(), { sourceDurationSeconds }))
+  }, { force: true });
   if (session.pausedForForeground && session.foregroundPauseStartedMs) {
     session.foregroundPauseMs += Date.now() - Number(session.foregroundPauseStartedMs || Date.now());
     session.foregroundPauseStartedMs = null;
@@ -959,7 +976,7 @@ async function finalizeSession(session) {
   const expectedForegroundSeconds = Math.max(minGameSeconds, elapsedSeconds - foregroundPauseSeconds);
   if (elapsedSeconds < minGameSeconds) {
     await log(`Capture was ${elapsedSeconds}s, below ${minGameSeconds}s; keeping raw segments only.`);
-    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, `Capture was ${elapsedSeconds}s, below the ${minGameSeconds}s minimum. No review clip was created.`), progress: 100 }, { force: true });
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, `Capture was ${elapsedSeconds}s, below the ${minGameSeconds}s minimum. No review clip was created.`), progress: 100, ...clearEtaFields() }, { force: true });
     return;
   }
   const entries = await fs.readdir(session.sessionRoot, { withFileTypes: true });
@@ -978,20 +995,20 @@ async function finalizeSession(session) {
   segments.sort((a, b) => a.index - b.index);
   if (!segments.length) {
     await log("No usable segments were created.");
-    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "No usable video segments were created. No review clip was published."), progress: 100 }, { force: true });
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "No usable video segments were created. No review clip was published."), progress: 100, ...clearEtaFields() }, { force: true });
     return;
   }
   const cleanSegments = segments.filter((item) => !item.tainted);
   if (!cleanSegments.length) {
     await log("Every capture segment touched non-League foreground time; no review clip was created.");
-    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture only had alt-tab-tainted segments, so no review was published."), progress: 100 }, { force: true });
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture only had alt-tab-tainted segments, so no review was published."), progress: 100, ...clearEtaFields() }, { force: true });
     return;
   }
   const usableSegments = cleanSegments.filter((item) => item.size >= minCaptureSegmentBytes);
   const estimatedCoverageSeconds = usableSegments.reduce((sum, item) => sum + (Number(item.duration) || segmentSeconds), 0);
   if (estimatedCoverageSeconds < expectedForegroundSeconds * minCaptureCoverage) {
     await log(`Capture incomplete: ${usableSegments.length}/${cleanSegments.length} clean usable segments cover about ${Math.round(estimatedCoverageSeconds)}s of ${expectedForegroundSeconds}s foreground time (${elapsedSeconds}s game, ${foregroundPauseSeconds}s paused). Not creating a misleading auto review clip.`);
-    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture looked incomplete, so it was rejected instead of publishing a misleading review."), progress: 100 }, { force: true });
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture looked incomplete, so it was rejected instead of publishing a misleading review."), progress: 100, ...clearEtaFields() }, { force: true });
     return;
   }
 
@@ -1028,17 +1045,25 @@ async function finalizeSession(session) {
   if (!(await videoHasVisibleFrames(outputPath, duration))) {
     await fs.unlink(outputPath).catch(() => {});
     await log("Review clip was black-screen capture; rejected before publish.");
-    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture was black, so no review was published."), progress: 100 }, { force: true });
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture was black, so no review was published."), progress: 100, ...clearEtaFields() }, { force: true });
     return;
   }
   if (await videoHasGreenArtifacts(outputPath, duration)) {
     await fs.unlink(outputPath).catch(() => {});
     await log("Review clip had green block corruption; rejected before publish.");
-    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture had video corruption, so no review was published."), progress: 100 }, { force: true });
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture had video corruption, so no review was published."), progress: 100, ...clearEtaFields() }, { force: true });
     return;
   }
+  const clipCreatedAt = new Date();
+  const outputStat = await fs.stat(outputPath).catch(() => null);
+  const publishEtaContext = {
+    sourceDurationSeconds: elapsedSeconds,
+    reviewDurationSeconds: duration,
+    segmentCount: processed.length,
+    sourceBytes: outputStat?.size || null
+  };
   const sidecar = {
-    createdAt: new Date().toISOString(),
+    createdAt: clipCreatedAt.toISOString(),
     source: "AO Labs League live recorder",
     matchId: replay?.matchId || "",
     matchSource: replay?.matchSource || "",
@@ -1094,7 +1119,8 @@ async function finalizeSession(session) {
       ...sessionStatusFields(session, "Uploading review."),
       label: "publishing review",
       progress: 90,
-      matchId: replay?.matchId || ""
+      matchId: replay?.matchId || "",
+      ...(await etaFor("clip_to_live", 10 * 60, clipCreatedAt.toISOString(), publishEtaContext))
     };
     await publishRecorderStatus("publishing", publishingFields, { force: true });
     try {
@@ -1108,7 +1134,8 @@ async function finalizeSession(session) {
         ...sessionStatusFields(session, "Review sent to site."),
         label: "review live",
         progress: 100,
-        matchId: replay?.matchId || ""
+        matchId: replay?.matchId || "",
+        ...clearEtaFields()
       };
       await publishRecorderStatus("published", publishedFields, { force: true });
       holdIdleStatus("published", publishedFields);
@@ -1121,7 +1148,8 @@ async function finalizeSession(session) {
         ...sessionStatusFields(session, detail),
         label: "publish blocked",
         progress: 100,
-        matchId: replay?.matchId || ""
+        matchId: replay?.matchId || "",
+        ...clearEtaFields()
       };
       await publishRecorderStatus("blocked", blockedFields, { force: true });
       holdIdleStatus("blocked", blockedFields);
@@ -1130,7 +1158,8 @@ async function finalizeSession(session) {
     const localFields = {
       ...sessionStatusFields(session, "Review clip created locally."),
       label: "review saved",
-      progress: 100
+      progress: 100,
+      ...clearEtaFields()
     };
     await publishRecorderStatus("published", localFields, { force: true });
     holdIdleStatus("published", localFields);

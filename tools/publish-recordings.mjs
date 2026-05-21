@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
+import { clearEtaFields, etaFields, recordPublishComplete } from "./league-post-game-eta.mjs";
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -93,8 +94,25 @@ function clean(value, limit = 180) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, limit);
 }
 
+async function readJson(filePath, fallback = null) {
+  try {
+    return JSON.parse(await fs.readFile(filePath, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+
+function cleanEtaSeconds(value) {
+  const seconds = Number(value);
+  if (!Number.isFinite(seconds)) return null;
+  return Math.max(0, Math.min(60 * 60, Math.round(seconds)));
+}
+
 async function publishStatus(status, fields = {}) {
   const existing = JSON.parse(await fs.readFile(statusPath, "utf8").catch(() => "{}"));
+  const hasEtaSeconds = Object.prototype.hasOwnProperty.call(fields, "etaSeconds");
+  const hasEstimatedReadyAt = Object.prototype.hasOwnProperty.call(fields, "estimatedReadyAt");
+  const hasEtaBasis = Object.prototype.hasOwnProperty.call(fields, "etaBasis");
   const payload = {
     ...existing,
     status,
@@ -104,6 +122,9 @@ async function publishStatus(status, fields = {}) {
     matchId: clean(fields.matchId || existing.matchId || "", 40),
     startedAt: clean(fields.startedAt || existing.startedAt || "", 40),
     progress: Number.isFinite(Number(fields.progress)) ? Math.max(0, Math.min(100, Number(fields.progress))) : existing.progress,
+    etaSeconds: hasEtaSeconds ? cleanEtaSeconds(fields.etaSeconds) : cleanEtaSeconds(existing.etaSeconds),
+    estimatedReadyAt: hasEstimatedReadyAt ? clean(fields.estimatedReadyAt, 40) : clean(existing.estimatedReadyAt, 40),
+    etaBasis: hasEtaBasis ? clean(fields.etaBasis, 100) : clean(existing.etaBasis, 100),
     updatedAt: new Date().toISOString()
   };
   await fs.mkdir(analysisRoot, { recursive: true });
@@ -256,6 +277,29 @@ function newestSourceFile(state) {
   return [...files].sort((a, b) => Number(b.mtimeMs || 0) - Number(a.mtimeMs || 0) || String(a.name).localeCompare(String(b.name)))[0] || null;
 }
 
+async function sourceFileContext(fileName) {
+  if (!fileName) return {};
+  const sidecar = await readJson(path.join(sourceDir, `${fileName}.json`), {}).catch(() => ({}));
+  const stat = await fs.stat(path.join(sourceDir, fileName)).catch(() => null);
+  return {
+    sourceDurationSeconds: Number(sidecar.sourceDurationSeconds) || null,
+    reviewDurationSeconds: Number(sidecar.durationSeconds) || null,
+    segmentCount: Array.isArray(sidecar.segments) ? sidecar.segments.length : null,
+    sourceBytes: stat?.size || null
+  };
+}
+
+async function etaFor(stage, fallbackSeconds, startedAt, context = {}) {
+  return await etaFields({
+    analysisRoot,
+    sourceDir,
+    stage,
+    fallbackSeconds,
+    startedAt,
+    context
+  });
+}
+
 async function liveManifestContains(fileName) {
   if (!fileName) return false;
   const response = await fetch(`${liveBase}/recordings/recordings.json?verify=${Date.now()}`, {
@@ -271,7 +315,7 @@ async function liveManifestContains(fileName) {
   });
 }
 
-async function waitForLiveRecording(currentState) {
+async function waitForLiveRecording(currentState, options = {}) {
   const latest = newestSourceFile(currentState);
   if (!latest?.name) return false;
   const deadline = Date.now() + livePublishWaitMs;
@@ -279,7 +323,8 @@ async function waitForLiveRecording(currentState) {
     await publishStatus("publishing", {
       label: "publishing review",
       detail: "Waiting for league.aolabs.io to serve the new recording.",
-      progress: 98
+      progress: 98,
+      ...(await etaFor("deploy_to_live", 4 * 60, options.deployStartedAt, options.context))
     });
     if (await liveManifestContains(latest.name).catch(() => false)) return true;
     await new Promise((resolve) => setTimeout(resolve, 10000));
@@ -291,7 +336,10 @@ async function main() {
   if (!(await acquireLock())) return;
   await fs.mkdir(analysisRoot, { recursive: true });
   try {
+    const publishStartedAt = new Date();
     const currentState = await sourceState();
+    const latest = newestSourceFile(currentState);
+    const latestContext = await sourceFileContext(latest?.name);
     const previousState = await readPreviousState();
     const retryAnalysis = await needsAnalysisRetry();
     const expectedMissingLive = expectedSourceFile
@@ -308,7 +356,8 @@ async function main() {
       await publishStatus("blocked", {
         label: "publish blocked",
         detail,
-        progress: 100
+        progress: 100,
+        ...clearEtaFields()
       });
       throw new Error(detail);
     }
@@ -319,7 +368,8 @@ async function main() {
       await publishStatus("publishing", {
         label: "publishing review",
         detail: "Local edits are present; publishing recording files only.",
-        progress: 82
+        progress: 82,
+        ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
       });
     }
 
@@ -328,12 +378,14 @@ async function main() {
     await publishStatus("processing", {
       label: "analyzing review",
       detail: "Reading the recording and writing the site feedback.",
-      progress: 84
+      progress: 84,
+      ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
     });
     await runWithStatusHeartbeat(npmBin, ["run", "sync:recordings"], "processing", {
       label: "analyzing review",
       detail: "Still reading the recording and writing the site feedback.",
-      progress: 84
+      progress: 84,
+      ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
     });
     if (!(await hasPublishPathChanges())) {
       await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
@@ -344,7 +396,8 @@ async function main() {
     await publishStatus("publishing", {
       label: "publishing review",
       detail: "Saving the analyzed recording for the site.",
-      progress: 92
+      progress: 92,
+      ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
     });
     await run("git", ["add", "-f", "--", ...publishPaths]);
     if (!(await hasStagedChanges())) {
@@ -354,19 +407,33 @@ async function main() {
     await run("git", ["commit", "-m", `Update League recordings ${new Date().toISOString().slice(0, 10)}`]);
     await run("git", ["pull", "--rebase", "--autostash", "origin", "main"]);
     await run("git", ["push", "origin", "main"]);
+    const deployStartedAt = new Date();
     await publishStatus("publishing", {
       label: "deploying review",
       detail: "Deploying the updated recording page.",
-      progress: 96
+      progress: 96,
+      ...(await etaFor("deploy_to_live", 4 * 60, deployStartedAt, latestContext))
     });
     await run(railwayBin, ["up", "--detach", "--message", "Update League recordings"]);
-    if (!(await waitForLiveRecording(currentState))) {
+    if (!(await waitForLiveRecording(currentState, { deployStartedAt, context: latestContext }))) {
       throw new Error("Timed out waiting for league.aolabs.io to serve the new recording.");
+    }
+    const liveAt = new Date();
+    if (latest?.name) {
+      await recordPublishComplete({
+        analysisRoot,
+        sourceDir,
+        fileName: latest.name,
+        publishStartedAt: publishStartedAt.toISOString(),
+        deployStartedAt: deployStartedAt.toISOString(),
+        liveAt: liveAt.toISOString()
+      }).catch(() => {});
     }
     await publishStatus("published", {
       label: "review live",
       detail: "The new recording is on league.aolabs.io.",
-      progress: 100
+      progress: 100,
+      ...clearEtaFields()
     });
     await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
     console.log("League recordings published.");

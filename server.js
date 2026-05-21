@@ -141,9 +141,19 @@ function cleanProgress(value) {
   return Math.max(0, Math.min(100, Math.round(progress)));
 }
 
+function cleanEtaSeconds(value) {
+  const seconds = Number(value);
+  if (!Number.isFinite(seconds)) return null;
+  return Math.max(0, Math.min(60 * 60, Math.round(seconds)));
+}
+
 function publicRecordingStatus(raw) {
   const updatedMs = Date.parse(raw.updatedAt || raw.serverReceivedAt || "");
+  const estimatedReadyMs = Date.parse(raw.estimatedReadyAt || "");
   const ageSeconds = Number.isFinite(updatedMs) ? Math.max(0, Math.round((Date.now() - updatedMs) / 1000)) : null;
+  const etaSeconds = Number.isFinite(estimatedReadyMs)
+    ? Math.max(0, Math.round((estimatedReadyMs - Date.now()) / 1000))
+    : cleanEtaSeconds(raw.etaSeconds);
   return {
     status: cleanStatus(raw.status),
     label: cleanText(raw.label, 80) || "recorder status",
@@ -153,6 +163,9 @@ function publicRecordingStatus(raw) {
     startedAt: cleanText(raw.startedAt, 40),
     updatedAt: cleanText(raw.updatedAt || raw.serverReceivedAt, 40),
     progress: cleanProgress(raw.progress),
+    etaSeconds,
+    estimatedReadyAt: cleanText(raw.estimatedReadyAt, 40),
+    etaBasis: cleanText(raw.etaBasis, 100),
     ageSeconds,
     stale: ageSeconds === null || ageSeconds > 180
   };
@@ -295,6 +308,9 @@ async function handleApi(req, res, url) {
       matchId: cleanText(payload.matchId, 40),
       startedAt: cleanText(payload.startedAt, 40),
       progress: cleanProgress(payload.progress),
+      etaSeconds: cleanEtaSeconds(payload.etaSeconds),
+      estimatedReadyAt: cleanText(payload.estimatedReadyAt, 40),
+      etaBasis: cleanText(payload.etaBasis, 100),
       updatedAt: cleanText(payload.updatedAt, 40) || new Date().toISOString(),
       serverReceivedAt: new Date().toISOString()
     };
