@@ -19,12 +19,14 @@ const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
 const analysisVersion = "2026-05-19-direct-coach-evidence-v2";
+const clockAnchorVersion = "2026-05-21-visible-clock-v2";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
 const minAutoBytesPerSecond = Number(process.env.LEAGUE_MIN_AUTO_BYTES_PER_SECOND || 5000);
 const minAutoSidecarCoverage = Number(process.env.LEAGUE_MIN_AUTO_SIDECAR_COVERAGE || 0.6);
 const minSanitizedAutoSeconds = Number(process.env.LEAGUE_MIN_SANITIZED_AUTO_SECONDS || 90);
+const maxClockReadFrames = Number(process.env.LEAGUE_MAX_CLOCK_READ_FRAMES || 26);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 const ignoredSourceVideoPattern = /\.with-desktop-pauses\.(webm|mp4)$/i;
 
@@ -37,6 +39,7 @@ function coachClean(value, fallback = "") {
     .replace(/\bhigh[-\s]?elo\s+Samira\b/gi, "strong Samira player")
     .replace(/\bhigh[-\s]?elo\b/gi, "stronger games")
     .replace(/\bmaster[-\s]?facing\b/gi, "")
+    .replace(/\(\s*around\s+(\d{1,2}:[0-5]\d),\s*last\s+\w+\s+frames?\s*\)/gi, "around $1")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -619,16 +622,135 @@ function cleanList(value, maxItems = 5) {
     .slice(0, maxItems);
 }
 
+function normalizeClock(value) {
+  const match = String(value || "").match(/\b(\d{1,2}):([0-5]\d)\b/);
+  if (!match) return "";
+  return `${Number(match[1])}:${match[2]}`;
+}
+
 function cleanClockAnchors(value) {
   if (!Array.isArray(value)) return [];
   return value
     .map((anchor) => {
-      const clock = clean(anchor?.clock || anchor?.timestamp || anchor?.gameClock || "");
+      const clock = normalizeClock(anchor?.clock || anchor?.timestamp || anchor?.gameClock || "");
       const videoSeconds = Number(anchor?.videoSeconds ?? anchor?.video ?? anchor?.seekSeconds);
       if (!clock || !Number.isFinite(videoSeconds)) return null;
-      return { clock, videoSeconds: Math.round(videoSeconds * 1000) / 1000 };
+      const description = coachClean(anchor?.description || anchor?.event || anchor?.label || "");
+      return {
+        clock,
+        videoSeconds: Math.round(videoSeconds * 1000) / 1000,
+        ...(description ? { description } : {})
+      };
     })
     .filter(Boolean);
+}
+
+function clockSeconds(clock) {
+  const normalized = normalizeClock(clock);
+  if (!normalized) return null;
+  const [minutes, seconds] = normalized.split(":").map(Number);
+  return minutes * 60 + seconds;
+}
+
+function dedupeClockAnchors(...groups) {
+  const anchors = cleanClockAnchors(groups.flat());
+  const byClock = new Map();
+  for (const anchor of anchors) {
+    const seconds = clockSeconds(anchor.clock);
+    if (!Number.isFinite(seconds)) continue;
+    const current = byClock.get(anchor.clock);
+    if (!current || (anchor.description && !current.description)) {
+      byClock.set(anchor.clock, anchor);
+    }
+  }
+  return [...byClock.values()]
+    .sort((a, b) => a.videoSeconds - b.videoSeconds || clockSeconds(a.clock) - clockSeconds(b.clock))
+    .slice(0, 10);
+}
+
+function importantSegmentTimes(sidecar, duration) {
+  const segments = Array.isArray(sidecar?.segments) ? sidecar.segments : [];
+  if (!segments.length) return [];
+  const groups = [];
+  let currentGroup = null;
+  let outputTime = 0;
+  for (const segment of segments) {
+    const sourceDuration = Number(segment.durationSeconds) || Number(sidecar.segmentSeconds) || 0;
+    const speed = Math.max(1, Number(segment.speed) || 1);
+    const outputDuration = sourceDuration > 0 ? sourceDuration / speed : 0;
+    const start = outputTime;
+    const end = outputTime + outputDuration;
+    const important = segment.important === true || speed <= 1.05;
+    if (important) {
+      if (!currentGroup) currentGroup = { start, end };
+      currentGroup.end = end;
+    } else if (currentGroup) {
+      groups.push(currentGroup);
+      currentGroup = null;
+    }
+    outputTime = end;
+  }
+  if (currentGroup) groups.push(currentGroup);
+  return groups.flatMap((group) => {
+    const midpoint = group.start + ((group.end - group.start) / 2);
+    const start = group.start + Math.min(1, Math.max(0.1, (group.end - group.start) * 0.15));
+    const end = group.end - Math.min(1, Math.max(0.1, (group.end - group.start) * 0.15));
+    return [start, midpoint, end];
+  }).filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
+}
+
+function clockReadTimes(duration, sidecar) {
+  const candidates = [
+    ...importantSegmentTimes(sidecar, duration),
+    ...sampleTimesFor(duration)
+  ].filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
+  const deduped = [];
+  for (const time of candidates.sort((a, b) => a - b)) {
+    if (deduped.some((existing) => Math.abs(existing - time) < 2.5)) continue;
+    deduped.push(Math.round(time * 1000) / 1000);
+  }
+  if (deduped.length <= maxClockReadFrames) return deduped;
+  const important = importantSegmentTimes(sidecar, duration);
+  const importantSet = deduped.filter((time) => important.some((candidate) => Math.abs(candidate - time) < 1.5));
+  const remaining = deduped.filter((time) => !importantSet.includes(time));
+  return [...importantSet, ...remaining].slice(0, maxClockReadFrames).sort((a, b) => a - b);
+}
+
+function sourceSecondForVideoSecond(sidecar, videoSeconds) {
+  const segments = Array.isArray(sidecar?.segments) ? sidecar.segments : [];
+  if (!segments.length || !Number.isFinite(videoSeconds)) return null;
+  let sourceTime = 0;
+  let outputTime = 0;
+  for (const segment of segments) {
+    const sourceDuration = Number(segment.durationSeconds) || Number(sidecar.segmentSeconds) || 0;
+    const speed = Math.max(1, Number(segment.speed) || 1);
+    const outputDuration = sourceDuration > 0 ? sourceDuration / speed : 0;
+    if (videoSeconds <= outputTime + outputDuration + 0.001) {
+      return sourceTime + Math.max(0, videoSeconds - outputTime) * speed;
+    }
+    sourceTime += sourceDuration;
+    outputTime += outputDuration;
+  }
+  return sourceTime;
+}
+
+function expectedGameClockSeconds(sidecar, matchTimeMs, videoSeconds) {
+  const captureStartMs = Date.parse(sidecar?.startedAt || "");
+  const matchStartMs = Number(matchTimeMs || 0);
+  if (!Number.isFinite(captureStartMs) || !Number.isFinite(matchStartMs) || matchStartMs <= 0) return null;
+  const sourceSecond = sourceSecondForVideoSecond(sidecar, videoSeconds);
+  if (!Number.isFinite(sourceSecond)) return null;
+  return ((captureStartMs - matchStartMs) / 1000) + sourceSecond;
+}
+
+function clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds) {
+  const visibleClock = clockSeconds(anchor.clock);
+  if (!Number.isFinite(visibleClock)) return false;
+  const gameLength = Number(gameLengthSeconds || 0);
+  if (gameLength > 0 && visibleClock > gameLength + 75) return false;
+  const expected = expectedGameClockSeconds(sidecar, matchTimeMs, Number(anchor.videoSeconds));
+  if (!Number.isFinite(expected)) return true;
+  return Math.abs(visibleClock - expected) <= 90;
 }
 
 async function readExistingManifest() {
@@ -1086,6 +1208,88 @@ function parseJsonText(text) {
   return JSON.parse(match[0]);
 }
 
+async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, cacheKey, frameDir, matchTimeMs, gameLengthSeconds }) {
+  const cachePath = path.join(frameDir, "visible-clock-anchors.json");
+  const cached = await readJsonSafe(cachePath);
+  if (cached?.cacheKey === cacheKey && cached?.clockAnchorVersion === clockAnchorVersion) {
+    return cleanClockAnchors(cached.clockAnchors);
+  }
+  if (!process.env.OPENAI_API_KEY) return [];
+  const readTimes = clockReadTimes(duration, sidecar);
+  if (!readTimes.length) return [];
+  const clockDir = path.join(frameDir, "clock");
+  await fs.mkdir(clockDir, { recursive: true });
+  const images = [];
+  for (let index = 0; index < readTimes.length; index += 1) {
+    const videoSeconds = Math.round(readTimes[index] * 1000) / 1000;
+    const framePath = path.join(clockDir, `clock-${String(index + 1).padStart(2, "0")}.jpg`);
+    await extractFrame(sourcePath, framePath, videoSeconds, 1280);
+    const expected = expectedGameClockSeconds(sidecar, matchTimeMs, videoSeconds);
+    const expectedHint = Number.isFinite(expected)
+      ? ` The current match clock should be near ${mmss(expected)}; ignore other visible clocks from browser/player overlays.`
+      : "";
+    images.push({
+      type: "input_text",
+      text: `Frame ${index + 1}: review-video time ${mmss(videoSeconds)} (${videoSeconds}s). If the current League match in-game clock is visible in this frame, return that game clock with this exact videoSeconds value.${expectedHint}`
+    });
+    images.push({
+      type: "input_image",
+      image_url: `data:image/jpeg;base64,${(await fs.readFile(framePath)).toString("base64")}`,
+      detail: "high"
+    });
+  }
+  const prompt = [
+    "Read visible League of Legends in-game clock timestamps from these video frames.",
+    "The clock is the game clock shown in the League HUD, usually near the top center/top right, formatted M:SS or MM:SS.",
+    "Return an anchor only when the game clock is actually visible and readable in that exact frame. Do not infer from match length, file time, frame order, or nearby frames.",
+    "Some frames may contain desktop/browser/video-player overlays from alt-tabbed capture. Ignore those clocks. Only return the clock from the current League match HUD.",
+    "Try to return at least two different game-clock moments if at least two are visible.",
+    "For each returned anchor, include a short description of what is visibly happening in that same frame. Keep the description factual and compact, not advice.",
+    "If the frame is desktop/browser/launcher or the clock is not readable, omit it.",
+    "Return only JSON with this shape:",
+    '{"clockAnchors":[{"clock":"MM:SS","videoSeconds":0,"description":"short visible event in this frame"}]}',
+    `Recording file: ${file}.`
+  ].join("\n");
+  try {
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        store: false,
+        max_output_tokens: 900,
+        input: [
+          {
+            role: "user",
+            content: [
+              { type: "input_text", text: prompt },
+              ...images
+            ]
+          }
+        ]
+      })
+    });
+    if (!response.ok) throw new Error(`OpenAI clock response ${response.status}`);
+    const parsed = parseJsonText(extractOutputText(await response.json()));
+    const anchors = dedupeClockAnchors(parsed.clockAnchors)
+      .filter((anchor) => anchor.videoSeconds >= 0 && anchor.videoSeconds <= Math.max(0.25, duration))
+      .filter((anchor) => clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds));
+    await fs.writeFile(cachePath, `${JSON.stringify({
+      cacheKey,
+      clockAnchorVersion,
+      generatedAt: new Date().toISOString(),
+      clockAnchors: anchors
+    }, null, 2)}\n`, "utf8");
+    return anchors;
+  } catch (error) {
+    console.warn(`Clock anchor fallback for ${file}: ${error.message}`);
+    return [];
+  }
+}
+
 async function analyzeRecording({ file, duration, framePaths, frameTimes, sequenceLabel, reviewPhase: phase }) {
   const manual = manualFeedback(file);
   if (manual) return { ...manual, sampledFrames: framePaths.length };
@@ -1361,6 +1565,7 @@ async function main() {
     const phase = reviewPhase(index, sourceEntries.length);
     const sequenceLabel = `${index + 1} of ${sourceEntries.length}`;
     const slug = slugify(name);
+    const frameDir = path.join(analysisRoot, slug);
     const destName = publicRecordingName(name, stat);
     const destPath = path.join(recordingRoot, destName);
     const posterPath = path.join(posterRoot, `${slug}.jpg`);
@@ -1376,7 +1581,6 @@ async function main() {
 
     let analysis = cached;
     if (!analysis) {
-      const frameDir = path.join(analysisRoot, slug);
       await fs.mkdir(frameDir, { recursive: true });
       const sampleTimes = sampleTimesFor(duration);
       const framePaths = [];
@@ -1387,6 +1591,26 @@ async function main() {
       }
       analysis = await analyzeRecording({ file: name, duration, framePaths, frameTimes: sampleTimes, sequenceLabel, reviewPhase: phase });
     }
+    const matchTimeMs = matchStats.matchTimeMs || replayMeta.matchTimeMs || stat.mtimeMs;
+    const analysisClockAnchors = cleanClockAnchors(analysis.clockAnchors)
+      .filter((anchor) => clockFitsCurrentMatch(anchor, entry.sidecar, matchTimeMs, matchStats.gameLengthSeconds || null));
+    const shouldReadVisibleClock = duration >= 8 && (analysisClockAnchors.length < 2 || /^auto_/i.test(name));
+    const visibleClockAnchors = shouldReadVisibleClock
+      ? await detectVisibleClockAnchors({
+        file: name,
+        sourcePath,
+        duration,
+        sidecar: entry.sidecar,
+        cacheKey,
+        frameDir,
+        matchTimeMs,
+        gameLengthSeconds: matchStats.gameLengthSeconds || null
+      })
+      : [];
+    const clockAnchors = dedupeClockAnchors(analysisClockAnchors, visibleClockAnchors);
+    const clockMoments = cleanClockAnchors(clockAnchors)
+      .filter((anchor) => anchor.description)
+      .slice(0, 4);
 
     const isFullReview = duration > 90;
     const shortTitle = isFullReview
@@ -1408,7 +1632,7 @@ async function main() {
       matchId: parts.matchId,
       score: parts.score,
       clipNumber: parts.clipNumber,
-      matchTimeMs: matchStats.matchTimeMs || replayMeta.matchTimeMs || stat.mtimeMs,
+      matchTimeMs,
       gameHappenedAt: matchStats.gameHappenedAt || replayMeta.gameHappenedAt || recordedDate.toISOString(),
       gameHappenedAtLabel: matchStats.gameHappenedAtLabel || replayMeta.gameHappenedAtLabel || shortDateTime(recordedDate),
       recordedAt: recordedDate.toISOString(),
@@ -1448,7 +1672,8 @@ async function main() {
       diamondRule: coachClean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
       drill: coachClean(analysis.drill, "Name the payout before committing."),
       timeline: cleanList(analysis.timeline, 6).map((item) => coachClean(item)),
-      clockAnchors: cleanClockAnchors(analysis.clockAnchors),
+      clockAnchors,
+      clockMoments,
       nuance: cleanList(analysis.nuance, 5).map((item) => coachClean(item)),
       reviewLimit: coachClean(analysis.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
       analysisSource: analysis.analysisSource || "cache",

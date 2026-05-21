@@ -1621,7 +1621,7 @@ function displayCritique(item) {
   };
   if (byFile[item.file]) return byFile[item.file];
   return stripCoachPrefix(recordingLesson(item))
-    .replace(/^You\s+/i, "The leak is ")
+    .replace(/^You\s+/i, "The leak is that you ")
     .replace(/^Your\s+/i, "The leak is ")
     .replace(/\s+/g, " ")
     .trim();
@@ -1846,6 +1846,24 @@ function appendStorySpan(paragraph, text, className, options = {}) {
   paragraph.append(span);
 }
 
+function recordingClockMomentText(item, existingTimes = new Set()) {
+  const moments = Array.isArray(item?.clockMoments) ? item.clockMoments : [];
+  const parts = moments
+    .map((moment) => {
+      const clock = String(moment?.clock || moment?.timestamp || "").match(/\b\d{1,2}:[0-5]\d\b/)?.[0] || "";
+      const description = String(moment?.description || moment?.event || "")
+        .replace(/\s+/g, " ")
+        .replace(/[.!?]+$/g, "")
+        .trim();
+      const seconds = secondsFromTimestamp(clock);
+      if (!clock || !description || existingTimes.has(seconds)) return "";
+      return `${clock} ${description}`;
+    })
+    .filter(Boolean)
+    .slice(0, 3);
+  return parts.join("; ");
+}
+
 function recordingStoryParagraph(item) {
   const paragraph = document.createElement("p");
   paragraph.className = "recording-list-story";
@@ -1876,6 +1894,11 @@ function recordingStoryParagraph(item) {
   const hasNewEvidenceTime = evidenceTimes.some((seconds) => !existingTimes.has(seconds));
   if (hasText(evidence) && !paragraph.textContent.includes(evidence) && (!evidenceTimes.length || hasNewEvidenceTime)) {
     appendStoryText(paragraph, `The clip shows it: ${evidence}`, timestampOptions);
+  }
+  const momentTimes = new Set(timestampSecondsInText(paragraph.textContent));
+  const clockMoments = recordingClockMomentText(item, momentTimes);
+  if (hasText(clockMoments)) {
+    appendStoryText(paragraph, `Also visible: ${clockMoments}.`, timestampOptions);
   }
   return paragraph;
 }
