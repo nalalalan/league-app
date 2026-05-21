@@ -1113,11 +1113,11 @@ async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameD
   }));
   const prompt = [
     "Choose the clickable timestamp moments that are actual evidence for the coaching claim, not just random readable game clocks.",
-    "Alan uses these timestamps to study what he did wrong or what he should repeat. If the advice is overstay/reset, choose frames that show staying, low HP, respawns, gold/recall context, or the reset window. If the advice is structure conversion, choose frames that show tower/inhib/nexus or a chase away from it. If the advice is wave/objective/vision/CC, choose frames that visibly support that claim.",
-    "Use only the allowed anchors below. Do not invent clocks, videoSeconds, or events. Choose 2-4 moments when at least 2 allowed anchors can show setup, mistake, consequence, or the correct contrasting habit.",
+    "Alan uses these timestamps to study what he did, what leaked, what happened next, and what he should do differently. If the advice is overstay/reset, choose frames that show staying, low HP, respawns, gold/recall context, or the reset window. If the advice is structure conversion, choose frames that show tower/inhib/nexus, a free structure, a blocked structure, or a chase away from it. If the advice is wave/objective/vision/CC, choose frames that visibly support that claim.",
+    "Use only the allowed anchors below. Do not invent clocks, videoSeconds, or events. Choose 2-4 moments when at least 2 allowed anchors can show setup, Alan's action, leak/consequence, or the correct contrasting habit.",
     "Only return 1 moment if there is genuinely only 1 connected anchor. A setup anchor plus a consequence anchor is better than one perfect anchor.",
     "If an allowed anchor is only normal gameplay, walking, farming, shop, respawn, or a random fight unrelated to the coaching claim, reject it.",
-    "Descriptions should be short evidence labels tied to the lesson, not generic frame captions. Say Samira, not Player or Champion.",
+    "Descriptions should be short evidence labels tied to the lesson, not generic frame captions. Say Samira, not Player or Champion. A good structure/objective moment should be labeled as good evidence, not treated as a chase.",
     "Return only JSON with this shape:",
     '{"clockMoments":[{"clock":"MM:SS","videoSeconds":0,"description":"why this frame is evidence for the lesson"}]}',
     `Recording file: ${file}.`,
@@ -1751,6 +1751,64 @@ function parseJsonText(text) {
   return JSON.parse(match[0]);
 }
 
+async function requestOpenAiJson(prompt, images, maxOutputTokens = 1800) {
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      store: false,
+      max_output_tokens: maxOutputTokens,
+      input: [
+        {
+          role: "user",
+          content: [
+            { type: "input_text", text: prompt },
+            ...images
+          ]
+        }
+      ]
+    })
+  });
+  if (!response.ok) throw new Error(`OpenAI response ${response.status}`);
+  return parseJsonText(extractOutputText(await response.json()));
+}
+
+function analysisSpecificityIssues(parsed) {
+  const feedback = coachClean(parsed?.feedback, "");
+  const gameDetail = coachClean(parsed?.gameDetail, "");
+  const eventEvidence = coachClean(parsed?.eventEvidence, "");
+  const pattern = coachClean(parsed?.pattern, "");
+  const nuance = cleanList(parsed?.nuance, 5);
+  const combined = [feedback, gameDetail, eventEvidence, pattern, nuance.join(" ")].join(" ");
+  const issues = [];
+  if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback)) {
+    issues.push("feedback must keep Mistake/Fix shape");
+  }
+  if (gameDetail.length < 180) {
+    issues.push("gameDetail too short for a useful decision-chain recap");
+  }
+  if (!eventEvidence || eventEvidence.length < 60) {
+    issues.push("eventEvidence must name visible proof");
+  }
+  if (!/\b(leak|cost|punish|punished|shutdown|tempo|missed|risk|risky|death|died|gave|lost|blocked|consequence|happened)\b/i.test(combined)) {
+    issues.push("missing leak or consequence");
+  }
+  if (!/\b(then|after|before|because|instead|next|when)\b/i.test(gameDetail)) {
+    issues.push("missing decision sequence");
+  }
+  if (!/\b\d{1,2}:\d{2}\b/.test([gameDetail, eventEvidence, pattern].join(" ")) && !coachClean(parsed?.reviewLimit, "").toLowerCase().includes("timestamp")) {
+    issues.push("missing timestamped anchor or timestamp limit");
+  }
+  if (nuance.length < 3) {
+    issues.push("nuance needs at least three specific bullets");
+  }
+  return issues;
+}
+
 async function verifyVisibleClockAnchors({ file, sourcePath, anchors, frameDir }) {
   const candidates = cleanClockAnchors(anchors);
   if (!candidates.length) return [];
@@ -1939,47 +1997,46 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
     "Coach like a blunt but serious League coach: name the actual mistake, do not soften it, and do not insult Alan. Be direct enough that he knows exactly where he messed up.",
     "Give exactly one highest-value improvement for this recording, plus the specific visible mistake moments that make the advice trustworthy. The top advice must stay direct, narrow, and playable in the next queue.",
-    "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently.",
-    "Also include eventEvidence: one compact sentence naming the actual visible things that prove the coaching claim. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, or missed reset window; if the advice is structure conversion, the evidence must show structure access or the chase away from it. This is proof, not advice.",
-    "Also include goodThing: one honest positive thing Alan did well if the footage supports it. If nothing positive is visible, use an empty string rather than inventing praise.",
-    "Write gameDetail like a short game-story recap, not a stat audit: one compact paragraph, two or three notable visible moments where the decision got risky, at most three light timestamps, no K/D/A, no CS count, no numbered timeline, and one final simple lesson sentence.",
+    "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
+    "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was.",
+    "Also include eventEvidence: one compact sentence naming the actual visible things that prove the coaching claim. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, missed reset window, or tempo leak; if the advice is structure conversion, the evidence must show structure access, a free structure, a blocked structure, or the chase away from it. This is proof, not advice.",
+    "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
+    "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
+    "Write gameDetail like a short decision-chain recap, not a stat audit: one compact paragraph, two or three notable visible moments where the decision changed state, at most three light timestamps, no K/D/A, no CS count, no numbered timeline, and one final simple lesson sentence. It must include setup -> Alan's action -> leak/consequence -> better next check when the frames support those parts.",
     "Do not use 'high elo', 'master-facing', or rank-label coaching language; name the exact visible habit and exact in-game payoff.",
-    "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty.",
+    "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty. A limited review is better than a vague confident one.",
     "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
     "If any visible game-clock timestamp appears in gameDetail, eventEvidence, timeline, evidence, or pattern, include a matching clockAnchors item: {\"clock\":\"MM:SS\",\"videoSeconds\":number}. Use the review-video time from the labeled frame where that clock is visible. Timestamps should be evidence anchors for the lesson, not decorative time labels. If you are not sure the clock is visible or useful for the lesson, do not include the timestamp in visible copy.",
+    "When timestamps are available, include at least one timestamp for the mistake/leak and one timestamp for either consequence or the correct contrasting habit. If only one useful timestamp is visible, say why in reviewLimit.",
     "Prioritize repeatable habits that stop the gameplay from transferring to harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
+    "The nuance bullets must be specific coaching facts, not paraphrases: include what was good, what leaked, what the harder-game punishment would be, and the next repeatable check when the frames support them.",
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise narrative paragraph with notable visible moments and one simple lesson sentence","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, better next check, and one simple lesson sentence","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model,
-        store: false,
-        max_output_tokens: 1400,
-        input: [
-          {
-            role: "user",
-            content: [
-              { type: "input_text", text: prompt },
-              ...images
-            ]
-          }
-        ]
-      })
-    });
-    if (!response.ok) throw new Error(`OpenAI response ${response.status}`);
-    const parsed = parseJsonText(extractOutputText(await response.json()));
+    let parsed = await requestOpenAiJson(prompt, images, 1800);
+    const detailIssues = analysisSpecificityIssues(parsed);
+    if (detailIssues.length) {
+      const retryPrompt = [
+        prompt,
+        "",
+        `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
+        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, and the better next click/check. Use only visible frame evidence and useful timestamps. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+      ].join("\n");
+      parsed = await requestOpenAiJson(retryPrompt, images, 1800);
+    }
+    const finalDetailIssues = analysisSpecificityIssues(parsed);
+    if (finalDetailIssues.length) {
+      parsed.reviewLimit = coachClean(
+        [parsed.reviewLimit, `Detail gate still limited by: ${finalDetailIssues.join("; ")}.`].filter(Boolean).join(" "),
+        "The sampled frames did not support a fully specific review."
+      );
+    }
     return {
       champion: clean(parsed.champion, "Unknown"),
       confidence: clean(parsed.confidence, "low").toLowerCase(),
