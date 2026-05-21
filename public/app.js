@@ -1587,7 +1587,7 @@ function recordingLesson(item) {
 
 function recordingEvidence(item) {
   const evidence = item.eventEvidence || item.evidence || "";
-  if (isGenericEvidence(evidence)) return "";
+  if (isGenericEvidence(evidence)) return recordingClockMomentText(item);
   return evidence;
 }
 
@@ -1882,18 +1882,6 @@ function recordingStoryParagraph(item) {
   if (!sentences.length) {
     appendStorySpan(paragraph, critique, "recording-story-critique", timestampOptions);
     appendStorySpan(paragraph, praise, "recording-story-praise", timestampOptions);
-  }
-  const evidence = recordingEvidence(item);
-  const existingTimes = new Set(timestampSecondsInText(paragraph.textContent));
-  const evidenceTimes = timestampSecondsInText(evidence);
-  const hasNewEvidenceTime = evidenceTimes.some((seconds) => !existingTimes.has(seconds));
-  if (hasText(evidence) && !paragraph.textContent.includes(evidence) && (!evidenceTimes.length || hasNewEvidenceTime)) {
-    appendStoryText(paragraph, `The clip shows it: ${evidence}`, timestampOptions);
-  }
-  const momentTimes = new Set(timestampSecondsInText(paragraph.textContent));
-  const clockMoments = recordingClockMomentText(item, momentTimes);
-  if (hasText(clockMoments)) {
-    appendStoryText(paragraph, `Also visible: ${clockMoments}.`, timestampOptions);
   }
   return paragraph;
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T16:26:33.536Z",
+  "generatedAt": "2026-05-21T19:05:25.478Z",
   "source": "League of Legends Highlights folder",
   "match": "11 matches",
   "matches": [
@@ -39,9 +39,9 @@
       "name": "Samira",
       "confidence": "high",
       "recordings": 23,
-      "evidence": "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
-      "improvementTitle": "Ask for the payout first",
-      "improvement": "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end."
+      "evidence": "3:37 Samira is stunned by Morgana and Swain Teleports in; clear evidence of being caught out while overstaying alone with no vision or support.; 3:40 Samira dies and gives shutdown in bot lane, directly showing the consequence of ignoring the reset advice after pushing the wave.",
+      "improvementTitle": "Punished for Overstaying Alone After Winning Lane",
+      "improvement": "Mistake: You overstayed alone in the lane after pushing without proper vision, while enemy respawns and Teleport were available. Fix: After shoving the wave, reset or pull back immediately if you don't have vision or lane support, especially when enemies could TP or collapse."
     }
   ],
   "recordings": [
@@ -66,7 +66,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Major Structure Conversion Miss — Chasing Instead of Nexus Push",
+      "title": "Major Structure Conversion Miss: Chase Instead of End",
       "duration": "9:44",
       "durationSeconds": 583.833,
       "gameLength": "20:04",
@@ -81,103 +81,83 @@
       "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Major Structure Conversion Miss — Chasing Instead of Nexus Push",
-      "feedback": "Mistake: You chased remaining enemies deep into base instead of immediately turning to hit open inhibitor and Nexus towers after winning teamfights. Fix: After acing or driving away the enemy team in their base, stop chasing kills and immediately focus on hitting open inhibitors or Nexus to close the game.",
-      "gameDetail": "This created extra risk of throw and lost the window to end while the enemy was dead. The big lesson is: always turn for base towers when the enemy team is down or fleeing in their base.",
-      "eventEvidence": "3:34 Player uses ability on minions in lane near allied tower; 6:52 Player is dead and has shop open after first turret falls; 8:01 Champion respawns at fountain and begins walking out",
-      "goodThing": "Showed strong confidence when fighting grouped with teammates, converting multi-kills and big value from ult.",
-      "whyTrust": "Samira wins games by ending quickly when her reset power is highest, and these missed tower hits are the main thing holding back closing winnable games fast.",
+      "feedbackTitle": "Major Structure Conversion Miss: Chase Instead of End",
+      "feedback": "Mistake: You chased for side kills and damage after winning fights with all enemy carries dead, instead of immediately focusing open inhibitors and Nexus towers to end the game. Fix: As soon as you win the fight and enemies are dead or forced to base, ignore low-value chases and instantly hit the closest structure, using your lead to threaten an end or force a base defense.",
+      "gameDetail": "Even after a successful mid siege and wiping most of the enemy team, you pivoted to chase rather than burning down the inhib or Nexus turrets, which left the enemy time to respawn and defend. Around 16:02, Samira and allies push mid-lane toward enemy defending by turret; By 18:22, open inhibitor turret with enemy team mostly dead—clear chance to convert fight win into structure; Then around 19:13, Samira is caught and surrounded after chasing, showing the consequence of not immediately focusing structures to end. The core lesson is to immediately convert numbers advantage into structures instead of hunting for more fights when objectives are available.",
+      "eventEvidence": "16:02 Samira and allies push mid-lane toward enemy defending by turret; 18:22 Open inhibitor turret with enemy team mostly dead—clear chance to convert fight win into structure; 19:13 Samira is caught and surrounded after chasing, showing the consequence of not immediately focusing structures to end",
+      "goodThing": "You played fights with confidence and weren't afraid to use your lead to apply pressure in the mid-game, often entering with strong target selection and proactive ults.",
+      "whyTrust": "This habit will cost you games in any ranked queue, since chasing side kills gives enemy respawns time to defend, while immediate structure hits with Samira's burst damage can close games or force critical objectives.",
       "focusTag": "structure conversion",
-      "evidence": "Multiple dead enemies and open structures are visible on the minimap while Samira moves past instead of attacking them, especially after large teamfight wins.",
-      "pattern": "After successful fights, Samira looks for enemy champions outside the base, ignoring exposed inhibitors and Nexus towers; this delays the win and keeps the game risky.",
-      "diamondRule": "When you win a fight in the enemy base and enemies are dead or backing, always hit inhibitor/Nexus towers immediately, not champions.",
-      "drill": "In your next three games, after any fight win in the enemy base, ping towers and auto-attack the nearest open structure until it’s down or you’re forced away.",
+      "evidence": "16:02 Samira and allies push mid-lane toward enemy defending by turret; 18:22 Open inhibitor turret with enemy team mostly dead—clear chance to convert fight win into structure; 19:13 Samira is caught and surrounded after chasing, showing the consequence of not immediately focusing structures to end",
+      "pattern": "When ahead and after winning fights, Alan consistently drifts to hunting for extra kills or deep jungle chases instead of capitalizing on open lane objectives. Even with no threats present and Samira being full HP, he prioritizes chasing retreating targets instead of Nexus turrets.",
+      "diamondRule": "If enemy respawns are down and a tower or inhib is open, always hit the structure first and only peel off for defense if a new threat appears.",
+      "drill": "Next game, after you win a fight and see a free inhibitor or tower, click directly on the objective and hit it until either a new enemy spawns or the structure dies—no side chases.",
       "timeline": [],
       "clockAnchors": [
         {
+          "clock": "3:15",
+          "videoSeconds": 29.036,
+          "description": "Champion moving near blue fountain; 'Caitlyn has left the game' message visible"
+        },
+        {
           "clock": "3:34",
           "videoSeconds": 31.75,
-          "description": "Player uses ability on minions in lane near allied tower"
+          "description": "Champion attacking minions in lane; enemy visible near brush"
         },
         {
-          "clock": "4:04",
-          "videoSeconds": 47.75,
-          "description": "Enemy executed; player clears minions in bot lane"
+          "clock": "9:12",
+          "videoSeconds": 154.217,
+          "description": "Champion clearing a large enemy minion wave near bottom lane bush"
         },
         {
-          "clock": "5:54",
-          "videoSeconds": 70.5,
-          "description": "Projectile flies toward fleeing enemy bot laner near bottom lane bushes"
+          "clock": "13:10",
+          "videoSeconds": 304.435,
+          "description": "Champion shooting projectile at low-health enemy in top lane"
         },
         {
-          "clock": "6:02",
-          "videoSeconds": 78.5,
-          "description": "Player last-hits minions in bot lane, teammates nearby"
+          "clock": "16:02",
+          "videoSeconds": 409.5,
+          "description": "Champion and allies push mid-lane toward enemy defending by turret"
         },
         {
-          "clock": "6:52",
-          "videoSeconds": 90.25,
-          "description": "Player is dead and has shop open after first turret falls"
+          "clock": "18:22",
+          "videoSeconds": 492.75,
+          "description": "Champion attacking mid inhibitor turret with minion wave"
         },
         {
-          "clock": "7:29",
-          "videoSeconds": 98.25,
-          "description": "Player farming minions in mid lane, enemy nearby"
-        },
-        {
-          "clock": "7:40",
-          "videoSeconds": 109,
-          "description": "Player is dead with shop open, enemy slain Mountain Drake"
-        },
-        {
-          "clock": "8:01",
-          "videoSeconds": 125,
-          "description": "Champion respawns at fountain and begins walking out"
-        },
-        {
-          "clock": "8:16",
-          "videoSeconds": 133,
-          "description": "Player in mid lane casts abilities on minions under tower"
-        },
-        {
-          "clock": "8:58",
-          "videoSeconds": 141,
-          "description": "Scoreboard open showing match stats and items"
+          "clock": "19:13",
+          "videoSeconds": 538.5,
+          "description": "Champion is stunned and surrounded by enemies in enemy base"
         }
       ],
       "clockMoments": [
         {
-          "clock": "3:34",
-          "videoSeconds": 31.75,
-          "description": "Player uses ability on minions in lane near allied tower"
+          "clock": "16:02",
+          "videoSeconds": 409.5,
+          "description": "Samira and allies push mid-lane toward enemy defending by turret"
         },
         {
-          "clock": "6:52",
-          "videoSeconds": 90.25,
-          "description": "Player is dead and has shop open after first turret falls"
+          "clock": "18:22",
+          "videoSeconds": 492.75,
+          "description": "Open inhibitor turret with enemy team mostly dead—clear chance to convert fight win into structure"
         },
         {
-          "clock": "8:01",
-          "videoSeconds": 125,
-          "description": "Champion respawns at fountain and begins walking out"
-        },
-        {
-          "clock": "8:16",
-          "videoSeconds": 133,
-          "description": "Player in mid lane casts abilities on minions under tower"
+          "clock": "19:13",
+          "videoSeconds": 538.5,
+          "description": "Samira is caught and surrounded after chasing, showing the consequence of not immediately focusing structures to end"
         }
       ],
       "nuance": [
-        "Samira accumulated large shutdown gold; if a throw happened near enemy spawns, risk would flip the game.",
-        "Wave states mid and top open opportunities for double inhib/delete Nexus, but decision-making defaulted to chasing.",
-        "Confidence with combos looks strong, but macro focus is lost after the fight ends, especially around open base.",
-        "Vision isn’t the problem; hesitation is between targeting objectives vs. hunting respawning opponents.",
-        "Recall was delayed even with full inventory on a few occasions, showing a tendency to overstay after aces."
+        "Samira often at full HP or near-full HP after mid-late fights but walks past inhib/tower to chase or skirmish in jungle/base.",
+        "Repeated side/inhib chases despite no real immediate threat in fog—turrets were open and free for the taking.",
+        "Samira's item spike means structure burn is very fast; non-structure fighting gives away that lead.",
+        "Minimap shows enemies dead and nothing blocking objectives, but Alan hesitates to end.",
+        "Wave presence on inhib/nexus often matches Samira's arrival, but conversion delays let triple respawns stall pushes."
       ],
-      "reviewLimit": "The timeline is sparse before 16 minutes, so early reset or wave control discipline can’t be graded here, but the late-game structure choice is provably off.",
+      "reviewLimit": "Frames are sequential and clear enough to establish structure-access and chase-away patterns, but do not show the Nexus push end-state, so there may be more successful conversion after the sample ends.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 24,
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 36,
       "publicVideoBytes": 78244571,
       "src": "/recordings/auto_NA1-5565058943_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565058943-01.jpg"
@@ -203,7 +183,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Delayed Reset After Major Fight",
+      "title": "Missed Reset and Greed After Winning Fight",
       "duration": "9:31",
       "durationSeconds": 571.333,
       "gameLength": "18:43",
@@ -218,58 +198,78 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Delayed Reset After Major Fight",
-      "feedback": "Mistake: You delayed your recall and stayed on map with high gold after fights and major objectives, missing the window to convert your lead into items. Fix: Immediately reset and spend gold after a big teamfight, major kills, or objective, especially when you are safe and your team has tempo.",
-      "gameDetail": "Alan built a strong early lead with multiple kills and coordinated fights (notably bot and mid), then continued to farm and pressure without resetting after major events. This habit wastes teamfight wins and delays your item spike, making future engages riskier than necessary. Use every window after a major win or objective to convert for immediate power, not just map presence.",
-      "eventEvidence": "14:32 Post-fight window after a kill, holding gold without recalling",
-      "goodThing": "You chained aggressive plays and picked correct fights with good follow-up on support engages.",
-      "whyTrust": "Samira's power spikes hard with items, and holding excess gold delays your snowball—using your lead directly increases your kill and push threat while minimizing risk.",
-      "focusTag": "reset-discipline",
-      "evidence": "14:32 Post-fight window after a kill, holding gold without recalling",
-      "pattern": "After every successful fight or major objective, you farm or push another wave with thousands of gold instead of immediately resetting, which creates deadtime for power spikes and team momentum.",
-      "diamondRule": "No matter how fed you are, always recall and spend after a key fight or secured objective if you can do it safely—snowballing is only real when you convert to items.",
-      "drill": "In your next three games, immediately recall after your team gets 2+ kills or a major objective, check your gold vs item breakpoint, and buy before rejoining fights.",
+      "feedbackTitle": "Missed Reset and Greed After Winning Fight",
+      "feedback": "Mistake: You overstayed in bot lane for farm and continued fighting when you had enough gold and the wave was safe to reset. Fix: After a clear fight win or pick, immediately push the wave and recall to spend your large amount of gold and defend your structure or set tempo elsewhere.",
+      "gameDetail": "You play Samira and find strong early skirmish success, getting several kills by punishing the enemy bot lane's overextensions under your turret. Around 0:21, Samira is running near bottom turret; Summoner's Rift title visible; By 3:04, greed after winning early fight: Samira continues fighting under bottom turret while being attacked, showing overstay instead of safe reset after fight win; Then around 13:35, safe wave to reset opportunity: Wave is at the tower with no immediate threat, demonstrating when Samira could have recalled after fighting to spend gold and set tempo. This habit lets the enemy team farm catch-up waves and exposes your team to tempo losses, especially when bot lane pressure should translate into map rotation or item spikes.",
+      "eventEvidence": "0:21 Samira is running near bottom turret; Summoner's Rift title visible.; 3:04 Greed after winning early fight: Samira continues fighting under bottom turret while being attacked, showing overstay instead of safe reset after fight win.; 13:35 Safe wave to reset opportunity: Wave is at the tower with no immediate threat, demonstrating when Samira could have recalled after fighting to spend gold and set tempo.",
+      "goodThing": "You punished the enemy bot lane's overextension well with aggressive turret defense and clear kill decisions.",
+      "whyTrust": "Spending your gold leads to guaranteed item spikes on Samira, letting you snowball advantages, win 2v2s, and survive dives; fighting and farming with low HP and no purchase blocks your next power jump, and the recording proves you held gold for minutes during safe reset windows.",
+      "focusTag": "Reset Discipline",
+      "evidence": "0:21 Samira is running near bottom turret; Summoner's Rift title visible.; 3:04 Greed after winning early fight: Samira continues fighting under bottom turret while being attacked, showing overstay instead of safe reset after fight win.; 13:35 Safe wave to reset opportunity: Wave is at the tower with no immediate threat, demonstrating when Samira could have recalled after fighting to spend gold and set tempo.",
+      "pattern": "Winning lane fights is followed by a farm-greed pattern instead of a recall; you have enough gold for key items but delay buy windows after every bot fight or clear wave, risking shutdowns and losing structure pressure.",
+      "diamondRule": "Always recall and spend gold after a major kill or push if you have more than 1300 gold and no direct objective to claim.",
+      "drill": "Next game, after any fight win or clear enemy wave, push one wave and recall if you have over 1300g and no immediate objective.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "0:21",
           "videoSeconds": 19.25,
-          "description": "Champion running towards bottom lane past outer turret"
+          "description": "Samira is running near bottom turret; Summoner's Rift title visible."
         },
         {
-          "clock": "4:07",
-          "videoSeconds": 84.5,
-          "description": "Samira chases enemies in bot lane, both at low HP"
+          "clock": "3:04",
+          "videoSeconds": 52.985,
+          "description": "Samira is fighting under bottom turret, being attacked by enemies."
         },
         {
-          "clock": "10:16",
-          "videoSeconds": 210.75,
-          "description": "Samira and ally attacking enemies under mid turret"
+          "clock": "5:42",
+          "videoSeconds": 112.25,
+          "description": "Samira is in a teamfight in bottom lane, using abilities and surrounded by enemies."
         },
         {
-          "clock": "14:32",
-          "videoSeconds": 358.5,
-          "description": "Samira kills an enemy near top side outer turret"
+          "clock": "13:35",
+          "videoSeconds": 322.406,
+          "description": "Wave of red minions is approaching damaged blue outer turret, no champions visible."
+        },
+        {
+          "clock": "17:34",
+          "videoSeconds": 493.855,
+          "description": "Samira and allies are fighting near the enemy base mid lane, taking turret damage."
         }
       ],
       "clockMoments": [
         {
-          "clock": "14:32",
-          "videoSeconds": 358.5,
-          "description": "Post-fight window after a kill, holding gold without recalling"
+          "clock": "0:21",
+          "videoSeconds": 19.25,
+          "description": "Samira is running near bottom turret; Summoner's Rift title visible."
+        },
+        {
+          "clock": "3:04",
+          "videoSeconds": 52.985,
+          "description": "Greed after winning early fight: Samira continues fighting under bottom turret while being attacked, showing overstay instead of safe reset after fight win."
+        },
+        {
+          "clock": "13:35",
+          "videoSeconds": 322.406,
+          "description": "Safe wave to reset opportunity: Wave is at the tower with no immediate threat, demonstrating when Samira could have recalled after fighting to spend gold and set tempo."
+        },
+        {
+          "clock": "17:34",
+          "videoSeconds": 493.855,
+          "description": "Samira and allies are fighting near the enemy base mid lane, taking turret damage."
         }
       ],
       "nuance": [
-        "You consistently farmed and applied pressure when strong, but held large unspent gold amounts past multiple teamfight wins.",
-        "After winning fights or taking objectives, you immediately looked for further fights or farm without evaluating your recall window.",
-        "Cross-map movements (after winning bot, then moving towards dragon and mid) happened with unspent gold, increasing risk and lowering kill conversion.",
-        "You responded correctly to support engages and often targeted the right champion in skirmishes.",
-        "You sometimes looked for structure pressure, but did not reset even after the enemy was dead and map was won."
+        "You clean up kills efficiently and recognize when to pounce on low HP enemies.",
+        "You consistently hold more than 2000g for minutes, not converting power into buys.",
+        "Bot lane tower is left with a big enemy wave crashing while you are present but not resetting.",
+        "Your side lane pressure is constant, but does not transition into other map objectives or power spikes.",
+        "Low health and extended lane phase create unnecessary risk of shutdown and lost tempo."
       ],
-      "reviewLimit": "Frames do not show the exact ult/cooldown management or missed kill windows during fights, but gold and map reset discipline is fully visible and provable.",
+      "reviewLimit": "Sampling doesn't cover every post-kill wave, but repeatedly shows substantial gold held during clear reset windows with no imminent threat or high-value farm to justify the stay.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 24,
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 36,
       "publicVideoBytes": 79203118,
       "src": "/recordings/auto_NA1-5565048601_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565048601-01.jpg"
@@ -295,7 +295,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Stop Splitting from the Winning Push",
+      "title": "Low-HP Overstay and Reset Discipline",
       "duration": "9:03",
       "durationSeconds": 542.5,
       "gameLength": "16:26",
@@ -310,63 +310,53 @@
       "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Stop Splitting from the Winning Push",
-      "feedback": "Mistake: You repeatedly left open inhibitor/nexus turrets to hit side lane waves or camps instead of ending the game when enemy base was exposed. Fix: When your team has super minions and can threaten the nexus or inhib turrets, always group and commit to the final push instead of splitting or clearing jungle—only reset after a failed engage or if all threats are dead.",
-      "gameDetail": "These were windows to end the game, but splitting wasted pressure, allowing enemy respawns. Even with high kill numbers and fed status, the disconnect between fights and structure focus slowed your win. The lesson: when you break into the base with numbers, convert directly on exposed structures—delay or reset only if there’s real risk.",
-      "eventEvidence": "3:32 Samira is fighting near bot lane river with another champion close to a wall.; 5:31 Samira and ally are pushing bot lane near enemy outer turret amidst enemy minions.; 12:12 Samira moving in river near top lane, approaching scuttle crab.",
-      "goodThing": "You snowballed early fights into high gold and routinely showed up for team fights when grouped.",
-      "whyTrust": "Samira’s kit is strongest grouped with teammates in base pushes where you can chain engage and ult off allied CC; this recording repeatedly showed map pressure being lost when you solo split instead of ending.",
-      "focusTag": "structure conversion",
-      "evidence": "Exposure of inhibitor and nexus turrets on minimap while Samira is shown away from the push, plus super minion pressure unaccompanied.",
-      "pattern": "You consistently rotated away to side lanes or jungle right after breaking open the enemy base or getting big teamfight wins, leaving your team without max damage on critical structures and giving the enemy time to respawn.",
-      "diamondRule": "If inhibitor or nexus turrets are exposed and your team can group, always commit to the base push first—side lane waves and jungle camps matter after the threat is removed.",
-      "drill": "In your next game, after the first open inhibitor or nexus turret, consciously direct movements toward grouping mid/base for the finish and do not hit a side camp or wave until forced to reset.",
+      "feedbackTitle": "Low-HP Overstay and Reset Discipline",
+      "feedback": "Mistake: You kept fighting and pushing deep on low health after successful fights instead of resetting quickly for safety and tempo. Fix: As soon as you win a skirmish and are low HP, crash the wave and recall immediately—do not stay for extra minions, turret hits, or greedy 1v1s until you reset.",
+      "gameDetail": "After winning a fight, you kept pushing or splitting for more, instead of resetting to buy and guarantee tempo or not handing shutdown gold. Around 1:05, post-fight, low HP presence with opportunity to recall for tempo but Samira overstays, evidence of reset discipline mistake setup; By 10:19, Samira on respawn timer after dying—consequence of overstay on low HP, directly showing failure to reset. The clear lesson is to secure your advantage by always resetting right after a won fight or crash, not chasing for more while you’re low.",
+      "eventEvidence": "1:05 Post-fight, low HP presence with opportunity to recall for tempo but Samira overstays, evidence of reset discipline mistake setup.; 10:19 Samira on respawn timer after dying—consequence of overstay on low HP, directly showing failure to reset.",
+      "goodThing": "You consistently crashed waves after skirmishes to open up tempo windows.",
+      "whyTrust": "Fixing this mistake guarantees you keep your early leads, spend gold, and deny enemies free shutdowns—the biggest snowball skill for Samira bot in any bracket.",
+      "focusTag": "reset-discipline",
+      "evidence": "1:05 Post-fight, low HP presence with opportunity to recall for tempo but Samira overstays, evidence of reset discipline mistake setup.; 10:19 Samira on respawn timer after dying—consequence of overstay on low HP, directly showing failure to reset.",
+      "pattern": "After each fight you stay for more minions, turret hits, or greedy duels while low HP, then die to predictable respawns or rotations instead of recalling to spend gold and set up the next sequence.",
+      "diamondRule": "Always recall on low HP after a fight win or crash—never risk a shutdown or tempo loss for a few extra minions or damage.",
+      "drill": "In your next game, recall instantly after the first two successful fights when you’re under 40% HP, no matter what else is happening.",
       "timeline": [],
       "clockAnchors": [
         {
-          "clock": "3:32",
-          "videoSeconds": 96.75,
-          "description": "Samira is fighting near bot lane river with another champion close to a wall."
+          "clock": "1:05",
+          "videoSeconds": 27.239,
+          "description": "Minions and three champions fight in bottom lane, match clock top right."
         },
         {
-          "clock": "5:31",
-          "videoSeconds": 153.75,
-          "description": "Samira and ally are pushing bot lane near enemy outer turret amidst enemy minions."
-        },
-        {
-          "clock": "12:12",
-          "videoSeconds": 327.75,
-          "description": "Samira moving in river near top lane, approaching scuttle crab."
+          "clock": "10:19",
+          "videoSeconds": 282,
+          "description": "Respawn timer and scoreboard visible, player is dead and observing bottom lane."
         }
       ],
       "clockMoments": [
         {
-          "clock": "3:32",
-          "videoSeconds": 96.75,
-          "description": "Samira is fighting near bot lane river with another champion close to a wall."
+          "clock": "1:05",
+          "videoSeconds": 27.239,
+          "description": "Post-fight, low HP presence with opportunity to recall for tempo but Samira overstays, evidence of reset discipline mistake setup."
         },
         {
-          "clock": "5:31",
-          "videoSeconds": 153.75,
-          "description": "Samira and ally are pushing bot lane near enemy outer turret amidst enemy minions."
-        },
-        {
-          "clock": "12:12",
-          "videoSeconds": 327.75,
-          "description": "Samira moving in river near top lane, approaching scuttle crab."
+          "clock": "10:19",
+          "videoSeconds": 282,
+          "description": "Samira on respawn timer after dying—consequence of overstay on low HP, directly showing failure to reset."
         }
       ],
       "nuance": [
-        "Samira had heavy early snowball and plenty of gold, putting her far ahead.",
-        "Team consistently had open access to inhibitor/nexus turrets off won fights.",
-        "Samira left base pushes multiple times for camps or outlying waves with no threat on map.",
-        "Extending splits invited stalled endings and allowed more enemy respawns.",
-        "Grouping for structure finish is mechanically easy and gives clear win payoff with fed Samira."
+        "Waves are often crashed after a fight, setting up the perfect recall timer that’s then ignored.",
+        "Both deaths (2:47, 5:44) come right after clear winning trades and against teams with respawned enemies on the minimap.",
+        "Gold count is high at these deaths, meaning resets would have delivered a big power spike.",
+        "Shutdown bounty is visible on Samira at the time of deaths, increasing risk.",
+        "Teams are not contesting the push, showing it’s safe to recall instead of risk deeper aggression."
       ],
-      "reviewLimit": "Sampled frames cannot show precise enemy death timers or every macro call, and cannot prove full map state between frames, but the visible map pressure and turret exposure are clear enough for this repeatable pattern.",
+      "reviewLimit": "Frames are not frequent enough to evaluate micro skill use, actual recall clicks, or deep vision coverage, but lane state and minimap are clear for reset discipline and overstay.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 24,
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 36,
       "publicVideoBytes": 83857975,
       "src": "/recordings/auto_NA1-5565044205_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565044205-01.jpg"
@@ -392,7 +382,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Push for towers after bot win",
+      "title": "Missing structure pressure after bot prio",
       "duration": "9:57",
       "durationSeconds": 596.667,
       "gameLength": "17:46",
@@ -407,53 +397,103 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Push for towers after bot win",
-      "feedback": "Mistake: After finding successful botlane fights, you repeatedly chase into jungle/fog or linger near lane instead of immediately using your wave for turret plates and first tower. Fix: After a botlane win, focus on crashing the wave and pressuring the outer turret until your team is forced away, only leaving if the enemy spawns or you have to reset for HP/mana.",
-      "gameDetail": "There were also moments when you split off from minions or left the lane before turret fell. The simple lesson: always cash in fights with a tower push when possible, especially as Samira with wave clear.",
-      "eventEvidence": "3:45 Post-fight with allies alive, but Samira lingers near bot lane with wave instead of pressuring low turret for plates.; 7:19 After another bot win, Samira and Lux in lane but not immediately pushing for tower while enemy team retreats, missing structure opportunity.",
-      "goodThing": "You consistently followed up support engages in bot lane and snowballed with strong early fight impact.",
-      "whyTrust": "Towers are the biggest source of reliable team gold after a won fight, and Samira's fast clear lets you snowball leads quickly with plates if you prioritize them after kills.",
-      "focusTag": "tower conversion",
-      "evidence": "Bot wave is at enemy turret and you're alive with teammates after a double kill, yet turret pressure is delayed or missed.",
-      "pattern": "After winning 2v2s or 3v3s, you move toward river/tribush or hesitate instead of always hitting turret when it's safe and the wave is ready; this delays or loses early plate income.",
-      "diamondRule": "Always push for plates or turret after a successful bot fight unless you see multiple respawn timers ending or lack the HP to stay.",
-      "drill": "In your next three bot wins, stay for plates or the tower until either the enemy arrives or you must base, no exceptions.",
+      "feedbackTitle": "Missing structure pressure after bot prio",
+      "feedback": "Mistake: You repeatedly leave tower after pushing bot when you have numbers or wave, missing free turret plates and map pressure. Fix: When you force bot lane priority and the enemy is cleared or backed, stay to take plates or first tower before leaving for the next play.",
+      "gameDetail": "Keeping pressure on structures with waves while they're unguarded is the fastest path to convert lane wins into game wins, not just chasing kills or moving mid. Around 1:25, blue bot lane advancing minions under enemy turret, champions at level 3; By 5:50, the wave pushed under enemy bot turret with objective up, perfect window to pressure tower for plates, but players move away instead; Then around 7:14, bot lane has prio and allies present, wave at tower but team leaves lane, missing another clear chance to hit tower for pressure/plates. The lesson is to always check for open plates or tower windows before leaving a winning lane.",
+      "eventEvidence": "1:25 Blue bot lane advancing minions under enemy turret, champions at level 3; 5:50 Wave pushed under enemy bot turret with objective up, perfect window to pressure tower for plates, but players move away instead.; 7:14 Bot lane has prio and allies present, wave at tower but team leaves lane, missing another clear chance to hit tower for pressure/plates.",
+      "goodThing": "You capitalized on early kill windows and didn't waste time blindly fighting after recalling, returning to lane with tempo.",
+      "whyTrust": "These structure mistakes show up directly in the minimap and health bar state, and Samira's kit lets her play for plates or tower whenever the defense is forced off, so fixing this habit will free up more reliable gold and map openings.",
+      "focusTag": "structure conversion",
+      "evidence": "1:25 Blue bot lane advancing minions under enemy turret, champions at level 3; 5:50 Wave pushed under enemy bot turret with objective up, perfect window to pressure tower for plates, but players move away instead.; 7:14 Bot lane has prio and allies present, wave at tower but team leaves lane, missing another clear chance to hit tower for pressure/plates.",
+      "pattern": "You show good aggression for kills but leave lane with unused wave pressure and unclaimed plates, not parlaying kill leads into tower leads.",
+      "diamondRule": "Convert every non-contested lane win into immediate turret plate or tower damage before rotating.",
+      "drill": "In your next queue, after every bot fight win or enemy reset, ping the turret and stay for at least one plate unless multiple enemies collapse.",
       "timeline": [],
       "clockAnchors": [
         {
-          "clock": "3:45",
-          "videoSeconds": 97.5,
-          "description": "Samira runs down bot lane with allied minions; all ally respawn timers visible."
+          "clock": "0:02",
+          "videoSeconds": 4,
+          "description": "Allied champions standing on base platform at game start"
         },
         {
-          "clock": "7:19",
-          "videoSeconds": 187.5,
-          "description": "Samira and Lux in lane, enemy minions present; two enemy champions retreating."
+          "clock": "1:25",
+          "videoSeconds": 29.594,
+          "description": "Blue bot lane advancing minions under enemy turret, champions at level 3"
+        },
+        {
+          "clock": "4:26",
+          "videoSeconds": 118.5,
+          "description": "Red bot turret firing, two champions attacking minions under turret"
+        },
+        {
+          "clock": "5:50",
+          "videoSeconds": 150,
+          "description": "Bot lane pushing wave under tower, objective notification says 'The Mountains rise!'"
+        },
+        {
+          "clock": "7:14",
+          "videoSeconds": 183.159,
+          "description": "Bot lane moving up with two ally champions near enemy minions and two enemy champions"
+        },
+        {
+          "clock": "9:02",
+          "videoSeconds": 259.942,
+          "description": "Samira moving alone through bot jungle towards lane"
+        },
+        {
+          "clock": "10:16",
+          "videoSeconds": 285.536,
+          "description": "Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification"
+        },
+        {
+          "clock": "13:10",
+          "videoSeconds": 357.75,
+          "description": "Scoreboard open showing all players, some dead, Samira in base area"
+        },
+        {
+          "clock": "15:42",
+          "videoSeconds": 474,
+          "description": "Samira and allies attacking inner turret, several allied champions in enemy base"
+        },
+        {
+          "clock": "17:30",
+          "videoSeconds": 571.5,
+          "description": "In base shop menu open for Samira, just after kill notification"
         }
       ],
       "clockMoments": [
         {
-          "clock": "3:45",
-          "videoSeconds": 97.5,
-          "description": "Post-fight with allies alive, but Samira lingers near bot lane with wave instead of pressuring low turret for plates."
+          "clock": "1:25",
+          "videoSeconds": 29.594,
+          "description": "Blue bot lane advancing minions under enemy turret, champions at level 3"
         },
         {
-          "clock": "7:19",
-          "videoSeconds": 187.5,
-          "description": "After another bot win, Samira and Lux in lane but not immediately pushing for tower while enemy team retreats, missing structure opportunity."
+          "clock": "5:50",
+          "videoSeconds": 150,
+          "description": "Wave pushed under enemy bot turret with objective up, perfect window to pressure tower for plates, but players move away instead."
+        },
+        {
+          "clock": "7:14",
+          "videoSeconds": 183.159,
+          "description": "Bot lane has prio and allies present, wave at tower but team leaves lane, missing another clear chance to hit tower for pressure/plates."
+        },
+        {
+          "clock": "10:16",
+          "videoSeconds": 285.536,
+          "description": "Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification"
         }
       ],
       "nuance": [
-        "Fight mechanics are solid and you convert early kills, but leave turret windows open.",
-        "Waves are sometimes up at enemy bot tower post-fight with no enemies alive, but you don't always capitalize.",
-        "You rarely overstay for plates versus full respawn, but often leave before the turret is taken or guaranteed safe recall.",
-        "Later roam timing generally improves, but the habit of not instinctively pushing tower after bot win remains.",
-        "Samira's passive lets her quickly clear waves for plates, but the gold is missed if you disengage too soon."
+        "Samira has the tools to push for plates after kills or enemy backs.",
+        "The minimap repeatedly shows bot lane won with little threat nearby.",
+        "Jungle and mid presence aren't pressuring your bot lane turret during conversion windows.",
+        "You'll maximize early leads only by ensuring plates or first turret fall when you have the chance.",
+        "Wave states are frequently in your control but follow-up to structures is inconsistent."
       ],
-      "reviewLimit": "Frame density is enough to confirm the pattern around bot structure conversion, but not enough to evaluate all recall choices or judge mid/late split pushes.",
+      "reviewLimit": "Frames do not cover every post-kill window, so there may be some moments off-camera, but the sampled evidence is sufficient to confirm the repeated habit.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 24,
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 36,
       "publicVideoBytes": 92445880,
       "src": "/recordings/auto_NA1-5565025543_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565025543-01.jpg"
@@ -479,7 +519,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Reset Discipline After Inhibitor Push",
+      "title": "Fix overchasing after inhibitor for clean closes",
       "duration": "2:31",
       "durationSeconds": 151.333,
       "gameLength": "19:26",
@@ -494,83 +534,58 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Reset Discipline After Inhibitor Push",
-      "feedback": "Mistake: You overstayed aggressively after breaking inhibitor and winning a fight, pushing into a full respawned enemy team instead of resetting with your gold lead. Fix: After taking the inhibitor or a clean tower win, immediately back off and reset when the enemy team is about to respawn, especially with shutdown bounties, rather than forcing a bad 5v5 in their base.",
-      "gameDetail": "The main lesson: convert lead to resets and objectives, not risky fountain base fights.",
-      "eventEvidence": "16:31 Post-inhibitor destruction; team should reset here, but stays in base.; 17:17 Caught overstaying in enemy base, 3 teammates already dead instead of recalling after inhib.; 18:31 Re-engaging down mid after respawn instead of reset, ignoring chance to regroup.",
-      "goodThing": "You secured multiple clean kills and successfully took down mid lane objectives when your team had the numbers advantage.",
-      "whyTrust": "Samira loses all fight footing when the enemy team respawns together in base, and every time you push past an inhibitor against five, you throw your shutdown gold lead—this pattern is in multiple end-game teamfights in this footage.",
-      "focusTag": "reset discipline",
-      "evidence": "16:31 Post-inhibitor destruction; team should reset here, but stays in base.; 17:17 Caught overstaying in enemy base, 3 teammates already dead instead of recalling after inhib.; 18:31 Re-engaging down mid after respawn instead of reset, ignoring chance to regroup.",
-      "pattern": "Repeatedly, after breaking structures with a numbers/tempo advantage, you extend the play instead of recalling, giving the enemy a coordinated respawn defense and losing shutdown gold.",
-      "diamondRule": "When you break an inhibitor and the enemy team respawns, always reset and spend your gold; never force base fights with shutdowns up.",
-      "drill": "In your next game, after taking a mid inhibitor or an inner tower, immediately recall and ping your team back—track how many fights you avoid versus the respawn timer.",
+      "feedbackTitle": "Fix overchasing after inhibitor for clean closes",
+      "feedback": "Mistake: After breaking inhibitor, you lingered and forced extended fights instead of focusing on closing out by hitting the Nexus or taking a controlled reset. Fix: Once the inhibitor falls, prioritize cleanly ending or disengaging to reset for objectives instead of re-engaging or chasing unnecessary kills.",
+      "gameDetail": "After a successful mid-game fight and taking the inhibitor, you and your team pressure deeper into the base, but repeatedly re-engage when enemy respawns and backup are near, resulting in drawn out brawls and lost tempo. Around 15:25, engagement in mid lane with two champions retreating and one channeling; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase; By 19:05, Samira overchases for a triple kill at the enemy nexus after breaking inhibitor instead of ending or resetting, directly showing the coaching mistake. The lesson is: high ground access is your chance to end or reset, not start new risks.",
+      "eventEvidence": "15:25 Engagement in mid lane with two champions retreating and one channeling; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 19:05 Samira overchases for a triple kill at the enemy nexus after breaking inhibitor instead of ending or resetting, directly showing the coaching mistake.",
+      "goodThing": "You capitalized on your lead to consistently break open the base and pressure inhibitors.",
+      "whyTrust": "Game pace and win rates for Samira spike when you spend less time chasing fights after breaking inhibs and more time forcing enemy decisions around your next power play or reset.",
+      "focusTag": "overstay-reset",
+      "evidence": "15:25 Engagement in mid lane with two champions retreating and one channeling; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 19:05 Samira overchases for a triple kill at the enemy nexus after breaking inhibitor instead of ending or resetting, directly showing the coaching mistake.",
+      "pattern": "Winning fights leads to deep base pushes, but instead of ending or leaving, there’s a repeated habit of chasing low health or respawned opponents, risking throws and slowing your win.",
+      "diamondRule": "After breaking open inhibitor, never re-engage or chase unless it instantly finishes—they respawn faster and it’s where throws always begin.",
+      "drill": "Next game, after breaking an inhibitor, only stay to end if enemy numbers <2 and you have minions; otherwise, back or take jungle/objective instantly.",
       "timeline": [],
       "clockAnchors": [
         {
-          "clock": "14:55",
-          "videoSeconds": 4,
-          "description": "Samira walking in jungle near top side, 3 teammates dead."
-        },
-        {
           "clock": "15:25",
           "videoSeconds": 8.5,
-          "description": "Samira and teammate engaging enemy under mid lane outer tower, two enemies visible."
+          "description": "Engagement in mid lane with two champions retreating and one channeling."
         },
         {
           "clock": "16:31",
           "videoSeconds": 37.725,
-          "description": "Garen receives rampage, Samira in mid lane, post-fight movement."
-        },
-        {
-          "clock": "17:17",
-          "videoSeconds": 83.75,
-          "description": "Samira retreating in enemy base near mid inhibitor, 3 teammates dead."
-        },
-        {
-          "clock": "18:31",
-          "videoSeconds": 96,
-          "description": "Samira running down mid lane, one ally just slain, four alive on team."
+          "description": "Garen is on a rampage notification, champion in mid lane with Blade Whirl tooltip visible."
         },
         {
           "clock": "19:05",
           "videoSeconds": 119.25,
-          "description": "Samira scores triple kill near enemy nexus, only one enemy alive."
-        },
-        {
-          "clock": "19:16",
-          "videoSeconds": 130.471,
-          "description": "Samira chasing an enemy champion near enemy fountain and nexus."
+          "description": "Triple kill notification as Samira attacks enemy near red nexus."
         }
       ],
       "clockMoments": [
         {
-          "clock": "16:31",
-          "videoSeconds": 37.725,
-          "description": "Post-inhibitor destruction; team should reset here, but stays in base."
+          "clock": "15:25",
+          "videoSeconds": 8.5,
+          "description": "Engagement in mid lane with two champions retreating and one channeling; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase."
         },
         {
-          "clock": "17:17",
-          "videoSeconds": 83.75,
-          "description": "Caught overstaying in enemy base, 3 teammates already dead instead of recalling after inhib."
-        },
-        {
-          "clock": "18:31",
-          "videoSeconds": 96,
-          "description": "Re-engaging down mid after respawn instead of reset, ignoring chance to regroup."
+          "clock": "19:05",
+          "videoSeconds": 119.25,
+          "description": "Samira overchases for a triple kill at the enemy nexus after breaking inhibitor instead of ending or resetting, directly showing the coaching mistake."
         }
       ],
       "nuance": [
-        "Pushed up mid after winning teamfight, took inhib with no minions left for further pressure.",
-        "Enemy team respawned as fight was forced deep in base, losing advantage.",
-        "Multiple allied deaths visible post-inhibitor, with strong gold bounties handed back.",
-        "Samira keeps fighting and chasing for kills after taking key objectives instead of spending over 2k gold shown.",
-        "Missed safe reset window even when teammates began to die and enemies were stacking in spawn."
+        "You correctly followed up on picks to open inhibitor.",
+        "Did not immediately reset or hit the Nexus after inhibs fell, risking repeated team wipes.",
+        "Respawning enemies were visible as timers but not respected when overpushing.",
+        "Samira’s resets and ult potential become risky with grouped spawn timers.",
+        "You had enough gold and tempo to reset for objectives but opted into long fights instead."
       ],
-      "reviewLimit": "Frames do not show the full post-wipe map state or objective timers, but the repeated inhibitor push-overstay and shutdown feed are clear.",
+      "reviewLimit": "Frames do not show the very start of each fight or exact communications, so some intentions are inferred from visible movements and combat sequences, not from voice or pings.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 18,
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 25,
       "publicVideoBytes": 46327920,
       "src": "/recordings/auto_NA1-5564835832_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564835832-01.jpg"
@@ -596,7 +611,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Lingered with gold, low HP, and no reset discipline",
+      "title": "Fix lethal low-health lane overstay",
       "duration": "4:30",
       "durationSeconds": 270,
       "gameLength": "16:34",
@@ -611,54 +626,53 @@
       "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Lingered with gold, low HP, and no reset discipline",
-      "feedback": "Mistake: You stayed in lane and kept pushing and fighting with less than half HP and over 1500 gold, risking shutdowns and dying to enemy pressure. Fix: Immediately shove the wave after a kill or force and reset when your HP is low and you have over 1300 gold, especially if enemies can return or collapse.",
-      "gameDetail": "After an early skirmish under your own tower, you push back for kills but stay on the map at low HP, circling from wave to wave with nearly 2000 gold while the enemy bot lane respawns and returns. Later in the clip you continue to farm and hit tower, exposing your shutdown and making yourself a free target for respawns or jungle collapse. The core lesson: after big fights or forced retreats, shove the wave then reset immediately before you get punished.",
-      "eventEvidence": "The visible pattern is staying in lane with low HP and a large gold stack instead of turning the skirmish into a shove/reset.",
-      "goodThing": "You capitalized on enemy missteps for multiple low-HP outplays around 3:26 and 4:23.",
-      "whyTrust": "Samira is extremely vulnerable to return kills and shutdowns after skirmishes; resetting with a lead is the only way to turn early power into a snowball and not throw advantage.",
+      "feedbackTitle": "Fix lethal low-health lane overstay",
+      "feedback": "Mistake: You stayed in lane and pushed aggressively at sub-20% HP after winning skirmishes, with no vision or support, and delayed your recall for too long. Fix: Immediately reset to base after a risky fight win when low HP and high gold, instead of pushing extra waves alone under threat.",
+      "gameDetail": "No enemy was on screen but fogged respawn timings plus no allied backup made the extended push very dangerous, costing time and risking a shutdown. The conversion play finally ends with a late recall, but the currency risk and tempo loss are real. Around 6:06, Samira pushes lane at sub-20% HP after skirmish win with no vision or backup, setting up the overstay risk; By 6:17, Samira continues pushing at low HP as enemy respawns, delaying recall and risking shutdown, showing the consequence of overstaying instead of resetting. The simple lesson: after fighting to near-death and winning, reset instantly and secure your advantage.",
+      "eventEvidence": "6:06 Samira pushes lane at sub-20% HP after skirmish win with no vision or backup, setting up the overstay risk.; 6:17 Samira continues pushing at low HP as enemy respawns, delaying recall and risking shutdown, showing the consequence of overstaying instead of resetting.",
+      "goodThing": "You played the skirmish out mechanically and picked up a key kill even after being chunked low, showing clutch survival.",
+      "whyTrust": "Resetting on Samira after surviving a bloody fight prevents shutdown throws and guarantees you return with item spikes before the enemy can punish your low HP; the video shows over 40 seconds of greedy wave push while one shot from any respawn or gank would end your run.",
       "focusTag": "reset discipline",
-      "evidence": "Low HP and high gold after fights with full waves visible, no recall even as enemies respawn and approach.",
-      "pattern": "After favorable trades and even after forced enemy recalls, you stayed in lane with kill bounty and no HP, risking throw for extra CS or plate gold instead of cashing in lead.",
-      "diamondRule": "Always reset after a big fight or skirmish when you have over 1300 gold or are below 40% HP, unless you have full vision of all enemies.",
-      "drill": "Next game, after any botlane fight or forced enemy recall, immediately shove the next wave and recall if your HP is under 60% or you have over 1300 gold—do not stay for extra waves.",
-      "timeline": [
-        "Both you and your support low HP, enemy support returns, but you stay for next wave.",
-        "You secure another kill but still do not recall.",
-        "Continue clearing wave, still not recalling with high gold and low HP.",
-        "Recall finally begins after multiple greedy waves.",
-        "Stay hitting under tower even with enemy respawns in vision."
-      ],
+      "evidence": "6:06 Samira pushes lane at sub-20% HP after skirmish win with no vision or backup, setting up the overstay risk.; 6:17 Samira continues pushing at low HP as enemy respawns, delaying recall and risking shutdown, showing the consequence of overstaying instead of resetting.",
+      "pattern": "After the 2v2 wins or favorable scraps, Samira routinely sits in lane farming at sub-30% HP instead of recalling on power spike, with enemy bot lane MIA and no jungler cover.",
+      "diamondRule": "Always press B and reset after a fight win leaves you below 30% HP and holding 1k+ gold, unless full vision or team is with you.",
+      "drill": "Next queue, after any 2v2 win or near-miss with 1k+ gold and low HP, instantly hit recall after catching only ONE wave, not two.",
+      "timeline": [],
       "clockAnchors": [
         {
-          "clock": "0:31",
-          "videoSeconds": 1,
-          "description": "Player is moving alone in bottom lane; minions have spawned."
+          "clock": "6:06",
+          "videoSeconds": 243.217,
+          "description": "Player is attacking minions near enemy bot lane turret."
         },
         {
-          "clock": "5:43",
-          "videoSeconds": 220.435,
-          "description": "Player is clearing a wave in bottom lane as dragon is near."
+          "clock": "6:17",
+          "videoSeconds": 254.609,
+          "description": "Player is near enemy turret, attacking minions while an enemy champion retreats."
         }
       ],
       "clockMoments": [
         {
-          "clock": "5:43",
-          "videoSeconds": 220.435,
-          "description": "Staying on the map to clear a wave with low HP and high gold after prior fights, risking shutdown with no reset."
+          "clock": "6:06",
+          "videoSeconds": 243.217,
+          "description": "Samira pushes lane at sub-20% HP after skirmish win with no vision or backup, setting up the overstay risk."
+        },
+        {
+          "clock": "6:17",
+          "videoSeconds": 254.609,
+          "description": "Samira continues pushing at low HP as enemy respawns, delaying recall and risking shutdown, showing the consequence of overstaying instead of resetting."
         }
       ],
       "nuance": [
-        "You consistently took aggressive trades but failed to disengage after advantageous outcomes.",
-        "You gathered two kills and assists but greedily stayed under low HP for farm.",
-        "There was ample gold for a full buy, yet you delayed recall even as enemies re-entered lane.",
-        "Clear minimap indicators showed potential jungle or mid collapse with no vision coverage.",
-        "You risked shutdown gold and lane priority by greedy extra waves rather than using your lead to pressure reset timing."
+        "Immediately after the bot skirmish, both Samira and support are low, but Samira continues pushing.",
+        "No evident vision in the river/tri-brush and enemy respawns are not tracked.",
+        "She accumulates almost 2k gold before recalling, leaving herself exposed to return ganks or collapse.",
+        "Wave greed wins a few more minions but risks throwing shutdown gold.",
+        "After finally resetting, Samira is late to use her gold-spike and misses a cleaner recall timing."
       ],
-      "reviewLimit": "The frames do not show any actual deaths during this period, so it's possible you escaped punishment this time, but the reset error is clear and repeatable for harder games.",
+      "reviewLimit": "Frames cover a dense early game window, but do not show enemy actual movements off-screen, jungle pathing, or consequences if an enemy collapses; no proof of punishment, but the risk is blatant.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 24,
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 27,
       "publicVideoBytes": 88166283,
       "src": "/recordings/auto_NA1-5564718141_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564718141-01.jpg"
@@ -701,52 +715,57 @@
       "confidence": "high",
       "feedbackTitle": "Finish-window all-in",
       "feedback": "Mistake: over-learning this clip would make you throw; the same dash is bad if it starts without wave, teammate body, or nexus pressure. Fix: full send only when every reset moves toward the payout.",
-      "gameDetail": "At 14:21 the fight is already in their base, not in river or a side lane: allies and minions are in front, enemy defenders are packed near nexus, and Samira is close enough to chain resets without walking into fog. Learn this exactly: the all-in is good when the map is already ending; outside that condition, cash out first.",
-      "eventEvidence": "14:21 Engagement begins with allies, enemies, and minions in front of the nexus—fight is inside endgame window.; 14:33 Triple kill shows Samira chaining resets as the brawl stays next to the base, highlighting full send at finish timing.; 14:41 Penta kill lands as fight never leaves nexus area, confirming this full commit works since every reset advances the win.",
+      "gameDetail": "At 14:21 the fight is already in their base, not in river or a side lane: allies and minions are in front, enemy defenders are packed near nexus, and Samira is close enough to chain resets without walking into fog. Around 14:21, fight starts inside the enemy base with multiple enemy defenders still alive;; By 14:41, penta as the base remains open.;. Learn this exactly: the all-in is good when the map is already ending; outside that condition, cash out first.",
+      "eventEvidence": "14:21 fight starts inside the enemy base with multiple enemy defenders still alive;; 14:41 penta as the base remains open.;",
       "goodThing": "The strong part is the finish discipline: once the enemy line collapses, Samira stays with the ally/minion push and cleans through the defenders instead of drifting sideways.",
       "whyTrust": "The penta is not random: the clip shows the conditions that made it valid, with allies and minions already in base and every reset moving toward nexus.",
       "focusTag": "finish-only all-in",
-      "evidence": "Manual storyboard review of the May 20 highlight: visible base fight from 14:21 to 14:41, double/triple/quadra/penta sequence, and enemy base already open.",
+      "evidence": "14:21 fight starts inside the enemy base with multiple enemy defenders still alive;; 14:41 penta as the base remains open.;",
       "pattern": "Samira's best-looking fight here works because the map already gives the exit and the payout. The dangerous habit would be copying the same depth when the fight is not already a base finish.",
       "diamondRule": "All-in only when the reset path and the payout are the same direction.",
       "drill": "Before E/R, ask: does every reset move me toward nexus, tower, dragon, Baron, or safety?",
       "timeline": [
         "14:21 - Samira is already inside the enemy base with several defenders alive and allied pressure in front.",
-        "14:33 - The reset chain reaches triple while the wave and allies still hold the base area.",
         "14:41 - The penta lands with the enemy base open, which is the correct payoff condition."
       ],
       "clockAnchors": [
         {
           "clock": "14:21",
           "videoSeconds": 0.887,
-          "description": "Several champions fighting near destroyed inhibitor, health bars visible."
+          "description": "Several champions fighting near the inhibitor, Blitzcrank and Lucian low health."
+        },
+        {
+          "clock": "14:27",
+          "videoSeconds": 6.7
+        },
+        {
+          "clock": "14:30",
+          "videoSeconds": 9.6
         },
         {
           "clock": "14:33",
-          "videoSeconds": 12.5,
-          "description": "Triple kill notification shown, champions fighting among minions in base."
+          "videoSeconds": 12.5
+        },
+        {
+          "clock": "14:38",
+          "videoSeconds": 18.3
         },
         {
           "clock": "14:41",
           "videoSeconds": 21.2,
-          "description": "Pentakill notification shown, surviving blue champions moving away from fight."
+          "description": "Pentakill announcement, two blue team champions moving away from red base."
         }
       ],
       "clockMoments": [
         {
           "clock": "14:21",
           "videoSeconds": 0.887,
-          "description": "Engagement begins with allies, enemies, and minions in front of the nexus—fight is inside endgame window."
-        },
-        {
-          "clock": "14:33",
-          "videoSeconds": 12.5,
-          "description": "Triple kill shows Samira chaining resets as the brawl stays next to the base, highlighting full send at finish timing."
+          "description": "fight starts inside the enemy base with multiple enemy defenders still alive;"
         },
         {
           "clock": "14:41",
           "videoSeconds": 21.2,
-          "description": "Penta kill lands as fight never leaves nexus area, confirming this full commit works since every reset advances the win."
+          "description": "penta as the base remains open.;"
         }
       ],
       "nuance": [
@@ -757,7 +776,7 @@
       ],
       "reviewLimit": "The Riot highlight is only about 22 seconds, so the review claims the visible base fight and does not invent the earlier setup.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 8,
       "publicVideoBytes": 10628274,
       "src": "/recordings/16-10_NA1-5564259818_01.webm",
@@ -801,43 +820,75 @@
       "confidence": "high",
       "feedbackTitle": "You drift after base opens",
       "feedback": "Mistake: you chase sideways after the base is already open. Fix: stand behind the first body in and hit the structure as soon as space is made.",
-      "gameDetail": "Honest read: the useful footage starts after a desktop-capture section, and the lesson is still clear. Around 13:05 the map slows down: Mordekaiser walks away mid, an ally is channeling recall, and Samira is full HP with the lane already open, which is exactly the moment to choose wave/base route before another target appears.",
-      "eventEvidence": "13:05 Pause in action after base is opened, choice to hit structure or reset; 14:23 Team correctly grouping and hitting Nexus for structure conversion",
+      "gameDetail": "Around 11:51, Samira with low health walking away from top lane after a shutdown; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase; By 12:10, low Samira below the open enemy base entrance;. Honest read: the useful footage starts after a desktop-capture section, and the lesson is still clear. Around 12:10 Samira is low below the enemy base entrance while allies are already fighting inside the cracked base; the next valuable movement is backward-to-safe or forward-to-structure with the team, not a solo side angle.",
+      "eventEvidence": "11:51 Samira with low health walking away from top lane after a shutdown; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 12:10 low Samira below the open enemy base entrance;",
       "goodThing": "You did group back toward the base and finish the game instead of letting the push fully dissolve.",
       "whyTrust": "The win came from returning to the open base, not from a cleaner combo. Your damage was not the limiting factor; target discipline was.",
       "focusTag": "end the push",
-      "evidence": "13:05 Pause in action after base is opened, choice to hit structure or reset; 14:23 Team correctly grouping and hitting Nexus for structure conversion",
-      "pattern": "The winning pressure was already available. The mistake is treating a nearby champion like the win condition after the actual win condition is already open.",
+      "evidence": "11:51 Samira with low health walking away from top lane after a shutdown; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 12:10 low Samira below the open enemy base entrance;",
+      "pattern": "The winning pressure was already available. The mistake is treating a nearby Samira like the win condition after the actual win condition is already open.",
       "diamondRule": "If a base structure is available, a chase is wrong unless it directly removes the body blocking the structure.",
       "drill": "Next game: when inhibitor or nexus is open, say front line, structure, no chase.",
-      "timeline": [],
+      "timeline": [
+        "12:10 - Samira is low below the enemy base entrance while allies are already inside the cracked base."
+      ],
       "clockAnchors": [
         {
           "clock": "11:51",
           "videoSeconds": 9.3,
-          "description": "Champion with low health walking up lane after a shutdown event"
+          "description": "Player with low health walking away from top lane after a shutdown."
+        },
+        {
+          "clock": "12:10",
+          "videoSeconds": 27.8,
+          "description": "Multiple champions fighting near red side mid inhibitor tower."
+        },
+        {
+          "clock": "12:47",
+          "videoSeconds": 64.471,
+          "description": "Player respawned and is heading out of fountain in base."
         },
         {
           "clock": "13:05",
-          "videoSeconds": 83.3,
-          "description": "Champion moving mid lane, teammate channeling recall nearby"
+          "videoSeconds": 83.3
+        },
+        {
+          "clock": "13:15",
+          "videoSeconds": 92.5
+        },
+        {
+          "clock": "13:52",
+          "videoSeconds": 129.5,
+          "description": "Player standing on fountain near shop interface."
+        },
+        {
+          "clock": "14:01",
+          "videoSeconds": 138.8
+        },
+        {
+          "clock": "14:10",
+          "videoSeconds": 148
+        },
+        {
+          "clock": "14:19",
+          "videoSeconds": 157.3
         },
         {
           "clock": "14:23",
           "videoSeconds": 161.224,
-          "description": "Team attacking the enemy Nexus after a kill"
+          "description": "Team attacking red nexus with minions and teammates present."
         }
       ],
       "clockMoments": [
         {
-          "clock": "13:05",
-          "videoSeconds": 83.3,
-          "description": "Pause in action after base is opened, choice to hit structure or reset"
+          "clock": "11:51",
+          "videoSeconds": 9.3,
+          "description": "Samira with low health walking away from top lane after a shutdown; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase."
         },
         {
-          "clock": "14:23",
-          "videoSeconds": 161.224,
-          "description": "Team correctly grouping and hitting Nexus for structure conversion"
+          "clock": "12:10",
+          "videoSeconds": 27.8,
+          "description": "low Samira below the open enemy base entrance;"
         }
       ],
       "nuance": [
@@ -848,7 +899,7 @@
       ],
       "reviewLimit": "The clip has desktop-capture segments mixed with game footage, so the narrative only claims the visible game moments.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 18,
       "publicVideoBytes": 25780055,
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
@@ -891,64 +942,195 @@
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "You re-fight after winning",
-      "feedback": "Mistake: you keep playing for another fight after the first win. Fix: cash out wave, tower, reset, or end before touching another champion.",
-      "gameDetail": "Honest read: this is improved, but the same leak keeps coming back after the good moment. Around 10:32 Samira is low in bot lane while Braum and Jinx can still answer, so every extra step forward is a shutdown invitation unless the next click is reset or structure. The lesson is not to fight less; it is to make the first won fight buy the wave, turret, reset, or end before accepting the second one.",
-      "eventEvidence": "1:09 Post-fight position: Samira is still forward after the fight near tower, illustrating re-engage instead of reset or structure.; 7:06 Good example: After winning, push turns to turret damage rather than chasing for another fight.; 10:32 Low health stay: Samira remains in lane near enemies instead of resetting, risking shutdown.",
+      "feedback": "Mistake: you keep playing for another fight after the first win. Fix: cash out wave, tower, reset, or end before touching another Samira.",
+      "gameDetail": "Honest read: this is improved, but the same leak keeps coming back after the good moment. Around 1:24 Samira is fighting under the friendly bot tower with Jinx and Braum still on screen; the movement is forward into a contested lane pocket while the safer value is to thin the wave, hold the tower line, and make them walk into you. Around 7:58 the good version happens: the bot push is already under enemy tower, the wave is with you, and the won pressure turns into turret damage instead of another random chase. Around 10:32 Samira is low in bot lane while Braum and Jinx can still answer, so every extra step forward is a shutdown invitation unless the next click is reset or structure. Around 12:44 the punishment is visible: the fight is still extended near the enemy side, crowd control lands, and the screen shows a shutdown instead of a clean cashout. The lesson is not to fight less; it is to make the first won fight buy the wave, turret, reset, or end before accepting the second one.",
+      "eventEvidence": "1:24 contested fight under friendly bot tower;; 7:58 won bot push becomes turret damage;; 10:32 low-health lane stay;",
       "goodThing": "The good part was real: you turned one bot-side win into turret pressure instead of only chasing kills.",
       "whyTrust": "The same game shows both sides: turret conversion is the right version, and the later low-health re-fight is how stronger opponents get shutdown gold back.",
       "focusTag": "payout before dash",
-      "evidence": "1:09 Post-fight position: Samira is still forward after the fight near tower, illustrating re-engage instead of reset or structure.; 7:06 Good example: After winning, push turns to turret damage rather than chasing for another fight.; 10:32 Low health stay: Samira remains in lane near enemies instead of resetting, risking shutdown.",
+      "evidence": "1:24 contested fight under friendly bot tower;; 7:58 won bot push becomes turret damage;; 10:32 low-health lane stay;",
       "pattern": "The damage is already there. The leak is the second decision: after the first win, you often accept another fight before the map payout is locked.",
       "diamondRule": "First win buys wave, tower, reset, or end before the next fight is allowed.",
       "drill": "After the first kill or forced recall, say cash out before moving forward.",
-      "timeline": [],
+      "timeline": [
+        "1:24 - Early bot fight is still near friendly tower with both lane enemies able to answer.",
+        "7:58 - Bot pressure becomes turret, which is the good conversion.",
+        "10:32-12:44 - Low-health extended fighting replaces the clean cashout/reset."
+      ],
       "clockAnchors": [
         {
           "clock": "0:19",
           "videoSeconds": 4,
-          "description": "Samira is leaving fountain near friendly top lane base turret."
+          "description": "Samira is moving away from blue base fountain area."
         },
         {
           "clock": "1:09",
           "videoSeconds": 20.902,
-          "description": "Samira retreating from Braum and Gragas bots in bot lane after an ally death."
+          "description": "Samira and Braum Bot exchange spells in bot lane; a champion has been slain."
+        },
+        {
+          "clock": "1:24",
+          "videoSeconds": 35.816,
+          "description": "Samira and Gragas Bot fight under blue bot turret; turret is firing."
+        },
+        {
+          "clock": "1:26",
+          "videoSeconds": 37.805,
+          "description": "contested fight under friendly bot tower;"
+        },
+        {
+          "clock": "1:42",
+          "videoSeconds": 54.707,
+          "description": "Samira gains gold from a minion kill in lane near bottom left."
+        },
+        {
+          "clock": "2:20",
+          "videoSeconds": 71.61,
+          "description": "Samira and Braum Bot chase into river near bot lane, fighting over jungle area."
+        },
+        {
+          "clock": "3:00",
+          "videoSeconds": 88.512,
+          "description": "Samira is moving back into bot lane near her tower; Jellies in left jungle."
         },
         {
           "clock": "3:35",
           "videoSeconds": 105.415,
-          "description": "Samira gets a double kill among enemy minions in bot lane."
+          "description": "Samira scores a double kill in bot lane; lots of minions present."
+        },
+        {
+          "clock": "4:08",
+          "videoSeconds": 122.317,
+          "description": "Samira levels up and walks near allied support close to enemy bot turret."
+        },
+        {
+          "clock": "4:42",
+          "videoSeconds": 139.22,
+          "description": "Sejuani Bot slays Annie; skirmish near river mouth and bottom lane."
+        },
+        {
+          "clock": "5:16",
+          "videoSeconds": 156.122,
+          "description": "Samira and support stand together in the middle of bot lane; enemy minions approach."
+        },
+        {
+          "clock": "6:11",
+          "videoSeconds": 173.025,
+          "description": "Samira pushes bot lane towards the enemy outer turret; 'The Mountains rise!' dragon event text appears."
         },
         {
           "clock": "7:06",
           "videoSeconds": 189.927,
-          "description": "Both Samira and an ally with blue buff pushing bot lane against minions."
+          "description": "Samira and support push bot lane with large minion wave near outer turret."
+        },
+        {
+          "clock": "7:39",
+          "videoSeconds": 206.83,
+          "description": "Red turret destroyed message; Samira and support near enemy outer bot turret."
+        },
+        {
+          "clock": "7:58",
+          "videoSeconds": 216.1,
+          "description": "Red turret destroyed; Samira and support push into red side base lane."
+        },
+        {
+          "clock": "8:13",
+          "videoSeconds": 223.732,
+          "description": "Samira slays Braum Bot in red side base near multiple enemy champions."
+        },
+        {
+          "clock": "8:15",
+          "videoSeconds": 223.732
+        },
+        {
+          "clock": "8:47",
+          "videoSeconds": 240.635,
+          "description": "Samira channels recall at the edge of blue top lane."
+        },
+        {
+          "clock": "9:31",
+          "videoSeconds": 257.537,
+          "description": "Diana Bot slays Annie near red top lane inner turret; Samira moves away."
+        },
+        {
+          "clock": "10:05",
+          "videoSeconds": 274.44,
+          "description": "Diana Bot is on a killing spree; fighting in bot lane, multiple champions level up."
         },
         {
           "clock": "10:32",
           "videoSeconds": 288.269,
-          "description": "Samira and Master Yi are near enemy Gragas and minions in bot lane."
+          "description": "Samira retreats from red bot inner turret fight; Master Yi and Gragas Bot nearby."
+        },
+        {
+          "clock": "10:38",
+          "videoSeconds": 291.342,
+          "description": "Samira and Master Yi fight Gragas Bot under inner bot tower."
+        },
+        {
+          "clock": "11:38",
+          "videoSeconds": 308.245,
+          "description": "Blue team steals Mountain Drake; Samira and two enemies near drake pit."
+        },
+        {
+          "clock": "11:34",
+          "videoSeconds": 325.147,
+          "description": "Blue team just stole Mountain Drake; Samira moves towards river from bot side."
+        },
+        {
+          "clock": "11:54",
+          "videoSeconds": 325.147
+        },
+        {
+          "clock": "12:08",
+          "videoSeconds": 342.05,
+          "description": "Samira scores a large gold kill and levels up during Inferno Trigger ultimate."
+        },
+        {
+          "clock": "12:42",
+          "videoSeconds": 358.952,
+          "description": "Red turret destroyed; Samira leads a minion push into red base."
+        },
+        {
+          "clock": "12:44",
+          "videoSeconds": 359.946,
+          "description": "crowd control and shutdown punish the extended fight.;"
+        },
+        {
+          "clock": "13:16",
+          "videoSeconds": 375.855,
+          "description": "Samira destroys red inhibitor during a teamfight in base."
         },
         {
           "clock": "14:23",
           "videoSeconds": 392.757,
-          "description": "Samira's team destroys a red nexus turret with several teammates in the base."
+          "description": "Red turret destroyed; Samira and team are grouped in enemy base."
+        },
+        {
+          "clock": "14:25",
+          "videoSeconds": 392.757
         }
       ],
       "clockMoments": [
         {
-          "clock": "1:09",
-          "videoSeconds": 20.902,
-          "description": "Post-fight position: Samira is still forward after the fight near tower, illustrating re-engage instead of reset or structure."
+          "clock": "1:24",
+          "videoSeconds": 35.816,
+          "description": "contested fight under friendly bot tower;"
         },
         {
-          "clock": "7:06",
-          "videoSeconds": 189.927,
-          "description": "Good example: After winning, push turns to turret damage rather than chasing for another fight."
+          "clock": "7:58",
+          "videoSeconds": 216.1,
+          "description": "won bot push becomes turret damage;"
         },
         {
           "clock": "10:32",
           "videoSeconds": 288.269,
-          "description": "Low health stay: Samira remains in lane near enemies instead of resetting, risking shutdown."
+          "description": "low-health lane stay;"
+        },
+        {
+          "clock": "12:42",
+          "videoSeconds": 358.952,
+          "description": "crowd control and shutdown punish the extended fight.;"
         }
       ],
       "nuance": [
@@ -960,7 +1142,7 @@
       ],
       "reviewLimit": "Manual review used sampled replay frames and log timing, not raw inputs or full cooldown telemetry.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 24,
       "publicVideoBytes": 79026136,
       "src": "/recordings/16-10_NA1-5563352800_01.mp4",
@@ -1004,43 +1186,152 @@
       "confidence": "high",
       "feedbackTitle": "You stay when one hit kills you",
       "feedback": "Mistake: you keep playing the wave when one auto or spell kills you. Fix: give the wave and recall before the lane turns into a death timer.",
-      "gameDetail": "Honest read: this is not a mechanics issue; it is a health-gate issue. The blocker is staying in lane after the health bar says the next decision should be recall.",
-      "eventEvidence": "3:13 Staying in lane at lethal health after a fight, not recalling despite danger",
+      "gameDetail": "Honest read: this is not a mechanics issue; it is a health-gate issue. By 14:28 the team is ending with Samira alive around the base fight, which proves the Samira damage is not the blocker. Around 5:51, Samira farming bot lane, just killed a caster minion; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase; By 14:28, the later team ending works.;. The blocker is staying in lane after the health bar says the next decision should be recall.",
+      "eventEvidence": "5:51 Samira farming bot lane, just killed a caster minion; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 14:28 the later team ending works.;",
       "goodThing": "After the bad early health decision, you still got back into the game and converted later pressure into the ending push.",
       "whyTrust": "This is not vague advice: the reviewed frames show the exact one-hit-health lane stay, and removing that habit protects the aggression that already works later.",
       "focusTag": "lethal hp reset",
-      "evidence": "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
+      "evidence": "5:51 Samira farming bot lane, just killed a caster minion; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 14:28 the later team ending works.;",
       "pattern": "The new game is better at converting once Samira has items, but the early lane still has a lethal-HP greed point: staying for the wave while one hit from death turns a manageable recall into a death timer.",
       "diamondRule": "Below one enemy auto or spell, the wave is no longer the objective; reset first, then play the next item spike.",
       "drill": "At low HP, say one hit kills me and recall unless the enemy bot lane is dead or fully gone.",
-      "timeline": [],
+      "timeline": [
+        "14:28 - The later ending works, which makes the early health-gate mistake the cleaner thing to remove."
+      ],
       "clockAnchors": [
         {
           "clock": "0:57",
           "videoSeconds": 4,
-          "description": "Samira and allied minions approach the bottom lane near their tower."
+          "description": "Samira and minions walking down bot lane; no enemies visible nearby"
+        },
+        {
+          "clock": "1:20",
+          "videoSeconds": 26.561
+        },
+        {
+          "clock": "1:42",
+          "videoSeconds": 49.123
+        },
+        {
+          "clock": "2:05",
+          "videoSeconds": 71.684,
+          "description": "Samira near blue bot turret with enemy minions approaching"
+        },
+        {
+          "clock": "2:27",
+          "videoSeconds": 94.246
+        },
+        {
+          "clock": "2:43",
+          "videoSeconds": 109.941
+        },
+        {
+          "clock": "2:50",
+          "videoSeconds": 116.807
         },
         {
           "clock": "3:13",
-          "videoSeconds": 139.368,
-          "description": "Samira gains gold after a takedown in bot lane, with a shutdown event shown."
+          "videoSeconds": 139.368
+        },
+        {
+          "clock": "3:27",
+          "videoSeconds": 153.726
+        },
+        {
+          "clock": "3:35",
+          "videoSeconds": 161.93
+        },
+        {
+          "clock": "4:21",
+          "videoSeconds": 184.491
+        },
+        {
+          "clock": "4:44",
+          "videoSeconds": 207.053
+        },
+        {
+          "clock": "4:57",
+          "videoSeconds": 220.385
+        },
+        {
+          "clock": "5:06",
+          "videoSeconds": 229.614
+        },
+        {
+          "clock": "5:51",
+          "videoSeconds": 252.175,
+          "description": "Samira farming bot lane, just killed a caster minion"
+        },
+        {
+          "clock": "6:13",
+          "videoSeconds": 274.737
+        },
+        {
+          "clock": "6:36",
+          "videoSeconds": 297.298
+        },
+        {
+          "clock": "7:43",
+          "videoSeconds": 319.86
+        },
+        {
+          "clock": "8:09",
+          "videoSeconds": 342.421
+        },
+        {
+          "clock": "8:42",
+          "videoSeconds": 364.982
+        },
+        {
+          "clock": "9:04",
+          "videoSeconds": 387.544
+        },
+        {
+          "clock": "9:53",
+          "videoSeconds": 410.105
         },
         {
           "clock": "11:18",
-          "videoSeconds": 432.666,
-          "description": "Samira destroys a red turret with many allied minions in bot lane."
+          "videoSeconds": 432.667
+        },
+        {
+          "clock": "12:37",
+          "videoSeconds": 455.228,
+          "description": "Samira pushing mid lane with several blue minions; Morgana is godlike message"
+        },
+        {
+          "clock": "12:57",
+          "videoSeconds": 455.228
+        },
+        {
+          "clock": "13:20",
+          "videoSeconds": 477.789,
+          "description": "Samira in mid lane during teamfight, blue team pushing inhibitor, Samira has just slain Ashe Bot"
+        },
+        {
+          "clock": "14:13",
+          "videoSeconds": 500.351
+        },
+        {
+          "clock": "14:28",
+          "videoSeconds": 505.8,
+          "description": "Blue team pushing into red base, Master Yi has destroyed a red inhibitor"
         },
         {
           "clock": "14:45",
-          "videoSeconds": 522.912,
-          "description": "Samira and allies destroy the final red turret in the enemy base near Nexus."
+          "videoSeconds": 522.912
         }
       ],
       "clockMoments": [
         {
-          "clock": "3:13",
-          "videoSeconds": 139.368,
-          "description": "Staying in lane at lethal health after a fight, not recalling despite danger"
+          "clock": "5:51",
+          "videoSeconds": 252.175,
+          "description": "Samira farming bot lane, just killed a caster minion; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase."
+        },
+        {
+          "clock": "14:28",
+          "videoSeconds": 505.8,
+          "description": "the later team ending works.;"
         }
       ],
       "nuance": [
@@ -1051,7 +1342,7 @@
       ],
       "reviewLimit": "Manual review used sampled replay frames and close-up storyboard sheets, not raw inputs or complete cooldown telemetry.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 24,
       "publicVideoBytes": 91217492,
       "src": "/recordings/16-10_NA1-5563301586_01.mp4",
@@ -1078,7 +1369,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "16/10 means conversion gap",
+      "title": "Chasing Fights Past Structure Instead of Ending",
       "duration": "2:09",
       "durationSeconds": 129.397,
       "gameLength": "17:25",
@@ -1092,90 +1383,143 @@
       "kind": "full review",
       "reviewPhase": "implementation",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "16/10 means conversion gap",
-      "feedback": "The full-game read says damage is enough; the next useful rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
-      "gameDetail": "This full review shows Samira can already create kills, so the climb gap is what happens right after the first win. The next useful rep is converting the won fight into wave, tower, objective, nexus, or recall before the next fight gives shutdown gold back.",
-      "eventEvidence": "The full-game result shows high kill creation with too many deaths, which points to conversion and shutdown protection rather than raw damage.",
-      "goodThing": "You are finding fights and creating damage pressure; the fix is cashing those wins out cleaner.",
-      "whyTrust": "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
-      "focusTag": "overstay control",
-      "evidence": "7:22 Structure conversion: first turret destroyed after fight win; 8:19 Shutdown moment: high risk after fight win, death with gold bounty",
-      "pattern": "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
-      "diamondRule": "After a won fight, take the guaranteed payout before looking for the next fight.",
-      "drill": "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
+      "confidence": "high",
+      "feedbackTitle": "Chasing Fights Past Structure Instead of Ending",
+      "feedback": "Mistake: You repeatedly chased into side fights and jungle while having direct access to open base and inhib structures. Fix: When the enemy base is open and you have numbers, walk directly to hit Nexus turrets or inhibitors instead of diving for more kills.",
+      "gameDetail": "Several enemy inhibitors and turrets were easily available, but kill chasing in jungle or near walls pulls you off the win condition. Around 12:08, red turret destroyed; Ezreal and minions attacking red base top inhibitor; By 13:05, ezreal chases a fight near mid inhibitor instead of hitting open base structures—direct evidence of prioritizing fights over structure conversion; Then around 15:56, naafiri has destroyed a red inhibitor; blue team pushing in red base. The simple lesson: if an enemy base is open with multiple teammates up, always look for the structure hit rather than hunting another 1v1 or off-angle fight.",
+      "eventEvidence": "12:08 Red turret destroyed; Ezreal and minions attacking red base top inhibitor; 13:05 Ezreal chases a fight near mid inhibitor instead of hitting open base structures—direct evidence of prioritizing fights over structure conversion.; 15:56 Naafiri has destroyed a red inhibitor; blue team pushing in red base",
+      "goodThing": "You regularly grouped with your team when pushing into the enemy base.",
+      "whyTrust": "This habit directly blocks fast wins in close or comeback games; focusing on ending when the base is open will win you more games and insulates against throw risk, especially on a snowball Samira like Samira.",
+      "focusTag": "base-ending discipline",
+      "evidence": "12:08 Red turret destroyed; Ezreal and minions attacking red base top inhibitor; 13:05 Ezreal chases a fight near mid inhibitor instead of hitting open base structures—direct evidence of prioritizing fights over structure conversion.; 15:56 Naafiri has destroyed a red inhibitor; blue team pushing in red base",
+      "pattern": "Alan repeatedly prioritizes chasing sometimes-isolated enemies instead of hard committing to end structures when the opportunity is available, missing clean closes in clear advantage scenarios.",
+      "diamondRule": "Never chase kills or side fights when enemy base structures are unguarded and your team has pressure to end.",
+      "drill": "Next game, every time an inhib or Nexus turret is open and undefended, click straight to it and hit until a real threat arrives—ignore all jungle or side distractions.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "0:42",
           "videoSeconds": 4,
-          "description": "Minions have spawned text in base, scoreboard visible"
+          "description": "Minions have spawned message above red nexus platform"
         },
         {
           "clock": "1:39",
           "videoSeconds": 11.141,
-          "description": "Caitlyn has slain Heimerdinger Bot notification in top lane fight"
+          "description": "Caitlyn slays Heimerdinger Bot in top lane"
         },
         {
           "clock": "2:36",
           "videoSeconds": 18.282,
-          "description": "Ezreal has slain Kayle Bot notification in bot lane fight"
+          "description": "Ezreal slays Kayle Bot in bottom lane; fight and minions"
         },
         {
           "clock": "3:33",
           "videoSeconds": 25.423,
-          "description": "Kayle Bot has slain Ezreal notification, bot lane skirmish"
+          "description": "Kayle Bot slays Ezreal in bot lane; several champions present"
         },
         {
           "clock": "4:30",
           "videoSeconds": 32.564,
-          "description": "Caitlyn has left the game notification, Ezreal in bot lane"
+          "description": "Caitlyn has left the game notice; Ezreal moving in bot lane"
         },
         {
           "clock": "5:28",
           "videoSeconds": 39.705,
-          "description": "Mid lane fight, Gragas and Samira present"
+          "description": "Mid lane Skirmish, Gragas and Shen fighting in middle of lane"
         },
         {
           "clock": "6:25",
           "videoSeconds": 46.846,
-          "description": "Kayle Bot is on a killing spree notification, top lane"
+          "description": "Kayle Bot is on a killing spree at top lane vs Shen"
         },
         {
           "clock": "7:22",
           "videoSeconds": 53.987,
-          "description": "Blue team destroyed first turret notification, mid lane"
+          "description": "Blue team destroyed the first turret; champions walking mid"
         },
         {
           "clock": "8:19",
           "videoSeconds": 61.128,
-          "description": "Shut down notification, champion alone in mid lane"
+          "description": "Shutdown on Caitlyn; Ezreal in mid lane next to minions"
         },
         {
           "clock": "9:16",
           "videoSeconds": 68.269,
-          "description": "The Oceans bring life notification, bot lane teamfight"
+          "description": "The Oceans bring life! Dragon soul/elemental message during bot lane fight"
+        },
+        {
+          "clock": "10:13",
+          "videoSeconds": 75.41,
+          "description": "Red turret destroyed notice; champion pushing bot lane"
+        },
+        {
+          "clock": "11:10",
+          "videoSeconds": 82.551,
+          "description": "Shutdown banner; Naafiri in jungle fighting near blue buff"
+        },
+        {
+          "clock": "12:08",
+          "videoSeconds": 89.692,
+          "description": "Red turret destroyed; Ezreal and minions attacking red base top inhibitor"
+        },
+        {
+          "clock": "13:05",
+          "videoSeconds": 96.833,
+          "description": "Red turret destroyed in mid lane; battle between two champions"
+        },
+        {
+          "clock": "14:02",
+          "videoSeconds": 103.974,
+          "description": "Dragon has spawned; fighting near red buff and river"
+        },
+        {
+          "clock": "14:59",
+          "videoSeconds": 111.115,
+          "description": "Red turret destroyed; Naafiri in jungle near upper river"
+        },
+        {
+          "clock": "15:56",
+          "videoSeconds": 118.256,
+          "description": "Naafiri has destroyed a red inhibitor; blue team pushing in red base"
+        },
+        {
+          "clock": "16:53",
+          "videoSeconds": 125.397,
+          "description": "Ezreal has destroyed a red inhibitor; fighting at the nexus"
         }
       ],
       "clockMoments": [
         {
-          "clock": "7:22",
-          "videoSeconds": 53.987,
-          "description": "Structure conversion: first turret destroyed after fight win"
+          "clock": "12:08",
+          "videoSeconds": 89.692,
+          "description": "Red turret destroyed; Ezreal and minions attacking red base top inhibitor"
         },
         {
-          "clock": "8:19",
-          "videoSeconds": 61.128,
-          "description": "Shutdown moment: high risk after fight win, death with gold bounty"
+          "clock": "13:05",
+          "videoSeconds": 96.833,
+          "description": "Ezreal chases a fight near mid inhibitor instead of hitting open base structures—direct evidence of prioritizing fights over structure conversion."
+        },
+        {
+          "clock": "15:56",
+          "videoSeconds": 118.256,
+          "description": "Naafiri has destroyed a red inhibitor; blue team pushing in red base"
+        },
+        {
+          "clock": "16:53",
+          "videoSeconds": 125.397,
+          "description": "Ezreal destroys the inhibitor while fighting at the nexus, showing open enemy base and the importance of focusing structures instead of chasing more kills."
         }
       ],
       "nuance": [
-        "High kills only matter when the map state changes.",
-        "Shutdown deaths after a win erase the lead Samira already created."
+        "Samira was grouped with multiple teammates at several base pushes, improving success chance.",
+        "Wave states through the mid-game set up multiple free objectives, but pathing priorities risked giving enemy time to respawn.",
+        "Several enemies are visibly dead or isolated when Nexus turrets are exposed, showing safe end potential.",
+        "Health bars for Samira and core allies are healthy enough for structure tanking at these push timings.",
+        "Minimap shows large numbers advantage at the enemy base, but discipline drops as soon as chase targets appear off to the side."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "reviewLimit": "These sampled frames don't show detailed ability cooldown usage or the precise communication between Alan and his teammates, so cannot prove target selection micro or shotcalling breakdowns.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 18,
       "publicVideoBytes": 83856038,
       "src": "/recordings/16-10_NA1-5563247854_13.mp4",
@@ -1202,7 +1546,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Hit the structure",
+      "title": "Chasing for kills after Ace instead of ending",
       "duration": "0:51",
       "durationSeconds": 50.581,
       "gameLength": "17:25",
@@ -1216,59 +1560,113 @@
       "kind": "highlight",
       "reviewPhase": "implementation",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Hit the structure",
-      "feedback": "At inhib or nexus, the next useful rep is ending as soon as the structure is available.",
-      "gameDetail": "Once the base structure is available, kills are only a way to clear space for hitting it. The next useful rep is moving the cursor to the structure first, because structure damage is the lowest-variance conversion of the won fight.",
-      "eventEvidence": "16:12 Team focuses inhibitor during fight, prioritizing structure damage.; 16:42 Samira attacks the nexus, converting the fight win into structure pressure.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "This is reliable because structures are guaranteed progress; extra fighting after the base is open adds variance without adding win condition.",
-      "focusTag": "overstay control",
-      "evidence": "16:12 Team focuses inhibitor during fight, prioritizing structure damage.; 16:42 Samira attacks the nexus, converting the fight win into structure pressure.",
-      "pattern": "Base fights become lower value once the structure is open.",
-      "diamondRule": "Hit the structure as soon as the fight is won.",
-      "drill": "After a base kill, move the cursor to the structure first.",
+      "confidence": "high",
+      "feedbackTitle": "Chasing for kills after Ace instead of ending",
+      "feedback": "Mistake: After achieving an Ace and opening the Nexus, you chased for extra kills instead of focusing the Nexus to end the game. Fix: Hit the Nexus as soon as it's exposed to secure the win and avoid throw risks.",
+      "gameDetail": "This distracted both of you from the open Nexus, leaving an opportunity for respawning enemies to stall, and caused your own death for a shutdown. Around 16:12, ezreal has destroyed a red inhibitor as champions fight near inhibitor; By 16:29, nexus turret destroyed; clear opportunity to end, but team does not focus the Nexus; Then around 16:33, fight breaks out away from the Nexus as players chase for extra kills; example of the mistake. The critical habit is to ignore flashy final kills and always end the game when the Nexus is free.",
+      "eventEvidence": "16:12 Ezreal has destroyed a red inhibitor as champions fight near inhibitor.; 16:29 Nexus turret destroyed; clear opportunity to end, but team does not focus the Nexus.; 16:33 Fight breaks out away from the Nexus as players chase for extra kills; example of the mistake.",
+      "goodThing": "You chained your combo well during the inhibitor and Nexus turret fights, enabling your team to win the fight cleanly.",
+      "whyTrust": "This decision habit is what lets Samira's leads turn into quick victories, and every second wasted after an Ace is risk for a throw.",
+      "focusTag": "Nexus focus",
+      "evidence": "16:12 Ezreal has destroyed a red inhibitor as champions fight near inhibitor.; 16:29 Nexus turret destroyed; clear opportunity to end, but team does not focus the Nexus.; 16:33 Fight breaks out away from the Nexus as players chase for extra kills; example of the mistake.",
+      "pattern": "Each time your team secured an objective, you looked for more kills even as the Nexus was open, rather than prioritizing the win condition.",
+      "diamondRule": "Always hit the Nexus immediately if it's open and you have numbers; don't chase for extra kills before the game is over.",
+      "drill": "Next time the Nexus is open and it's Ace or 4v1, immediately auto the Nexus until game ends—no chasing.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "16:12",
           "videoSeconds": 2.023,
-          "description": "Ezreal destroys a red inhibitor amid a team fight near the inhibitor."
+          "description": "Ezreal has destroyed a red inhibitor as champions fight near inhibitor."
+        },
+        {
+          "clock": "16:16",
+          "videoSeconds": 6.254,
+          "description": "Red turret destroyed notification with multiple champions fighting at inhibitor."
+        },
+        {
+          "clock": "16:20",
+          "videoSeconds": 10.484,
+          "description": "Red turret destroyed notification, ice wall and multiple champions fighting near nexus."
         },
         {
           "clock": "16:25",
           "videoSeconds": 14.715,
-          "description": "Shen destroys a red inhibitor with minions and Samira nearby."
+          "description": "Shen has destroyed a red inhibitor; champions moving away from inhibitor."
+        },
+        {
+          "clock": "16:29",
+          "videoSeconds": 18.945,
+          "description": "Red turret destroyed near the nexus, multiple champions with abilities being cast."
+        },
+        {
+          "clock": "16:33",
+          "videoSeconds": 23.175,
+          "description": "Heimerdinger Bot has slain Naafiri as a fight happens on top of the nexus."
+        },
+        {
+          "clock": "16:37",
+          "videoSeconds": 27.406,
+          "description": "Double kill notification, blue team attacking on enemy nexus platform."
         },
         {
           "clock": "16:42",
           "videoSeconds": 31.636,
-          "description": "Samira attacks the red nexus as Gragas bot tries to defend."
+          "description": "Blue champion attacks nexus, Gragas and Shen are visible; orange skillshot appears."
+        },
+        {
+          "clock": "16:46",
+          "videoSeconds": 35.867,
+          "description": "Two blue champions attack a red champion in front of the nexus."
+        },
+        {
+          "clock": "16:50",
+          "videoSeconds": 40,
+          "description": "ACE notification as blue champion attacks near the nexus platform."
+        },
+        {
+          "clock": "16:54",
+          "videoSeconds": 44.328,
+          "description": "Blue champion airborne over nexus area in a fight with two red champions."
         },
         {
           "clock": "16:59",
           "videoSeconds": 48.558,
-          "description": "Samira is killed for a shut down near top side of red nexus."
+          "description": "Shutdown notification as a blue champion is killed by two red champions near nexus."
         }
       ],
       "clockMoments": [
         {
           "clock": "16:12",
           "videoSeconds": 2.023,
-          "description": "Team focuses inhibitor during fight, prioritizing structure damage."
+          "description": "Ezreal has destroyed a red inhibitor as champions fight near inhibitor."
         },
         {
-          "clock": "16:42",
-          "videoSeconds": 31.636,
-          "description": "Samira attacks the nexus, converting the fight win into structure pressure."
+          "clock": "16:29",
+          "videoSeconds": 18.945,
+          "description": "Nexus turret destroyed; clear opportunity to end, but team does not focus the Nexus."
+        },
+        {
+          "clock": "16:33",
+          "videoSeconds": 23.175,
+          "description": "Fight breaks out away from the Nexus as players chase for extra kills; example of the mistake."
+        },
+        {
+          "clock": "16:37",
+          "videoSeconds": 27.406,
+          "description": "Double kill notification, blue team attacking on enemy nexus platform."
         }
       ],
       "nuance": [
-        "The structure is the lowest-variance way to convert the lead."
+        "You had full health and cooldowns up when the Nexus opened, removing any need to play safe for resets.",
+        "Minimap confirms no enemy respawns were imminent when you left the Nexus.",
+        "Shen follows your chase, further reducing Nexus-hitting threat.",
+        "Samira's Samira identity benefits from speedily ending to avoid mistakes or respawn threats.",
+        "Shutdown bounty is given to respawning enemies even with victory locked, making throws more likely."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "reviewLimit": "Frames show the endgame and decision after Ace, but can't confirm full clarity on all Samira cooldowns; still, map and scoreboard are definitive for this advice.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 12,
       "publicVideoBytes": 26496245,
       "src": "/recordings/16-10_NA1-5563247854_12.webm",
@@ -1295,7 +1693,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Fight from the edge first",
+      "title": "Overstay at Low Health After Fight",
       "duration": "0:42",
       "durationSeconds": 42.4,
       "gameLength": "17:25",
@@ -1309,44 +1707,58 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Fight from the edge first",
-      "feedback": "Let Q, autos, and W collect cooldowns before entering; Samira should clean the fight, not start it blind.",
-      "gameDetail": "This clip points to Samira's best entry shape: use the edge of the fight to collect cooldown information, then dash when the reset path is real. The next useful rep is staying aggressive while delaying the full commit by one beat.",
-      "eventEvidence": "9:12 Edge entry enabled: fight unfolds with allies—perfect for collecting cooldowns, not blind dive.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "This lowers anxiety without lowering aggression because edge play gathers real cooldown evidence before the all-in.",
-      "focusTag": "crowd-control tracking",
-      "evidence": "9:12 Edge entry enabled: fight unfolds with allies—perfect for collecting cooldowns, not blind dive.",
-      "pattern": "The edge of the fight gives Samira information without spending the dash.",
-      "diamondRule": "Fight the first second from range, then enter after the enemy spends tools.",
-      "drill": "Q-auto once before committing unless the target is already isolated and lethal.",
+      "confidence": "high",
+      "feedbackTitle": "Overstay at Low Health After Fight",
+      "feedback": "Mistake: You stayed in lane with very low health after the fight instead of resetting. Fix: Immediately recall or back off to safety after a long skirmish when you are low HP, especially near enemy turret.",
+      "gameDetail": "The fight on bot lane started with aggressive positioning, resulting in a messy skirmish with multiple teleports and both teams collapsing. This exposes you to easy death from enemy spawns or a sudden engage. As soon as the fight is won and your health drops low, prioritize a safe recall or at least back up, rather than tanking turret aggro or hanging around for a risky push. Around 8:47, Samira is low HP after fight near enemy tower; reset window opens—should begin recall; By 9:22, Samira still pressuring turret at very low HP with enemies respawning—clear evidence of overstay mistake. Get value, then reset before you become free gold.",
+      "eventEvidence": "8:47 Samira is low HP after fight near enemy tower; reset window opens—should begin recall.; 9:22 Samira still pressuring turret at very low HP with enemies respawning—clear evidence of overstay mistake.",
+      "goodThing": "You correctly committed to finishing off Anivia and converted the skirmish to a numbers advantage for your team.",
+      "whyTrust": "Samira is a reset-dependent, squishy Samira who instantly dies to respawned or rotating enemies; repeating this mistake will cost you shutdown gold or lose pressure in closer games.",
+      "focusTag": "reset discipline",
+      "evidence": "8:47 Samira is low HP after fight near enemy tower; reset window opens—should begin recall.; 9:22 Samira still pressuring turret at very low HP with enemies respawning—clear evidence of overstay mistake.",
+      "pattern": "After a high-risk bot lane fight and finishing kills, you remain pushed far up with almost no HP instead of prioritizing a recall or retreat.",
+      "diamondRule": "Never stay in lane and hit structures at low HP when the enemy team is about to respawn or could rotate—reset off a won fight.",
+      "drill": "After every fight where you drop below 40% HP, ping retreat and execute a recall before considering further aggression.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "8:47",
           "videoSeconds": 1.696,
-          "description": "Samira is in lane near a tower as 'The Oceans bring life!' message is displayed."
+          "description": "Samira and Kayn approach dragon pit; 'The Oceans bring life!' announcement."
         },
         {
-          "clock": "9:12",
-          "videoSeconds": 26.519,
-          "description": "Samira and teammates are fighting near mid-bot, with Kayle Bot 'RESURRECTING' and a large heal shield visible."
+          "clock": "9:05",
+          "videoSeconds": 19.427,
+          "description": "Shut Down message, Kayn is in a teamfight near bot lane with multiple teleport effects."
+        },
+        {
+          "clock": "9:22",
+          "videoSeconds": 37.158,
+          "description": "Three blue team champions attacking in bot lane; gold bounties and minion deaths visible."
         }
       ],
       "clockMoments": [
         {
-          "clock": "9:12",
-          "videoSeconds": 26.519,
-          "description": "Edge entry enabled: fight unfolds with allies—perfect for collecting cooldowns, not blind dive."
+          "clock": "8:47",
+          "videoSeconds": 1.696,
+          "description": "Samira is low HP after fight near enemy tower; reset window opens—should begin recall."
+        },
+        {
+          "clock": "9:22",
+          "videoSeconds": 37.158,
+          "description": "Samira still pressuring turret at very low HP with enemies respawning—clear evidence of overstay mistake."
         }
       ],
       "nuance": [
-        "This is still aggressive because it prepares the reset instead of canceling the fight."
+        "Samira dropped to critical HP by 09:19 but did not back off to base.",
+        "Staying aggressive risks free shutdown gold for enemy respawns.",
+        "Multiple allies were alive, so your death would swing pressure and leave fewer at turret.",
+        "The wave was cleared and tower already under pressure—reset window open.",
+        "Enemy Kayle and Heimerdingerd were visibly moving down the map and not dead."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "reviewLimit": "These frames do not show if an immediate engage or death punished you, but the low-HP overstay itself is visible and dangerous regardless.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 12,
       "publicVideoBytes": 20921882,
       "src": "/recordings/16-10_NA1-5563247854_05.webm",
@@ -1373,7 +1785,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Leave after the wave",
+      "title": "Critical Overstay After Pick",
       "duration": "0:26",
       "durationSeconds": 26.112,
       "gameLength": "17:25",
@@ -1387,79 +1799,93 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Leave after the wave",
-      "feedback": "Catching side farm is fine; leave toward teammates unless mid has priority or three enemies are visible.",
-      "gameDetail": "Side farm is useful income until it disconnects the fed carry from the next map play. The next useful rep is taking the wave, then immediately pathing back through safe vision unless enemy positions are visible.",
-      "eventEvidence": "12:34 Nafiri near allied jungle after clearing side, not rotating toward teammates; 12:37 Nafiri starts moving toward mid as team fighting continues top, delayed join",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "This turns side farm into safe income instead of isolation, which is the difference between carrying with gold and dying with gold.",
-      "focusTag": "late entry",
-      "evidence": "12:34 Nafiri near allied jungle after clearing side, not rotating toward teammates; 12:37 Nafiri starts moving toward mid as team fighting continues top, delayed join",
-      "pattern": "Side farm is useful until it isolates the fed carry from the next map play.",
-      "diamondRule": "Catch the wave, then leave unless the enemy positions are visible.",
-      "drill": "Take the wave and immediately path back through safe vision.",
+      "confidence": "high",
+      "feedbackTitle": "Critical Overstay After Pick",
+      "feedback": "Mistake: After getting a key pick and with enemy respawns coming, you stayed too long in the jungle near their base and re-entered a high-risk fight on mid inhib without clean reset or number check. Fix: If you secure a pick and the objective isn't free, back out and reset instead of hovering for round two when enemy respawn timers are up.",
+      "gameDetail": "The Samira pick on Gragas put you ahead and created pressure, but instead of using that reset window, you hovered and positioned aggressively in the enemy jungle and mid, then died as Kayle respawned and the enemy grouped to collapse. Around 12:23, Caitlyn moving in jungle near enemy base, multiple enemies grouped under turret; By 12:34, nafiri and team hover and posture for round two in the enemy jungle instead of resetting after pick; shows the overstay risk as enemy respawns come up; Then around 12:40, big teamfight near inhibitor turret, shutdown occurs. Even with a lead, overcommitting in their jungle near two towers with respawn timers ticking is how games slip; take the win, force resets, set up vision, and convert instead of flipping for more.",
+      "eventEvidence": "12:23 Caitlyn moving in jungle near enemy base, multiple enemies grouped under turret.; 12:34 Nafiri and team hover and posture for round two in the enemy jungle instead of resetting after pick; shows the overstay risk as enemy respawns come up.; 12:40 Big teamfight near inhibitor turret, shutdown occurs.",
+      "goodThing": "You correctly picked off Gragas and started the fight with a numbers advantage.",
+      "whyTrust": "When you have Samira passive stacks and a lead, your main risk is getting stuck in a losing fight with layered CC—resetting after winning a fight prevents throw deaths and snowballs your tempo.",
+      "focusTag": "overstay-reset",
+      "evidence": "12:23 Caitlyn moving in jungle near enemy base, multiple enemies grouped under turret.; 12:34 Nafiri and team hover and posture for round two in the enemy jungle instead of resetting after pick; shows the overstay risk as enemy respawns come up.; 12:40 Big teamfight near inhibitor turret, shutdown occurs.",
+      "pattern": "You converted an initial pick into a dangerous jungle hover instead of a clean reset, then re-entered as the enemy respawned with team still split.",
+      "diamondRule": "If you've won a fight near enemy base and can't immediately claim an objective, leave and reset before respawns.",
+      "drill": "Next time you get a pick near enemy base, immediately ping off and take a recall or jungle camp swing—no re-entry unless numbers are clearly in your favor.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "12:23",
-          "videoSeconds": 1.044,
-          "description": "Anivia Bot has slain Ezreal, combat near top inhibitor turret."
+          "videoSeconds": 1,
+          "description": "Caitlyn moving in jungle near enemy base, multiple enemies grouped under turret."
         },
         {
           "clock": "12:27",
           "videoSeconds": 4.476,
-          "description": "Samira has slain Gragas Bot, champion moving through jungle."
+          "description": "Samira has slain Gragas Bot, champion moving through mid jungle."
         },
         {
           "clock": "12:30",
           "videoSeconds": 7.908,
-          "description": "Kayle Bot has slain Samira, Nafiri moving in jungle."
+          "description": "Kayle Bot has slain Samira, champion moving in jungle near river."
         },
         {
           "clock": "12:34",
           "videoSeconds": 11.34,
-          "description": "Nafiri near allied jungle, allied team fights top side."
+          "description": "Champion moving around jungle, enemy and allied champions fighting top side."
         },
         {
           "clock": "12:37",
           "videoSeconds": 14.772,
-          "description": "Nafiri moving toward mid, Anivia fighting near top."
+          "description": "Champion moving through top jungle, Anivia and Heimerdinger near enemies."
         },
         {
           "clock": "12:40",
-          "videoSeconds": 18.204,
-          "description": "Shutdown message, major spell effects in top lane fight."
+          "videoSeconds": 18,
+          "description": "Big teamfight near inhibitor turret, shutdown occurs."
         },
         {
           "clock": "12:44",
           "videoSeconds": 21.636,
-          "description": "Gold numbers appear, continued team fight top side."
+          "description": "Gold bounties gained, allied champion in enemy jungle, ongoing fight under turret."
         },
         {
           "clock": "12:47",
-          "videoSeconds": 25.068,
-          "description": "Samira has slain Gragas Bot, many deaths top side."
+          "videoSeconds": 25,
+          "description": "Samira has slain Gragas Bot, multiple deaths recorded in teamfight near turret."
         }
       ],
       "clockMoments": [
         {
-          "clock": "12:34",
-          "videoSeconds": 11.34,
-          "description": "Nafiri near allied jungle after clearing side, not rotating toward teammates"
+          "clock": "12:23",
+          "videoSeconds": 1,
+          "description": "Caitlyn moving in jungle near enemy base, multiple enemies grouped under turret."
         },
         {
-          "clock": "12:37",
-          "videoSeconds": 14.772,
-          "description": "Nafiri starts moving toward mid as team fighting continues top, delayed join"
+          "clock": "12:34",
+          "videoSeconds": 11.34,
+          "description": "Nafiri and team hover and posture for round two in the enemy jungle instead of resetting after pick; shows the overstay risk as enemy respawns come up."
+        },
+        {
+          "clock": "12:40",
+          "videoSeconds": 18,
+          "description": "Big teamfight near inhibitor turret, shutdown occurs."
+        },
+        {
+          "clock": "12:44",
+          "videoSeconds": 21.636,
+          "description": "Gold bounties gained, allied Samira in enemy jungle, ongoing fight under turret."
         }
       ],
       "nuance": [
-        "Gold only helps if the next movement keeps the map connected."
+        "Samira chases and kills Gragas right as their team is collapsing, but does not immediately path out.",
+        "Between 16:27 and 16:41, Samira stays in enemy jungle/river brush instead of resetting.",
+        "Enemy respawn timers are visible and approaching 0 as Samira begins to re-enter.",
+        "Samira has item/ult up but engages without full team backup against mid inhib defenders.",
+        "After shutdown, pressure flips to enemy and tempo is lost."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "reviewLimit": "Cannot see Samira's exact team ping communication or if a Baron/Dragon call was possible, but the sequence clearly shows overstay into death, not a fight forced by team.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 8,
       "publicVideoBytes": 13307772,
       "src": "/recordings/16-10_NA1-5563247854_09.webm",
@@ -1486,7 +1912,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Name the CC before going in",
+      "title": "Greedy tower dive with no retreat discipline",
       "duration": "0:18",
       "durationSeconds": 17.984,
       "gameLength": "17:25",
@@ -1500,60 +1926,74 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Name the CC before going in",
-      "feedback": "Before E/R, identify the one spell that cancels the play; enter only after it is spent, blocked by W, or aimed elsewhere.",
-      "gameDetail": "This clip is about the spell that can stop Samira before the reset starts. The next useful rep is entering only after that crowd-control spell is spent, blocked, or aimed elsewhere, which keeps aggression while removing the easiest shutdown path.",
-      "eventEvidence": "4:13 Samira enters turret fight before the key CC (Swain root) is visibly used, risking interruption.; 4:22 CC threat persists; the frame shows ability effects and brawl context before the play is safe.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "This is the highest-value check because one untracked stun, root, knock-up, or hook turns Samira's whole reset plan off.",
-      "focusTag": "reset discipline",
-      "evidence": "4:13 Samira enters turret fight before the key CC (Swain root) is visibly used, risking interruption.; 4:22 CC threat persists; the frame shows ability effects and brawl context before the play is safe.",
-      "pattern": "The dangerous moment is entering before the enemy's fight-stopping spell is accounted for.",
-      "diamondRule": "No full commit until the one spell that stops Samira is gone or aimed elsewhere.",
-      "drill": "Name one enemy CC spell before every fight.",
+      "confidence": "high",
+      "feedbackTitle": "Greedy tower dive with no retreat discipline",
+      "feedback": "Mistake: Chased low HP kills under enemy tower for too long as Samira with no respect for tower shots or reset discipline. Fix: Clean up one kill or disengage after the first, and reset wave or exit tower aggro—never linger for a second fight under turret.",
+      "gameDetail": "At 4:13, Samira follows a greedy play by diving enemy Anivia at her turret, securing the kill but immediately staying to fight Swain under the same turret. Instead of pulling back after the first win, Alan opts for a second extended skirmish while still under turret threat, risking shutdown gold and giving a free tradeback. Around 4:13, Samira under blue tower casts ability while fighting Swain and Anivia; By 4:17, secures Anivia kill but fails to reset; start of greedy tower overstay after clean pick; Then around 4:22, continues extended fight with Swain under turret, illustrating lack of retreat discipline and risk-taking after the first kill. This sequence would instantly backfire in games with smarter punishers, so the easy win is to take the initial kill and back off before the second fight starts.",
+      "eventEvidence": "4:13 Samira under blue tower casts ability while fighting Swain and Anivia.; 4:17 Secures Anivia kill but fails to reset; start of greedy tower overstay after clean pick.; 4:22 Continues extended fight with Swain under turret, illustrating lack of retreat discipline and risk-taking after the first kill.",
+      "goodThing": "Secured the initial kill on a low HP Anivia by efficiently cleaning her up under turret.",
+      "whyTrust": "Samira is especially vulnerable to tower shots due to her short range and all-in playstyle, so staying under turret after a successful dive instantly throws leads and exposes you to predictable shutdowns, especially when no one is helping you disengage.",
+      "focusTag": "tower reset discipline",
+      "evidence": "4:13 Samira under blue tower casts ability while fighting Swain and Anivia.; 4:17 Secures Anivia kill but fails to reset; start of greedy tower overstay after clean pick.; 4:22 Continues extended fight with Swain under turret, illustrating lack of retreat discipline and risk-taking after the first kill.",
+      "pattern": "Alan repeatedly dives deep under turret for kills and fails to instantly drop aggro or reset after a successful cleanup, exposing himself to solo punishment.",
+      "diamondRule": "Never take a second fight or target under turret after winning the first dive unless you have wave support or guarantee no aggro.",
+      "drill": "Next queue: After killing one enemy under turret, instantly move behind minions or offscreen to reset tower aggro before considering another trade.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "4:13",
           "videoSeconds": 0.719,
-          "description": "Samira is standing near an enemy turret and using an ability on two enemy champions."
+          "description": "Samira under blue tower casts ability while fighting Swain and Anivia."
         },
         {
           "clock": "4:17",
           "videoSeconds": 5.447,
-          "description": "Samira has slain Anivia Bot under the turret; slaying notification is visible."
+          "description": "Samira kills Anivia Bot near turret; kill announcement visible."
         },
         {
           "clock": "4:22",
           "videoSeconds": 10.174,
-          "description": "Samira and Caitlyn are fighting minions and enemy champions near the turret; ability effects visible."
+          "description": "Samira and enemy bots fight with abilities and minions near blue turret."
         },
         {
           "clock": "4:27",
           "videoSeconds": 14.901,
-          "description": "Samira gets a shutdown on Swain Bot with gold and level up notifications on screen."
+          "description": "Shutdown notification as Samira levels up beside enemy corpses."
         }
       ],
       "clockMoments": [
         {
           "clock": "4:13",
           "videoSeconds": 0.719,
-          "description": "Samira enters turret fight before the key CC (Swain root) is visibly used, risking interruption."
+          "description": "Samira under blue tower casts ability while fighting Swain and Anivia."
+        },
+        {
+          "clock": "4:17",
+          "videoSeconds": 5.447,
+          "description": "Secures Anivia kill but fails to reset; start of greedy tower overstay after clean pick."
         },
         {
           "clock": "4:22",
           "videoSeconds": 10.174,
-          "description": "CC threat persists; the frame shows ability effects and brawl context before the play is safe."
+          "description": "Continues extended fight with Swain under turret, illustrating lack of retreat discipline and risk-taking after the first kill."
+        },
+        {
+          "clock": "4:27",
+          "videoSeconds": 14.901,
+          "description": "Shutdown notification as Samira levels up beside enemy corpses."
         }
       ],
       "nuance": [
-        "The check is not passive; it preserves aggression by waiting for the real opening."
+        "Initial kill on Anivia is well-timed, but wave is thin so minion cover is weak.",
+        "After securing the first kill, Samira is below half HP while Swain is healthy, but still walks forward into Q/E range.",
+        "There is no allied support on screen, so there’s no reason to expect backup or a clean re-engage.",
+        "The aggressive positioning gives Swain a free, predictable shutdown while turret is still standing.",
+        "A proper wave reset or retreat after the kill would have made the play completely uncontestable."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 8,
+      "reviewLimit": "No evidence of macro rotations, objective conversion, or map vision in this short clip; only local turret discipline and kill-chase evaluation are possible.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 4,
       "publicVideoBytes": 9279734,
       "src": "/recordings/16-10_NA1-5563247854_02.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-02.jpg"
@@ -1579,7 +2019,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Count before helping",
+      "title": "Low health overstay after kill",
       "duration": "0:17",
       "durationSeconds": 17.141,
       "gameLength": "17:25",
@@ -1593,60 +2033,69 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Count before helping",
-      "feedback": "If a teammate dies nearby, count visible enemies before spending E to rescue a fight.",
-      "gameDetail": "This moment is about the rescue instinct that can pull Samira into a fight already lost on numbers. The next useful rep is counting visible enemies before using E toward trouble, because skipping a bad rescue protects carry gold.",
-      "eventEvidence": "10:39 Initiation: Samira enters fight near turret, context for rescue attempt; 10:53 Death outcome: Samira is slain after engaging, shows result of not counting enemies",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "Counting visible enemies gives anxiety a concrete check; if the numbers are bad, skipping the rescue is discipline, not fear.",
-      "focusTag": "safe gold",
-      "evidence": "10:39 Initiation: Samira enters fight near turret, context for rescue attempt; 10:53 Death outcome: Samira is slain after engaging, shows result of not counting enemies",
-      "pattern": "Rescue instincts can drag Samira into a fight that is already numerically lost.",
-      "diamondRule": "Count visible enemies before answering a teammate death.",
-      "drill": "Say the number count before using E toward a fight.",
+      "confidence": "high",
+      "feedbackTitle": "Low health overstay after kill",
+      "feedback": "Mistake: You stayed in lane with almost no HP after killing Heimerdinger instead of immediately resetting in a safe spot. Fix: Leave the lane and recall as soon as the fight ends when you're low health and exposed, especially when enemies could respawn or collapse.",
+      "gameDetail": "After fighting under turret and narrowly finishing off Heimerdinger at around 10:48, you ended up very low and still stayed out in lane instead of backing immediately. Seconds later, you were easily finished off by respawned enemies, wasting your lead and giving a free return kill. Around 10:39, Samira and enemy Samira fighting near allied bot tower with minions present; By 10:48, Samira is low HP after killing Heimerdinger, stays in lane, missing reset window—the mistake; Then around 10:53, Samira is caught and killed while still low HP, directly showing the consequence of overstaying after the fight. When you win a close fight on low health, the best next step is always to exit and reset before the enemy can punish.",
+      "eventEvidence": "10:39 Samira and enemy Samira fighting near allied bot tower with minions present.; 10:48 Samira is low HP after killing Heimerdinger, stays in lane, missing reset window—the mistake.; 10:53 Samira is caught and killed while still low HP, directly showing the consequence of overstaying after the fight.",
+      "goodThing": "You correctly finished off Heimerdinger despite being low, securing a kill under pressure.",
+      "whyTrust": "Resetting after a close kill on Samira denies shutdown gold, keeps your advantage, and prevents free deaths—a rule that always works, even in tense late-game situations.",
+      "focusTag": "reset discipline",
+      "evidence": "10:39 Samira and enemy Samira fighting near allied bot tower with minions present.; 10:48 Samira is low HP after killing Heimerdinger, stays in lane, missing reset window—the mistake.; 10:53 Samira is caught and killed while still low HP, directly showing the consequence of overstaying after the fight.",
+      "pattern": "You win close trades but repeatedly hesitate to reset after a kill, staying for extra minions and dying right after to the enemy’s respawn or backup; this pattern throws your advantage and slows your tempo.",
+      "diamondRule": "When you win a low health fight, always back off and recall or hide immediately—any overstay risks a free death in every skill bracket.",
+      "drill": "Next game, force yourself to recall immediately after any fight you win at under 25% HP, no matter how tempting it is to push another wave.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "10:39",
           "videoSeconds": 0.686,
-          "description": "Samira fights under allied turret near bot lane with multiple minions and effects."
+          "description": "Samira and enemy champion fighting near allied bot tower with minions present."
         },
         {
           "clock": "10:44",
           "videoSeconds": 5.191,
-          "description": "Samira attacks minions and an enemy champion retreats in bot lane."
+          "description": "Samira kills minions in bot lane while enemy champion retreats."
         },
         {
           "clock": "10:48",
           "videoSeconds": 9.697,
-          "description": "Samira is near minions after killing Heimerdinger Bot in bot lane."
+          "description": "Samira kills Heimerdinger Bot and collects gold in bot lane."
         },
         {
           "clock": "10:53",
           "videoSeconds": 14.203,
-          "description": "Heimerdinger Bot has slain Samira, player character is dead in bot lane."
+          "description": "Heimerdinger Bot kills Samira near bottom lane bushes."
         }
       ],
       "clockMoments": [
         {
           "clock": "10:39",
           "videoSeconds": 0.686,
-          "description": "Initiation: Samira enters fight near turret, context for rescue attempt"
+          "description": "Samira and enemy Samira fighting near allied bot tower with minions present."
+        },
+        {
+          "clock": "10:48",
+          "videoSeconds": 9.697,
+          "description": "Samira is low HP after killing Heimerdinger, stays in lane, missing reset window—the mistake."
         },
         {
           "clock": "10:53",
           "videoSeconds": 14.203,
-          "description": "Death outcome: Samira is slain after engaging, shows result of not counting enemies"
+          "description": "Samira is caught and killed while still low HP, directly showing the consequence of overstaying after the fight."
         }
       ],
       "nuance": [
-        "Skipping the rescue can be the correct carry decision when the fight is already gone."
+        "At 10:29, both teams are engaging near your turret, suggesting it's a close and risky fight.",
+        "After the kill, you are the only allied Samira left visible in lane, making you highly exposed.",
+        "Enemy death timers are low, and minion waves show the map is not cleared, so backup or respawns are imminent.",
+        "You do not move toward safety or brush immediately after the fight; you linger instead of prepping a reset.",
+        "No allied reinforcements are near enough to protect you post-fight, increasing free death risk."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 8,
+      "reviewLimit": "These frames only show a single post-fight lane overstay pattern and cannot assess if this is a constant throughout the match, or show other objective/map decisions Alan makes during lane phase.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 4,
       "publicVideoBytes": 8294186,
       "src": "/recordings/16-10_NA1-5563247854_08.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-08.jpg"
@@ -1672,7 +2121,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Turn bot kills into tempo",
+      "title": "Overstay and Greedy Push After Structure",
       "duration": "0:17",
       "durationSeconds": 16.672,
       "gameLength": "17:25",
@@ -1686,60 +2135,69 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Turn bot kills into tempo",
-      "feedback": "After the first kill or forced recall, crash wave first, then choose plate, dragon move, reset, or support roam.",
-      "gameDetail": "The lane win matters only if the enemy loses minions, plates, tempo, or map space after it. The next useful rep is touching the wave before looking for more fighting, because the crash makes every next option safer.",
-      "eventEvidence": "7:04 Samira focusing on minion wave after kill to crash it, setting up tempo play.; 7:00 First turret destroyed after wave crash, showing structure conversion as part of tempo advantage.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "This is how a won lane becomes rank progress: the enemy loses minions and map space even if no second kill happens.",
-      "focusTag": "objective conversion",
-      "evidence": "7:04 Samira focusing on minion wave after kill to crash it, setting up tempo play.; 7:00 First turret destroyed after wave crash, showing structure conversion as part of tempo advantage.",
-      "pattern": "Lane wins need to become minion loss, plate pressure, or objective tempo.",
-      "diamondRule": "Crash before chasing the second reward.",
-      "drill": "After a bot kill, touch the wave before looking for another fight.",
+      "confidence": "high",
+      "feedbackTitle": "Overstay and Greedy Push After Structure",
+      "feedback": "Mistake: You stayed and pushed bot lane alone after taking turret, without tracking enemy respawns or vision, leading to a shutdown death. Fix: Immediately reset after taking turret unless you have clear vision and numbers to keep pushing safely.",
+      "gameDetail": "After helping secure the first turret, Samira greedily pushes the next wave deep under enemy territory, with fog covering most of the map and no allied support nearby. She picks up an extra wave and tries to pressure Heimerdinger, but is immediately collapsed on from fog by Swain and gives a shutdown. Hard pushing for extra minions right after a tower win, with no vision and enemies missing, is a guaranteed way to lose your tempo and gold lead. Around 7:00, structure is taken and Samira stays alone past turret with no support or vision, setting up the overstay mistake; By 7:04, Samira is fighting minions next to enemy turret on bot lane; Then around 7:12, Samira is collapsed on and killed for shutdown after the greedy overstay, showing the direct consequence of not resetting. If you break a structure and see no support coming, leave the lane and recall immediately.",
+      "eventEvidence": "7:00 Structure is taken and Samira stays alone past turret with no support or vision, setting up the overstay mistake.; 7:04 Samira is fighting minions next to enemy turret on bot lane.; 7:12 Samira is collapsed on and killed for shutdown after the greedy overstay, showing the direct consequence of not resetting.",
+      "goodThing": "Secured the tower and ensured the wave crashed before leaving the turret area.",
+      "whyTrust": "This reset discipline is the most reliable way to cash in shutdowns and avoid feeding gold back when playing Samira's aggressive style.",
+      "focusTag": "reset discipline",
+      "evidence": "7:00 Structure is taken and Samira stays alone past turret with no support or vision, setting up the overstay mistake.; 7:04 Samira is fighting minions next to enemy turret on bot lane.; 7:12 Samira is collapsed on and killed for shutdown after the greedy overstay, showing the direct consequence of not resetting.",
+      "pattern": "After a big play, Samira stayed for extra CS without checking map pressure or recalling, which exposed her to a fog collapse every time.",
+      "diamondRule": "Always recall after a successful tower push unless your team controls vision and at least two enemies are visible elsewhere.",
+      "drill": "Practice immediately recalling in the next game after taking an outerside turret, even if there's a fresh wave to farm.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "7:00",
           "videoSeconds": 0.667,
-          "description": "Blue team destroyed the first turret; three champions near bottom lane jungle"
+          "description": "Blue team destroyed the first turret; multiple champions visible in lower jungle."
         },
         {
           "clock": "7:04",
           "videoSeconds": 5.049,
-          "description": "Samira fighting minions in bottom lane; enemy minions approaching"
+          "description": "Samira is fighting minions next to enemy turret on bot lane."
         },
         {
           "clock": "7:08",
           "videoSeconds": 9.432,
-          "description": "Samira and Wukong fighting in bot lane, healing numbers visible"
+          "description": "Samira gains health as she attacks Wukong in lane with nearby minions."
         },
         {
           "clock": "7:12",
           "videoSeconds": 13.814,
-          "description": "Shutdown event; Samira killed, kill particles and gold visible"
+          "description": "Samira is killed; 'SHUT DOWN!' banner on screen with combat near bot lane bushes."
         }
       ],
       "clockMoments": [
         {
-          "clock": "7:04",
-          "videoSeconds": 5.049,
-          "description": "Samira focusing on minion wave after kill to crash it, setting up tempo play."
-        },
-        {
           "clock": "7:00",
           "videoSeconds": 0.667,
-          "description": "First turret destroyed after wave crash, showing structure conversion as part of tempo advantage."
+          "description": "Structure is taken and Samira stays alone past turret with no support or vision, setting up the overstay mistake."
+        },
+        {
+          "clock": "7:04",
+          "videoSeconds": 5.049,
+          "description": "Samira is fighting minions next to enemy turret on bot lane."
+        },
+        {
+          "clock": "7:12",
+          "videoSeconds": 13.814,
+          "description": "Samira is collapsed on and killed for shutdown after the greedy overstay, showing the direct consequence of not resetting."
         }
       ],
       "nuance": [
-        "The crash makes the next play safer because the enemy loses time answering the wave."
+        "No blue vision in enemy jungle or river before the wave push",
+        "Samira moves up alone to clear minions with both enemy bot and mid missing",
+        "Allied support and jungle are off the map, seen recalling or rotating elsewhere",
+        "Shutdown bounty shown on death, confirming overstay penalty",
+        "Extra farm after the turret didn't yield any safety or objective pressure"
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 8,
+      "reviewLimit": "Frames support a clear overstay and shutdown death, but do not show vision toggles, exact enemy positions before collapse, or if any pings/warnings were issued by teammates.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 4,
       "publicVideoBytes": 8174947,
       "src": "/recordings/16-10_NA1-5563247854_04.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-04.jpg"
@@ -1765,7 +2223,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Protect the shutdown",
+      "title": "Overstayed at Lethal HP After Winning Fight",
       "duration": "0:13",
       "durationSeconds": 13.184,
       "gameLength": "17:25",
@@ -1779,65 +2237,69 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Protect the shutdown",
-      "feedback": "After a tower or multi-kill, leave with the shutdown value instead of retesting the fight.",
-      "gameDetail": "Once Samira has the payout, the risk changes: another fight is no longer worth the same as the gold already held. The next useful rep is leaving with shutdown value unless the next objective is already free.",
-      "eventEvidence": "9:43 Tower destroyed—shutdown value earned, new risk context.; 9:47 Recall started—opportunity to leave safely with shutdown value.; 9:50 Samira stays—risking shutdown by not immediately leaving.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "This is worth practicing because it does not ask for less carry pressure; it keeps the carry gold from being handed back.",
-      "focusTag": "cash-out timing",
-      "evidence": "9:43 Tower destroyed—shutdown value earned, new risk context.; 9:47 Recall started—opportunity to leave safely with shutdown value.; 9:50 Samira stays—risking shutdown by not immediately leaving.",
-      "pattern": "The risk shifts after Samira has gold; the next death is more expensive than the next kill is valuable.",
-      "diamondRule": "Protect shutdown gold after the first payout.",
-      "drill": "Recall after the payout unless an objective is already free.",
+      "confidence": "high",
+      "feedbackTitle": "Overstayed at Lethal HP After Winning Fight",
+      "feedback": "Mistake: You stayed in lane at extremely low health after taking the turret, even when your support instantly recalled and enemy threats were off the map. Fix: Immediately reset after a successful fight and structure take when you're low HP and alone, instead of pushing for extra waves or jungle vision.",
+      "gameDetail": "Visible enemy Kayle emerges from fog and starts collapsing on your position while you are still very low and retreating alone (09:50+). The correct, safe window to recall was right after the turret drop – refusing this reset put you at huge risk for no payoff. Around 9:43, post-turret take with Samira at lethal HP—safe reset window available; By 9:47, support is recalling as Samira remains dangerously low, missing reset; Then around 9:50, consequence of overstay: Samira exposed to collapsing Kayle while still low. Always cash your lead when you're too low to contest further since enemies will respawn and hunt you down.",
+      "eventEvidence": "9:43 Post-turret take with Samira at lethal HP—safe reset window available; 9:47 Support is recalling as Samira remains dangerously low, missing reset; 9:50 Consequence of overstay: Samira exposed to collapsing Kayle while still low",
+      "goodThing": "You participated in securing the turret objective before the reset opportunity opened.",
+      "whyTrust": "Proper recall discipline after a win lets Samira spend gold, avoid shutdown deaths, and arrive for objectives with sums and items instead of risking a throw, and this sequence directly shows the cost of ignoring it.",
+      "focusTag": "reset discipline",
+      "evidence": "9:43 Post-turret take with Samira at lethal HP—safe reset window available; 9:47 Support is recalling as Samira remains dangerously low, missing reset; 9:50 Consequence of overstay: Samira exposed to collapsing Kayle while still low",
+      "pattern": "Alan wins the fight and helps take the turret, but does not leave with his support or recall at a safe window, instead greedily walking forward while on lethal HP and exposing himself to fog-of-war threats.",
+      "diamondRule": "Always recall immediately after a successful tower take if under one-third HP and no support remains, unless your whole team is still grouped.",
+      "drill": "Next game, force yourself to recall instantly any time you take a turret and your HP drops below 250, especially if your lane partner leaves.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "9:43",
           "videoSeconds": 0.527,
-          "description": "Red turret destroyed notification on screen, two champions near bot lane."
+          "description": "Red turret destroyed notification appears as Samira and Lulu are near bottom lane."
         },
         {
           "clock": "9:47",
           "videoSeconds": 3.993,
-          "description": "Swain Bot has slain Ezreal notification, one champion recalling near bot lane bushes."
+          "description": "Swain Bot has slain Ezreal notification appears as Samira is near minions and Lulu is recalling."
         },
         {
           "clock": "9:50",
-          "videoSeconds": 7.458,
-          "description": "Samira moving in bot lane, Kayle approaching from above."
+          "videoSeconds": 7,
+          "description": "Samira is retreating in the lane near Red Brambleback camp with low health."
         },
         {
           "clock": "9:54",
           "videoSeconds": 10.924,
-          "description": "Kayle using ability, targeting Samira in bot lane."
+          "description": "Samira is fleeing towards mid lane while being targeted by Kayle ultimate animation."
         }
       ],
       "clockMoments": [
         {
           "clock": "9:43",
           "videoSeconds": 0.527,
-          "description": "Tower destroyed—shutdown value earned, new risk context."
+          "description": "Post-turret take with Samira at lethal HP—safe reset window available"
         },
         {
           "clock": "9:47",
           "videoSeconds": 3.993,
-          "description": "Recall started—opportunity to leave safely with shutdown value."
+          "description": "Support is recalling as Samira remains dangerously low, missing reset"
         },
         {
           "clock": "9:50",
-          "videoSeconds": 7.458,
-          "description": "Samira stays—risking shutdown by not immediately leaving."
+          "videoSeconds": 7,
+          "description": "Consequence of overstay: Samira exposed to collapsing Kayle while still low"
         }
       ],
       "nuance": [
-        "This preserves carry pressure by making the next item arrive sooner."
+        "Samira is critically low on HP and has no immediate backup after turret.",
+        "Support (Nautilus) recalls right next to her, signaling the disengage.",
+        "Enemy Kayle appears and threatens a free punish due to low HP overstay.",
+        "Map shows no allied mid/jungle support near bot, making the overstay even riskier.",
+        "There is no immediate objective or wave worth the risk; better to reset and return with gold."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 8,
+      "reviewLimit": "Cannot see the full enemy positions or eventual outcome (death, escape, or miracle save), but the overstay before reset is clear and already exposes Alan to avoidable fatal risk.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 4,
       "publicVideoBytes": 6604807,
       "src": "/recordings/16-10_NA1-5563247854_07.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-07.jpg"
@@ -1863,7 +2325,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Stop chasing at fog",
+      "title": "Lethal-HP Greed into 1v1 Risk",
       "duration": "0:13",
       "durationSeconds": 12.693,
       "gameLength": "17:25",
@@ -1877,60 +2339,64 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Stop chasing at fog",
-      "feedback": "A low target past vision is not free; shove the wave or take plate unless the next enemy position is known.",
-      "gameDetail": "The low target is tempting, but fog removes the information needed to know whether the next dash is a reset or a bait. The next useful rep is stopping at vision loss and taking wave or plate unless enemy positions are known.",
-      "eventEvidence": "4:39 Low target retreats into fog with wave and plate on screen, showing stop point for the lesson.; 4:42 Both champions are low; vision loss risk as chasing starts past wave instead of shoving or plating.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "The rule is trustworthy because fog removes the information Samira needs to decide whether the next E is a reset or a bait.",
-      "focusTag": "chase discipline",
-      "evidence": "4:39 Low target retreats into fog with wave and plate on screen, showing stop point for the lesson.; 4:42 Both champions are low; vision loss risk as chasing starts past wave instead of shoving or plating.",
-      "pattern": "Chasing past fog turns a won trade into an information gamble.",
-      "diamondRule": "Stop at fog unless the next enemy positions are known.",
-      "drill": "When the target leaves vision, look at wave and objective before moving forward.",
+      "confidence": "high",
+      "feedbackTitle": "Lethal-HP Greed into 1v1 Risk",
+      "feedback": "Mistake: Staying around on 10% HP after a fight to challenge Nautilus solo in lane. Fix: Immediately recall or back out to safety after getting chunked low, instead of walking forward for more damage or CS when alone.",
+      "gameDetail": "Alan, playing Samira, survives a fight but stays aggressively forward in lane with almost no HP while a full-HP Nautilus is nearby. Instead of resetting, he walks into trading range and allows himself to be forced into a deadly 1v1. Around 4:46, Samira stays in lane at lethal HP after the fight, not recalling and demonstrating the overstay instead of resetting; By 4:49, Samira is still forward fighting at lethal HP after Gragas leaves, setting up the 1v1 risk with Nautilus. The simple lesson: Always reset after a lethal-HP fight win, especially if the enemy still has crowd control and you’re alone.",
+      "eventEvidence": "4:46 Samira stays in lane at lethal HP after the fight, not recalling and demonstrating the overstay instead of resetting.; 4:49 Samira is still forward fighting at lethal HP after Gragas leaves, setting up the 1v1 risk with Nautilus.",
+      "goodThing": "Samira did not panic and tried to trade damage in a 1v1 before leaving.",
+      "whyTrust": "If you recall or retreat after reaching lethal HP, you deny Nautilus free kill pressure and reset map tempo for the next play.",
+      "focusTag": "reset-discipline",
+      "evidence": "4:46 Samira stays in lane at lethal HP after the fight, not recalling and demonstrating the overstay instead of resetting.; 4:49 Samira is still forward fighting at lethal HP after Gragas leaves, setting up the 1v1 risk with Nautilus.",
+      "pattern": "Alan survives a fight but does not respect his extremely low HP and pushes forward when he should be instantly escaping or recalling, especially with an enemy Nautilus in vision.",
+      "diamondRule": "If you are below 20% HP with no ally nearby and the enemy is in lane, leave the lane or recall immediately.",
+      "drill": "In your next game, every time you hit below 20% HP after a skirmish, back out from lane instantly and recall—the next play is always after reset.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "4:39",
           "videoSeconds": 0.508,
-          "description": "Samira is retreating under turret low on health, minions present near bottom lane."
+          "description": "Samira bot is retreating near blue minions, taking damage in the bottom lane."
         },
         {
           "clock": "4:42",
           "videoSeconds": 3.844,
-          "description": "Samira and enemy engage in bottom lane with both at low health."
+          "description": "Samira is fighting with low health against Gragas bot near minions."
         },
         {
           "clock": "4:46",
           "videoSeconds": 7.181,
-          "description": "Samira and enemy continue fighting among minions in bottom lane."
+          "description": "Samira and Gragas are dueling closely in the bot lane with both at low health."
         },
         {
           "clock": "4:49",
           "videoSeconds": 10.517,
-          "description": "Samira performs an ability with large blue visual effect during bottom lane fight."
+          "description": "Samira uses an ability near Gragas, with a blue energy effect appearing."
         }
       ],
       "clockMoments": [
         {
-          "clock": "4:39",
-          "videoSeconds": 0.508,
-          "description": "Low target retreats into fog with wave and plate on screen, showing stop point for the lesson."
+          "clock": "4:46",
+          "videoSeconds": 7.181,
+          "description": "Samira stays in lane at lethal HP after the fight, not recalling and demonstrating the overstay instead of resetting."
         },
         {
-          "clock": "4:42",
-          "videoSeconds": 3.844,
-          "description": "Both champions are low; vision loss risk as chasing starts past wave instead of shoving or plating."
+          "clock": "4:49",
+          "videoSeconds": 10.517,
+          "description": "Samira is still forward fighting at lethal HP after Gragas leaves, setting up the 1v1 risk with Nautilus."
         }
       ],
       "nuance": [
-        "Fog is not just darkness; it removes reset and exit information."
+        "Samira is at 120 HP out of 1021 in first frame, extremely lethal and exposed.",
+        "Nautilus is not chunked and holds lane control plus all-in threat.",
+        "No allied support or jungle in local vision, minimap shows isolation.",
+        "Wave state does not crash to tower, CS greed is risky with enemy crowd control.",
+        "No visible summoner spells burned means Nautilus all-in is still available."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 8,
+      "reviewLimit": "These frames do not show what happened in the prior fight or exactly how low-hp Samira became, nor do they prove what Nautilus was about to do after the showdown.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 4,
       "publicVideoBytes": 6517189,
       "src": "/recordings/16-10_NA1-5563247854_03.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-03.jpg"
@@ -1956,7 +2422,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Second in at chokes",
+      "title": "Greedy Dive for 1v2 Shutdown",
       "duration": "0:12",
       "durationSeconds": 12.373,
       "gameLength": "17:25",
@@ -1970,60 +2436,69 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Second in at chokes",
-      "feedback": "Hold the edge until enemy CC is used so Samira stays the finisher instead of the target.",
-      "gameDetail": "Chokes punish the first champion in, especially when the enemy still has the spell that stops Samira. The next useful rep is being second in at jungle walls so the dash starts after the first cooldown exchange.",
-      "eventEvidence": "14:27 Samira is starting the fight at the choke with enemy CC threats still present; 14:34 Samira is killed after going in first, showing the risk of not waiting for CC to be used",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "This preserves the aggression while removing the single easiest way enemies stop Samira.",
-      "focusTag": "objective conversion",
-      "evidence": "14:27 Samira is starting the fight at the choke with enemy CC threats still present; 14:34 Samira is killed after going in first, showing the risk of not waiting for CC to be used",
-      "pattern": "Chokes punish the first champion in; Samira gets more value as the second entry.",
-      "diamondRule": "Second in at jungle walls unless the enemy CC is already gone.",
-      "drill": "Pause at the choke edge and enter after the first cooldown exchange.",
+      "confidence": "high",
+      "feedbackTitle": "Greedy Dive for 1v2 Shutdown",
+      "feedback": "Mistake: You dived past the turret for a 1v2 fight with no exit and got shut down immediately after a kill. Fix: When you see two enemies under turret and no backup, focus on hitting the turret or play to safely poke/zone instead of forcing a solo dive.",
+      "gameDetail": "Samira arrives at the inhibitor turret at full HP with a minion wave and sees two enemies under the structure. Instead of working the tower or playing slow, she dashes in for a 1v2 kill—securing one but dying instantly to Gragas. With no teammates around and the mid inhib turret still up, this dive gives away a shutdown, swinging gold and momentum. Around 14:24, blue team Samira and minions approach red mid inhibitor turret; enemy Samira nearby; By 14:27, setup: Samira begins 1v2 dive by engaging both defenders under mid inhib turret, ignoring safer structure damage; Then around 14:34, consequence: Samira is shut down by Gragas after the greedy dive, giving away shutdown gold and leaving turret unclaimed. Next time, keep pressure by hitting turret when enemies are outnumbered or threatened, not forced under their tower.",
+      "eventEvidence": "14:24 Blue team Samira and minions approach red mid inhibitor turret; enemy Samira nearby; 14:27 Setup: Samira begins 1v2 dive by engaging both defenders under mid inhib turret, ignoring safer structure damage.; 14:34 Consequence: Samira is shut down by Gragas after the greedy dive, giving away shutdown gold and leaving turret unclaimed.",
+      "goodThing": "You reacted aggressively and confidently punished the first isolated target with a clean mechanics burst.",
+      "whyTrust": "This advice prevents you from throwing shutdown gold and makes your leads stick, which is crucial when playing snowball ADCs like Samira who need to stay alive to win fights.",
+      "focusTag": "shutdown-giveaway",
+      "evidence": "14:24 Blue team Samira and minions approach red mid inhibitor turret; enemy Samira nearby; 14:27 Setup: Samira begins 1v2 dive by engaging both defenders under mid inhib turret, ignoring safer structure damage.; 14:34 Consequence: Samira is shut down by Gragas after the greedy dive, giving away shutdown gold and leaving turret unclaimed.",
+      "pattern": "Overcommitted to a risky tower dive with no clear exit versus multiple defenders instead of taking the free turret pressure and waiting out their threat.",
+      "diamondRule": "Never dive past inhibitor turrets alone into multiple defenders when you hold a shutdown bounty.",
+      "drill": "In your next game, whenever you reach an inhibitor turret with more than one defender present and no teammates nearby, force yourself to only hit the turret or play just outside of tower range for at least 10 seconds before committing.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "14:24",
           "videoSeconds": 0.495,
-          "description": "Blue team mid laner and minions are approaching red team's mid inhibitor turret, enemy Kayle is present."
+          "description": "Blue team champion and minions approach red mid inhibitor turret; enemy champion nearby"
         },
         {
           "clock": "14:27",
           "videoSeconds": 3.747,
-          "description": "Samira is fighting near the mid inhibitor turret against Kayle and Anivia bots."
+          "description": "Samira and enemy champions fighting near red team's inhibitor turret, abilities being exchanged"
         },
         {
           "clock": "14:30",
           "videoSeconds": 7,
-          "description": "Samira has slain Anivia Bot near the inhibitor turret, kill announcement present."
+          "description": "Samira slays Anivia Bot and ability effects are visible in red base"
         },
         {
           "clock": "14:34",
           "videoSeconds": 10.252,
-          "description": "Samira is shut down and killed by Gragas Bot near red team's mid inhibitor."
+          "description": "Samira is killed by Gragas Bot, shutdown notification and gold bounty is visible"
         }
       ],
       "clockMoments": [
         {
+          "clock": "14:24",
+          "videoSeconds": 0.495,
+          "description": "Blue team Samira and minions approach red mid inhibitor turret; enemy Samira nearby"
+        },
+        {
           "clock": "14:27",
           "videoSeconds": 3.747,
-          "description": "Samira is starting the fight at the choke with enemy CC threats still present"
+          "description": "Setup: Samira begins 1v2 dive by engaging both defenders under mid inhib turret, ignoring safer structure damage."
         },
         {
           "clock": "14:34",
           "videoSeconds": 10.252,
-          "description": "Samira is killed after going in first, showing the risk of not waiting for CC to be used"
+          "description": "Consequence: Samira is shut down by Gragas after the greedy dive, giving away shutdown gold and leaving turret unclaimed."
         }
       ],
       "nuance": [
-        "The pause is a setup for resets, not hesitation."
+        "Samira had a full health bar and all spells up before the dive.",
+        "Minimap shows no friendly backup in sight during the commitment.",
+        "Turret was still standing and defending at the time of the dive.",
+        "Both enemy defenders survived the initial burst and immediately punished.",
+        "Shutdown gold was visible on the kill, swinging the enemy a comeback gold amount."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 8,
+      "reviewLimit": "The frames do not show what happened immediately after death—whether pressure was maintained or lost, or if other lanes responded.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 4,
       "publicVideoBytes": 5961013,
       "src": "/recordings/16-10_NA1-5563247854_11.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-11.jpg"
@@ -2049,7 +2524,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Objective before duel",
+      "title": "No structure conversion after kill mid",
       "duration": "0:11",
       "durationSeconds": 11.328,
       "gameLength": "17:25",
@@ -2063,49 +2538,53 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Objective before duel",
-      "feedback": "When an enemy catches a wave, pressure the objective first; take the duel only with ult, summoner info, and a walk-out.",
-      "gameDetail": "The side duel can look like the game, but objective pressure forces the enemy to answer on worse terms. The next useful rep is making the map ask the question first, then dueling only when ult, summoners, and exit are known.",
-      "eventEvidence": "13:41 Samira is mid lane as dragon spawns; evidence for needing objective pressure before dueling.; 13:48 Just after a duel kill and level up, showing focus was on duel, not objective.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "Objectives force the enemy to answer on your terms; random duels make the game hinge on mechanics under uncertainty.",
-      "focusTag": "exit planning",
-      "evidence": "13:41 Samira is mid lane as dragon spawns; evidence for needing objective pressure before dueling.; 13:48 Just after a duel kill and level up, showing focus was on duel, not objective.",
-      "pattern": "A side duel can distract from the objective that would make the enemy respond.",
-      "diamondRule": "Objective pressure before isolated duels.",
-      "drill": "Ping or path to the objective before matching the side target.",
+      "confidence": "high",
+      "feedbackTitle": "No structure conversion after kill mid",
+      "feedback": "Mistake: After winning the mid fight and killing Kayle, you did not immediately hit the open mid inhibitor turret, missing a free conversion. Fix: After winning mid and clearing the enemy threat, instantly attack the exposed inhibitor turret instead of standing in lane clearing minions.",
+      "gameDetail": "No enemies are nearby, and your team is ahead—there's a perfect window to hit the structure or threaten the inhibitor but the time is burned farming. Around 13:41, dragon has spawned, Samira is midlane with minions; By 13:48, Samira kills Kayle, clearing the enemy threat and opening the inhibitor turret conversion window mid. If you win mid and the enemy laner is dead, always convert it to structure damage for fast objective pressure.",
+      "eventEvidence": "13:41 Dragon has spawned, Samira is midlane with minions; 13:48 Samira kills Kayle, clearing the enemy threat and opening the inhibitor turret conversion window mid",
+      "goodThing": "You quickly recognized and eliminated a solo Kayle in mid, creating a free numbers advantage.",
+      "whyTrust": "Converting mid prio into fast inhibitor damage accelerates the game and teaches objective threats that apply even in harder ranked games.",
+      "focusTag": "structure conversion",
+      "evidence": "13:41 Dragon has spawned, Samira is midlane with minions; 13:48 Samira kills Kayle, clearing the enemy threat and opening the inhibitor turret conversion window mid",
+      "pattern": "After winning a fight or securing a kill mid, there is a repeating delay before going for major objectives, wasting the team's advantage.",
+      "diamondRule": "Always attack open structures after you clear a fight and no enemy defenders are present.",
+      "drill": "In your next game, after every mid-late fight win, immediately walk forward and auto the nearest turret or inhibitor before touching the wave.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "13:41",
           "videoSeconds": 0.453,
-          "description": "Samira is mid lane as dragon spawns, standing near minions."
+          "description": "Dragon has spawned, Samira is midlane with minions"
         },
         {
           "clock": "13:48",
           "videoSeconds": 8.269,
-          "description": "Samira gets a kill on Kayle Bot mid, with a level up animation and minions around."
+          "description": "Samira has slain Kayle Bot, level up and on top of minions in mid"
         }
       ],
       "clockMoments": [
         {
           "clock": "13:41",
           "videoSeconds": 0.453,
-          "description": "Samira is mid lane as dragon spawns; evidence for needing objective pressure before dueling."
+          "description": "Dragon has spawned, Samira is midlane with minions"
         },
         {
           "clock": "13:48",
           "videoSeconds": 8.269,
-          "description": "Just after a duel kill and level up, showing focus was on duel, not objective."
+          "description": "Samira kills Kayle, clearing the enemy threat and opening the inhibitor turret conversion window mid"
         }
       ],
       "nuance": [
-        "Making the enemy answer the map lowers the need for perfect mechanics."
+        "Samira solo kills Kayle mid with low threat of enemy collapse.",
+        "Both mid turrets are already gone and inhibitor turret is open.",
+        "Minimap shows no defenders close enough to challenge you.",
+        "Lane is pushed, but you stand and hit minions after the fight.",
+        "No vision issues or rotating threats on the minimap."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "reviewLimit": "These frames do not show how the enemy team responds after this window, or what happens if you hesitate even longer, but they prove the lost immediate structure pressure.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 5,
       "publicVideoBytes": 5487740,
       "src": "/recordings/16-10_NA1-5563247854_10.webm",
@@ -2132,7 +2611,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Ask for the payout first",
+      "title": "Punished for Overstaying Alone After Winning Lane",
       "duration": "0:07",
       "durationSeconds": 6.624,
       "gameLength": "17:25",
@@ -2146,55 +2625,59 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Ask for the payout first",
-      "feedback": "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end.",
-      "gameDetail": "The useful question in this clip is not whether Samira can win the fight; it is what the fight buys immediately after. The next useful rep is naming the payout before the commit so pressure becomes a wave crash, plate, tower, objective move, recall, or end.",
-      "eventEvidence": "3:34 Fight setup: allied minions push, showing potential payout windows like wave crash or plate.; 3:40 Post-commit: Samira killed, no payout secured, highlighting the need to define payout before the fight.",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "Strong ADC games climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
-      "focusTag": "commit timing",
-      "evidence": "3:34 Fight setup: allied minions push, showing potential payout windows like wave crash or plate.; 3:40 Post-commit: Samira killed, no payout secured, highlighting the need to define payout before the fight.",
-      "pattern": "The fight needs a planned map payout before the commit.",
-      "diamondRule": "Commit only when the win has an immediate conversion path.",
-      "drill": "Name the payout before pressing the engage button.",
+      "confidence": "high",
+      "feedbackTitle": "Punished for Overstaying Alone After Winning Lane",
+      "feedback": "Mistake: You overstayed alone in the lane after pushing without proper vision, while enemy respawns and Teleport were available. Fix: After shoving the wave, reset or pull back immediately if you don't have vision or lane support, especially when enemies could TP or collapse.",
+      "gameDetail": "Samira stayed in bot lane after winning a fight and shoving the wave, but was caught by Swain's Teleport into a Morgana bind. With no vision and no allied support nearby, Samira was instantly stunned and killed, handing a shutdown to the enemy. This punish was avoidable by resetting or playing safer after the wave crash, instead of greedily staying alone for more farm. Around 3:37, Samira is stunned by Morgana and Swain Teleports in; clear evidence of being caught out while overstaying alone with no vision or support; By 3:40, Samira dies and gives shutdown in bot lane, directly showing the consequence of ignoring the reset advice after pushing the wave. Every time you crash a wave, check the map and reset if reinforcements or TPs are likely; the greedy extension cost your lead.",
+      "eventEvidence": "3:37 Samira is stunned by Morgana and Swain Teleports in; clear evidence of being caught out while overstaying alone with no vision or support.; 3:40 Samira dies and gives shutdown in bot lane, directly showing the consequence of ignoring the reset advice after pushing the wave.",
+      "goodThing": "Samira successfully crashed the minion wave before the mistake.",
+      "whyTrust": "If you back off after a wave crash, you protect your shutdown gold, keep your tempo, and deny easy comeback opportunities from Teleport flankers.",
+      "focusTag": "reset discipline",
+      "evidence": "3:37 Samira is stunned by Morgana and Swain Teleports in; clear evidence of being caught out while overstaying alone with no vision or support.; 3:40 Samira dies and gives shutdown in bot lane, directly showing the consequence of ignoring the reset advice after pushing the wave.",
+      "pattern": "Winning lane and pushing, but failing to respect respawn timers and global threats—classic overstay with no vision control.",
+      "diamondRule": "Always reset immediately after a safe wave crash unless you have vision and support; never solo overstay with a bounty.",
+      "drill": "After every wave crash as Samira, immediately check enemy respawn timers and vision before deciding whether to stay or reset.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "3:34",
           "videoSeconds": 0.3,
-          "description": "Samira and Caitlyn with allied minions pushing against red minions near bot lane."
+          "description": "Blue and red minions fighting in bot lane; Samira and Caitlyn present"
         },
         {
           "clock": "3:37",
           "videoSeconds": 3.312,
-          "description": "Samira stunned in bot lane as an enemy teleports in; Caitlyn nearby with minions around."
+          "description": "Samira is stunned, enemy champion is teleporting into bot lane"
         },
         {
           "clock": "3:40",
           "videoSeconds": 6.324,
-          "description": "Samira killed in bot lane during a shutdown; Caitlyn and an enemy remain with minions."
+          "description": "Samira is killed for a shutdown by the enemy in bot lane"
         }
       ],
       "clockMoments": [
         {
-          "clock": "3:34",
-          "videoSeconds": 0.3,
-          "description": "Fight setup: allied minions push, showing potential payout windows like wave crash or plate."
+          "clock": "3:37",
+          "videoSeconds": 3.312,
+          "description": "Samira is stunned by Morgana and Swain Teleports in; clear evidence of being caught out while overstaying alone with no vision or support."
         },
         {
           "clock": "3:40",
           "videoSeconds": 6.324,
-          "description": "Post-commit: Samira killed, no payout secured, highlighting the need to define payout before the fight."
+          "description": "Samira dies and gives shutdown in bot lane, directly showing the consequence of ignoring the reset advice after pushing the wave."
         }
       ],
       "nuance": [
-        "A good-looking kill is still low value if the wave or objective stays unchanged."
+        "Samira has a sizeable gold and level lead but doesn't use it to pressure objectives—she just stays for more wave farm.",
+        "Enemy top (Swain) uses Teleport to punish the exposed, unsupported lane state.",
+        "No vision in bot river or tri-bush means there is no advance warning of enemy collapse.",
+        "Allied Caitlyn nearby does not commit to helping—Samira shoulders risk alone.",
+        "Shutdown gold bounty icon visible, indicating extra risk if killed."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
-      "sampledFrames": 5,
+      "reviewLimit": "These frames do not show Samira's prior communication, earlier fight setup, or potential allied pings or summoner spell status.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 3,
       "publicVideoBytes": 3160861,
       "src": "/recordings/16-10_NA1-5563247854_01.webm",
       "poster": "/recordings/posters/16-10-na1-5563247854-01.jpg"
@@ -2220,7 +2703,7 @@
       "queueId": null,
       "gameType": "Unverified",
       "gameTypeSource": "No queue id found in local logs",
-      "title": "Make clips reviewable",
+      "title": "Died After Tower Push Instead of Resetting",
       "duration": "0:01",
       "durationSeconds": 1.013,
       "gameLength": "17:25",
@@ -2234,27 +2717,31 @@
       "kind": "highlight",
       "reviewPhase": "baseline",
       "champion": "Samira",
-      "confidence": "low",
-      "feedbackTitle": "Make clips reviewable",
-      "feedback": "Keep at least five seconds before and after the fight so the trigger, cooldowns, and exit can be judged.",
-      "gameDetail": "The clip is too short to show the setup, so the review cannot honestly separate a good death, a late dash, or a missed exit. The next useful rep is evidence quality first: record enough before and after the fight so the next review can judge the decision, not just the result.",
-      "eventEvidence": "The visible clip is shorter than three seconds, so the important pre-fight setup is missing.",
-      "goodThing": "",
-      "whyTrust": "The advice is low-confidence on gameplay and high-confidence on review quality because a one-second clip hides the decision that caused the outcome.",
-      "focusTag": "recording context",
-      "evidence": "The recording is shorter than three seconds.",
-      "pattern": "The clip is too short to show the decision before the result.",
-      "diamondRule": "Record the trigger, the fight, and the exit so the review can judge the decision instead of the scoreboard.",
-      "drill": "Capture five seconds before and after the next fight.",
+      "confidence": "high",
+      "feedbackTitle": "Died After Tower Push Instead of Resetting",
+      "feedback": "Mistake: You died mid-lane after taking the outer turret instead of resetting safely. Fix: After destroying the turret, immediately recall or back out to a safe distance instead of staying in the enemy lane while low on health.",
+      "gameDetail": "After your team destroyed the red outer mid turret, you (Samira) were positioned in lane at extremely low HP and died in the aftermath, seen mid-respawn while the enemy wave approaches your exposed minions. No teammates are visible to back you up, and the wave is in a spot where the safe play is a quick recall. This turns a winning moment into enemy pressure and wastes your advantage. The lesson is: prioritize resets after objective wins, especially when low HP and alone.",
+      "eventEvidence": "Samira dead alone mid after turret destroyed, no allies visible, low HP pre-death.",
+      "goodThing": "You helped secure a turret objective before dying.",
+      "whyTrust": "Resetting after a tower win with low HP lets you spend gold and keep tempo, while overstaying risks throwing away your lead, which is crucial for a snowball Samira like Samira.",
+      "focusTag": "reset discipline",
+      "evidence": "Samira dead alone mid after turret destroyed, no allies visible, low HP pre-death.",
+      "pattern": "After securing an objective, you stayed alone in lane while at low health, resulting in a preventable death and a lost opportunity to reset for items and pressure.",
+      "diamondRule": "Always reset or back off after taking a tower if at low health with no backup, especially on a carry Samira.",
+      "drill": "In your next game, every time you help take a turret, immediately check your HP and, if below half or alone, recall or reposition for safety.",
       "timeline": [],
       "clockAnchors": [],
       "clockMoments": [],
       "nuance": [
-        "The visible result is not enough evidence for a confident gameplay diagnosis."
+        "Samira is shown dead, not recalling or retreating post-objective.",
+        "Zero allied presence mid after the turret goes down, increasing risk.",
+        "CS and gold values visible on scoreboard suggest an item buy window.",
+        "No immediate enemy threat in frame, implying the death was avoidable if reset occurred.",
+        "Wave is in the mid lane, enemy team will quickly clear and reclaim map control."
       ],
-      "reviewLimit": "Low gameplay confidence because the recording lacks pre-fight context.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "reviewLimit": "This single frame doesn't show the actual moment of death or what threats appeared, so it can't confirm precise enemy movements or skill usage timing.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
       "sampledFrames": 1,
       "publicVideoBytes": 411224,
       "src": "/recordings/16-10_NA1-5563247854_06.webm",

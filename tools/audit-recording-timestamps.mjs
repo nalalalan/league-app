@@ -98,6 +98,12 @@ function timestampMatchesAnchor(timestamp, anchors) {
   });
 }
 
+function anchorMatchesTimestamp(anchor, timestamp) {
+  const timestampSeconds = clockSeconds(timestamp);
+  const anchorSeconds = clockSeconds(anchor.clock);
+  return Number.isFinite(timestampSeconds) && Number.isFinite(anchorSeconds) && Math.abs(anchorSeconds - timestampSeconds) <= 2.5;
+}
+
 function unanchoredNarrativeTimestamps(recording, anchors) {
   const misses = [];
   for (const text of narrativeFields(recording)) {
@@ -107,6 +113,29 @@ function unanchoredNarrativeTimestamps(recording, anchors) {
     }
   }
   return [...new Set(misses)];
+}
+
+function displayClockAnchors(recording, anchors) {
+  const visibleTimestamps = new Set(narrativeFields(recording).flatMap((text) => String(text).match(/\b\d{1,2}:[0-5]\d\b/g) || []));
+  const momentTimestamps = new Set((Array.isArray(recording.clockMoments) ? recording.clockMoments : [])
+    .map((moment) => normalizeClock(moment?.clock))
+    .filter(Boolean));
+  const wanted = [...new Set([...visibleTimestamps, ...momentTimestamps])];
+  const selected = [];
+  for (const timestamp of wanted) {
+    const timestampSeconds = clockSeconds(timestamp);
+    const match = anchors
+      .map((anchor) => ({
+        anchor,
+        delta: Math.abs(clockSeconds(anchor.clock) - timestampSeconds)
+      }))
+      .filter((item) => Number.isFinite(item.delta) && item.delta <= 2.5)
+      .sort((a, b) => a.delta - b.delta || (b.anchor.description ? 1 : 0) - (a.anchor.description ? 1 : 0))[0]?.anchor;
+    if (match && !selected.some((anchor) => anchor.clock === match.clock && anchor.videoSeconds === match.videoSeconds)) {
+      selected.push(match);
+    }
+  }
+  return selected;
 }
 
 async function verifyAnchorsWithVision(recording, anchors, videoPath) {
@@ -181,17 +210,18 @@ async function main() {
   let checkedAnchors = 0;
 
   for (const recording of manifest.recordings || []) {
-    const anchors = (Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [])
+    const allAnchors = (Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [])
       .map((anchor) => ({
         clock: normalizeClock(anchor.clock),
         videoSeconds: Number(anchor.videoSeconds),
         description: clean(anchor.description)
       }))
       .filter((anchor) => anchor.clock && Number.isFinite(anchor.videoSeconds));
+    const anchors = displayClockAnchors(recording, allAnchors);
 
     const duration = Number(recording.durationSeconds || 0);
     const videoPath = manifestVideoPath(recording);
-    const unanchored = unanchoredNarrativeTimestamps(recording, anchors);
+    const unanchored = unanchoredNarrativeTimestamps(recording, allAnchors);
     if (unanchored.length) {
       failures.push(`${recording.file}: visible text has unverified timestamp(s): ${unanchored.join(", ")}`);
     }

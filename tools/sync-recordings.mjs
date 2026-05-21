@@ -18,9 +18,9 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-19-direct-coach-evidence-v2";
-const clockAnchorVersion = "2026-05-21-visible-clock-strict-v4";
-const coachEvidenceVersion = "2026-05-21-coach-evidence-moments-v1";
+const analysisVersion = "2026-05-21-useful-timestamp-evidence-v1";
+const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v2";
+const coachEvidenceVersion = "2026-05-21-coach-evidence-useful-v2";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -28,6 +28,7 @@ const minAutoBytesPerSecond = Number(process.env.LEAGUE_MIN_AUTO_BYTES_PER_SECON
 const minAutoSidecarCoverage = Number(process.env.LEAGUE_MIN_AUTO_SIDECAR_COVERAGE || 0.6);
 const minSanitizedAutoSeconds = Number(process.env.LEAGUE_MIN_SANITIZED_AUTO_SECONDS || 90);
 const maxClockReadFrames = Number(process.env.LEAGUE_MAX_CLOCK_READ_FRAMES || 34);
+const maxAnalysisFrames = Number(process.env.LEAGUE_MAX_ANALYSIS_FRAMES || 36);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 const ignoredSourceVideoPattern = /\.with-desktop-pauses\.(webm|mp4)$/i;
 
@@ -40,6 +41,7 @@ function coachClean(value, fallback = "") {
     .replace(/\bhigh[-\s]?elo\s+Samira\b/gi, "strong Samira player")
     .replace(/\bhigh[-\s]?elo\b/gi, "stronger games")
     .replace(/\bmaster[-\s]?facing\b/gi, "")
+    .replace(/\s+as per lesson\b/gi, "")
     .replace(/\(\s*around\s+(\d{1,2}:[0-5]\d),\s*last\s+\w+\s+frames?\s*\)/gi, "around $1")
     .replace(/\s+/g, " ")
     .trim();
@@ -683,10 +685,10 @@ function dedupeClockAnchors(...groups) {
   }
   return [...byClock.values()]
     .sort((a, b) => a.videoSeconds - b.videoSeconds || clockSeconds(a.clock) - clockSeconds(b.clock))
-    .slice(0, 10);
+    .slice(0, maxClockReadFrames);
 }
 
-function importantSegmentTimes(sidecar, duration) {
+function importantSegmentGroups(sidecar) {
   const segments = Array.isArray(sidecar?.segments) ? sidecar.segments : [];
   if (!segments.length) return [];
   const groups = [];
@@ -709,6 +711,12 @@ function importantSegmentTimes(sidecar, duration) {
     outputTime = end;
   }
   if (currentGroup) groups.push(currentGroup);
+  return groups;
+}
+
+function importantSegmentTimes(sidecar, duration) {
+  const groups = importantSegmentGroups(sidecar);
+  if (!groups.length) return [];
   return groups.flatMap((group) => {
     const midpoint = group.start + ((group.end - group.start) / 2);
     const start = group.start + Math.min(1, Math.max(0.1, (group.end - group.start) * 0.15));
@@ -717,28 +725,77 @@ function importantSegmentTimes(sidecar, duration) {
   }).filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
 }
 
-function clockReadTimes(duration, sidecar, candidateTimes = []) {
-  const prioritizedTimes = candidateTimes
-    .map(Number)
-    .filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
-  const candidates = [
-    ...importantSegmentTimes(sidecar, duration),
-    ...prioritizedTimes,
-    ...sampleTimesFor(duration)
-  ].filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
+function dedupeTimes(times, minGapSeconds = 2.5) {
   const deduped = [];
-  for (const time of candidates.sort((a, b) => a - b)) {
-    if (deduped.some((existing) => Math.abs(existing - time) < 2.5)) continue;
+  for (const time of times
+    .map(Number)
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => a - b)) {
+    if (deduped.some((existing) => Math.abs(existing - time) < minGapSeconds)) continue;
     deduped.push(Math.round(time * 1000) / 1000);
   }
+  return deduped;
+}
+
+function inVideoTimes(times, duration) {
+  return times
+    .map(Number)
+    .filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
+}
+
+function analysisSampleTimes(duration, sidecar) {
+  const base = sampleTimesFor(duration);
+  const groups = importantSegmentGroups(sidecar);
+  const groupMidpoints = groups.map((group) => group.start + ((group.end - group.start) / 2));
+  const groupEdges = groups.flatMap((group) => {
+    const span = Math.max(0, group.end - group.start);
+    if (span < 12) return [];
+    return [
+      group.start + Math.min(1, span * 0.15),
+      group.end - Math.min(1, span * 0.15)
+    ];
+  });
+  const prioritized = dedupeTimes([...groupMidpoints, ...base, ...groupEdges])
+    .filter((time) => time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
+  if (prioritized.length <= maxAnalysisFrames) return prioritized;
+  const kept = dedupeTimes([...groupMidpoints, ...base])
+    .filter((time) => time >= 0.2 && time <= Math.max(0.2, duration - 0.2))
+    .slice(0, maxAnalysisFrames);
+  for (const time of prioritized) {
+    if (kept.length >= maxAnalysisFrames) break;
+    if (kept.some((existing) => Math.abs(existing - time) < 2.5)) continue;
+    kept.push(time);
+  }
+  return kept.sort((a, b) => a - b);
+}
+
+function clockReadTimes(duration, sidecar, candidateTimes = []) {
+  const prioritizedTimes = inVideoTimes(candidateTimes, duration);
+  const groups = importantSegmentGroups(sidecar);
+  const groupMidpoints = inVideoTimes(groups.map((group) => group.start + ((group.end - group.start) / 2)), duration);
+  const groupEdges = inVideoTimes(groups.flatMap((group) => {
+    const span = Math.max(0, group.end - group.start);
+    if (span < 12) return [];
+    return [
+      group.start + Math.min(1, Math.max(0.1, span * 0.15)),
+      group.end - Math.min(1, Math.max(0.1, span * 0.15))
+    ];
+  }), duration);
+  const candidates = [
+    ...prioritizedTimes,
+    ...groupMidpoints,
+    ...sampleTimesFor(duration),
+    ...groupEdges
+  ].filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
+  const deduped = dedupeTimes(candidates);
   if (deduped.length <= maxClockReadFrames) return deduped;
-  const important = importantSegmentTimes(sidecar, duration);
-  const prioritySet = deduped.filter((time) => (
-    important.some((candidate) => Math.abs(candidate - time) < 1.5) ||
-    prioritizedTimes.some((candidate) => Math.abs(candidate - time) < 1.5)
-  ));
-  const remaining = deduped.filter((time) => !prioritySet.includes(time));
-  return [...prioritySet, ...remaining].slice(0, maxClockReadFrames).sort((a, b) => a - b);
+  const kept = dedupeTimes([...prioritizedTimes, ...groupMidpoints]).slice(0, maxClockReadFrames);
+  for (const time of [...sampleTimesFor(duration), ...groupEdges, ...deduped]) {
+    if (kept.length >= maxClockReadFrames) break;
+    if (kept.some((existing) => Math.abs(existing - time) < 2.5)) continue;
+    kept.push(time);
+  }
+  return kept.sort((a, b) => a - b);
 }
 
 function sourceSecondForVideoSecond(sidecar, videoSeconds) {
@@ -856,34 +913,147 @@ function coachEvidenceTags(text) {
   return tags;
 }
 
+function tagOverlapScore(first, second) {
+  let count = 0;
+  for (const tag of first) {
+    if (second.has(tag)) count += 1;
+  }
+  return count;
+}
+
+function anchorDescriptionLooksWeak(anchorText) {
+  return /\b(player|champion)\s+(uses ability|casts abilities|begins walking out|moving in river|farming minions|last-hits minions|is moving alone|walks toward|running down)\b/i.test(anchorText) ||
+    /\b(scuttle crab|scoreboard open|shop open)\b/i.test(anchorText);
+}
+
+function coachWantsEnemyStructureEvidence(analysisText) {
+  return /\b(base|inhib|inhibitor|nexus|end|ending|open structure|structure conversion)\b/i.test(analysisText);
+}
+
+function anchorShowsEnemyStructure(anchorText) {
+  return /\b(enemy|their|opponent|open|base|inhib|inhibitor|nexus)\b.{0,40}\b(tower|turret|structure|base|inhib|inhibitor|nexus)\b/i.test(anchorText) ||
+    /\b(tower|turret|structure|base|inhib|inhibitor|nexus)\b.{0,40}\b(enemy|their|opponent|open)\b/i.test(anchorText);
+}
+
+function anchorConflictsWithStructureEvidenceNeed(anchorText, analysisText) {
+  if (!coachWantsEnemyStructureEvidence(analysisText)) return false;
+  if (/\b(allied|friendly|own)\b.{0,24}\b(tower|turret|base|fountain)\b/i.test(anchorText)) return true;
+  return /\b(tower|turret|structure|base|inhib|nexus)\b/i.test(analysisText) &&
+    !anchorShowsEnemyStructure(anchorText) &&
+    !/\b(chase|chasing|sideways|away|retreat|fleeing|overextend|overstay)\b/i.test(anchorText);
+}
+
 function anchorEvidenceScore(anchor, analysis, index = 0) {
   const coachTags = coachEvidenceTags(analysisCoachText(analysis));
   const anchorText = [anchor.clock, anchor.description].map((value) => clean(value).toLowerCase()).join(" ");
   const anchorTags = coachEvidenceTags(anchorText);
+  const coachText = analysisCoachText(analysis);
   let score = 0;
-  for (const tag of anchorTags) {
-    if (coachTags.has(tag)) score += 5;
-  }
+  score += tagOverlapScore(anchorTags, coachTags) * 7;
   const anchorSeconds = clockSeconds(anchor.clock);
   const explicitTexts = [analysis?.gameDetail, analysis?.eventEvidence, analysis?.evidence, analysis?.pattern, ...(Array.isArray(analysis?.timeline) ? analysis.timeline : [])];
   if (Number.isFinite(anchorSeconds) && explicitTexts.some((text) => timestampSecondsInText(text).some((seconds) => Math.abs(seconds - anchorSeconds) <= 2.5))) {
-    score += 8;
+    score += 12;
   }
-  if (/\b(low hp|low-health|lethal|shutdown|respawn|fountain|recall|reset|gold|tower|turret|inhib|nexus|structure|wave|dragon|baron|fog|cc|crowd control|stun|hook)\b/i.test(anchorText)) {
+  if (/\b(low hp|low-health|lethal|shutdown|overstay|overstaying|re-?engage|recall|reset|gold|tower|turret|inhib|nexus|structure|wave|dragon|baron|fog|cc|crowd control|stun|hook|chase|chasing|sideways|enemy base|open base)\b/i.test(anchorText)) {
     score += 4;
   }
-  if (anchor.description) score += 1;
+  if (anchorDescriptionLooksWeak(anchorText)) score -= 8;
+  if (anchorConflictsWithStructureEvidenceNeed(anchorText, coachText)) score -= 12;
+  if (anchorTags.size === 0 || tagOverlapScore(anchorTags, coachTags) === 0) score -= 5;
   return score - (index * 0.01);
 }
 
-function fallbackEvidenceClockMoments(analysis, clockAnchors, maxItems = 4) {
-  return cleanClockAnchors(clockAnchors)
-    .map((anchor, index) => ({ anchor, score: anchorEvidenceScore(anchor, analysis, index) }))
-    .filter((item) => item.score > 0 || item.anchor.description)
+function normalizeEvidenceDescription(description, champion = "Samira") {
+  const name = clean(champion, "Samira");
+  return coachClean(description)
+    .replace(/\benemy champion\b/gi, "enemy")
+    .replace(/\bchampion damage\b/gi, `${name} damage`)
+    .replace(/\bPlayer\b/g, name)
+    .replace(/\bplayer\b/g, name)
+    .replace(/\bChampion\b/g, name)
+    .replace(/\bchampion\b/g, name)
+    .replace(/\bChamp\b/g, name)
+    .replace(/\bchamp\b/g, name)
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeVisibleCoachText(text, champion = "Samira") {
+  return normalizeEvidenceDescription(text, champion);
+}
+
+function usefulEvidenceMoment(anchor, analysis, threshold = 8) {
+  return anchorEvidenceScore(anchor, analysis) >= threshold;
+}
+
+function contextualFallbackDescription(anchor, analysis) {
+  const champion = clean(analysis?.champion, "Samira");
+  const description = normalizeEvidenceDescription(anchor.description || "", champion).replace(/[.!?]+$/g, "");
+  const coachText = analysisCoachText(analysis);
+  if (coachWantsEnemyStructureEvidence(coachText)) {
+    return `${description}; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.`;
+  }
+  if (coachEvidenceTags(coachText).has("reset")) {
+    return `${description}; setup for the reset decision, where the next check is recall, spend, or keep risking the shutdown.`;
+  }
+  if (coachEvidenceTags(coachText).has("overstay")) {
+    return `${description}; setup for the overstay decision, where the next check is leave now or accept another risky fight.`;
+  }
+  return `${description}; setup for the same coaching decision.`;
+}
+
+function ensureMinimumEvidenceMoments(analysis, anchors, moments, minItems = 2) {
+  const allowed = cleanClockAnchors(anchors);
+  const selected = cleanClockAnchors(moments);
+  if (selected.length >= Math.min(minItems, allowed.length)) return selected;
+  const selectedKeys = new Set(selected.map((moment) => `${moment.clock}@${moment.videoSeconds}`));
+  const reference = selected.length ? selected[0].videoSeconds : null;
+  const candidates = allowed
+    .filter((anchor) => !selectedKeys.has(`${anchor.clock}@${anchor.videoSeconds}`))
+    .map((anchor, index) => {
+      const contextual = { ...anchor, description: contextualFallbackDescription(anchor, analysis) };
+      return {
+        anchor: contextual,
+        score: anchorEvidenceScore(contextual, analysis, index),
+        distance: Number.isFinite(reference) ? Math.abs(anchor.videoSeconds - reference) : anchor.videoSeconds
+      };
+    })
+    .sort((a, b) => b.score - a.score || a.distance - b.distance || a.anchor.videoSeconds - b.anchor.videoSeconds);
+  const out = [...selected];
+  for (const candidate of candidates) {
+    if (out.length >= Math.min(minItems, allowed.length)) break;
+    out.push(candidate.anchor);
+  }
+  return dedupeClockAnchors(out).sort((a, b) => a.videoSeconds - b.videoSeconds);
+}
+
+function selectUsefulEvidenceMoments(analysis, anchors, proposed = [], maxItems = 4, threshold = 8) {
+  const allowed = cleanClockAnchors(anchors);
+  const byKey = new Map(allowed.map((anchor) => [`${anchor.clock}@${anchor.videoSeconds}`, anchor]));
+  const champion = clean(analysis?.champion, "Samira");
+  const selected = cleanClockAnchors(proposed)
+    .map((moment) => {
+      const match = byKey.get(`${moment.clock}@${moment.videoSeconds}`) ||
+        allowed.find((anchor) => anchor.clock === moment.clock && Math.abs(Number(anchor.videoSeconds) - Number(moment.videoSeconds)) <= 0.01);
+      return match ? { ...match, description: normalizeEvidenceDescription(moment.description || match.description || "", champion) } : null;
+    })
+    .filter(Boolean)
+    .filter((moment) => usefulEvidenceMoment(moment, analysis, threshold));
+  const selectedKeys = new Set(selected.map((moment) => `${moment.clock}@${moment.videoSeconds}`));
+  const fill = allowed
+    .map((anchor, index) => ({ anchor: { ...anchor, description: normalizeEvidenceDescription(anchor.description || "", champion) }, score: anchorEvidenceScore(anchor, analysis, index) }))
+    .filter((item) => item.score >= threshold)
+    .filter((item) => !selectedKeys.has(`${item.anchor.clock}@${item.anchor.videoSeconds}`))
     .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)
+    .map((item) => item.anchor);
+  return dedupeClockAnchors([...selected, ...fill])
     .slice(0, maxItems)
-    .map((item) => item.anchor)
     .sort((a, b) => a.videoSeconds - b.videoSeconds);
+}
+
+function fallbackEvidenceClockMoments(analysis, clockAnchors, maxItems = 4) {
+  return selectUsefulEvidenceMoments(analysis, clockAnchors, [], maxItems);
 }
 
 function anchorsSignature(clockAnchors) {
@@ -897,9 +1067,17 @@ async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameD
   if (!anchors.length) return [];
   const signature = anchorsSignature(anchors);
   const cachePath = path.join(frameDir, "coach-evidence-moments.json");
+  if (analysis?.analysisSource === "manual") {
+    const manualMoments = ensureMinimumEvidenceMoments(analysis, anchors, evidenceMomentsFromText(analysis, anchors));
+    if (manualMoments.length >= Math.min(2, anchors.length)) return manualMoments.slice(0, 4);
+  }
   const cached = await readJsonSafe(cachePath);
   if (cached?.cacheKey === cacheKey && cached?.coachEvidenceVersion === coachEvidenceVersion && cached?.anchorsSignature === signature) {
-    const cachedMoments = cleanClockAnchors(cached.clockMoments);
+    const cachedMoments = ensureMinimumEvidenceMoments(
+      analysis,
+      anchors,
+      selectUsefulEvidenceMoments(analysis, anchors, cached.clockMoments)
+    );
     if (cachedMoments.length) return cachedMoments;
   }
   if (!process.env.OPENAI_API_KEY) return fallbackEvidenceClockMoments(analysis, anchors);
@@ -911,8 +1089,10 @@ async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameD
   const prompt = [
     "Choose the clickable timestamp moments that are actual evidence for the coaching claim, not just random readable game clocks.",
     "Alan uses these timestamps to study what he did wrong or what he should repeat. If the advice is overstay/reset, choose frames that show staying, low HP, respawns, gold/recall context, or the reset window. If the advice is structure conversion, choose frames that show tower/inhib/nexus or a chase away from it. If the advice is wave/objective/vision/CC, choose frames that visibly support that claim.",
-    "Use only the allowed anchors below. Do not invent clocks, videoSeconds, or events. Prefer 2-4 moments, but use 1 if only 1 truly supports the lesson.",
-    "Descriptions should be short evidence labels tied to the lesson, not generic frame captions.",
+    "Use only the allowed anchors below. Do not invent clocks, videoSeconds, or events. Choose 2-4 moments when at least 2 allowed anchors can show setup, mistake, consequence, or the correct contrasting habit.",
+    "Only return 1 moment if there is genuinely only 1 connected anchor. A setup anchor plus a consequence anchor is better than one perfect anchor.",
+    "If an allowed anchor is only normal gameplay, walking, farming, shop, respawn, or a random fight unrelated to the coaching claim, reject it.",
+    "Descriptions should be short evidence labels tied to the lesson, not generic frame captions. Say Samira, not Player or Champion.",
     "Return only JSON with this shape:",
     '{"clockMoments":[{"clock":"MM:SS","videoSeconds":0,"description":"why this frame is evidence for the lesson"}]}',
     `Recording file: ${file}.`,
@@ -943,14 +1123,12 @@ async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameD
     });
     if (!response.ok) throw new Error(`OpenAI evidence moment response ${response.status}`);
     const parsed = parseJsonText(extractOutputText(await response.json()));
-    const selected = cleanClockAnchors(parsed.clockMoments)
-      .map((moment) => {
-        const match = allowed.find((anchor) => anchor.clock === moment.clock && Math.abs(Number(anchor.videoSeconds) - Number(moment.videoSeconds)) <= 0.01);
-        return match ? { ...match, description: coachClean(moment.description, match.description) } : null;
-      })
-      .filter(Boolean)
-      .slice(0, 4);
-    const clockMoments = selected.length ? selected : fallbackEvidenceClockMoments(analysis, anchors);
+    const selected = selectUsefulEvidenceMoments(analysis, anchors, parsed.clockMoments, 4);
+    const clockMoments = ensureMinimumEvidenceMoments(
+      analysis,
+      anchors,
+      selected.length ? selected : fallbackEvidenceClockMoments(analysis, anchors)
+    ).slice(0, 4);
     await fs.writeFile(cachePath, `${JSON.stringify({
       cacheKey,
       coachEvidenceVersion,
@@ -971,6 +1149,126 @@ function evidenceTextFromMoments(clockMoments) {
     .slice(0, 3);
   if (!moments.length) return "";
   return moments.map((moment) => `${moment.clock} ${coachClean(moment.description)}`).join("; ");
+}
+
+function annotateClockAnchorsWithMoments(clockAnchors, clockMoments) {
+  const moments = cleanClockAnchors(clockMoments);
+  return cleanClockAnchors(clockAnchors).map((anchor) => {
+    if (anchor.description) return anchor;
+    const anchorSeconds = clockSeconds(anchor.clock);
+    const match = moments.find((moment) => {
+      const momentSeconds = clockSeconds(moment.clock);
+      return Number.isFinite(anchorSeconds) && Number.isFinite(momentSeconds) && Math.abs(anchorSeconds - momentSeconds) <= 2.5;
+    });
+    return match?.description ? { ...anchor, description: match.description } : anchor;
+  });
+}
+
+function evidenceMomentsFromText(analysis, anchors, maxItems = 4) {
+  const allowed = cleanClockAnchors(anchors);
+  if (!allowed.length) return [];
+  const champion = clean(analysis?.champion, "Samira");
+  const text = coachClean([analysis?.eventEvidence, analysis?.gameDetail, analysis?.timeline?.join("; ")].filter(Boolean).join("; "));
+  const chunks = text.match(/[^.;!?]+(?:[.;!?]+|$)/g) || [];
+  const moments = [];
+  for (const chunk of chunks) {
+    const clocks = String(chunk).match(/\b\d{1,2}:[0-5]\d\b/g) || [];
+    for (const clock of clocks) {
+      const clockValue = clockSeconds(clock);
+      if (!Number.isFinite(clockValue)) continue;
+      const match = allowed
+        .map((anchor) => ({
+          anchor,
+          delta: Math.abs(clockSeconds(anchor.clock) - clockValue)
+        }))
+        .filter((item) => Number.isFinite(item.delta) && item.delta <= 2.5)
+        .sort((a, b) => a.delta - b.delta || (b.anchor.description ? 1 : 0) - (a.anchor.description ? 1 : 0))[0]?.anchor;
+      if (!match) continue;
+      const description = normalizeEvidenceDescription(
+        String(chunk).replace(/\b\d{1,2}:[0-5]\d\b\s*-?\s*/g, "").trim() || match.description || "",
+        champion
+      );
+      moments.push({ ...match, description });
+    }
+  }
+  return dedupeClockAnchors(moments).slice(0, maxItems);
+}
+
+function sentenceParts(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g) || [];
+}
+
+function clockSetInText(text) {
+  return new Set(timestampSecondsInText(text).map((seconds) => Math.round(seconds)));
+}
+
+function sentenceUsesMomentClock(sentence, clockMoments) {
+  const sentenceClocks = clockSetInText(sentence);
+  return cleanClockAnchors(clockMoments)
+    .map((moment) => clockSeconds(moment.clock))
+    .some((seconds) => Number.isFinite(seconds) && sentenceClocks.has(Math.round(seconds)));
+}
+
+function usefulMomentCountInText(text, clockMoments) {
+  const textClocks = clockSetInText(text);
+  return cleanClockAnchors(clockMoments)
+    .map((moment) => clockSeconds(moment.clock))
+    .filter((seconds) => Number.isFinite(seconds) && textClocks.has(Math.round(seconds)))
+    .length;
+}
+
+function clauseDescription(description, champion) {
+  const cleaned = normalizeEvidenceDescription(description, champion)
+    .replace(/[.!?]+$/g, "")
+    .replace(/^at\s+\d{1,2}:[0-5]\d,?\s*/i, "")
+    .replace(/^shows\b/i, "shows")
+    .replace(/^team\b/i, "the team")
+    .replace(/^open\b/i, "open")
+    .replace(/^safe\b/i, "safe")
+    .replace(/^wave\b/i, "the wave")
+    .replace(/^blue\b/i, "blue")
+    .replace(/^post-fight\b/i, "post-fight")
+    .trim();
+  if (/^(Samira|Jinx|Braum|Lux|Kayle|Garen|Mordekaiser|Ashe|Fizz|Diana|Gragas|Caitlyn|Summoner's Rift)\b/.test(cleaned)) {
+    return cleaned;
+  }
+  return cleaned.replace(/^([A-Z])/, (_, letter) => letter.toLowerCase());
+}
+
+function momentEvidenceSentence(clockMoments, champion = "Samira") {
+  const moments = cleanClockAnchors(clockMoments)
+    .filter((moment) => moment.description)
+    .slice(0, 3);
+  if (moments.length < 2) return "";
+  const leadWords = ["Around", "By", "Then around"];
+  const clauses = moments.map((moment, index) => {
+    const description = clauseDescription(moment.description, champion);
+    return `${leadWords[index] || "Around"} ${moment.clock}, ${description}`;
+  });
+  return `${clauses.join("; ")}.`;
+}
+
+function integrateMomentEvidence(gameDetail, clockMoments, champion = "Samira") {
+  const cleaned = normalizeVisibleCoachText(gameDetail, champion);
+  const moments = cleanClockAnchors(clockMoments).filter((moment) => moment.description);
+  if (moments.length < 2) return cleaned;
+  const strippedSentences = sentenceParts(cleaned).filter((sentence) => {
+    const clocks = timestampSecondsInText(sentence);
+    return !(clocks.length >= 2 && sentenceUsesMomentClock(sentence, moments));
+  });
+  const base = normalizeVisibleCoachText(strippedSentences.join(" "), champion);
+  if (usefulMomentCountInText(base, moments) >= Math.min(2, moments.length)) return base;
+  const evidenceSentence = momentEvidenceSentence(moments, champion);
+  if (!evidenceSentence) return base;
+  const sentences = sentenceParts(base);
+  if (!sentences.length) return evidenceSentence;
+  const lessonIndex = sentences.findIndex((sentence) => /\b(the\s+)?(big|simple|core|main)?\s*lesson\b/i.test(sentence));
+  const insertAt = lessonIndex >= 0 ? lessonIndex : Math.max(1, sentences.length - 1);
+  sentences.splice(insertAt, 0, evidenceSentence);
+  return coachClean(sentences.join(" "));
 }
 
 async function readExistingManifest() {
@@ -1879,7 +2177,7 @@ async function main() {
     let analysis = cached;
     if (!analysis) {
       await fs.mkdir(frameDir, { recursive: true });
-      const sampleTimes = sampleTimesFor(duration);
+      const sampleTimes = analysisSampleTimes(duration, entry.sidecar);
       const framePaths = [];
       for (let sampleIndex = 0; sampleIndex < sampleTimes.length; sampleIndex += 1) {
         const framePath = path.join(frameDir, `frame-${sampleIndex + 1}.jpg`);
@@ -1905,7 +2203,10 @@ async function main() {
         candidateAnchors: candidateClockAnchors
       })
       : [];
-    const clockAnchors = dedupeClockAnchors(visibleClockAnchors);
+    const clockAnchors = dedupeClockAnchors(
+      visibleClockAnchors,
+      analysis.analysisSource === "manual" ? candidateClockAnchors : []
+    );
     const clockMoments = await selectEvidenceClockMoments({
       file: name,
       analysis,
@@ -1913,9 +2214,15 @@ async function main() {
       frameDir,
       cacheKey
     });
+    const annotatedClockAnchors = annotateClockAnchorsWithMoments(clockAnchors, clockMoments);
+    const narrativeClockAnchors = clockMoments;
+    const championName = clean(analysis.champion, "Samira");
     const clockMomentEvidence = evidenceTextFromMoments(clockMoments);
-    const cleanedEventEvidence = stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), clockAnchors);
-    const cleanedEvidence = stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), clockAnchors);
+    const rawGameDetail = coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`);
+    const cleanedGameDetail = stripUnverifiedClockReferences(rawGameDetail, narrativeClockAnchors);
+    const integratedGameDetail = integrateMomentEvidence(cleanedGameDetail, clockMoments, championName);
+    const cleanedEventEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), narrativeClockAnchors), championName);
+    const cleanedEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), narrativeClockAnchors), championName);
 
     const isFullReview = duration > 90;
     const shortTitle = isFullReview
@@ -1965,25 +2272,25 @@ async function main() {
       reviewPhase: phase,
       champion: clean(analysis.champion, "Unknown"),
       confidence: clean(analysis.confidence, "low"),
-      feedbackTitle: coachClean(analysis.feedbackTitle, "Focus"),
-      feedback: coachClean(analysis.feedback, "Review the clip and choose one safer next action."),
-      gameDetail: stripUnverifiedClockReferences(coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`), clockAnchors),
-      eventEvidence: isGenericEvidenceText(cleanedEventEvidence) ? clockMomentEvidence : cleanedEventEvidence,
-      goodThing: coachClean(analysis.goodThing, ""),
-      whyTrust: coachClean(analysis.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
-      focusTag: coachClean(analysis.focusTag, "review"),
-      evidence: isGenericEvidenceText(cleanedEvidence) ? clockMomentEvidence : cleanedEvidence,
-      pattern: stripUnverifiedClockReferences(coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."), clockAnchors),
-      diamondRule: coachClean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
-      drill: coachClean(analysis.drill, "Name the payout before committing."),
-      timeline: stripUnverifiedTimelineItems(analysis.timeline, clockAnchors),
-      clockAnchors,
+      feedbackTitle: normalizeVisibleCoachText(analysis.feedbackTitle || "Focus", championName),
+      feedback: normalizeVisibleCoachText(analysis.feedback || "Review the clip and choose one safer next action.", championName),
+      gameDetail: integratedGameDetail,
+      eventEvidence: clockMomentEvidence || (isGenericEvidenceText(cleanedEventEvidence) ? "" : cleanedEventEvidence),
+      goodThing: normalizeVisibleCoachText(analysis.goodThing || "", championName),
+      whyTrust: normalizeVisibleCoachText(analysis.whyTrust || "This feedback is tied to the visible replay pattern and one controllable in-game decision.", championName),
+      focusTag: normalizeVisibleCoachText(analysis.focusTag || "review", championName),
+      evidence: clockMomentEvidence || (isGenericEvidenceText(cleanedEvidence) ? "" : cleanedEvidence),
+      pattern: normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."), narrativeClockAnchors), championName),
+      diamondRule: normalizeVisibleCoachText(analysis.diamondRule || "Convert the first winning moment before taking the next fight.", championName),
+      drill: normalizeVisibleCoachText(analysis.drill || "Name the payout before committing.", championName),
+      timeline: stripUnverifiedTimelineItems(analysis.timeline, narrativeClockAnchors),
+      clockAnchors: annotatedClockAnchors,
       clockMoments,
-      nuance: cleanList(analysis.nuance, 5).map((item) => coachClean(item)),
-      reviewLimit: coachClean(analysis.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
+      nuance: cleanList(analysis.nuance, 5).map((item) => normalizeVisibleCoachText(item, championName)),
+      reviewLimit: normalizeVisibleCoachText(analysis.reviewLimit || "The review is based on sampled frames, not full input/cooldown telemetry.", championName),
       analysisSource: analysis.analysisSource || "cache",
       analysisVersion,
-      sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : sampleTimesFor(duration).length),
+      sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : analysisSampleTimes(duration, entry.sidecar).length),
       publicVideoBytes,
       src: publicPath(destPath),
       poster: publicPath(posterPath)
