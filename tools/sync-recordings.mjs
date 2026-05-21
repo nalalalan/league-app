@@ -23,6 +23,7 @@ const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 4
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
 const minAutoBytesPerSecond = Number(process.env.LEAGUE_MIN_AUTO_BYTES_PER_SECOND || 5000);
+const minAutoSidecarCoverage = Number(process.env.LEAGUE_MIN_AUTO_SIDECAR_COVERAGE || 0.6);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 
 function clean(value, fallback = "") {
@@ -374,6 +375,57 @@ async function probeVideoHealth(filePath) {
   };
 }
 
+async function frameVisibility(filePath, second) {
+  try {
+    const { stdout } = await execFileAsync("ffmpeg", [
+      "-v", "error",
+      "-ss", String(Math.max(0, second)),
+      "-i", filePath,
+      "-frames:v", "1",
+      "-vf", "scale=32:18,format=gray",
+      "-f", "rawvideo",
+      "-"
+    ], {
+      windowsHide: true,
+      encoding: "buffer",
+      maxBuffer: 1024 * 1024
+    });
+    const pixels = Buffer.from(stdout || []);
+    if (!pixels.length) return null;
+    let sum = 0;
+    let squared = 0;
+    for (const value of pixels) {
+      sum += value;
+      squared += value * value;
+    }
+    const mean = sum / pixels.length;
+    const variance = Math.max(0, (squared / pixels.length) - (mean * mean));
+    return { mean, stdev: Math.sqrt(variance) };
+  } catch {
+    return null;
+  }
+}
+
+async function videoVisibility(filePath, duration) {
+  const total = Number(duration) || 0;
+  if (!(total > 0)) return null;
+  const samples = [
+    Math.min(20, total * 0.2),
+    total * 0.5,
+    total * 0.8
+  ];
+  const stats = [];
+  for (const second of samples) {
+    const stat = await frameVisibility(filePath, second);
+    if (stat) stats.push(stat);
+  }
+  if (!stats.length) return null;
+  return {
+    visible: stats.some((item) => item.mean > 8 && item.stdev > 4),
+    samples: stats
+  };
+}
+
 async function readJsonSafe(filePath) {
   try {
     return JSON.parse(await fs.readFile(filePath, "utf8"));
@@ -387,9 +439,24 @@ function screenSize(value) {
   return match ? { width: Number(match[1]), height: Number(match[2]) } : null;
 }
 
-function autoCaptureRejectReason(name, health, sidecar) {
+function trustedAutoSidecar(sidecar, health) {
+  if (!sidecar || sidecar.validForPublish === false) return false;
+  if (sidecar.source !== "AO Labs League live recorder") return false;
+  if (sidecar.allSegmentsPreserved !== true) return false;
+  const sourceSeconds = Number(sidecar.sourceDurationSeconds || health?.duration || 0);
+  if (!(sourceSeconds > 0)) return false;
+  const segmentSeconds = Array.isArray(sidecar.segments)
+    ? sidecar.segments.reduce((sum, segment) => sum + (Number(segment.durationSeconds) || 0), 0)
+    : 0;
+  const outputSeconds = Number(sidecar.durationSeconds || health?.duration || 0);
+  return Math.max(segmentSeconds, outputSeconds) >= sourceSeconds * minAutoSidecarCoverage;
+}
+
+function autoCaptureRejectReason(name, health, sidecar, visual) {
   if (!/^auto_/i.test(name)) return "";
-  if (health?.duration > 300 && health.bytesPerSecond > 0 && health.bytesPerSecond < minAutoBytesPerSecond) {
+  if (visual && visual.visible === false) return "sampled frames are black";
+  const hasTrustedSidecar = trustedAutoSidecar(sidecar, health);
+  if (!hasTrustedSidecar && health?.duration > 300 && health.bytesPerSecond > 0 && health.bytesPerSecond < minAutoBytesPerSecond) {
     return `${Math.round(health.duration)}s but only ${Math.round(health.bytesPerSecond)} bytes/s`;
   }
   if (!sidecar) return "";
@@ -1222,17 +1289,21 @@ async function main() {
       const stat = await fs.stat(sourcePath);
       const health = await probeVideoHealth(sourcePath).catch(() => null);
       const sidecar = await readJsonSafe(`${sourcePath}.json`);
+      const visual = /^auto_/i.test(entry.name) && health?.duration > 60
+        ? await videoVisibility(sourcePath, health.duration)
+        : null;
       return {
         name: entry.name,
         sourcePath,
         stat,
         health,
-        sidecar
+        sidecar,
+        visual
       };
     }));
   const sourceEntries = discoveredEntries
     .filter((entry) => {
-      const rejectReason = autoCaptureRejectReason(entry.name, entry.health, entry.sidecar);
+      const rejectReason = autoCaptureRejectReason(entry.name, entry.health, entry.sidecar, entry.visual);
       if (!rejectReason) return true;
       console.log(`Skipping invalid auto capture ${entry.name}: ${rejectReason}.`);
       return false;

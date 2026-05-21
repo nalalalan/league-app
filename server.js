@@ -135,6 +135,12 @@ function cleanStatus(value) {
     : "unknown";
 }
 
+function cleanProgress(value) {
+  const progress = Number(value);
+  if (!Number.isFinite(progress)) return null;
+  return Math.max(0, Math.min(100, Math.round(progress)));
+}
+
 function publicRecordingStatus(raw) {
   const updatedMs = Date.parse(raw.updatedAt || raw.serverReceivedAt || "");
   const ageSeconds = Number.isFinite(updatedMs) ? Math.max(0, Math.round((Date.now() - updatedMs) / 1000)) : null;
@@ -146,6 +152,7 @@ function publicRecordingStatus(raw) {
     matchId: cleanText(raw.matchId, 40),
     startedAt: cleanText(raw.startedAt, 40),
     updatedAt: cleanText(raw.updatedAt || raw.serverReceivedAt, 40),
+    progress: cleanProgress(raw.progress),
     ageSeconds,
     stale: ageSeconds === null || ageSeconds > 180
   };
@@ -287,6 +294,7 @@ async function handleApi(req, res, url) {
       mode: cleanText(payload.mode, 40),
       matchId: cleanText(payload.matchId, 40),
       startedAt: cleanText(payload.startedAt, 40),
+      progress: cleanProgress(payload.progress),
       updatedAt: cleanText(payload.updatedAt, 40) || new Date().toISOString(),
       serverReceivedAt: new Date().toISOString()
     };

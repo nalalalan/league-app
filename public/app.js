@@ -2144,20 +2144,25 @@ function renderRecordingLiveStatus(data = {}) {
   const visibleStatus = stale ? "unknown" : status;
   const label = stale ? "status stale" : (data.label || fallbackRecordingStatusLabel(visibleStatus));
   const age = statusAgeLabel(data.ageSeconds);
+  const progress = Number.isFinite(Number(data.progress)) ? Math.max(0, Math.min(100, Number(data.progress))) : 0;
+  const showProgress = !stale && ["waiting", "recording", "paused", "processing", "publishing", "published"].includes(visibleStatus);
   const detail = stale
     ? (age ? `last update ${age}` : "no recent heartbeat")
     : (data.detail || (age ? `updated ${age}` : ""));
   recordingLiveStatus.hidden = false;
   recordingLiveStatus.className = `recording-live-status is-${visibleStatus}`;
+  recordingLiveStatus.style.setProperty("--status-progress", `${progress}%`);
   recordingLiveStatus.innerHTML = `
     <span class="recording-live-dot" aria-hidden="true"></span>
     <span class="recording-live-copy">
       <strong></strong>
       <span></span>
+      <span class="recording-live-progress" aria-hidden="true"><i></i></span>
     </span>
   `;
   recordingLiveStatus.querySelector("strong").textContent = label;
   recordingLiveStatus.querySelector(".recording-live-copy span").textContent = detail;
+  recordingLiveStatus.querySelector(".recording-live-progress").hidden = !showProgress;
   recordingLiveStatus.title = [label, detail, data.mode ? `mode ${data.mode}` : ""].filter(Boolean).join(" | ");
 }
 

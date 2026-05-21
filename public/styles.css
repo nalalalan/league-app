@@ -1697,8 +1697,9 @@ h1 {
   grid-template-columns: 9px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
+  width: min(260px, 38vw);
   min-width: 190px;
-  max-width: min(320px, 44vw);
+  max-width: 260px;
   border: 1px solid rgba(104, 87, 68, .18);
   border-radius: 999px;
   padding: 7px 11px;
@@ -1721,7 +1722,7 @@ h1 {
 
 .recording-live-copy {
   display: grid;
-  gap: 1px;
+  gap: 2px;
   min-width: 0;
 }
 
@@ -1746,15 +1747,48 @@ h1 {
   line-height: 1.05;
 }
 
+.recording-live-progress {
+  display: block;
+  width: 100%;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(104, 87, 68, .16);
+}
+
+.recording-live-progress[hidden] {
+  display: none;
+}
+
+.recording-live-progress i {
+  display: block;
+  width: var(--status-progress, 0%);
+  height: 100%;
+  min-width: 5px;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: .72;
+  transition: width .45s ease;
+}
+
 .recording-live-status.is-recording .recording-live-dot {
   background: #2d7a43;
   box-shadow: 0 0 0 4px rgba(45, 122, 67, .14), 0 0 18px rgba(45, 122, 67, .28);
+}
+
+.recording-live-status.is-recording .recording-live-progress i {
+  background: #2d7a43;
 }
 
 .recording-live-status.is-processing .recording-live-dot,
 .recording-live-status.is-publishing .recording-live-dot {
   background: #b06a1d;
   box-shadow: 0 0 0 4px rgba(176, 106, 29, .14), 0 0 18px rgba(176, 106, 29, .22);
+}
+
+.recording-live-status.is-processing .recording-live-progress i,
+.recording-live-status.is-publishing .recording-live-progress i {
+  background: #b06a1d;
 }
 
 .recording-live-status.is-blocked .recording-live-dot,
@@ -1766,6 +1800,10 @@ h1 {
 .recording-live-status.is-published .recording-live-dot {
   background: #4c6f9f;
   box-shadow: 0 0 0 4px rgba(76, 111, 159, .14);
+}
+
+.recording-live-status.is-published .recording-live-progress i {
+  background: #4c6f9f;
 }
 
 .situation-list {
@@ -3941,5 +3979,12 @@ h1 {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+@media (min-width: 561px) {
+  .recording-head .recording-live-status {
+    width: min(260px, 38vw);
+    max-width: 260px;
   }
 }
