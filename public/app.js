@@ -1342,7 +1342,7 @@ function recordingMainCard(review) {
   article.className = "recording-main";
 
   const title = document.createElement("h3");
-  title.textContent = ((review.detectedChampions || []).map((champion) => champion.name).filter(Boolean)[0] || "samira").toLowerCase();
+  title.textContent = (review.detectedChampions || []).map((champion) => champion.name).filter(Boolean)[0] || "Samira";
 
   const focus = document.createElement("p");
   focus.className = "recording-main-focus";
