@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-21T19:05:25.478Z",
+  "generatedAt": "2026-05-21T20:14:52.780Z",
   "source": "League of Legends Highlights folder",
-  "match": "11 matches",
+  "match": "12 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -13,11 +13,12 @@
     "NA1-5565058943",
     "NA1-5565048601",
     "NA1-5565025543",
-    "NA1-5564835832"
+    "NA1-5564835832",
+    "NA1-5565145132"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 12:07 PM ET",
-  "totalDuration": "70:33",
-  "totalRecordings": 23,
+  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 4:12 PM ET",
+  "totalDuration": "80:52",
+  "totalRecordings": 24,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira: stop giving wins back",
@@ -38,13 +39,102 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 23,
+      "recordings": 24,
       "evidence": "3:37 Samira is stunned by Morgana and Swain Teleports in; clear evidence of being caught out while overstaying alone with no vision or support.; 3:40 Samira dies and gives shutdown in bot lane, directly showing the consequence of ignoring the reset advice after pushing the wave.",
       "improvementTitle": "Punished for Overstaying Alone After Winning Lane",
       "improvement": "Mistake: You overstayed alone in the lane after pushing without proper vision, while enemy respawns and Teleport were available. Fix: After shoving the wave, reset or pull back immediately if you don't have vision or lane support, especially when enemies could TP or collapse."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565145132_01.mp4",
+      "publicFile": "auto_NA1-5565145132_01.mp4",
+      "cacheKey": "220373724:1779394349848",
+      "fingerprint": "1c6b80dc91c8",
+      "matchId": "NA1-5565145132",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779392638828,
+      "gameHappenedAt": "2026-05-21T19:43:58.828Z",
+      "gameHappenedAtLabel": "May 21, 2026, 3:43 PM",
+      "recordedAt": "2026-05-21T20:12:30.150Z",
+      "recordedAtLabel": "May 21, 2026, 4:12 PM",
+      "recordedAtTimeLabel": "4:12 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Missing structure focus: not converting waves into towers",
+      "duration": "10:20",
+      "durationSeconds": 619.5,
+      "gameLength": "21:27",
+      "gameLengthSeconds": 1287,
+      "kda": "8/12/2",
+      "kills": 8,
+      "deaths": 12,
+      "assists": 2,
+      "cs": 84,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Missing structure focus: not converting waves into towers",
+      "feedback": "Mistake: You chase and fight around side lanes and inhib towers instead of consistently cracking open the exposed structures with big waves. Fix: The next time you have a wave near an inhibitor or Nexus turret with no immediate threat, ignore extra fights and auto the turret to abuse your lead.",
+      "gameDetail": "Every time you rotate with your lead, if there's an open structure and the enemy team is dead or split, finish the building so you win faster and don't risk throw fights. Around 0:12, champions are standing at the fountain at game start; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase; By 16:53, the wave and open inhibitor turret available after a kill, shows chance to convert pressure into structure but instead chasing past tower—evidence of missing structure focus.",
+      "eventEvidence": "0:12 Champions are standing at the fountain at game start; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 16:53 Wave and open inhibitor turret available after a kill, shows chance to convert pressure into structure but instead chasing past tower—evidence of missing structure focus.",
+      "goodThing": "You consistently played around pushing bot and mid when you had the side wave.",
+      "whyTrust": "Samira wins games through snowball and fast map progression—your mechanical fights are strong enough, but without immediate structure focus you leave the door open for unnecessary deaths and comeback fights, visible in this VOD.",
+      "focusTag": "structure conversion",
+      "evidence": "0:12 Champions are standing at the fountain at game start; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 16:53 Wave and open inhibitor turret available after a kill, shows chance to convert pressure into structure but instead chasing past tower—evidence of missing structure focus.",
+      "pattern": "Twice you overprioritized a chase or extended fight after winning a skirmish or while the wave is at the base turret, instead of converting the wave into an inhibitor or Nexus turret fast.",
+      "diamondRule": "If your wave reaches inhibitor or Nexus turret and two or more enemies are dead or off map, always hit the turret first until someone physically chases you off.",
+      "drill": "Next game, whenever a big wave reaches an exposed turret and the path is clear, ignore fights and see how much you can auto the turret before disengaging.",
+      "timeline": [
+        "16:53 - You kill at inhibitor tower and have wave, but chase further past it instead of taking inhib."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "0:12",
+          "videoSeconds": 21,
+          "description": "Champions are standing at the fountain at game start."
+        },
+        {
+          "clock": "16:53",
+          "videoSeconds": 402.804,
+          "description": "Player is near the enemy inhibitor after getting a kill, minions are nearby."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "0:12",
+          "videoSeconds": 21,
+          "description": "Champions are standing at the fountain at game start; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase."
+        },
+        {
+          "clock": "16:53",
+          "videoSeconds": 402.804,
+          "description": "Wave and open inhibitor turret available after a kill, shows chance to convert pressure into structure but instead chasing past tower—evidence of missing structure focus."
+        }
+      ],
+      "nuance": [
+        "You showed good timing moving to bot and mid with each wave.",
+        "When teammates were in the enemy base, you had chances to close out at inhibitor but instead chased fights.",
+        "Several structure openings were ignored for fight setups when enemies were on long respawns.",
+        "Wave management and positioning were good, but structure conversion discipline was missing.",
+        "Your map leads let you frontline, but you didn't translate that quickly enough into ending power."
+      ],
+      "reviewLimit": "No detailed evidence of contesting objectives like Baron or Elder is visible, and vision/fog discipline can't be fully assessed from these frames.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 36,
+      "publicVideoBytes": 78269244,
+      "src": "/recordings/auto_NA1-5565145132_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565145132-01.jpg"
+    },
     {
       "file": "auto_NA1-5565058943_01.mp4",
       "publicFile": "auto_NA1-5565058943_01.mp4",
@@ -195,7 +285,7 @@
       "cs": 118,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Missed Reset and Greed After Winning Fight",
@@ -800,9 +890,9 @@
       "clipTimestamp": "",
       "clipWindow": "",
       "timestamp": "",
-      "queueId": 880,
-      "gameType": "Co-op vs AI Beginner",
-      "gameTypeSource": "LeagueClient log",
+      "queueId": null,
+      "gameType": "Unverified",
+      "gameTypeSource": "No queue id found in local logs",
       "title": "You drift after base opens",
       "duration": "3:34",
       "durationSeconds": 213.6,
@@ -1558,7 +1648,7 @@
       "cs": 128,
       "statsSource": "League Client match history",
       "kind": "highlight",
-      "reviewPhase": "implementation",
+      "reviewPhase": "baseline",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Chasing for kills after Ace instead of ending",
