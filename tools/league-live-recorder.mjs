@@ -41,11 +41,13 @@ const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || "https://league.aolabs.io/api/recording-status").trim();
 const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const statusPath = path.join(analysisRoot, "recording-status.json");
+const postGameStatusHoldMs = Number(process.env.LEAGUE_POST_GAME_STATUS_HOLD_MS || 3 * 60 * 1000);
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 let encoderProfilePromise;
 let lastStatusKey = "";
 let lastStatusPostMs = 0;
 let lastStatusErrorMs = 0;
+let idleHoldStatus = null;
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -53,6 +55,14 @@ function clean(value, fallback = "") {
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function holdIdleStatus(status, fields = {}) {
+  idleHoldStatus = {
+    status,
+    fields: { ...fields },
+    untilMs: Date.now() + postGameStatusHoldMs
+  };
 }
 
 async function log(message) {
@@ -1080,19 +1090,50 @@ async function finalizeSession(session) {
   if (publishAfterGame) {
     await waitForNoGame("Publishing paused");
     await log("Publishing updated League recordings.");
-    await publishRecorderStatus("publishing", {
+    const publishingFields = {
       ...sessionStatusFields(session, "Uploading review."),
+      label: "publishing review",
       progress: 90,
       matchId: replay?.matchId || ""
-    }, { force: true });
-    await run(npmBin, ["run", "publish:recordings"]);
-    await publishRecorderStatus("published", {
-      ...sessionStatusFields(session, "Review sent to site."),
-      progress: 100,
-      matchId: replay?.matchId || ""
-    }, { force: true });
+    };
+    await publishRecorderStatus("publishing", publishingFields, { force: true });
+    try {
+      await run(npmBin, ["run", "publish:recordings"], {
+        env: {
+          ...process.env,
+          LEAGUE_EXPECT_SOURCE_FILE: path.basename(outputPath)
+        }
+      });
+      const publishedFields = {
+        ...sessionStatusFields(session, "Review sent to site."),
+        label: "review live",
+        progress: 100,
+        matchId: replay?.matchId || ""
+      };
+      await publishRecorderStatus("published", publishedFields, { force: true });
+      holdIdleStatus("published", publishedFields);
+    } catch (error) {
+      const combinedOutput = `${error.stdout || ""}\n${error.stderr || ""}`;
+      const blockedLine = combinedOutput.match(/Publish blocked[^\r\n]*/i)?.[0];
+      const detail = blockedLine || "Review clip created, but the site publish failed. Check publisher log.";
+      await log(`Publish failed after review clip creation: ${error.message}`);
+      const blockedFields = {
+        ...sessionStatusFields(session, detail),
+        label: "publish blocked",
+        progress: 100,
+        matchId: replay?.matchId || ""
+      };
+      await publishRecorderStatus("blocked", blockedFields, { force: true });
+      holdIdleStatus("blocked", blockedFields);
+    }
   } else {
-    await publishRecorderStatus("published", { ...sessionStatusFields(session, "Review clip created locally."), progress: 100 }, { force: true });
+    const localFields = {
+      ...sessionStatusFields(session, "Review clip created locally."),
+      label: "review saved",
+      progress: 100
+    };
+    await publishRecorderStatus("published", localFields, { force: true });
+    holdIdleStatus("published", localFields);
   }
 }
 
@@ -1117,6 +1158,7 @@ async function main() {
   while (true) {
     const running = await gameIsRunning();
     if (running && !session) {
+      idleHoldStatus = null;
       try {
         session = await startSession();
       } catch (error) {
@@ -1141,16 +1183,23 @@ async function main() {
         await finalizeSession(current);
       } catch (error) {
         await log(`Finalize failed: ${error.message}`);
-        await publishRecorderStatus("error", { ...sessionStatusFields(current, "Post-game processing failed. Check recorder log."), progress: 100 }, { force: true });
+        const errorFields = { ...sessionStatusFields(current, "Post-game processing failed. Check recorder log."), label: "recorder error", progress: 100 };
+        await publishRecorderStatus("error", errorFields, { force: true });
+        holdIdleStatus("error", errorFields);
       }
     }
     if (!running && !session) {
-      await publishRecorderStatus("watching", {
-        label: "recorder ready",
-        detail: "waiting for League",
-        mode: captureModePreference,
-        progress: 0
-      }, { throttleMs: 60000 });
+      if (idleHoldStatus && Date.now() < idleHoldStatus.untilMs) {
+        await publishRecorderStatus(idleHoldStatus.status, idleHoldStatus.fields, { throttleMs: 60000 });
+      } else {
+        idleHoldStatus = null;
+        await publishRecorderStatus("watching", {
+          label: "recorder ready",
+          detail: "waiting for League",
+          mode: captureModePreference,
+          progress: 0
+        }, { throttleMs: 60000 });
+      }
     }
     await delay(pollMs);
   }

@@ -13,6 +13,7 @@ const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Docume
 const startupPath = path.join(process.env.APPDATA || "", "Microsoft", "Windows", "Start Menu", "Programs", "Startup", "AO Labs League live recorder.vbs");
 const liveBase = process.env.LEAGUE_SITE_URL || "https://league.aolabs.io";
 const maxFreshSeconds = Number(process.env.LEAGUE_VERIFY_MAX_STATUS_AGE_SECONDS || 180);
+const requireLatestLive = process.env.LEAGUE_VERIFY_REQUIRE_LIVE_LATEST !== "0";
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 const ignoredSourceVideoPattern = /\.with-desktop-pauses\.(webm|mp4)$/i;
 
@@ -143,6 +144,9 @@ async function manifestCheck() {
   if (!latest) return fail("recording source", "no source videos found");
   const manifest = await fetchJson(`${liveBase}/recordings/recordings.json?verify=automation-health`);
   const recordings = Array.isArray(manifest.recordings) ? manifest.recordings : [];
+  if (!requireLatestLive) {
+    return ok("live manifest", `${recordings.length} recordings live; latest-source check skipped for setup-only verification`);
+  }
   const found = recordings.find((item) => item.file === latest.name || item.publicFile === latest.name || String(item.src || "").endsWith(`/${latest.name}`));
   if (!found) return fail("live manifest", `latest source ${latest.name} is not visible live`);
   const videoUrl = new URL(found.src, liveBase).toString();
