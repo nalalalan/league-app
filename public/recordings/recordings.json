@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-21T15:11:13.035Z",
+  "generatedAt": "2026-05-21T16:12:21.853Z",
   "source": "League of Legends Highlights folder",
-  "match": "9 matches",
+  "match": "11 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -11,11 +11,13 @@
     "NA1-5564718141",
     "NA1-5564835832",
     "NA1-5565025543",
-    "NA1-5565044205"
+    "NA1-5565048601",
+    "NA1-5565044205",
+    "NA1-5565058943"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 11:08 AM ET",
-  "totalDuration": "50:36",
-  "totalRecordings": 21,
+  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 12:07 PM ET",
+  "totalDuration": "69:27",
+  "totalRecordings": 23,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira: stop giving wins back",
@@ -36,7 +38,7 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 21,
+      "recordings": 23,
       "evidence": "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
       "improvementTitle": "Ask for the payout first",
       "improvement": "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end."
@@ -44,10 +46,179 @@
   ],
   "recordings": [
     {
+      "file": "auto_NA1-5565058943_01.mp4",
+      "publicFile": "auto_NA1-5565058943_01.mp4",
+      "cacheKey": "206036566:1779379659537",
+      "fingerprint": "70742c1f52f1",
+      "matchId": "NA1-5565058943",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779378159604,
+      "gameHappenedAt": "2026-05-21T15:42:39.604Z",
+      "gameHappenedAtLabel": "May 21, 2026, 11:42 AM",
+      "recordedAt": "2026-05-21T16:07:39.652Z",
+      "recordedAtLabel": "May 21, 2026, 12:07 PM",
+      "recordedAtTimeLabel": "12:07 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Major Structure Conversion Leak",
+      "duration": "9:22",
+      "durationSeconds": 561.833,
+      "gameLength": "20:04",
+      "gameLengthSeconds": 1204,
+      "kda": "22/5/2",
+      "kills": 22,
+      "deaths": 5,
+      "assists": 2,
+      "cs": 151,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Major Structure Conversion Leak",
+      "feedback": "Mistake: You chased kills and fought repeatedly with open access to structures instead of focusing on ending or cashing out map control. Fix: As soon as inhibitor or nexus towers are open and you have numbers or a wave, ignore chase fights and immediately pressure for structure or reset for objectives.",
+      "gameDetail": "You snowballed early as Samira, picked up several kills, and opened the map, but when mid inhib and two lanes were exposed you chased into fights and side lanes with the enemy spawning instead of pushing nexus or recalling for reset. The ending sequence again involved fighting in the jungle and lane when mid inhibitors and towers were already available. The lesson is to always turn a fight win into immediate tower or nexus pressure and not burn your lead on side chases or repeated fights.",
+      "eventEvidence": "10:53 Allied champions grouping mid after key fight, but not pushing exposed inhibitor/nexus despite enemy wipe",
+      "goodThing": "Strong early snowball and good mechanical follow-up in multi-kill situations.",
+      "whyTrust": "Samira is a reset-carry but you get paid only when lead is converted to structure; all the evidence shows missed conversion leading to enemy respawns denying you the win.",
+      "focusTag": "structure conversion",
+      "evidence": "10:53 Allied champions grouping mid after key fight, but not pushing exposed inhibitor/nexus despite enemy wipe",
+      "pattern": "After winning a fight and opening the base, you repeatedly chase or fight again instead of going for exposed structures or resetting, letting the enemy respawn and slowing down your win.",
+      "diamondRule": "Always turn a fight win into immediate tower or nexus pressure—never chase into fog or side lanes when the base is open.",
+      "drill": "In your next game, after any successful fight in the enemy base, ping 'push' and hit the nearest exposed tower or inhibitor before doing anything else.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "4:03",
+          "videoSeconds": 39.75,
+          "description": "champion farming minions in lane"
+        },
+        {
+          "clock": "10:03",
+          "videoSeconds": 165.75,
+          "description": "champion walking in bottom lane near minions"
+        },
+        {
+          "clock": "10:53",
+          "videoSeconds": 183.25,
+          "description": "two allied champions pushing mid lane together"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "10:53",
+          "videoSeconds": 183.25,
+          "description": "Allied champions grouping mid after key fight, but not pushing exposed inhibitor/nexus despite enemy wipe"
+        }
+      ],
+      "nuance": [
+        "Player had full control after multi-kill fights and enemy respawn timers.",
+        "Mid lane was repeatedly open but fights happened in side or jungle.",
+        "Structure HP was visibly low, and waves were there or could be brought.",
+        "Several frames show nearly full build/inventory gold but no recall to spend.",
+        "Mechanical execution on Samira was good but decisions after fights delayed the win."
+      ],
+      "reviewLimit": "Frames do not show the full visibility of every enemy spawn or potential all-in, so subtle map threats may be missed, but the structure opening and chase/fight pattern are clear and specific.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "sampledFrames": 24,
+      "publicVideoBytes": 74129336,
+      "src": "/recordings/auto_NA1-5565058943_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565058943-01.jpg"
+    },
+    {
+      "file": "auto_NA1-5565048601_01.mp4",
+      "publicFile": "auto_NA1-5565048601_01.mp4",
+      "cacheKey": "205790892:1779378015254",
+      "fingerprint": "9e35eca47c10",
+      "matchId": "NA1-5565048601",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779376633074,
+      "gameHappenedAt": "2026-05-21T15:17:13.074Z",
+      "gameHappenedAtLabel": "May 21, 2026, 11:17 AM",
+      "recordedAt": "2026-05-21T15:40:15.532Z",
+      "recordedAtLabel": "May 21, 2026, 11:40 AM",
+      "recordedAtTimeLabel": "11:40 AM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Missing Nexus Push Window",
+      "duration": "9:12",
+      "durationSeconds": 551.833,
+      "gameLength": "18:43",
+      "gameLengthSeconds": 1123,
+      "kda": "24/5/2",
+      "kills": 24,
+      "deaths": 5,
+      "assists": 2,
+      "cs": 118,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Missing Nexus Push Window",
+      "feedback": "Mistake: You chased enemy champions near the enemy Nexus instead of immediately hitting open Nexus turrets when your team had numbers and pressure. Fix: As soon as the inhibitors are down and you have minions and teammates, ignore chasing survivors and auto attack Nexus turrets until defenders respawn or you win.",
+      "gameDetail": "Alan's Samira dominated mid/late team fights and led several successful engages, but repeatedly followed low-reward fights or enemy chases into fogged base space even after the inhibitor was down instead of turning directly on the open Nexus towers. The telling moment was just outside the enemy base, where Alan and allies ran after retreating/fleeing enemies instead of ending the game, which left the Nexus turrets standing when a fast finish was available. The simple lesson: convert numbers into game wins by hitting Nexus structures as soon as they're vulnerable, not by cleaning up kills.",
+      "eventEvidence": "12:37 Multiple allies present outside inhibitor, setup for Nexus push but focus is not on turrets—opportunity to convert structure ignored.",
+      "goodThing": "Consistently snowballed fights for team pressure and secured soul/Baron with strong teamfight presence.",
+      "whyTrust": "You end more games, climb faster, and avoid risky throws by always hitting Nexus turrets as soon as the enemy base is open and you bring numbers—it converts leads and removes comeback risk.",
+      "focusTag": "Nexus conversion",
+      "evidence": "12:37 Multiple allies present outside inhibitor, setup for Nexus push but focus is not on turrets—opportunity to convert structure ignored.",
+      "pattern": "When ahead and the enemy inhibitor is down, Alan repeatedly prioritizes follow-up skirmishes/chases over directly auto-attacking Nexus turrets, costing free win windows.",
+      "diamondRule": "When the enemy inhibitor is down and you have two or more allies in the base, immediately attack Nexus turrets—never chase enemy champions away from your win condition.",
+      "drill": "In your next game, as soon as you break the inhibitor line and have two allies alive in the enemy base, ping the Nexus turret and attack it immediately without chasing.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "6:14",
+          "videoSeconds": 112.25,
+          "description": "A champion is taking down a turret in the bottom lane with minions."
+        },
+        {
+          "clock": "12:37",
+          "videoSeconds": 273.75,
+          "description": "Multiple champions are outside an enemy inhibitor turret, minions are pushing the lane."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "12:37",
+          "videoSeconds": 273.75,
+          "description": "Multiple allies present outside inhibitor, setup for Nexus push but focus is not on turrets—opportunity to convert structure ignored."
+        }
+      ],
+      "nuance": [
+        "Samira secured clear teamfight wins and kept pressure up in lane and midgame.",
+        "Dragon and Baron conversions were successful when contested.",
+        "Map presence and vision were generally good until late base siege.",
+        "The mistake was not about fighting skill but about conversion discipline at the Nexus.",
+        "The thrown win window came with at least two teammates and open Nexus turrets visible, with no enemy wave clear nearby."
+      ],
+      "reviewLimit": "Sampled frames do not show the initial transition from mid to inhibitor push, so cannot analyze inhibitor break mechanics or wave setup precision.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "sampledFrames": 24,
+      "publicVideoBytes": 76503007,
+      "src": "/recordings/auto_NA1-5565048601_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565048601-01.jpg"
+    },
+    {
       "file": "auto_NA1-5565044205_01.mp4",
       "publicFile": "auto_NA1-5565044205_01.mp4",
-      "cacheKey": "181249338:1779376131481",
-      "fingerprint": "f68545b7b81c",
+      "cacheKey": "187933905:1779379246741",
+      "fingerprint": "5a3be9fdc511",
       "matchId": "NA1-5565044205",
       "score": "auto",
       "clipNumber": 1,
@@ -64,9 +235,9 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Major Structure Conversion Miss: Chase vs Nexus Push",
-      "duration": "8:45",
-      "durationSeconds": 525,
+      "title": "Stop Splitting from the Winning Push",
+      "duration": "9:03",
+      "durationSeconds": 542.5,
       "gameLength": "16:26",
       "gameLengthSeconds": 986,
       "kda": "19/6/2",
@@ -79,44 +250,64 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Major Structure Conversion Miss: Chase vs Nexus Push",
-      "feedback": "Mistake: After breaking into the enemy base, you chased remaining enemies instead of focusing on killing open structures (inhibitor and Nexus towers) or ending the game. Fix: Once the base is open and enemies are dead or zoned, immediately turn to hit inhibitor/Nexus towers instead of chasing for kills or walking away from objectives.",
-      "gameDetail": "Samira snowballed through early lane fights and used her reset timings well to get strong, but late-game sequences showed a habit of chasing away from open objectives. The game got extended with unnecessary fighting and kill hunting around the enemy base, which could have risked a comeback if death timers synced for the enemy team. Lesson: Always hit open structures when the enemy base is free and you have numbers or tempo.",
-      "eventEvidence": "11:57 Champion moving near jungle entrance, three allies dead; HUD and clock visible.",
-      "goodThing": "Early resets were timed decently and Samira played fights with confidence when ahead.",
-      "whyTrust": "Securing the win by hitting Nexus towers directly is the most reliable way to convert a lead; evidence from this recording shows you repeatedly walked past or away from winnable objectives.",
+      "feedbackTitle": "Stop Splitting from the Winning Push",
+      "feedback": "Mistake: You repeatedly left open inhibitor/nexus turrets to hit side lane waves or camps instead of ending the game when enemy base was exposed. Fix: When your team has super minions and can threaten the nexus or inhib turrets, always group and commit to the final push instead of splitting or clearing jungle—only reset after a failed engage or if all threats are dead.",
+      "gameDetail": "These were windows to end the game, but splitting wasted pressure, allowing enemy respawns. Even with high kill numbers and fed status, the disconnect between fights and structure focus slowed your win. The lesson: when you break into the base with numbers, convert directly on exposed structures—delay or reset only if there’s real risk.",
+      "eventEvidence": "3:32 Samira is fighting near bot lane river with another champion close to a wall.; 5:31 Samira and ally are pushing bot lane near enemy outer turret amidst enemy minions.; 12:12 Samira moving in river near top lane, approaching scuttle crab.",
+      "goodThing": "You snowballed early fights into high gold and routinely showed up for team fights when grouped.",
+      "whyTrust": "Samira’s kit is strongest grouped with teammates in base pushes where you can chain engage and ult off allied CC; this recording repeatedly showed map pressure being lost when you solo split instead of ending.",
       "focusTag": "structure conversion",
-      "evidence": "11:57 Champion moving near jungle entrance, three allies dead; HUD and clock visible.",
-      "pattern": "Winning fights near the enemy base but then chasing for additional kills or repositioning, instead of immediately securing objectives and ending the game when possible.",
-      "diamondRule": "Always hit inhibs or Nexus towers before chasing kills if the enemy base is open and your wave is in.",
-      "drill": "Next game, after killing two or more enemy base defenders, immediately hit the closest available inhibitor or Nexus tower until it falls.",
+      "evidence": "Exposure of inhibitor and nexus turrets on minimap while Samira is shown away from the push, plus super minion pressure unaccompanied.",
+      "pattern": "You consistently rotated away to side lanes or jungle right after breaking open the enemy base or getting big teamfight wins, leaving your team without max damage on critical structures and giving the enemy time to respawn.",
+      "diamondRule": "If inhibitor or nexus turrets are exposed and your team can group, always commit to the base push first—side lane waves and jungle camps matter after the threat is removed.",
+      "drill": "In your next game, after the first open inhibitor or nexus turret, consciously direct movements toward grouping mid/base for the finish and do not hit a side camp or wave until forced to reset.",
       "timeline": [],
       "clockAnchors": [
         {
-          "clock": "11:57",
-          "videoSeconds": 308.25,
-          "description": "Champion moving near jungle entrance, three allies dead; HUD and clock visible."
+          "clock": "3:32",
+          "videoSeconds": 96.75,
+          "description": "Samira is fighting near bot lane river with another champion close to a wall."
+        },
+        {
+          "clock": "5:31",
+          "videoSeconds": 153.75,
+          "description": "Samira and ally are pushing bot lane near enemy outer turret amidst enemy minions."
+        },
+        {
+          "clock": "12:12",
+          "videoSeconds": 327.75,
+          "description": "Samira moving in river near top lane, approaching scuttle crab."
         }
       ],
       "clockMoments": [
         {
-          "clock": "11:57",
-          "videoSeconds": 308.25,
-          "description": "Champion moving near jungle entrance, three allies dead; HUD and clock visible."
+          "clock": "3:32",
+          "videoSeconds": 96.75,
+          "description": "Samira is fighting near bot lane river with another champion close to a wall."
+        },
+        {
+          "clock": "5:31",
+          "videoSeconds": 153.75,
+          "description": "Samira and ally are pushing bot lane near enemy outer turret amidst enemy minions."
+        },
+        {
+          "clock": "12:12",
+          "videoSeconds": 327.75,
+          "description": "Samira moving in river near top lane, approaching scuttle crab."
         }
       ],
       "nuance": [
-        "Samira handled early laning exchanges well and took good resets for item spikes.",
-        "On key fights that cracked open the base, minion waves were present and enemy respawn timers were favorable.",
-        "At least two moments showed a shift to chasing remaining enemies after an advantage rather than immediately hitting objectives.",
-        "Allied members were present and could tank towers, making structure focus possible and optimal.",
-        "No sudden waveclear threat or flank made the delay necessary, so hitting towers was the safest close."
+        "Samira had heavy early snowball and plenty of gold, putting her far ahead.",
+        "Team consistently had open access to inhibitor/nexus turrets off won fights.",
+        "Samira left base pushes multiple times for camps or outlying waves with no threat on map.",
+        "Extending splits invited stalled endings and allowed more enemy respawns.",
+        "Grouping for structure finish is mechanically easy and gives clear win payoff with fed Samira."
       ],
-      "reviewLimit": "Sampling misses some micro and may hide a few critical rotations, but the habit of skipping structure hits after base entry is unmistakable in visible frames.",
+      "reviewLimit": "Sampled frames cannot show precise enemy death timers or every macro call, and cannot prove full map state between frames, but the visible map pressure and turret exposure are clear enough for this repeatable pattern.",
       "analysisSource": "openai",
       "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
       "sampledFrames": 24,
-      "publicVideoBytes": 83119960,
+      "publicVideoBytes": 83857975,
       "src": "/recordings/auto_NA1-5565044205_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565044205-01.jpg"
     },
@@ -153,7 +344,7 @@
       "cs": 81,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Reset Discipline — Recalling and Map Presence",
@@ -245,7 +436,7 @@
       "cs": 89,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Reset and pressure, not repeated brawling",
@@ -1686,7 +1877,7 @@
       "cs": 128,
       "statsSource": "League Client match history",
       "kind": "highlight",
-      "reviewPhase": "implementation",
+      "reviewPhase": "baseline",
       "champion": "Samira",
       "confidence": "medium",
       "feedbackTitle": "Second in at chokes",
