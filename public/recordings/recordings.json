@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T23:39:37.640Z",
+  "generatedAt": "2026-05-21T23:39:43.169Z",
   "source": "League of Legends Highlights folder",
   "match": "15 matches",
   "matches": [
@@ -70,7 +70,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Overstayed After Winning Fight—Missed Reset/Conversion",
+      "title": "Failing to Convert Winning Fights to Structures",
       "duration": "18:22",
       "durationSeconds": 1102,
       "gameLength": "28:40",
@@ -85,20 +85,18 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Overstayed After Winning Fight—Missed Reset/Conversion",
-      "feedback": "Mistake: After winning a fight and pushing down lanes, you kept fighting in dangerous territory with low health instead of resetting immediately or cleanly converting to an objective. Fix: When you win a fight and your HP is low or teammates are cleared off the map, reset before re-entering the next wave or jungle area so you don't throw your shutdown or map pressure.",
-      "gameDetail": "After pushing out bot and mid with multiple shutdowns and numbers advantage (e. g. The simple lesson is to back after you win a fight and your health is low, instead of greedily staying to clear more waves or take risky skirmishes.",
-      "eventEvidence": "13:35 Samira is pushing mid lane after likely winning a fight, instead of resetting with low HP and shutdown; this frame evidences the overstay after a successful fight instead of backing for a reset/conversion.",
-      "goodThing": "Samira consistently won mid-game teamfights and successfully pressured lanes after fights.",
-      "whyTrust": "This feedback is grounded in the replay proof that every time you skip reset with shutdown gold, you end up dying soon after and lose all momentum, which is a major difference between low and higher level games for Samira snowballing.",
-      "focusTag": "reset discipline",
-      "evidence": "13:35 Samira is pushing mid lane after likely winning a fight, instead of resetting with low HP and shutdown; this frame evidences the overstay after a successful fight instead of backing for a reset/conversion.",
-      "pattern": "Alan takes repeated post-fight farming and skirmishing risks while low, rather than banking wins, letting the enemy respawn and catch him. Each overstay erases shutdown and tempo from the last fight.",
-      "diamondRule": "If you win a fight or clear a wave with shutdown bounty and under half HP, reset immediately before touching another lane or jungle area.",
-      "drill": "Next game, as soon as you win a fight and have shutdown bounty with less than 50% HP, press B and reset—do not hit another wave or camp until you've reset at least once.",
-      "timeline": [
-        "13:33 - Samira low HP post-fight, stays on map instead of resetting"
-      ],
+      "feedbackTitle": "Failing to Convert Winning Fights to Structures",
+      "feedback": "Mistake: You kept fighting and chasing after teamfights in the enemy base when structures (inhibitors or possibly nexus towers) were already open, instead of finishing the objective. Fix: Once you win a fight in the enemy base and have numbers, stop chasing kills and immediately hit the open structure to end the game or secure inhib/nexus.",
+      "gameDetail": "This greed for extra kills delays game-ending objectives and loses the snowball window, letting enemies respawn or recontest. The lesson is to always use man-advantage moments in the enemy base to directly hit structures when they are available, not to keep fighting or chasing.",
+      "eventEvidence": "",
+      "goodThing": "Strong teamfight mechanics and repeated successful engages, especially winning base fights.",
+      "whyTrust": "Samira is a reset snowball Samira built for clean objective conversion off mid-late teamfight wins—this leaks your biggest payoff.",
+      "focusTag": "structure conversion",
+      "evidence": "",
+      "pattern": "Alan repeatedly focuses on extra fighting near enemy fountain when the inhibitor or nexus are open, losing the chance to end or snowball the game. Each base entry after a won fight was not immediately converted to a structure hit, showing loss of the snowball threat Samira creates.",
+      "diamondRule": "If the enemy base is open and your team has numbers after a won fight, always hit the objective—never chase fresh fights or kills.",
+      "drill": "In next queue, after the enemy base is cracked and you have teammates, auto-path directly onto the inhib/nexus every time you win a fight, regardless of low enemies running away.",
+      "timeline": [],
       "clockAnchors": [
         {
           "clock": "0:27",
@@ -111,21 +109,14 @@
           "description": "Samira is farming caster and cannon minions mid lane; no visible enemies close."
         }
       ],
-      "clockMoments": [
-        {
-          "clock": "13:35",
-          "videoSeconds": 527.217,
-          "description": "Samira is pushing mid lane after likely winning a fight, instead of resetting with low HP and shutdown; this frame evidences the overstay after a successful fight instead of backing for a reset/conversion."
-        }
-      ],
+      "clockMoments": [],
       "nuance": [
-        "The good: Strong execution in teamfights, lane pressure, and objective-side presence.",
-        "What leaked: Consistently failing to reset after a win, farming multiple waves with shutdown HP.",
-        "Consequence: Allows the enemy to respawn and pick you off, erasing gold advantage and opening map for their play.",
-        "Harder-game punishment: Even faster rotations and punish windows; giving away game-ending shutdown.",
-        "Next check: Reset before pushing for more after a big win, especially with shutdown or low survivability."
+        "Strong teamfighting got the enemy low or off the map when base was open.",
+        "Did not move to hit inhib/nexus after the first win, kept clearing or fighting.",
+        "Higher ranked games will punish by letting enemies respawn and counter, wasting man-advantage and risking throws.",
+        "The next check: immediately right-click inhib/nexus after you win base fights."
       ],
-      "reviewLimit": "Frames are sampled about every 30-60s, so detailed kill/death order may be missed; however, the post-fight low-HP overstay pattern is fully visible.",
+      "reviewLimit": "Frames before 12:30 do not show open structures or endgame base states, but both 12:45 and 14:20 make the structure conversion leak clear.",
       "analysisSource": "openai",
       "analysisVersion": "2026-05-21-specific-decision-chain-v4",
       "sampledFrames": 36,
