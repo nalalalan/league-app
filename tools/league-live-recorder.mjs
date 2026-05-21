@@ -35,7 +35,7 @@ const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "4800k"
 const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "1600:-2").trim();
 const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
-const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "region").trim().toLowerCase();
+const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "desktop").trim().toLowerCase();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || "https://league.aolabs.io/api/recording-status").trim();
 const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
@@ -419,9 +419,10 @@ async function videoHasVisibleFrames(filePath, duration) {
 }
 
 function captureModes() {
+  if (/^(desktop|screen|full|full-screen|fullscreen)$/i.test(captureModePreference)) return ["desktop"];
   if (/^(title|window|window-title)$/i.test(captureModePreference)) return ["title"];
   if (/^(region|window-region)$/i.test(captureModePreference)) return ["region"];
-  return ["title", "region"];
+  return ["desktop", "title", "region"];
 }
 
 async function leagueWindowRect() {
@@ -571,14 +572,18 @@ async function segmentFootprint(sessionRoot) {
   return { bytes, count };
 }
 
-async function startCaptureChild(sessionRoot, startNumber = 0, mode = "title") {
+async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop") {
   const outputPattern = path.join(sessionRoot, "segment-%04d.mkv");
   const encoder = await encoderProfile();
   const filters = [];
-  let inputTarget = captureWindowTitle ? `title=${captureWindowTitle}` : "desktop";
+  let inputTarget = "desktop";
   let inputArgs = ["-i", inputTarget];
   let captureMode = mode;
   let captureRect = null;
+  if (mode === "title") {
+    inputTarget = captureWindowTitle ? `title=${captureWindowTitle}` : "desktop";
+    inputArgs = ["-i", inputTarget];
+  }
   if (mode === "region") {
     const rect = await leagueWindowRect();
     if (rect?.isForeground) {
@@ -640,7 +645,7 @@ async function startCaptureChild(sessionRoot, startNumber = 0, mode = "title") {
   const rectNote = captureRect
     ? `, rect ${captureRect.width}x${captureRect.height}, screen ${captureRect.logicalScreen}/${captureRect.physicalScreen}, dpi ${captureRect.dpiScale}`
     : "";
-  await log(`Started low-impact League window capture in ${sessionRoot} using ${encoder.label} at ${fps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, mode ${captureMode}, input ${inputTarget}${rectNote}, segment ${startNumber}.`);
+  await log(`Started low-impact League capture in ${sessionRoot} using ${encoder.label} at ${fps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, mode ${captureMode}, input ${inputTarget}${rectNote}, segment ${startNumber}.`);
   return { child, encoder: encoder.name, inputTarget, captureMode, captureRect };
 }
 
@@ -669,7 +674,7 @@ async function startSession() {
     taintedSegmentIndexes: new Set(),
     captureRestarts: 0
   };
-  await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { force: true });
+  await publishRecorderStatus("recording", sessionStatusFields(session, session.captureMode === "desktop" ? "Full desktop capture active for this League game." : "League window capture active."), { force: true });
   return session;
 }
 
@@ -719,7 +724,7 @@ async function restartCaptureIfNeeded(session) {
       await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { force: true });
     }
   }
-  await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { throttleMs: 30000 });
+  await publishRecorderStatus("recording", sessionStatusFields(session, session.captureMode === "desktop" ? "Full desktop capture active for this League game." : "League window capture active."), { throttleMs: 30000 });
   const footprint = await segmentFootprint(session.sessionRoot);
   if (footprint.bytes > session.lastSegmentBytes + minCaptureGrowthBytes) {
     session.lastSegmentBytes = footprint.bytes;
@@ -747,13 +752,26 @@ async function restartCaptureIfNeeded(session) {
   const startNumber = await nextSegmentIndex(session.sessionRoot);
   const modes = session.captureModes?.length ? session.captureModes : captureModes();
   const mode = resumeAfterForegroundPause
-    ? session.captureMode || modes[0] || "region"
-    : modes[Math.min(session.captureRestarts, modes.length - 1)] || modes[0] || "title";
+    ? session.captureMode || modes[0] || "desktop"
+    : modes[Math.min(session.captureRestarts, modes.length - 1)] || modes[0] || "desktop";
   const restartReason = resumeAfterForegroundPause
     ? "League window is foreground again; capture is resuming"
     : "League window capture stopped while game is still running; restarting capture";
   await log(`${restartReason} at segment ${startNumber} with ${mode} mode.`);
-  const capture = await startCaptureChild(session.sessionRoot, startNumber, mode);
+  let capture;
+  try {
+    capture = await startCaptureChild(session.sessionRoot, startNumber, mode);
+  } catch (error) {
+    if (mode === "region" && /League window/i.test(error.message || "")) {
+      session.pausedForForeground = true;
+      session.foregroundPauseStartedMs = session.foregroundPauseStartedMs || Date.now();
+      session.lastSegmentGrowthMs = Date.now();
+      await log(`Capture restart waiting: ${error.message}`);
+      await publishRecorderStatus("paused", { ...sessionStatusFields(session, "Region fallback is waiting for the League window to stay foreground."), progress: 20 }, { force: true });
+      return;
+    }
+    throw error;
+  }
   session.child = capture.child;
   session.encoder = capture.encoder;
   session.inputTarget = capture.inputTarget;
@@ -761,7 +779,7 @@ async function restartCaptureIfNeeded(session) {
   session.captureRect = capture.captureRect;
   session.lastSegmentBytes = footprint.bytes;
   session.lastSegmentGrowthMs = Date.now();
-  await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { force: true });
+  await publishRecorderStatus("recording", sessionStatusFields(session, session.captureMode === "desktop" ? "Full desktop capture active for this League game." : "League window capture active."), { force: true });
 }
 
 async function waitForNoGame(reason) {
@@ -961,7 +979,9 @@ async function finalizeSession(session) {
       important: item.important
     })),
     validForPublish: true,
-    privacyPolicy: "Default capture records the League window area when League is foreground. If alt-tab happens during a capture segment, that segment is excluded before the review clip is published.",
+    privacyPolicy: session.captureMode === "desktop"
+      ? "Full desktop capture was used for reliability, so alt-tabbed desktop or browser content during the game can appear in the source clip."
+      : "Region capture records the League window area when League is foreground. If alt-tab happens during a capture segment, that segment is excluded before the review clip is published.",
     inputPolicy: "Screen and mouse cursor are recorded. Raw keyboard text is not logged."
   };
   await fs.writeFile(path.join(session.sessionRoot, "review-clip.json"), `${JSON.stringify(sidecar, null, 2)}\n`, "utf8");

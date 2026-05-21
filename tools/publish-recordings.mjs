@@ -11,9 +11,14 @@ const analysisRoot = path.join(appRoot, "_recording-analysis");
 const statePath = path.join(analysisRoot, "source-state.json");
 const lockPath = path.join(analysisRoot, "publish-recordings.lock");
 const retryStatePath = path.join(analysisRoot, "analysis-retry-state.json");
+const statusPath = path.join(analysisRoot, "recording-status.json");
 const sourceDir = process.env.LEAGUE_RECORDINGS_DIR || "C:\\Users\\phama\\Documents\\League of Legends\\Highlights";
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 const railwayBin = process.platform === "win32" ? "railway.cmd" : "railway";
+const liveBase = (process.env.LEAGUE_SITE_URL || "https://league.aolabs.io").replace(/\/+$/, "");
+const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || `${liveBase}/api/recording-status`).trim();
+const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
+const livePublishWaitMs = Number(process.env.LEAGUE_LIVE_PUBLISH_WAIT_MS || 5 * 60 * 1000);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 const fallbackRetryMs = Number(process.env.LEAGUE_ANALYSIS_RETRY_MINUTES || 60) * 60 * 1000;
 const publishPaths = [
@@ -56,6 +61,36 @@ async function run(command, args, options = {}) {
   if (result.stdout) process.stdout.write(result.stdout);
   if (result.stderr) process.stderr.write(result.stderr);
   return result;
+}
+
+function clean(value, limit = 180) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, limit);
+}
+
+async function publishStatus(status, fields = {}) {
+  const existing = JSON.parse(await fs.readFile(statusPath, "utf8").catch(() => "{}"));
+  const payload = {
+    ...existing,
+    status,
+    label: clean(fields.label || status, 80),
+    detail: clean(fields.detail || "", 180),
+    mode: clean(fields.mode || existing.mode || "publisher", 40),
+    matchId: clean(fields.matchId || existing.matchId || "", 40),
+    startedAt: clean(fields.startedAt || existing.startedAt || "", 40),
+    progress: Number.isFinite(Number(fields.progress)) ? Math.max(0, Math.min(100, Number(fields.progress))) : existing.progress,
+    updatedAt: new Date().toISOString()
+  };
+  await fs.mkdir(analysisRoot, { recursive: true });
+  await fs.writeFile(statusPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  if (!statusToken || !/^https?:\/\//i.test(statusEndpoint)) return;
+  await fetch(statusEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${statusToken}`
+    },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
 }
 
 function processIsAlive(pid) {
@@ -172,6 +207,42 @@ async function markAnalysisRetry() {
   }, null, 2)}\n`, "utf8");
 }
 
+function newestSourceFile(state) {
+  const files = Array.isArray(state?.files) ? state.files : [];
+  return [...files].sort((a, b) => Number(b.mtimeMs || 0) - Number(a.mtimeMs || 0) || String(a.name).localeCompare(String(b.name)))[0] || null;
+}
+
+async function liveManifestContains(fileName) {
+  if (!fileName) return false;
+  const response = await fetch(`${liveBase}/recordings/recordings.json?verify=${Date.now()}`, {
+    headers: { Accept: "application/json" },
+    cache: "no-store"
+  });
+  if (!response.ok) return false;
+  const manifest = await response.json();
+  const recordings = Array.isArray(manifest.recordings) ? manifest.recordings : [];
+  return recordings.some((item) => {
+    const src = String(item.src || "");
+    return item.file === fileName || item.publicFile === fileName || src.endsWith(`/${fileName}`);
+  });
+}
+
+async function waitForLiveRecording(currentState) {
+  const latest = newestSourceFile(currentState);
+  if (!latest?.name) return false;
+  const deadline = Date.now() + livePublishWaitMs;
+  while (Date.now() < deadline) {
+    await publishStatus("publishing", {
+      label: "publishing review",
+      detail: "Waiting for league.aolabs.io to serve the new recording.",
+      progress: 98
+    });
+    if (await liveManifestContains(latest.name).catch(() => false)) return true;
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+  }
+  return false;
+}
+
 async function main() {
   if (!(await acquireLock())) return;
   await fs.mkdir(analysisRoot, { recursive: true });
@@ -192,6 +263,11 @@ async function main() {
 
     await run("git", ["pull", "--rebase", "origin", "main"]);
     if (retryAnalysis) await markAnalysisRetry();
+    await publishStatus("processing", {
+      label: "analyzing review",
+      detail: "Reading the recording and writing the site feedback.",
+      progress: 84
+    });
     await run(npmBin, ["run", "sync:recordings"]);
     if (!(await hasGitChanges())) {
       await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
@@ -199,6 +275,11 @@ async function main() {
       return;
     }
 
+    await publishStatus("publishing", {
+      label: "publishing review",
+      detail: "Saving the analyzed recording for the site.",
+      progress: 92
+    });
     await run("git", ["add", "-f", "--", ...publishPaths]);
     if (!(await hasStagedChanges())) {
       console.log("League recordings synced; no publishable changes.");
@@ -207,7 +288,20 @@ async function main() {
     await run("git", ["commit", "-m", `Update League recordings ${new Date().toISOString().slice(0, 10)}`]);
     await run("git", ["pull", "--rebase", "origin", "main"]);
     await run("git", ["push", "origin", "main"]);
+    await publishStatus("publishing", {
+      label: "deploying review",
+      detail: "Deploying the updated recording page.",
+      progress: 96
+    });
     await run(railwayBin, ["up", "--detach", "--message", "Update League recordings"]);
+    if (!(await waitForLiveRecording(currentState))) {
+      throw new Error("Timed out waiting for league.aolabs.io to serve the new recording.");
+    }
+    await publishStatus("published", {
+      label: "review live",
+      detail: "The new recording is on league.aolabs.io.",
+      progress: 100
+    });
     await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
     console.log("League recordings published.");
   } finally {

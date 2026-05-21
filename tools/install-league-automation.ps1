@@ -9,7 +9,7 @@ $RecorderTaskName = "AO Labs League live recorder"
 $PublisherTaskName = "AO Labs League recording publisher"
 $RecorderScript = Join-Path $AppRoot "tools\league-live-recorder.mjs"
 $PublisherScript = Join-Path $AppRoot "tools\publish-recordings.ps1"
-$RecorderLaunchCommand = "`$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','User'); if (-not `$statusToken) { `$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','Machine') }; if (`$statusToken) { `$env:LEAGUE_STATUS_TOKEN=`$statusToken }; `$env:LEAGUE_LIVE_CAPTURE_MODE='region'; `$env:LEAGUE_LIVE_POLL_MS='1000'; `$env:LEAGUE_LIVE_SEGMENT_SECONDS='6'; `$env:LEAGUE_LIVE_FPS='6'; `$env:LEAGUE_LIVE_CAPTURE_SCALE='1600:-2'; `$env:LEAGUE_LIVE_CAPTURE_CQ='35'; & '$Node' '$RecorderScript'"
+$RecorderLaunchCommand = "`$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','User'); if (-not `$statusToken) { `$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','Machine') }; if (`$statusToken) { `$env:LEAGUE_STATUS_TOKEN=`$statusToken }; `$env:LEAGUE_LIVE_CAPTURE_MODE='desktop'; `$env:LEAGUE_LIVE_POLL_MS='1000'; `$env:LEAGUE_LIVE_SEGMENT_SECONDS='6'; `$env:LEAGUE_LIVE_FPS='6'; `$env:LEAGUE_LIVE_CAPTURE_SCALE='1600:-2'; `$env:LEAGUE_LIVE_CAPTURE_CQ='35'; & '$Node' '$RecorderScript'"
 
 function Quote-Vbs([string]$Value) {
   return $Value.Replace('"', '""')
@@ -63,7 +63,7 @@ $RecorderTaskOk = Try-RegisterTask `
   -Action $RecorderAction `
   -Trigger $RecorderTrigger `
   -Settings $LongRunningSettings `
-  -Description "Watches for League of Legends games, captures the League window at low priority, creates one review clip, and hands it to league.aolabs.io."
+  -Description "Watches for League of Legends games, captures the screen at low priority, creates one review clip, and hands it to league.aolabs.io."
 
 if (-not $RecorderTaskOk) {
   $RecorderCommand = "`"$PowerShell`" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$RecorderLaunchCommand`""

@@ -734,6 +734,8 @@ const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 let currentChampionId = "";
 let activeRecordingFile = "";
 let recordingReviewData = recordingReview;
+let lastRecordingStatus = "";
+let lastRecordingRefreshAt = 0;
 let championAtmosphere;
 let swapTimer = 0;
 let settleTimer = 0;
@@ -2174,7 +2176,15 @@ async function hydrateRecordingLiveStatus() {
       cache: "no-store"
     });
     if (!response.ok) throw new Error("status unavailable");
-    renderRecordingLiveStatus(await response.json());
+    const data = await response.json();
+    renderRecordingLiveStatus(data);
+    const status = String(data.status || "unknown").toLowerCase();
+    const now = Date.now();
+    if ((status === "published" && lastRecordingStatus !== "published") || (["publishing", "published"].includes(status) && now - lastRecordingRefreshAt > 30000)) {
+      lastRecordingRefreshAt = now;
+      window.setTimeout(() => loadRecordingData(), status === "published" ? 1200 : 0);
+    }
+    lastRecordingStatus = status;
   } catch {
     renderRecordingLiveStatus({
       status: "unknown",
