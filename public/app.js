@@ -1342,28 +1342,20 @@ function recordingMainCard(review) {
   article.className = "recording-main";
 
   const title = document.createElement("h3");
-  title.textContent = (review.detectedChampions || []).map((champion) => champion.name).filter(Boolean).join(", ") || "recording focus";
+  title.textContent = ((review.detectedChampions || []).map((champion) => champion.name).filter(Boolean)[0] || "samira").toLowerCase();
 
   const focus = document.createElement("p");
   focus.className = "recording-main-focus";
-  focus.textContent = item.focus || item.title || "Name the payout before the dash.";
-
-  const rule = document.createElement("p");
-  rule.className = "recording-main-rule";
-  rule.textContent = item.rule || item.nextRep || "Before E/R: wave, tower, dragon, recall, or nexus. If none is real, hold the dash.";
-
-  const why = document.createElement("p");
-  why.className = "recording-main-why";
-  why.textContent = item.whyTrust || "";
-
-  const limit = document.createElement("p");
-  limit.className = "recording-main-limit";
-  limit.textContent = isGenericEvidence(item.reviewLimit) ? "" : item.reviewLimit || "";
-
+  focus.textContent = [
+    item.focus || item.title || "Name the payout before the dash.",
+    item.rule || item.nextRep || "Before E/R: wave, tower, dragon, recall, or nexus. If none is real, hold the dash.",
+    item.whyTrust || ""
+  ]
+    .map((text) => String(text || "").replace(/^\s*Honest read:\s*/i, "").trim())
+    .filter(Boolean)
+    .join(" ")
+    .replace(/^([a-z])/, (match) => match.toUpperCase());
   article.append(title, focus);
-  if (rule.textContent) article.append(rule);
-  if (why.textContent) article.append(why);
-  if (limit.textContent) article.append(limit);
   return article;
 }
 
