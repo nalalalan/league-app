@@ -21,8 +21,11 @@ const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE
 const livePublishWaitMs = Number(process.env.LEAGUE_LIVE_PUBLISH_WAIT_MS || 5 * 60 * 1000);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 const fallbackRetryMs = Number(process.env.LEAGUE_ANALYSIS_RETRY_MINUTES || 60) * 60 * 1000;
-const publishPaths = [
-  "public/recordings",
+const expectedSourceFile = String(process.env.LEAGUE_EXPECT_SOURCE_FILE || "").trim();
+const recordingPublishPaths = [
+  "public/recordings"
+];
+const codePublishPaths = [
   "public/app.js",
   "public/index.html",
   "public/styles.css",
@@ -37,6 +40,9 @@ const publishPaths = [
   "tools/install-league-automation.ps1",
   "README.md"
 ];
+const publishPaths = process.env.LEAGUE_PUBLISH_INCLUDE_CODE === "1"
+  ? [...recordingPublishPaths, ...codePublishPaths]
+  : recordingPublishPaths;
 const ignoredSourceVideoPattern = /\.with-desktop-pauses\.(webm|mp4)$/i;
 
 function commandNeedsShell(command) {
@@ -197,6 +203,24 @@ async function hasStagedChanges() {
   return stdout.trim().length > 0;
 }
 
+async function stagedPathList(paths = []) {
+  const args = ["diff", "--cached", "--name-only"];
+  if (paths.length) args.push("--", ...paths);
+  const { stdout } = await execFileAsync("git", args, {
+    cwd: appRoot,
+    maxBuffer: 16 * 1024 * 1024
+  });
+  return stdout.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+}
+
+async function hasPublishPathChanges() {
+  const { stdout } = await execFileAsync("git", ["status", "--porcelain=v1", "--ignored=no", "--", ...publishPaths], {
+    cwd: appRoot,
+    maxBuffer: 16 * 1024 * 1024
+  });
+  return stdout.trim().length > 0;
+}
+
 async function gitPorcelain() {
   const { stdout } = await execFileAsync("git", ["status", "--porcelain=v1", "--ignored=no"], {
     cwd: appRoot,
@@ -270,18 +294,36 @@ async function main() {
     const currentState = await sourceState();
     const previousState = await readPreviousState();
     const retryAnalysis = await needsAnalysisRetry();
-    if (sameState(currentState, previousState) && process.env.LEAGUE_FORCE_ANALYSIS !== "1" && !retryAnalysis) {
+    const expectedMissingLive = expectedSourceFile
+      ? !(await liveManifestContains(expectedSourceFile).catch(() => false))
+      : false;
+    if (sameState(currentState, previousState) && process.env.LEAGUE_FORCE_ANALYSIS !== "1" && !retryAnalysis && !expectedMissingLive) {
       console.log("No new League recordings.");
       return;
     }
 
-    const before = await gitPorcelain();
-    if (before && process.env.LEAGUE_FORCE_PUBLISH_DIRTY !== "1") {
-      console.log(`League publish skipped because the repo has active local edits:\n${before}`);
-      return;
+    const stagedBefore = await stagedPathList();
+    if (stagedBefore.length && process.env.LEAGUE_FORCE_PUBLISH_DIRTY !== "1") {
+      const detail = `Publish blocked because staged local edits exist: ${stagedBefore.slice(0, 4).join(", ")}`;
+      await publishStatus("blocked", {
+        label: "publish blocked",
+        detail,
+        progress: 100
+      });
+      throw new Error(detail);
     }
 
-    await run("git", ["pull", "--rebase", "origin", "main"]);
+    const before = await gitPorcelain();
+    if (before && process.env.LEAGUE_FORCE_PUBLISH_DIRTY !== "1") {
+      console.log(`League publish continuing with active local edits; only recording publish paths will be staged:\n${before}`);
+      await publishStatus("publishing", {
+        label: "publishing review",
+        detail: "Local edits are present; publishing recording files only.",
+        progress: 82
+      });
+    }
+
+    await run("git", ["pull", "--rebase", "--autostash", "origin", "main"]);
     if (retryAnalysis) await markAnalysisRetry();
     await publishStatus("processing", {
       label: "analyzing review",
@@ -293,9 +335,9 @@ async function main() {
       detail: "Still reading the recording and writing the site feedback.",
       progress: 84
     });
-    if (!(await hasGitChanges())) {
+    if (!(await hasPublishPathChanges())) {
       await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
-      console.log("League recordings synced; no public changes.");
+      console.log("League recordings synced; no public recording changes.");
       return;
     }
 
@@ -310,7 +352,7 @@ async function main() {
       return;
     }
     await run("git", ["commit", "-m", `Update League recordings ${new Date().toISOString().slice(0, 10)}`]);
-    await run("git", ["pull", "--rebase", "origin", "main"]);
+    await run("git", ["pull", "--rebase", "--autostash", "origin", "main"]);
     await run("git", ["push", "origin", "main"]);
     await publishStatus("publishing", {
       label: "deploying review",
