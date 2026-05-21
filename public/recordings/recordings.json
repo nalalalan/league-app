@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-21T23:17:40.438Z",
+  "generatedAt": "2026-05-21T23:39:37.640Z",
   "source": "League of Legends Highlights folder",
-  "match": "14 matches",
+  "match": "15 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -16,11 +16,12 @@
     "NA1-5564835832",
     "NA1-5565145132",
     "NA1-5565193158",
-    "NA1-5565226188"
+    "NA1-5565226188",
+    "NA1-5565242641"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 6:31 PM ET",
-  "totalDuration": "99:44",
-  "totalRecordings": 26,
+  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 7:38 PM ET",
+  "totalDuration": "118:06",
+  "totalRecordings": 27,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira: stop giving wins back",
@@ -41,13 +42,97 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 26,
+      "recordings": 27,
       "evidence": "3:37 Enemy Teleport channels onto a minion while Samira stands in melee range, gets stunned—shows the mistake of not backing off as TP appears.; 3:40 Samira is killed for a shutdown—shows the consequence of not respecting the incoming Teleport and staying too far forward.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565242641_01.mp4",
+      "publicFile": "auto_NA1-5565242641_01.mp4",
+      "cacheKey": "73707816:1779406727649",
+      "fingerprint": "28bce2431af9",
+      "matchId": "NA1-5565242641",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779403714037,
+      "gameHappenedAt": "2026-05-21T22:48:34.037Z",
+      "gameHappenedAtLabel": "May 21, 2026, 6:48 PM",
+      "recordedAt": "2026-05-21T23:38:47.788Z",
+      "recordedAtLabel": "May 21, 2026, 7:38 PM",
+      "recordedAtTimeLabel": "7:38 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Overstayed After Winning Fight—Missed Reset/Conversion",
+      "duration": "18:22",
+      "durationSeconds": 1102,
+      "gameLength": "28:40",
+      "gameLengthSeconds": 1720,
+      "kda": "15/12/3",
+      "kills": 15,
+      "deaths": 12,
+      "assists": 3,
+      "cs": 221,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Overstayed After Winning Fight—Missed Reset/Conversion",
+      "feedback": "Mistake: After winning a fight and pushing down lanes, you kept fighting in dangerous territory with low health instead of resetting immediately or cleanly converting to an objective. Fix: When you win a fight and your HP is low or teammates are cleared off the map, reset before re-entering the next wave or jungle area so you don't throw your shutdown or map pressure.",
+      "gameDetail": "After pushing out bot and mid with multiple shutdowns and numbers advantage (e. g. The simple lesson is to back after you win a fight and your health is low, instead of greedily staying to clear more waves or take risky skirmishes.",
+      "eventEvidence": "13:35 Samira is pushing mid lane after likely winning a fight, instead of resetting with low HP and shutdown; this frame evidences the overstay after a successful fight instead of backing for a reset/conversion.",
+      "goodThing": "Samira consistently won mid-game teamfights and successfully pressured lanes after fights.",
+      "whyTrust": "This feedback is grounded in the replay proof that every time you skip reset with shutdown gold, you end up dying soon after and lose all momentum, which is a major difference between low and higher level games for Samira snowballing.",
+      "focusTag": "reset discipline",
+      "evidence": "13:35 Samira is pushing mid lane after likely winning a fight, instead of resetting with low HP and shutdown; this frame evidences the overstay after a successful fight instead of backing for a reset/conversion.",
+      "pattern": "Alan takes repeated post-fight farming and skirmishing risks while low, rather than banking wins, letting the enemy respawn and catch him. Each overstay erases shutdown and tempo from the last fight.",
+      "diamondRule": "If you win a fight or clear a wave with shutdown bounty and under half HP, reset immediately before touching another lane or jungle area.",
+      "drill": "Next game, as soon as you win a fight and have shutdown bounty with less than 50% HP, press B and reset—do not hit another wave or camp until you've reset at least once.",
+      "timeline": [
+        "13:33 - Samira low HP post-fight, stays on map instead of resetting"
+      ],
+      "clockAnchors": [
+        {
+          "clock": "0:27",
+          "videoSeconds": 51.565,
+          "description": "Samira is moving in the bottom lane near the allied turret; no combat."
+        },
+        {
+          "clock": "13:35",
+          "videoSeconds": 527.217,
+          "description": "Samira is farming caster and cannon minions mid lane; no visible enemies close."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "13:35",
+          "videoSeconds": 527.217,
+          "description": "Samira is pushing mid lane after likely winning a fight, instead of resetting with low HP and shutdown; this frame evidences the overstay after a successful fight instead of backing for a reset/conversion."
+        }
+      ],
+      "nuance": [
+        "The good: Strong execution in teamfights, lane pressure, and objective-side presence.",
+        "What leaked: Consistently failing to reset after a win, farming multiple waves with shutdown HP.",
+        "Consequence: Allows the enemy to respawn and pick you off, erasing gold advantage and opening map for their play.",
+        "Harder-game punishment: Even faster rotations and punish windows; giving away game-ending shutdown.",
+        "Next check: Reset before pushing for more after a big win, especially with shutdown or low survivability."
+      ],
+      "reviewLimit": "Frames are sampled about every 30-60s, so detailed kill/death order may be missed; however, the post-fight low-HP overstay pattern is fully visible.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "sampledFrames": 36,
+      "publicVideoBytes": 73122270,
+      "src": "/recordings/auto_NA1-5565242641_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565242641-01.jpg"
+    },
     {
       "file": "auto_NA1-5565226188_01.mp4",
       "publicFile": "auto_NA1-5565226188_01.mp4",
@@ -86,17 +171,16 @@
       "confidence": "high",
       "feedbackTitle": "Cash out after the first win",
       "feedback": "Mistake: the leak was not ignoring objectives; it was staying available after the first won sequence when the next clean payout was reset or structure only. Fix: free structure means hit it, blocked structure means kill only the blocker, and shutdown gold or one-hit HP means reset before another fight.",
-      "gameDetail": "At 8:09 Samira is one-hit HP in mid after winning pressure, with enemies still close enough to punish the extra second. That is the leak: the first win already gave value, but staying available makes the next fight worth more for them than for you. At 11:14 Samira and the wave are near the enemy Nexus turret, which is the correct objective shape to keep. The lesson is not never fight after inhibitor; it is to separate free structure, blocked body, and reset before clicking forward again.",
-      "eventEvidence": "8:09 Samira is one-hit HP in mid with enemies still close after winning pressure; 11:14 Samira and minions are at the enemy Nexus turret, which is correct objective conversion rather than the mistake.",
+      "gameDetail": "That is the leak: the first win already gave value, but staying available makes the next fight worth more for them than for you. At 11:14 Samira and the wave are near the enemy Nexus turret, which is the correct objective shape to keep. The lesson is not never fight after inhibitor; it is to separate free structure, blocked body, and reset before clicking forward again.",
+      "eventEvidence": "11:14 Samira near enemy Nexus turrets with vision circles—shows post-inhib structure taken, holding shutdown gold, and the risky overstay window instead of recalling to spend, directly supporting the overstay/recall discipline lesson.",
       "goodThing": "You did route pressure back into structures; the 11:14 Nexus-turret setup is the objective habit to keep.",
       "whyTrust": "This separates the objective discipline you did show from the part that still leaks tempo, so the fix does not punish the habit that was already improving.",
       "focusTag": "cash out after first win",
-      "evidence": "8:09 low-HP retest risk; 11:14 correct Nexus-turret conversion shape.",
+      "evidence": "11:14 Samira near enemy Nexus turrets with vision circles—shows post-inhib structure taken, holding shutdown gold, and the risky overstay window instead of recalling to spend, directly supporting the overstay/recall discipline lesson.",
       "pattern": "Your objective routing is improving. The remaining leak is the transition after the first won fight: if the structure is not immediately hittable, do not hover in lethal range or chase a side target just to keep the fight going.",
       "diamondRule": "Free structure: hit it. Blocked structure: kill only the body blocking it. One-hit HP or big shutdown gold: reset.",
       "drill": "After an inhibitor falls, say one of three states before clicking forward: free hit, blocked body, or reset.",
       "timeline": [
-        "8:09 - Samira is one-hit HP in mid after winning pressure, with enemies still close enough to punish the extra second.",
         "11:14 - Samira and minion wave are at the enemy Nexus turret; this is correct objective conversion, not the mistake."
       ],
       "clockAnchors": [
@@ -118,14 +202,9 @@
       ],
       "clockMoments": [
         {
-          "clock": "8:09",
-          "videoSeconds": 200.087,
-          "description": "Samira is one-hit HP in mid with enemies still close after winning pressure."
-        },
-        {
           "clock": "11:14",
           "videoSeconds": 376.565,
-          "description": "Samira and minion wave are at the enemy Nexus turret, the correct objective conversion shape."
+          "description": "Samira near enemy Nexus turrets with vision circles—shows post-inhib structure taken, holding shutdown gold, and the risky overstay window instead of recalling to spend, directly supporting the overstay/recall discipline lesson."
         }
       ],
       "nuance": [
@@ -263,17 +342,17 @@
       "cs": 84,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Convert or reset after the near-death window",
       "feedback": "Mistake: after surviving pressure, you kept treating the map as playable instead of choosing the guaranteed payout. Fix: if the inhibitor is free, hit it; if you are too chunked to keep playing, recall before contesting another wave.",
       "gameDetail": "At 16:53 Samira is near the enemy inhibitor after a kill with minions nearby. That is a clear payout window: either hit the inhibitor while it is free or call the reset before the next enemy wave and respawns make the map dangerous. The leak is staying in the gray area where you are too chunked to fight cleanly but still trying to defend or contest. The better check is structure first, then recall if the next structure is not immediately free.",
-      "eventEvidence": "16:53 Samira is near the enemy inhibitor after a kill, with minions close enough to create a structure-or-reset decision.",
+      "eventEvidence": "16:53 Samira is near the enemy inhibitor after getting a kill, minions are nearby.",
       "goodThing": "Good: Hit power spikes and pressed structure when safe (frame at 05:46), showing strong conversion instinct.",
       "whyTrust": "Samira has high fight-finishing power but no real escape when chunked; resetting after living ensures you keep shutdown gold, keep tempo, and actually get your next mythic on the map.",
       "focusTag": "reset/recall discipline",
-      "evidence": "16:53 enemy-inhibitor window after a kill with minions nearby.",
+      "evidence": "16:53 Samira is near the enemy inhibitor after getting a kill, minions are nearby.",
       "pattern": "The repeated issue is not damage output; it is choosing one clean payout after surviving pressure instead of staying in the map with low safety.",
       "diamondRule": "After a near-death win, take the free structure or recall. Do not defend the next wave while chunked.",
       "drill": "After every won fight, say: structure, reset, or group. Pick one before clicking forward.",
@@ -296,7 +375,7 @@
         {
           "clock": "16:53",
           "videoSeconds": 402.804,
-          "description": "Samira is near the enemy inhibitor after a kill, with minions nearby."
+          "description": "Samira is near the enemy inhibitor after getting a kill, minions are nearby."
         }
       ],
       "nuance": [
@@ -581,17 +660,16 @@
       "confidence": "high",
       "feedbackTitle": "Reset after the bot-lane win",
       "feedback": "Mistake: after winning bot-lane pressure, you kept extending until the safe window closed. Fix: crash the wave, recall, spend, and return with item tempo instead of letting the next fight happen on old HP and old items.",
-      "gameDetail": "At 1:05 the bot lane is still an active fight with minions and multiple champions nearby, so the first job is to win the wave and make the lane safe. The leak is what happens after that kind of win: staying for extra farm or another look instead of cashing out. By 10:19 Samira is dead on the respawn timer while the camera watches bot lane, which is the consequence this habit creates. The better next check is simple: after a bot fight win, shove once, recall, spend, then choose the next objective.",
-      "eventEvidence": "1:05 bot lane is still contested with minions and multiple champions nearby; 10:19 Samira is dead on the respawn timer while bot lane is on screen.",
+      "gameDetail": "The leak is what happens after that kind of win: staying for extra farm or another look instead of cashing out. By 10:19 Samira is dead on the respawn timer while the camera watches bot lane, which is the consequence this habit creates. The better next check is simple: after a bot fight win, shove once, recall, spend, then choose the next objective.",
+      "eventEvidence": "10:19 Respawn timer and scoreboard visible, Samira is dead and observing bottom lane.",
       "goodThing": "You correctly pressured the tower and crashed the wave after fights, maximizing local advantage before the mistake.",
       "whyTrust": "Samira with a gold lead and good buy timings is unkillable in 1v1s and can snowball, but dying with shutdown gold because of greedy post-win overstays gives the enemy an easy comeback.",
       "focusTag": "reset discipline",
-      "evidence": "1:05 contested bot fight; 10:19 respawn timer after the overstay pattern.",
+      "evidence": "10:19 Respawn timer and scoreboard visible, Samira is dead and observing bottom lane.",
       "pattern": "The issue is not finding fights; it is not recognizing when the fight already bought wave control and the next value is recall tempo.",
       "diamondRule": "After a bot-lane win, crash one wave and recall unless a free structure is already being hit.",
       "drill": "After each bot-lane kill or tower push, say: crash, recall, spend.",
       "timeline": [
-        "1:05 - Bot lane is contested with minions and multiple champions nearby.",
         "10:19 - Samira is dead on the respawn timer while bot lane is on screen."
       ],
       "clockAnchors": [
@@ -608,14 +686,9 @@
       ],
       "clockMoments": [
         {
-          "clock": "1:05",
-          "videoSeconds": 27.239,
-          "description": "Bot lane is contested with minions and multiple champions nearby."
-        },
-        {
           "clock": "10:19",
           "videoSeconds": 282,
-          "description": "Samira is dead on the respawn timer while bot lane is on screen."
+          "description": "Respawn timer and scoreboard visible, Samira is dead and observing bottom lane."
         }
       ],
       "nuance": [
@@ -671,7 +744,7 @@
       "confidence": "high",
       "feedbackTitle": "Missed tower conversion after bot push",
       "feedback": "Mistake: After winning lane fights and getting lane priority, you often leave bot lane before taking or finishing the turret when it is open and your wave is in position. Fix: When the enemy bot lane is dead or zoned off and your wave is at their turret, immediately convert that window into plate or turret damage instead of leaving the lane or walking to fog.",
-      "gameDetail": "This leaks early local gold and denies crucial tempo for opening the map. The correct next click was to stay and convert the wave crash into plates/tower, then take a fast safe reset or rotate only after the structure damage window closes. Around 1:25, the wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here; By 5:50, bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification. If you win lane and crash the wave, always check for free structure before considering a rotate or recall.",
+      "gameDetail": "This leaks early local gold and denies crucial tempo for opening the map. The correct next click was to stay and convert the wave crash into plates/tower, then take a fast safe reset or rotate only after the structure damage window closes. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. Around 1:25, the wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here; By 5:50, bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification. If you win lane and crash the wave, always check for free structure before considering a rotate or recall.",
       "eventEvidence": "1:25 Wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here.; 5:50 Bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; 10:16 Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification",
       "goodThing": "You consistently win bot lane trades and push waves into tower, showing lane control and good fight selection.",
       "whyTrust": "Samira snowballs hardest when bot lane turret falls early, unlocking the map for dives and roams—if you want reliable climb, punish every free turret window.",
@@ -1912,11 +1985,6 @@
           "clock": "16:46",
           "videoSeconds": 35.867,
           "description": "Alan chases a red Samira near the nexus instead of focusing Nexus; shows ignoring a free structure."
-        },
-        {
-          "clock": "16:50",
-          "videoSeconds": 40,
-          "description": "ACE notification as blue Samira attacks near the nexus platform."
         }
       ],
       "nuance": [
@@ -2966,32 +3034,18 @@
       "confidence": "high",
       "feedbackTitle": "Reset after the turret falls",
       "feedback": "Mistake: you are dead as the red turret falls, so the objective win turns into a stagger instead of a clean reset. Fix: once the turret drops, exit with the wave or recall with the team before the next enemy bodies arrive.",
-      "gameDetail": "At 10:05 the red turret is destroyed while Samira is already dead. The objective went through, so the good part is that the team got structure value; the leak is dying during or right after that conversion, which removes your ability to reset, spend, and help the next map play. The better decision after the turret falls is exit or recall, not staying in the lane long enough to become the stagger. The lesson is to make the objective win end the sequence cleanly.",
-      "eventEvidence": "10:05 the red turret is destroyed while Samira is dead, turning a structure win into a staggered death instead of a clean reset.",
+      "gameDetail": "The objective went through, so the good part is that the team got structure value; the leak is dying during or right after that conversion, which removes your ability to reset, spend, and help the next map play. The better decision after the turret falls is exit or recall, not staying in the lane long enough to become the stagger. The lesson is to make the objective win end the sequence cleanly.",
+      "eventEvidence": "",
       "goodThing": "Your team broke the inhibitor turret, creating an opportunity for a powerful map reset or further pressure.",
       "whyTrust": "This death costs Samira both tempo and agency on the map, but the correct reset after a turret break directly leads to more vision and better drag/baron prep in every rank.",
       "focusTag": "post-objective reset",
-      "evidence": "10:05 red turret destroyed while Samira is dead.",
+      "evidence": "",
       "pattern": "The structure conversion happened, but the death means the sequence did not end cleanly; the next improvement is exiting after the payout.",
       "diamondRule": "When the turret falls, the sequence is over unless the next structure is free right now.",
       "drill": "After every turret take, click back once and check recall before looking for another fight.",
-      "timeline": [
-        "10:05 - Red turret is destroyed while Samira is dead."
-      ],
-      "clockAnchors": [
-        {
-          "clock": "10:05",
-          "videoSeconds": 0.5,
-          "description": "Red turret is destroyed while Samira is dead."
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "10:05",
-          "videoSeconds": 0.5,
-          "description": "Red turret is destroyed while Samira is dead."
-        }
-      ],
+      "timeline": [],
+      "clockAnchors": [],
+      "clockMoments": [],
       "nuance": [
         "Good: the team still took the turret.",
         "Leak: Samira was dead during the payout instead of resetting after it.",
