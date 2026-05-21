@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-21T21:51:13.770Z",
+  "generatedAt": "2026-05-21T22:33:40.807Z",
   "source": "League of Legends Highlights folder",
-  "match": "13 matches",
+  "match": "14 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -15,11 +15,12 @@
     "NA1-5565025543",
     "NA1-5564835832",
     "NA1-5565145132",
-    "NA1-5565193158"
+    "NA1-5565193158",
+    "NA1-5565226188"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 5:39 PM ET",
-  "totalDuration": "92:05",
-  "totalRecordings": 25,
+  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 6:31 PM ET",
+  "totalDuration": "99:44",
+  "totalRecordings": 26,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira: stop giving wins back",
@@ -40,13 +41,105 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 25,
+      "recordings": 26,
       "evidence": "3:37 Samira is stunned while overstaying alone with no vision or support, as the enemy Teleports in—direct evidence of poor reset decision.; 3:40 Samira dies and gives shutdown; consequence of staying too long after shoving wave without resetting or respecting respawns.",
       "improvementTitle": "Punished for Overstaying Alone After Winning Lane",
       "improvement": "Mistake: You overstayed alone in the lane after pushing without proper vision, while enemy respawns and Teleport were available. Fix: After shoving the wave, reset or pull back immediately if you don't have vision or lane support, especially when enemies could TP or collapse."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565226188_01.mp4",
+      "publicFile": "auto_NA1-5565226188_01.mp4",
+      "cacheKey": "100829260:1779402716947",
+      "fingerprint": "7f5108b33f7b",
+      "matchId": "NA1-5565226188",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779401823164,
+      "gameHappenedAt": "2026-05-21T22:17:03.164Z",
+      "gameHappenedAtLabel": "May 21, 2026, 6:17 PM",
+      "recordedAt": "2026-05-21T22:31:57.083Z",
+      "recordedAtLabel": "May 21, 2026, 6:31 PM",
+      "recordedAtTimeLabel": "6:31 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Overchasing After Already Breaking Base",
+      "duration": "7:39",
+      "durationSeconds": 459,
+      "gameLength": "12:26",
+      "gameLengthSeconds": 746,
+      "kda": "17/3/4",
+      "kills": 17,
+      "deaths": 3,
+      "assists": 4,
+      "cs": 59,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Overchasing After Already Breaking Base",
+      "feedback": "Mistake: You kept chasing and fighting in the enemy base after the inhibitor was already down instead of finishing the game. Fix: Force objectives or go for the Nexus when the base is broken and you have numbers, rather than chasing kills and getting picked.",
+      "gameDetail": "At least once, this greed led directly to your death with waves and numbers prepped to convert to Nexus pressure. Around 1:07, shop interface open with Stealth Ward selected; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase; By 11:14, Samira near enemy Nexus turrets with vision; this evidences the opportunity to convert to Nexus pressure instead of chasing. The core lesson here is to end when the enemy is down and their base is open—anything else risks throwing the game.",
+      "eventEvidence": "1:07 Shop interface open with Stealth Ward selected; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 11:14 Samira near enemy Nexus turrets with vision; this evidences the opportunity to convert to Nexus pressure instead of chasing.",
+      "goodThing": "You successfully snowballed mid game fights and pushed waves decisively after winning team fights.",
+      "whyTrust": "Every time you ignore Nexus pressure as a fed Samira to fight for another kill inside the enemy base, you give opponents time to respawn and risk losing your tempo lead—this replay directly shows it.",
+      "focusTag": "structure conversion",
+      "evidence": "1:07 Shop interface open with Stealth Ward selected; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase.; 11:14 Samira near enemy Nexus turrets with vision; this evidences the opportunity to convert to Nexus pressure instead of chasing.",
+      "pattern": "After breaking the enemy’s base wide open, you repeatedly chased down isolated enemies for extra kills instead of focusing on Nexus or aligning your team to finish, causing unnecessary deaths.",
+      "diamondRule": "Never chase for kills after the inhibitors are down—group and end while you have pressure and map control.",
+      "drill": "In your next game, after taking an inhibitor, ping the Nexus, group with your team, and ignore nearby low-HP enemies to focus on ending.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "1:07",
+          "videoSeconds": 23.609,
+          "description": "Shop interface open with Stealth Ward selected"
+        },
+        {
+          "clock": "8:09",
+          "videoSeconds": 200.087,
+          "description": "Samira in mid lane fight, using skills near two enemies"
+        },
+        {
+          "clock": "11:14",
+          "videoSeconds": 376.565,
+          "description": "Samira near enemy Nexus turrets with large vision circles"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "1:07",
+          "videoSeconds": 23.609,
+          "description": "Shop interface open with Stealth Ward selected; setup for the structure decision, where the next check is tower, inhibitor, nexus, or no chase."
+        },
+        {
+          "clock": "11:14",
+          "videoSeconds": 376.565,
+          "description": "Samira near enemy Nexus turrets with vision; this evidences the opportunity to convert to Nexus pressure instead of chasing."
+        }
+      ],
+      "nuance": [
+        "You had a dominant snowball by grouping and fighting early.",
+        "Your map presence and wave management helped secure mid and bot inhibs.",
+        "Once the Nexus turrets were open, you split or chased instead of ending, giving the enemy chances to defend.",
+        "Lost at least one fight inside the base where no objectives could be gained from that death.",
+        "Every late death occurred during a moment the game could have ended or a major structure taken."
+      ],
+      "reviewLimit": "The sampled frames show mostly mid- to late-game base-breaking and do not provide much laning or jungle tracking context, but they do fully confirm the endgame decision-making habit.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-useful-timestamp-evidence-v1",
+      "sampledFrames": 36,
+      "publicVideoBytes": 80518700,
+      "src": "/recordings/auto_NA1-5565226188_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565226188-01.jpg"
+    },
     {
       "file": "auto_NA1-5565193158_01.mp4",
       "publicFile": "auto_NA1-5565193158_01.mp4",
@@ -714,7 +807,7 @@
       "cs": 89,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Fix overchasing after inhibitor for clean closes",
@@ -1564,7 +1657,7 @@
       "cs": 128,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "implementation",
+      "reviewPhase": "baseline",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Chasing Fights Past Structure Instead of Ending",
@@ -2112,7 +2205,7 @@
       "confidence": "high",
       "feedbackTitle": "Greedy tower dive with no retreat discipline",
       "feedback": "Mistake: Chased low HP kills under enemy tower for too long as Samira with no respect for tower shots or reset discipline. Fix: Clean up one kill or disengage after the first, and reset wave or exit tower aggro—never linger for a second fight under turret.",
-      "gameDetail": "At 4:13, Samira follows a greedy play by diving enemy Anivia at her turret, securing the kill but immediately staying to fight Swain under the same turret. Instead of pulling back after the first win, Alan opts for a second extended skirmish while still under turret threat, risking shutdown gold and giving a free tradeback. Around 4:13, Samira under blue tower casts ability while fighting Swain and Anivia; By 4:17, Samira secures Anivia kill but lingers after clean pick; start of tower overstay. Evidence of the moment to exit/reset after a successful dive; Then around 4:22, Samira continues extended fight with Swain under turret, demonstrating lack of retreat/reset discipline and prolonging tower threat. Shows consequence of not disengaging after the first kill. This sequence would instantly backfire in games with smarter punishers, so the easy win is to take the initial kill and back off before the second fight starts.",
+      "gameDetail": "At 4:13, Samira follows a greedy play by diving enemy Anivia at her turret, securing the kill but immediately staying to fight Swain under the same turret. Instead of pulling back after the first win, Alan opts for a second extended skirmish while still under turret threat, risking shutdown gold and giving a free tradeback. Evidence of the moment to exit/reset after a successful dive; Then around 4:22, Samira continues extended fight with Swain under turret, demonstrating lack of retreat/reset discipline and prolonging tower threat. Shows consequence of not disengaging after the first kill. This sequence would instantly backfire in games with smarter punishers, so the easy win is to take the initial kill and back off before the second fight starts.",
       "eventEvidence": "4:13 Samira under blue tower casts ability while fighting Swain and Anivia.; 4:17 Samira secures Anivia kill but lingers after clean pick; start of tower overstay. Evidence of the moment to exit/reset after a successful dive.; 4:22 Samira continues extended fight with Swain under turret, demonstrating lack of retreat/reset discipline and prolonging tower threat. Shows consequence of not disengaging after the first kill.",
       "goodThing": "Secured the initial kill on a low HP Anivia by efficiently cleaning her up under turret.",
       "whyTrust": "Samira is especially vulnerable to tower shots due to her short range and all-in playstyle, so staying under turret after a successful dive instantly throws leads and exposes you to predictable shutdowns, especially when no one is helping you disengage.",
