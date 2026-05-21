@@ -323,7 +323,7 @@ async function waitForLiveRecording(currentState, options = {}) {
   while (Date.now() < deadline) {
     await publishStatus("publishing", {
       label: "publishing review",
-      detail: "Waiting for league.aolabs.io to serve the new recording.",
+      detail: "Waiting for live site.",
       progress: 98,
       ...(await etaFor("deploy_to_live", 4 * 60, options.deployStartedAt, options.context))
     });
@@ -368,7 +368,7 @@ async function main() {
       console.log(`League publish continuing with active local edits; only recording publish paths will be staged:\n${before}`);
       await publishStatus("publishing", {
         label: "publishing review",
-        detail: "Local edits are present; publishing recording files only.",
+        detail: "Publishing recording files only.",
         progress: 82,
         ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
       });
@@ -378,13 +378,13 @@ async function main() {
     if (retryAnalysis) await markAnalysisRetry();
     await publishStatus("processing", {
       label: "analyzing review",
-      detail: "Reading the recording and writing the site feedback.",
+      detail: "Writing feedback.",
       progress: 84,
       ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
     });
     await runWithStatusHeartbeat(npmBin, ["run", "sync:recordings"], "processing", {
       label: "analyzing review",
-      detail: "Still reading the recording and writing the site feedback.",
+      detail: "Writing feedback.",
       progress: 84,
       ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
     });
@@ -396,7 +396,7 @@ async function main() {
 
     await publishStatus("publishing", {
       label: "publishing review",
-      detail: "Saving the analyzed recording for the site.",
+      detail: "Saving recording.",
       progress: 92,
       ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
     });
@@ -411,7 +411,7 @@ async function main() {
     const deployStartedAt = new Date();
     await publishStatus("publishing", {
       label: "deploying review",
-      detail: "Deploying the updated recording page.",
+      detail: "Deploying site.",
       progress: 96,
       ...(await etaFor("deploy_to_live", 4 * 60, deployStartedAt, latestContext))
     });

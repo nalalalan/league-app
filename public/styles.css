@@ -1694,15 +1694,15 @@ h1 {
 
 .recording-live-status {
   display: inline-grid;
-  grid-template-columns: 9px minmax(0, 1fr);
+  grid-template-columns: 11px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
-  width: min(260px, 38vw);
-  min-width: 190px;
-  max-width: 260px;
+  width: min(460px, 48vw);
+  min-width: 320px;
+  max-width: 460px;
   border: 1px solid rgba(104, 87, 68, .18);
-  border-radius: 999px;
-  padding: 7px 11px;
+  border-radius: 28px;
+  padding: 9px 13px;
   background: rgba(255, 253, 248, .72);
   color: #4a4039;
   box-shadow: 0 8px 22px rgba(87, 69, 45, .08);
@@ -1713,8 +1713,8 @@ h1 {
 }
 
 .recording-live-dot {
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   border-radius: 999px;
   background: #9b8d7d;
   box-shadow: 0 0 0 4px rgba(155, 141, 125, .12);
@@ -1744,7 +1744,14 @@ h1 {
   color: var(--muted);
   font-size: 11px;
   font-weight: 720;
-  line-height: 1.05;
+  line-height: 1.16;
+}
+
+.recording-live-copy > span:not(.recording-live-progress) {
+  display: block;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 .recording-live-progress {
@@ -3451,6 +3458,7 @@ h1 {
 
   .recording-live-status {
     width: 100%;
+    min-width: 0;
     max-width: 100%;
   }
 
@@ -3984,7 +3992,7 @@ h1 {
 
 @media (min-width: 561px) {
   .recording-head .recording-live-status {
-    width: min(260px, 38vw);
-    max-width: 260px;
+    width: min(460px, 48vw);
+    max-width: 460px;
   }
 }
