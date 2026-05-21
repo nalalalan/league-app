@@ -32,6 +32,15 @@ function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
 }
 
+function coachClean(value, fallback = "") {
+  return clean(value, fallback)
+    .replace(/\bhigh[-\s]?elo\s+Samira\b/gi, "strong Samira player")
+    .replace(/\bhigh[-\s]?elo\b/gi, "stronger games")
+    .replace(/\bmaster[-\s]?facing\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function slugify(value) {
   return clean(value)
     .toLowerCase()
@@ -1081,11 +1090,20 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
   const manual = manualFeedback(file);
   if (manual) return { ...manual, sampledFrames: framePaths.length };
   if (!process.env.OPENAI_API_KEY) return fallbackFeedback(file, duration, { reviewPhase: phase });
-  const images = await Promise.all(framePaths.map(async (framePath) => ({
-    type: "input_image",
-    image_url: `data:image/jpeg;base64,${(await fs.readFile(framePath)).toString("base64")}`,
-    detail: "high"
-  })));
+  const images = [];
+  for (let index = 0; index < framePaths.length; index += 1) {
+    const framePath = framePaths[index];
+    const videoSeconds = Math.round(Number(frameTimes[index] || 0) * 1000) / 1000;
+    images.push({
+      type: "input_text",
+      text: `Frame ${index + 1} is review-video time ${mmss(videoSeconds)} (${videoSeconds}s). If you mention a visible in-game clock from this frame, add a clockAnchors entry with that exact clock and this videoSeconds value.`
+    });
+    images.push({
+      type: "input_image",
+      image_url: `data:image/jpeg;base64,${(await fs.readFile(framePath)).toString("base64")}`,
+      detail: "high"
+    });
+  }
   const frameList = frameTimes.map((time, index) => `${index + 1}:${mmss(time)}`).join(", ");
 
   const prompt = [
@@ -1101,14 +1119,16 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include eventEvidence: one compact sentence naming the actual visible things that happened in the game, with timestamps when visible. This is proof, not advice.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like a short game-story recap, not a stat audit: one compact paragraph, two or three notable visible moments where the decision got risky, at most three light timestamps, no K/D/A, no CS count, no numbered timeline, and one final simple lesson sentence.",
+    "Do not use 'high elo', 'master-facing', or rank-label coaching language; name the exact visible habit and exact in-game payoff.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty.",
     "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
+    "If any visible game-clock timestamp appears in gameDetail, eventEvidence, timeline, evidence, or pattern, include a matching clockAnchors item: {\"clock\":\"MM:SS\",\"videoSeconds\":number}. Use the review-video time from the labeled frame where that clock is visible. If you are not sure the clock is visible, do not include the timestamp in visible copy.",
     "Prioritize repeatable habits that stop the gameplay from transferring to harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise narrative paragraph with notable visible moments and one simple lesson sentence","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise narrative paragraph with notable visible moments and one simple lesson sentence","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific nuance bullets from the frames"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -1139,20 +1159,21 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     return {
       champion: clean(parsed.champion, "Unknown"),
       confidence: clean(parsed.confidence, "low").toLowerCase(),
-      feedbackTitle: clean(parsed.feedbackTitle, "Focus"),
-      feedback: clean(parsed.feedback, "Review the clip and choose one safer next action."),
-      gameDetail: clean(parsed.gameDetail, `${clean(parsed.pattern, "The recording points to one repeatable decision pattern.")} ${clean(parsed.feedback, "Choose one safer next action.")}`),
-      eventEvidence: clean(parsed.eventEvidence, clean(parsed.evidence, "Generated from sampled replay frames.")),
-      goodThing: clean(parsed.goodThing, ""),
-      whyTrust: clean(parsed.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
-      focusTag: clean(parsed.focusTag, "review"),
-      evidence: clean(parsed.evidence, "Generated from sampled replay frames."),
-      pattern: clean(parsed.pattern, "The recording points to one repeatable decision pattern."),
-      diamondRule: clean(parsed.diamondRule, "Convert the first winning moment before taking the next fight."),
-      drill: clean(parsed.drill, "Name the payout before committing."),
-      timeline: cleanList(parsed.timeline, 6),
-      nuance: cleanList(parsed.nuance, 5),
-      reviewLimit: clean(parsed.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
+      feedbackTitle: coachClean(parsed.feedbackTitle, "Focus"),
+      feedback: coachClean(parsed.feedback, "Review the clip and choose one safer next action."),
+      gameDetail: coachClean(parsed.gameDetail, `${coachClean(parsed.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(parsed.feedback, "Choose one safer next action.")}`),
+      eventEvidence: coachClean(parsed.eventEvidence, coachClean(parsed.evidence, "Generated from sampled replay frames.")),
+      goodThing: coachClean(parsed.goodThing, ""),
+      whyTrust: coachClean(parsed.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
+      focusTag: coachClean(parsed.focusTag, "review"),
+      evidence: coachClean(parsed.evidence, "Generated from sampled replay frames."),
+      pattern: coachClean(parsed.pattern, "The recording points to one repeatable decision pattern."),
+      diamondRule: coachClean(parsed.diamondRule, "Convert the first winning moment before taking the next fight."),
+      drill: coachClean(parsed.drill, "Name the payout before committing."),
+      timeline: cleanList(parsed.timeline, 6).map((item) => coachClean(item)),
+      clockAnchors: cleanClockAnchors(parsed.clockAnchors),
+      nuance: cleanList(parsed.nuance, 5).map((item) => coachClean(item)),
+      reviewLimit: coachClean(parsed.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
       sampledFrames: framePaths.length,
       analysisSource: "openai"
     };
@@ -1415,21 +1436,21 @@ async function main() {
       reviewPhase: phase,
       champion: clean(analysis.champion, "Unknown"),
       confidence: clean(analysis.confidence, "low"),
-      feedbackTitle: clean(analysis.feedbackTitle, "Focus"),
-      feedback: clean(analysis.feedback, "Review the clip and choose one safer next action."),
-      gameDetail: clean(analysis.gameDetail, `${clean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${clean(analysis.feedback, "Choose one safer next action.")} ${clean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`),
-      eventEvidence: clean(analysis.eventEvidence, analysis.evidence || ""),
-      goodThing: clean(analysis.goodThing, ""),
-      whyTrust: clean(analysis.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
-      focusTag: clean(analysis.focusTag, "review"),
-      evidence: clean(analysis.evidence, "Generated from sampled replay frames."),
-      pattern: clean(analysis.pattern, "The recording points to one repeatable decision pattern."),
-      diamondRule: clean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
-      drill: clean(analysis.drill, "Name the payout before committing."),
-      timeline: cleanList(analysis.timeline, 6),
+      feedbackTitle: coachClean(analysis.feedbackTitle, "Focus"),
+      feedback: coachClean(analysis.feedback, "Review the clip and choose one safer next action."),
+      gameDetail: coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`),
+      eventEvidence: coachClean(analysis.eventEvidence, analysis.evidence || ""),
+      goodThing: coachClean(analysis.goodThing, ""),
+      whyTrust: coachClean(analysis.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
+      focusTag: coachClean(analysis.focusTag, "review"),
+      evidence: coachClean(analysis.evidence, "Generated from sampled replay frames."),
+      pattern: coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."),
+      diamondRule: coachClean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
+      drill: coachClean(analysis.drill, "Name the payout before committing."),
+      timeline: cleanList(analysis.timeline, 6).map((item) => coachClean(item)),
       clockAnchors: cleanClockAnchors(analysis.clockAnchors),
-      nuance: cleanList(analysis.nuance, 5),
-      reviewLimit: clean(analysis.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
+      nuance: cleanList(analysis.nuance, 5).map((item) => coachClean(item)),
+      reviewLimit: coachClean(analysis.reviewLimit, "The review is based on sampled frames, not full input/cooldown telemetry."),
       analysisSource: analysis.analysisSource || "cache",
       analysisVersion,
       sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : sampleTimesFor(duration).length),

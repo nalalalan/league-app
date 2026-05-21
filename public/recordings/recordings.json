@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T03:41:44.784Z",
+  "generatedAt": "2026-05-21T03:50:34.853Z",
   "source": "League of Legends Highlights folder",
   "match": "7 matches",
   "matches": [
@@ -82,7 +82,7 @@
       "gameDetail": "You won a fight mid and took structures with the team, but stayed to repeatedly contest near the enemy inhibitor and fountain, frequently re-engaging instead of leveraging the wave and map lead to reset. A major risk came when the enemy respawned and you were caught at low HP but still contested fights, leading to staggered deaths and loss of map tempo. The simple lesson is once you force inhibs or win a base fight, back off and reset to maximize gold use and pressure windows.",
       "eventEvidence": "After taking mid inhibitor and nexus turret (around 19:16, last two frames), Samira stays and re-engages near fountain instead of resetting, with visible respawned enemies and multiple skirmishes after core objectives are already down.",
       "goodThing": "Strong initial fight sequencing to get mid lane priority and take down core towers.",
-      "whyTrust": "Every high elo Samira uses reset discipline because staying after inhibitors lets the enemy collapse and removes your gold/item lead—visible deaths here show exactly how late stays can throw pressure.",
+      "whyTrust": "Every strong Samira player uses reset discipline because staying after inhibitors lets the enemy collapse and removes your gold/item lead—visible deaths here show exactly how late stays can throw pressure.",
       "focusTag": "reset discipline",
       "evidence": "Samira is seen deep in enemy base re-engaging with teammates after inhib/turret falls, next to multiple respawning enemies.",
       "pattern": "Repeated deep chases and teamfights inside base after winning earlier fights and breaking open the base, without using the chance to recall and spend gold.",

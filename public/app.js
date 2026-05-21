@@ -1764,49 +1764,27 @@ function recordingClockVideoAnchors(item) {
     .sort((a, b) => a.clockSeconds - b.clockSeconds || a.videoSeconds - b.videoSeconds);
 }
 
-function interpolateClockSeek(clockSeconds, item, duration) {
+function exactClockSeek(clockSeconds, item, duration) {
   const anchors = recordingClockVideoAnchors(item);
   if (!anchors.length) return null;
-  if (anchors.length === 1) return clampSeekSeconds(anchors[0].videoSeconds, duration);
-
-  const interpolate = (left, right) => {
-    const clockSpan = right.clockSeconds - left.clockSeconds;
-    if (!Number.isFinite(clockSpan) || Math.abs(clockSpan) < 0.001) return null;
-    const ratio = (clockSeconds - left.clockSeconds) / clockSpan;
-    return clampSeekSeconds(left.videoSeconds + ratio * (right.videoSeconds - left.videoSeconds), duration);
-  };
-
-  if (clockSeconds <= anchors[0].clockSeconds) {
-    return interpolate(anchors[0], anchors[1]) ?? clampSeekSeconds(anchors[0].videoSeconds, duration);
-  }
-  for (let index = 1; index < anchors.length; index += 1) {
-    if (clockSeconds <= anchors[index].clockSeconds) {
-      return interpolate(anchors[index - 1], anchors[index]) ?? clampSeekSeconds(anchors[index].videoSeconds, duration);
-    }
-  }
-  return interpolate(anchors[anchors.length - 2], anchors[anchors.length - 1]) ?? clampSeekSeconds(anchors.at(-1).videoSeconds, duration);
+  const exact = anchors
+    .map((anchor) => ({ ...anchor, delta: Math.abs(anchor.clockSeconds - clockSeconds) }))
+    .filter((anchor) => anchor.delta <= 2.5)
+    .sort((a, b) => a.delta - b.delta || a.videoSeconds - b.videoSeconds)[0];
+  return exact ? clampSeekSeconds(exact.videoSeconds, duration) : null;
 }
 
 function seekSecondsForStoryTimestamp(timestamp, item) {
   const clockSeconds = secondsFromTimestamp(timestamp);
   if (!Number.isFinite(clockSeconds)) return null;
   const duration = secondsForRecording(item);
-  const anchoredSeek = interpolateClockSeek(clockSeconds, item, duration);
+  const anchoredSeek = exactClockSeek(clockSeconds, item, duration);
   if (Number.isFinite(anchoredSeek)) return anchoredSeek;
   const clipStart = Number(item?.clipTimestampSeconds);
   if (Number.isFinite(clipStart) && clipStart > 0 && clockSeconds >= clipStart) {
     return clampSeekSeconds(clockSeconds - clipStart, duration);
   }
-  const anchors = recordingClockAnchors(item);
-  if (Number.isFinite(duration) && duration > 0 && anchors.length >= 2) {
-    const minClock = Math.min(...anchors);
-    const maxClock = Math.max(...anchors);
-    if (maxClock > minClock && maxClock > duration + 5) {
-      const ratio = (clockSeconds - minClock) / (maxClock - minClock);
-      return clampSeekSeconds(ratio * duration, duration);
-    }
-  }
-  return clampSeekSeconds(clockSeconds, duration);
+  return null;
 }
 
 function appendTimestampButton(container, timestamp, item) {
