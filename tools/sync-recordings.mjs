@@ -18,9 +18,9 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-21-useful-timestamp-evidence-v1";
+const analysisVersion = "2026-05-21-specific-decision-chain-v4";
 const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v2";
-const coachEvidenceVersion = "2026-05-21-coach-evidence-useful-v2";
+const coachEvidenceVersion = "2026-05-21-specific-evidence-useful-v4";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -948,7 +948,7 @@ function tagOverlapScore(first, second) {
 
 function anchorDescriptionLooksWeak(anchorText) {
   return /\b(player|champion)\s+(uses ability|casts abilities|begins walking out|moving in river|farming minions|last-hits minions|is moving alone|walks toward|running down)\b/i.test(anchorText) ||
-    /\b(scuttle crab|scoreboard open|shop open)\b/i.test(anchorText);
+    /\b(scuttle crab|scoreboard open|shop open|shop interface|stealth ward selected|game start|standing at (the )?fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
 }
 
 function coachWantsEnemyStructureEvidence(analysisText) {
@@ -1032,25 +1032,7 @@ function ensureMinimumEvidenceMoments(analysis, anchors, moments, minItems = 2) 
   const allowed = cleanClockAnchors(anchors);
   const selected = cleanClockAnchors(moments);
   if (selected.length >= Math.min(minItems, allowed.length)) return selected;
-  const selectedKeys = new Set(selected.map((moment) => `${moment.clock}@${moment.videoSeconds}`));
-  const reference = selected.length ? selected[0].videoSeconds : null;
-  const candidates = allowed
-    .filter((anchor) => !selectedKeys.has(`${anchor.clock}@${anchor.videoSeconds}`))
-    .map((anchor, index) => {
-      const contextual = { ...anchor, description: contextualFallbackDescription(anchor, analysis) };
-      return {
-        anchor: contextual,
-        score: anchorEvidenceScore(contextual, analysis, index),
-        distance: Number.isFinite(reference) ? Math.abs(anchor.videoSeconds - reference) : anchor.videoSeconds
-      };
-    })
-    .sort((a, b) => b.score - a.score || a.distance - b.distance || a.anchor.videoSeconds - b.anchor.videoSeconds);
-  const out = [...selected];
-  for (const candidate of candidates) {
-    if (out.length >= Math.min(minItems, allowed.length)) break;
-    out.push(candidate.anchor);
-  }
-  return dedupeClockAnchors(out).sort((a, b) => a.videoSeconds - b.videoSeconds);
+  return selected;
 }
 
 function selectUsefulEvidenceMoments(analysis, anchors, proposed = [], maxItems = 4, threshold = 8) {
@@ -1117,6 +1099,7 @@ async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameD
     "Use only the allowed anchors below. Do not invent clocks, videoSeconds, or events. Choose 2-4 moments when at least 2 allowed anchors can show setup, Alan's action, leak/consequence, or the correct contrasting habit.",
     "Only return 1 moment if there is genuinely only 1 connected anchor. A setup anchor plus a consequence anchor is better than one perfect anchor.",
     "If an allowed anchor is only normal gameplay, walking, farming, shop, respawn, or a random fight unrelated to the coaching claim, reject it.",
+    "Reject shop, fountain, scoreboard, game-start, or item-selection anchors unless the coaching claim is literally about buying, recalling, or spending.",
     "Descriptions should be short evidence labels tied to the lesson, not generic frame captions. Say Samira, not Player or Champion. A good structure/objective moment should be labeled as good evidence, not treated as a chase.",
     "Return only JSON with this shape:",
     '{"clockMoments":[{"clock":"MM:SS","videoSeconds":0,"description":"why this frame is evidence for the lesson"}]}',
@@ -1320,13 +1303,17 @@ function cacheKeyFor(stat) {
   return `${stat.size}:${Math.round(stat.mtimeMs)}`;
 }
 
-function cachedRecording(existing, fileName, cacheKey) {
-  const cached = existing?.recordings?.find((item) => (
+function existingRecording(existing, fileName, cacheKey) {
+  return existing?.recordings?.find((item) => (
     item.file === fileName &&
-    item.cacheKey === cacheKey &&
-    item.analysisVersion === analysisVersion
-  ));
+    item.cacheKey === cacheKey
+  )) || null;
+}
+
+function cachedRecording(existing, fileName, cacheKey) {
+  const cached = existingRecording(existing, fileName, cacheKey);
   if (!cached) return null;
+  if (cached.analysisVersion !== analysisVersion) return null;
   if (manualFeedback(fileName)) return null;
   if (cached.analysisSource === "fallback" && process.env.LEAGUE_RETRY_FALLBACK === "1" && process.env.OPENAI_API_KEY) return null;
   if (process.env.LEAGUE_FORCE_ANALYSIS === "1") return null;
@@ -1800,6 +1787,12 @@ function analysisSpecificityIssues(parsed) {
   if (!/\b(then|after|before|because|instead|next|when)\b/i.test(gameDetail)) {
     issues.push("missing decision sequence");
   }
+  if (/^(this|each time|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(gameDetail)) {
+    issues.push("gameDetail starts with conclusion instead of visible action");
+  }
+  if (/\b(shop interface|shop open|stealth ward selected|standing at (the )?fountain|fountain at game start|game start)\b/i.test([gameDetail, eventEvidence].join(" "))) {
+    issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
+  }
   if (!/\b\d{1,2}:\d{2}\b/.test([gameDetail, eventEvidence, pattern].join(" ")) && !coachClean(parsed?.reviewLimit, "").toLowerCase().includes("timestamp")) {
     issues.push("missing timestamped anchor or timestamp limit");
   }
@@ -1968,10 +1961,12 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
   }
 }
 
-async function analyzeRecording({ file, duration, framePaths, frameTimes, sequenceLabel, reviewPhase: phase }) {
+async function analyzeRecording({ file, duration, framePaths, frameTimes, sequenceLabel, reviewPhase: phase, previousAnalysis = null }) {
   const manual = manualFeedback(file);
   if (manual) return { ...manual, sampledFrames: framePaths.length };
-  if (!process.env.OPENAI_API_KEY) return fallbackFeedback(file, duration, { reviewPhase: phase });
+  if (!process.env.OPENAI_API_KEY) {
+    return previousAnalysis || fallbackFeedback(file, duration, { reviewPhase: phase });
+  }
   const images = [];
   for (let index = 0; index < framePaths.length; index += 1) {
     const framePath = framePaths[index];
@@ -2008,6 +2003,8 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
     "If any visible game-clock timestamp appears in gameDetail, eventEvidence, timeline, evidence, or pattern, include a matching clockAnchors item: {\"clock\":\"MM:SS\",\"videoSeconds\":number}. Use the review-video time from the labeled frame where that clock is visible. Timestamps should be evidence anchors for the lesson, not decorative time labels. If you are not sure the clock is visible or useful for the lesson, do not include the timestamp in visible copy.",
     "When timestamps are available, include at least one timestamp for the mistake/leak and one timestamp for either consequence or the correct contrasting habit. If only one useful timestamp is visible, say why in reviewLimit.",
+    "Do not use shop, fountain, scoreboard, game-start, or item-selection frames as proof unless the actual coaching point is buying, recalling, or spending. They are not valid setup anchors for objective, chase, wave, or fight feedback.",
+    "The first sentence of gameDetail must start with the visible game state or Alan's action, not a conclusion like 'This leaks...' or 'The better play...'.",
     "Prioritize repeatable habits that stop the gameplay from transferring to harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
@@ -2060,6 +2057,15 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     };
   } catch (error) {
     console.warn(`Feedback fallback for ${file}: ${error.message}`);
+    if (previousAnalysis) {
+      return {
+        ...previousAnalysis,
+        reviewLimit: coachClean(
+          [previousAnalysis.reviewLimit, `Detail refresh kept the previous review because model analysis failed: ${error.message}.`].filter(Boolean).join(" "),
+          "Detail refresh kept the previous review because model analysis failed."
+        )
+      };
+    }
     return fallbackFeedback(file, duration, { reviewPhase: phase });
   }
 }
@@ -2247,12 +2253,13 @@ async function main() {
     const destPath = path.join(recordingRoot, destName);
     const posterPath = path.join(posterRoot, `${slug}.jpg`);
     const cacheKey = cacheKeyFor(stat);
+    const previousAnalysis = existingRecording(existing, name, cacheKey);
     const cached = cachedRecording(existing, name, cacheKey);
 
     const publicVideoBytes = await ensurePublicVideo(sourcePath, destPath, stat);
     const duration = Number(entry.health?.duration) || await probeDuration(sourcePath);
     totalSeconds += duration;
-    if (!(await exists(posterPath)) || !cached) {
+    if (!(await exists(posterPath))) {
       await extractFrame(sourcePath, posterPath, Math.max(0.2, duration * 0.5), 640);
     }
 
@@ -2263,10 +2270,12 @@ async function main() {
       const framePaths = [];
       for (let sampleIndex = 0; sampleIndex < sampleTimes.length; sampleIndex += 1) {
         const framePath = path.join(frameDir, `frame-${sampleIndex + 1}.jpg`);
-        await extractFrame(sourcePath, framePath, sampleTimes[sampleIndex], duration > 90 ? 960 : 1024);
+        if (!(await exists(framePath))) {
+          await extractFrame(sourcePath, framePath, sampleTimes[sampleIndex], duration > 90 ? 960 : 1024);
+        }
         framePaths.push(framePath);
       }
-      analysis = await analyzeRecording({ file: name, duration, framePaths, frameTimes: sampleTimes, sequenceLabel, reviewPhase: phase });
+      analysis = await analyzeRecording({ file: name, duration, framePaths, frameTimes: sampleTimes, sequenceLabel, reviewPhase: phase, previousAnalysis });
     }
     const matchTimeMs = matchStats.matchTimeMs || replayMeta.matchTimeMs || stat.mtimeMs;
     const candidateClockAnchors = cleanClockAnchors(analysis.clockAnchors)
@@ -2371,7 +2380,7 @@ async function main() {
       nuance: cleanList(analysis.nuance, 5).map((item) => normalizeVisibleCoachText(item, championName)),
       reviewLimit: normalizeVisibleCoachText(analysis.reviewLimit || "The review is based on sampled frames, not full input/cooldown telemetry.", championName),
       analysisSource: analysis.analysisSource || "cache",
-      analysisVersion,
+      analysisVersion: analysis.analysisVersion || analysisVersion,
       sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : analysisSampleTimes(duration, entry.sidecar).length),
       publicVideoBytes,
       src: publicPath(destPath),
