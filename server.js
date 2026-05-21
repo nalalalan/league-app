@@ -142,6 +142,7 @@ function cleanProgress(value) {
 }
 
 function cleanEtaSeconds(value) {
+  if (value === null || value === undefined || value === "") return null;
   const seconds = Number(value);
   if (!Number.isFinite(seconds)) return null;
   return Math.max(0, Math.min(60 * 60, Math.round(seconds)));
