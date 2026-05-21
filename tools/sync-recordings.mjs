@@ -20,6 +20,7 @@ const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
 const analysisVersion = "2026-05-19-direct-coach-evidence-v2";
 const clockAnchorVersion = "2026-05-21-visible-clock-strict-v4";
+const coachEvidenceVersion = "2026-05-21-coach-evidence-moments-v1";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -42,6 +43,17 @@ function coachClean(value, fallback = "") {
     .replace(/\(\s*around\s+(\d{1,2}:[0-5]\d),\s*last\s+\w+\s+frames?\s*\)/gi, "around $1")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function isGenericEvidenceText(value) {
+  const text = clean(value).toLowerCase();
+  if (!text) return true;
+  return [
+    "generated from sampled replay frames",
+    "match-level samira read from sampled replay frames",
+    "evidence is limited to sampled replay context",
+    "conservative read until"
+  ].some((phrase) => text.includes(phrase));
 }
 
 function slugify(value) {
@@ -652,6 +664,12 @@ function clockSeconds(clock) {
   return minutes * 60 + seconds;
 }
 
+function timestampSecondsInText(text) {
+  return (String(text || "").match(/\b\d{1,2}:[0-5]\d\b/g) || [])
+    .map(clockSeconds)
+    .filter((seconds) => Number.isFinite(seconds));
+}
+
 function dedupeClockAnchors(...groups) {
   const anchors = cleanClockAnchors(groups.flat());
   const byClock = new Map();
@@ -804,6 +822,155 @@ function stripUnverifiedTimelineItems(value, clockAnchors) {
   return cleanList(value, 6)
     .map((item) => stripUnverifiedClockReferences(item, clockAnchors))
     .filter(Boolean);
+}
+
+function analysisCoachText(analysis) {
+  return [
+    analysis?.feedbackTitle,
+    analysis?.feedback,
+    analysis?.gameDetail,
+    analysis?.eventEvidence,
+    analysis?.pattern,
+    analysis?.diamondRule,
+    analysis?.drill,
+    analysis?.focusTag
+  ].map((value) => clean(value).toLowerCase()).join(" ");
+}
+
+function coachEvidenceTags(text) {
+  const source = String(text || "").toLowerCase();
+  const tags = new Set();
+  const groups = [
+    ["reset", /\b(reset|recall|spend|gold|shop|base|fountain|cash\s*out)\b/],
+    ["overstay", /\b(overstay|overstayed|stay|stayed|linger|re-?engage|second fight|again|after the win|respawn|shutdown|low hp|lethal)\b/],
+    ["structure", /\b(tower|turret|inhib|inhibitor|nexus|structure|end|ending|base open)\b/],
+    ["wave", /\b(wave|crash|minion|farm|cs|shove|push)\b/],
+    ["objective", /\b(dragon|baron|objective|tempo|map)\b/],
+    ["vision", /\b(fog|vision|ward|facecheck|unknown)\b/],
+    ["entry", /\b(cc|crowd control|stun|hook|ult|cooldown|second in|choke|dash|e\/r|combo|entry)\b/],
+    ["numbers", /\b(numbers|outnumber|team|ally|alone|support|collapse|gank)\b/]
+  ];
+  for (const [tag, pattern] of groups) {
+    if (pattern.test(source)) tags.add(tag);
+  }
+  return tags;
+}
+
+function anchorEvidenceScore(anchor, analysis, index = 0) {
+  const coachTags = coachEvidenceTags(analysisCoachText(analysis));
+  const anchorText = [anchor.clock, anchor.description].map((value) => clean(value).toLowerCase()).join(" ");
+  const anchorTags = coachEvidenceTags(anchorText);
+  let score = 0;
+  for (const tag of anchorTags) {
+    if (coachTags.has(tag)) score += 5;
+  }
+  const anchorSeconds = clockSeconds(anchor.clock);
+  const explicitTexts = [analysis?.gameDetail, analysis?.eventEvidence, analysis?.evidence, analysis?.pattern, ...(Array.isArray(analysis?.timeline) ? analysis.timeline : [])];
+  if (Number.isFinite(anchorSeconds) && explicitTexts.some((text) => timestampSecondsInText(text).some((seconds) => Math.abs(seconds - anchorSeconds) <= 2.5))) {
+    score += 8;
+  }
+  if (/\b(low hp|low-health|lethal|shutdown|respawn|fountain|recall|reset|gold|tower|turret|inhib|nexus|structure|wave|dragon|baron|fog|cc|crowd control|stun|hook)\b/i.test(anchorText)) {
+    score += 4;
+  }
+  if (anchor.description) score += 1;
+  return score - (index * 0.01);
+}
+
+function fallbackEvidenceClockMoments(analysis, clockAnchors, maxItems = 4) {
+  return cleanClockAnchors(clockAnchors)
+    .map((anchor, index) => ({ anchor, score: anchorEvidenceScore(anchor, analysis, index) }))
+    .filter((item) => item.score > 0 || item.anchor.description)
+    .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)
+    .slice(0, maxItems)
+    .map((item) => item.anchor)
+    .sort((a, b) => a.videoSeconds - b.videoSeconds);
+}
+
+function anchorsSignature(clockAnchors) {
+  return cleanClockAnchors(clockAnchors)
+    .map((anchor) => `${anchor.clock}@${anchor.videoSeconds}:${anchor.description || ""}`)
+    .join("|");
+}
+
+async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameDir, cacheKey }) {
+  const anchors = cleanClockAnchors(clockAnchors).filter((anchor) => anchor.description);
+  if (!anchors.length) return [];
+  const signature = anchorsSignature(anchors);
+  const cachePath = path.join(frameDir, "coach-evidence-moments.json");
+  const cached = await readJsonSafe(cachePath);
+  if (cached?.cacheKey === cacheKey && cached?.coachEvidenceVersion === coachEvidenceVersion && cached?.anchorsSignature === signature) {
+    const cachedMoments = cleanClockAnchors(cached.clockMoments);
+    if (cachedMoments.length) return cachedMoments;
+  }
+  if (!process.env.OPENAI_API_KEY) return fallbackEvidenceClockMoments(analysis, anchors);
+  const allowed = anchors.map((anchor) => ({
+    clock: anchor.clock,
+    videoSeconds: anchor.videoSeconds,
+    description: anchor.description || ""
+  }));
+  const prompt = [
+    "Choose the clickable timestamp moments that are actual evidence for the coaching claim, not just random readable game clocks.",
+    "Alan uses these timestamps to study what he did wrong or what he should repeat. If the advice is overstay/reset, choose frames that show staying, low HP, respawns, gold/recall context, or the reset window. If the advice is structure conversion, choose frames that show tower/inhib/nexus or a chase away from it. If the advice is wave/objective/vision/CC, choose frames that visibly support that claim.",
+    "Use only the allowed anchors below. Do not invent clocks, videoSeconds, or events. Prefer 2-4 moments, but use 1 if only 1 truly supports the lesson.",
+    "Descriptions should be short evidence labels tied to the lesson, not generic frame captions.",
+    "Return only JSON with this shape:",
+    '{"clockMoments":[{"clock":"MM:SS","videoSeconds":0,"description":"why this frame is evidence for the lesson"}]}',
+    `Recording file: ${file}.`,
+    `Feedback title: ${coachClean(analysis?.feedbackTitle, "")}`,
+    `Feedback: ${coachClean(analysis?.feedback, "")}`,
+    `Game story: ${coachClean(analysis?.gameDetail, "")}`,
+    `Event evidence: ${coachClean(analysis?.eventEvidence, "")}`,
+    `Allowed anchors: ${JSON.stringify(allowed)}`
+  ].join("\n");
+  try {
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        store: false,
+        max_output_tokens: 900,
+        input: [
+          {
+            role: "user",
+            content: [{ type: "input_text", text: prompt }]
+          }
+        ]
+      })
+    });
+    if (!response.ok) throw new Error(`OpenAI evidence moment response ${response.status}`);
+    const parsed = parseJsonText(extractOutputText(await response.json()));
+    const selected = cleanClockAnchors(parsed.clockMoments)
+      .map((moment) => {
+        const match = allowed.find((anchor) => anchor.clock === moment.clock && Math.abs(Number(anchor.videoSeconds) - Number(moment.videoSeconds)) <= 0.01);
+        return match ? { ...match, description: coachClean(moment.description, match.description) } : null;
+      })
+      .filter(Boolean)
+      .slice(0, 4);
+    const clockMoments = selected.length ? selected : fallbackEvidenceClockMoments(analysis, anchors);
+    await fs.writeFile(cachePath, `${JSON.stringify({
+      cacheKey,
+      coachEvidenceVersion,
+      anchorsSignature: signature,
+      generatedAt: new Date().toISOString(),
+      clockMoments
+    }, null, 2)}\n`, "utf8");
+    return clockMoments;
+  } catch (error) {
+    console.warn(`Coach evidence moment fallback for ${file}: ${error.message}`);
+    return fallbackEvidenceClockMoments(analysis, anchors);
+  }
+}
+
+function evidenceTextFromMoments(clockMoments) {
+  const moments = cleanClockAnchors(clockMoments)
+    .filter((moment) => moment.description)
+    .slice(0, 3);
+  if (!moments.length) return "";
+  return moments.map((moment) => `${moment.clock} ${coachClean(moment.description)}`).join("; ");
 }
 
 async function readExistingManifest() {
@@ -1450,13 +1617,13 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Coach like a blunt but serious League coach: name the actual mistake, do not soften it, and do not insult Alan. Be direct enough that he knows exactly where he messed up.",
     "Give exactly one highest-value improvement for this recording, plus the specific visible mistake moments that make the advice trustworthy. The top advice must stay direct, narrow, and playable in the next queue.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently.",
-    "Also include eventEvidence: one compact sentence naming the actual visible things that happened in the game, with timestamps when visible. This is proof, not advice.",
+    "Also include eventEvidence: one compact sentence naming the actual visible things that prove the coaching claim. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, or missed reset window; if the advice is structure conversion, the evidence must show structure access or the chase away from it. This is proof, not advice.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like a short game-story recap, not a stat audit: one compact paragraph, two or three notable visible moments where the decision got risky, at most three light timestamps, no K/D/A, no CS count, no numbered timeline, and one final simple lesson sentence.",
     "Do not use 'high elo', 'master-facing', or rank-label coaching language; name the exact visible habit and exact in-game payoff.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty.",
     "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
-    "If any visible game-clock timestamp appears in gameDetail, eventEvidence, timeline, evidence, or pattern, include a matching clockAnchors item: {\"clock\":\"MM:SS\",\"videoSeconds\":number}. Use the review-video time from the labeled frame where that clock is visible. If you are not sure the clock is visible, do not include the timestamp in visible copy.",
+    "If any visible game-clock timestamp appears in gameDetail, eventEvidence, timeline, evidence, or pattern, include a matching clockAnchors item: {\"clock\":\"MM:SS\",\"videoSeconds\":number}. Use the review-video time from the labeled frame where that clock is visible. Timestamps should be evidence anchors for the lesson, not decorative time labels. If you are not sure the clock is visible or useful for the lesson, do not include the timestamp in visible copy.",
     "Prioritize repeatable habits that stop the gameplay from transferring to harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
@@ -1739,9 +1906,16 @@ async function main() {
       })
       : [];
     const clockAnchors = dedupeClockAnchors(visibleClockAnchors);
-    const clockMoments = cleanClockAnchors(clockAnchors)
-      .filter((anchor) => anchor.description)
-      .slice(0, 4);
+    const clockMoments = await selectEvidenceClockMoments({
+      file: name,
+      analysis,
+      clockAnchors,
+      frameDir,
+      cacheKey
+    });
+    const clockMomentEvidence = evidenceTextFromMoments(clockMoments);
+    const cleanedEventEvidence = stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), clockAnchors);
+    const cleanedEvidence = stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), clockAnchors);
 
     const isFullReview = duration > 90;
     const shortTitle = isFullReview
@@ -1794,11 +1968,11 @@ async function main() {
       feedbackTitle: coachClean(analysis.feedbackTitle, "Focus"),
       feedback: coachClean(analysis.feedback, "Review the clip and choose one safer next action."),
       gameDetail: stripUnverifiedClockReferences(coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`), clockAnchors),
-      eventEvidence: stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), clockAnchors),
+      eventEvidence: isGenericEvidenceText(cleanedEventEvidence) ? clockMomentEvidence : cleanedEventEvidence,
       goodThing: coachClean(analysis.goodThing, ""),
       whyTrust: coachClean(analysis.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
       focusTag: coachClean(analysis.focusTag, "review"),
-      evidence: stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), clockAnchors),
+      evidence: isGenericEvidenceText(cleanedEvidence) ? clockMomentEvidence : cleanedEvidence,
       pattern: stripUnverifiedClockReferences(coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."), clockAnchors),
       diamondRule: coachClean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
       drill: coachClean(analysis.drill, "Name the payout before committing."),

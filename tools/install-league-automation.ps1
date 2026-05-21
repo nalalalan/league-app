@@ -9,7 +9,7 @@ $RecorderTaskName = "AO Labs League live recorder"
 $PublisherTaskName = "AO Labs League recording publisher"
 $RecorderScript = Join-Path $AppRoot "tools\league-live-recorder.mjs"
 $PublisherScript = Join-Path $AppRoot "tools\publish-recordings.ps1"
-$RecorderLaunchCommand = "`$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','User'); if (-not `$statusToken) { `$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','Machine') }; if (`$statusToken) { `$env:LEAGUE_STATUS_TOKEN=`$statusToken }; `$env:LEAGUE_LIVE_CAPTURE_MODE='desktop'; `$env:LEAGUE_LIVE_POLL_MS='1000'; `$env:LEAGUE_LIVE_SEGMENT_SECONDS='6'; `$env:LEAGUE_LIVE_FPS='6'; `$env:LEAGUE_LIVE_CAPTURE_SCALE='1600:-2'; `$env:LEAGUE_LIVE_CAPTURE_CQ='24'; `$env:LEAGUE_LIVE_CAPTURE_BITRATE='8000k'; `$env:LEAGUE_LIVE_CAPTURE_MAXRATE='12000k'; `$env:LEAGUE_LIVE_CAPTURE_BUFSIZE='18000k'; & '$Node' '$RecorderScript'"
+$RecorderLaunchCommand = "`$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','User'); if (-not `$statusToken) { `$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','Machine') }; if (`$statusToken) { `$env:LEAGUE_STATUS_TOKEN=`$statusToken }; `$env:LEAGUE_LIVE_CAPTURE_MODE='desktop'; `$env:LEAGUE_LIVE_POLL_MS='1000'; `$env:LEAGUE_LIVE_SEGMENT_SECONDS='6'; `$env:LEAGUE_LIVE_FPS='6'; `$env:LEAGUE_LIVE_CAPTURE_SCALE='1600:-2'; `$env:LEAGUE_LIVE_CAPTURE_CQ='20'; `$env:LEAGUE_LIVE_CAPTURE_BITRATE='12000k'; `$env:LEAGUE_LIVE_CAPTURE_MAXRATE='18000k'; `$env:LEAGUE_LIVE_CAPTURE_BUFSIZE='24000k'; & '$Node' '$RecorderScript'"
 
 function Quote-Vbs([string]$Value) {
   return $Value.Replace('"', '""')
