@@ -32,6 +32,7 @@ const publishPaths = [
   "tools/install-league-automation.ps1",
   "README.md"
 ];
+const ignoredSourceVideoPattern = /\.with-desktop-pauses\.(webm|mp4)$/i;
 
 function commandNeedsShell(command) {
   return process.platform === "win32" && /\.cmd$/i.test(command);
@@ -96,7 +97,7 @@ async function sourceState() {
   const entries = await fs.readdir(sourceDir, { withFileTypes: true });
   const files = [];
   for (const entry of entries) {
-    if (!entry.isFile() || !sourceVideoPattern.test(entry.name)) continue;
+    if (!entry.isFile() || !sourceVideoPattern.test(entry.name) || ignoredSourceVideoPattern.test(entry.name)) continue;
     const absolute = path.join(sourceDir, entry.name);
     const stat = await fs.stat(absolute);
     files.push({

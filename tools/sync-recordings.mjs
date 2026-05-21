@@ -24,7 +24,9 @@ const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYT
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
 const minAutoBytesPerSecond = Number(process.env.LEAGUE_MIN_AUTO_BYTES_PER_SECOND || 5000);
 const minAutoSidecarCoverage = Number(process.env.LEAGUE_MIN_AUTO_SIDECAR_COVERAGE || 0.6);
+const minSanitizedAutoSeconds = Number(process.env.LEAGUE_MIN_SANITIZED_AUTO_SECONDS || 90);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
+const ignoredSourceVideoPattern = /\.with-desktop-pauses\.(webm|mp4)$/i;
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -442,14 +444,20 @@ function screenSize(value) {
 function trustedAutoSidecar(sidecar, health) {
   if (!sidecar || sidecar.validForPublish === false) return false;
   if (sidecar.source !== "AO Labs League live recorder") return false;
-  if (sidecar.allSegmentsPreserved !== true) return false;
+  const preservesLeagueOnly = sidecar.allSegmentsPreserved === true ||
+    (sidecar.desktopSegmentsExcluded === true && sidecar.allLeagueForegroundSegmentsPreserved === true);
+  if (!preservesLeagueOnly) return false;
   const sourceSeconds = Number(sidecar.sourceDurationSeconds || health?.duration || 0);
   if (!(sourceSeconds > 0)) return false;
   const segmentSeconds = Array.isArray(sidecar.segments)
     ? sidecar.segments.reduce((sum, segment) => sum + (Number(segment.durationSeconds) || 0), 0)
     : 0;
   const outputSeconds = Number(sidecar.durationSeconds || health?.duration || 0);
-  return Math.max(segmentSeconds, outputSeconds) >= sourceSeconds * minAutoSidecarCoverage;
+  if (sidecar.desktopSegmentsExcluded === true && sidecar.allLeagueForegroundSegmentsPreserved === true) {
+    return Math.max(segmentSeconds, outputSeconds) >= minSanitizedAutoSeconds;
+  }
+  const expectedSeconds = Number(sidecar.expectedForegroundSeconds || sourceSeconds);
+  return Math.max(segmentSeconds, outputSeconds) >= expectedSeconds * minAutoSidecarCoverage;
 }
 
 function autoCaptureRejectReason(name, health, sidecar, visual) {
@@ -472,7 +480,7 @@ function autoCaptureRejectReason(name, health, sidecar, visual) {
   }
   const pauseSeconds = Number(sidecar.foregroundPauseSeconds || 0);
   const sourceSeconds = Number(sidecar.sourceDurationSeconds || health?.duration || 0);
-  if (sourceSeconds > 0 && pauseSeconds > Math.max(90, sourceSeconds * 0.35)) {
+  if (!hasTrustedSidecar && sourceSeconds > 0 && pauseSeconds > Math.max(90, sourceSeconds * 0.35)) {
     return `${Math.round(pauseSeconds)}s foreground pause during ${Math.round(sourceSeconds)}s game`;
   }
   return "";
@@ -1283,7 +1291,7 @@ async function main() {
   await fs.mkdir(analysisRoot, { recursive: true });
   const existing = await readExistingManifest();
   const discoveredEntries = await Promise.all((await fs.readdir(sourceDir, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && sourceVideoPattern.test(entry.name))
+    .filter((entry) => entry.isFile() && sourceVideoPattern.test(entry.name) && !ignoredSourceVideoPattern.test(entry.name))
     .map(async (entry) => {
       const sourcePath = path.join(sourceDir, entry.name);
       const stat = await fs.stat(sourcePath);
@@ -1331,7 +1339,6 @@ async function main() {
     const captureMeta = recordingMetadata.captureTimes.get(name) || {};
     const phase = reviewPhase(index, sourceEntries.length);
     const sequenceLabel = `${index + 1} of ${sourceEntries.length}`;
-    sourceStats.push(stat);
     const slug = slugify(name);
     const destName = publicRecordingName(name, stat);
     const destPath = path.join(recordingRoot, destName);
@@ -1365,7 +1372,9 @@ async function main() {
       ? `full review ${String(++fullGameCount).padStart(2, "0")}`
       : `highlight ${String(++highlightCount).padStart(2, "0")}`;
     const fingerprint = crypto.createHash("sha1").update(`${name}:${cacheKey}`).digest("hex").slice(0, 12);
-    const recordedDate = new Date(stat.mtimeMs);
+    const sidecarRecordedMs = Date.parse(entry.sidecar?.createdAt || entry.sidecar?.endedAt || "");
+    const recordedDate = new Date(Number.isFinite(sidecarRecordedMs) ? sidecarRecordedMs : stat.mtimeMs);
+    sourceStats.push({ mtimeMs: recordedDate.getTime() });
     const clipStart = Number(captureMeta.clipTimestampSeconds);
     const clipWindow = Number.isFinite(clipStart)
       ? `${shortClock(clipStart)}-${shortClock(clipStart + duration)}`
@@ -1391,7 +1400,7 @@ async function main() {
       queueId: queueMeta.queueId || null,
       gameType: queueMeta.gameType,
       gameTypeSource: queueMeta.gameTypeSource,
-      title: shortTitle,
+      title: clean(analysis.feedbackTitle, shortTitle),
       duration: mmss(duration),
       durationSeconds: Math.round(duration * 1000) / 1000,
       gameLength: matchStats.gameLength || "",

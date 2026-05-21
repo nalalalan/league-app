@@ -9,7 +9,7 @@ $RecorderTaskName = "AO Labs League live recorder"
 $PublisherTaskName = "AO Labs League recording publisher"
 $RecorderScript = Join-Path $AppRoot "tools\league-live-recorder.mjs"
 $PublisherScript = Join-Path $AppRoot "tools\publish-recordings.ps1"
-$RecorderLaunchCommand = "`$env:LEAGUE_LIVE_CAPTURE_MODE='region'; & '$Node' '$RecorderScript'"
+$RecorderLaunchCommand = "`$env:LEAGUE_LIVE_CAPTURE_MODE='region'; `$env:LEAGUE_LIVE_POLL_MS='1000'; `$env:LEAGUE_LIVE_SEGMENT_SECONDS='6'; `$env:LEAGUE_LIVE_FPS='6'; `$env:LEAGUE_LIVE_CAPTURE_SCALE='1600:-2'; `$env:LEAGUE_LIVE_CAPTURE_CQ='35'; & '$Node' '$RecorderScript'"
 
 function Quote-Vbs([string]$Value) {
   return $Value.Replace('"', '""')

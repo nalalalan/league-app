@@ -12,9 +12,9 @@ const captureRoot = process.env.LEAGUE_AUTO_CAPTURE_DIR || path.join(path.dirnam
 const leagueLockfile = process.env.LEAGUE_LOCKFILE || "C:\\Riot Games\\League of Legends\\lockfile";
 const lockPath = path.join(analysisRoot, "league-live-recorder.lock");
 const logPath = path.join(analysisRoot, "league-live-recorder.log");
-const pollMs = Number(process.env.LEAGUE_LIVE_POLL_MS || 5000);
+const pollMs = Number(process.env.LEAGUE_LIVE_POLL_MS || 1000);
 const endGraceMs = Number(process.env.LEAGUE_LIVE_END_GRACE_MS || 35000);
-const segmentSeconds = Number(process.env.LEAGUE_LIVE_SEGMENT_SECONDS || 30);
+const segmentSeconds = Number(process.env.LEAGUE_LIVE_SEGMENT_SECONDS || 6);
 const fastForwardSpeed = Number(process.env.LEAGUE_LIVE_FAST_FORWARD || 8);
 const minGameSeconds = Number(process.env.LEAGUE_LIVE_MIN_GAME_SECONDS || 90);
 const minCaptureSegmentBytes = Number(process.env.LEAGUE_LIVE_MIN_SEGMENT_BYTES || 16 * 1024);
@@ -22,16 +22,17 @@ const minCaptureCoverage = Number(process.env.LEAGUE_LIVE_MIN_CAPTURE_COVERAGE |
 const maxCaptureRestarts = Number(process.env.LEAGUE_LIVE_MAX_CAPTURE_RESTARTS || 20);
 const captureStallMs = Number(process.env.LEAGUE_LIVE_CAPTURE_STALL_MS || 45000);
 const minCaptureGrowthBytes = Number(process.env.LEAGUE_LIVE_MIN_GROWTH_BYTES || 8 * 1024);
-const fps = String(process.env.LEAGUE_LIVE_FPS || 10);
+// Defaults favor in-game FPS over review smoothness. The site review only needs readable decisions.
+const fps = String(process.env.LEAGUE_LIVE_FPS || 6);
 const encoderPreference = String(process.env.LEAGUE_LIVE_ENCODER || "auto").toLowerCase();
 const liveCq = String(process.env.LEAGUE_LIVE_CQ || 20);
-const liveCaptureCq = String(process.env.LEAGUE_LIVE_CAPTURE_CQ || 31);
+const liveCaptureCq = String(process.env.LEAGUE_LIVE_CAPTURE_CQ || 35);
 const x264Crf = String(process.env.LEAGUE_LIVE_CRF || 20);
-const x264CaptureCrf = String(process.env.LEAGUE_LIVE_CAPTURE_CRF || 32);
-const captureBitrate = String(process.env.LEAGUE_LIVE_CAPTURE_BITRATE || "3500k");
-const captureMaxrate = String(process.env.LEAGUE_LIVE_CAPTURE_MAXRATE || "5000k");
-const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "7000k");
-const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "1920:-2").trim();
+const x264CaptureCrf = String(process.env.LEAGUE_LIVE_CAPTURE_CRF || 36);
+const captureBitrate = String(process.env.LEAGUE_LIVE_CAPTURE_BITRATE || "2200k");
+const captureMaxrate = String(process.env.LEAGUE_LIVE_CAPTURE_MAXRATE || "3200k");
+const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "4800k");
+const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "1600:-2").trim();
 const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
 const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "region").trim().toLowerCase();
@@ -545,6 +546,11 @@ async function nextSegmentIndex(sessionRoot) {
   return indexes.length ? Math.max(...indexes) + 1 : 0;
 }
 
+async function latestSegmentIndex(sessionRoot) {
+  const nextIndex = await nextSegmentIndex(sessionRoot);
+  return nextIndex > 0 ? nextIndex - 1 : null;
+}
+
 async function segmentFootprint(sessionRoot) {
   const entries = await fs.readdir(sessionRoot, { withFileTypes: true }).catch(() => []);
   let bytes = 0;
@@ -654,6 +660,7 @@ async function startSession() {
     foregroundPauseMs: 0,
     foregroundPauseStartedMs: null,
     resumeAfterForegroundPause: false,
+    taintedSegmentIndexes: new Set(),
     captureRestarts: 0
   };
   await publishRecorderStatus("recording", sessionStatusFields(session, "League window capture active."), { force: true });
@@ -677,6 +684,7 @@ async function restartCaptureIfNeeded(session) {
   if (session.captureMode === "region") {
     const rect = await leagueWindowRect();
     if (!rect?.isForeground) {
+      const hadActiveChild = Boolean(session.child && !session.child.exited && !session.child.killed);
       if (!session.pausedForForeground) {
         await log("League window is not foreground; pausing capture so desktop/browser content is not recorded.");
         await publishRecorderStatus("paused", { ...sessionStatusFields(session, "Region fallback is paused while League is not foreground."), progress: 20 }, { force: true });
@@ -684,6 +692,14 @@ async function restartCaptureIfNeeded(session) {
         session.foregroundPauseStartedMs = Date.now();
       }
       await stopCaptureChild(session.child);
+      if (hadActiveChild) {
+        const taintedIndex = await latestSegmentIndex(session.sessionRoot);
+        if (Number.isFinite(taintedIndex)) {
+          session.taintedSegmentIndexes.add(taintedIndex);
+          if (taintedIndex > 0) session.taintedSegmentIndexes.add(taintedIndex - 1);
+          await log(`Segment ${taintedIndex}${taintedIndex > 0 ? ` and ${taintedIndex - 1}` : ""} touched non-League foreground time and will be excluded from the review clip.`);
+        }
+      }
       session.lastSegmentGrowthMs = Date.now();
       return;
     }
@@ -834,13 +850,16 @@ async function finalizeSession(session) {
   }
   const entries = await fs.readdir(session.sessionRoot, { withFileTypes: true });
   const segments = [];
+  const taintedSegmentIndexes = session.taintedSegmentIndexes instanceof Set
+    ? session.taintedSegmentIndexes
+    : new Set();
   for (const entry of entries) {
     if (!entry.isFile() || !/^segment-\d+\.mkv$/i.test(entry.name)) continue;
     const filePath = path.join(session.sessionRoot, entry.name);
     const stat = await fs.stat(filePath);
     const index = Number(entry.name.match(/segment-(\d+)/i)?.[1]) || 0;
     const duration = await probeDuration(filePath).catch(() => 0);
-    segments.push({ filePath, size: stat.size, duration, index });
+    segments.push({ filePath, size: stat.size, duration, index, tainted: taintedSegmentIndexes.has(index) });
   }
   segments.sort((a, b) => a.index - b.index);
   if (!segments.length) {
@@ -848,19 +867,25 @@ async function finalizeSession(session) {
     await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "No usable video segments were created. No review clip was published."), progress: 100 }, { force: true });
     return;
   }
-  const usableSegments = segments.filter((item) => item.size >= minCaptureSegmentBytes);
+  const cleanSegments = segments.filter((item) => !item.tainted);
+  if (!cleanSegments.length) {
+    await log("Every capture segment touched non-League foreground time; no review clip was created.");
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture only had alt-tab-tainted segments, so no review was published."), progress: 100 }, { force: true });
+    return;
+  }
+  const usableSegments = cleanSegments.filter((item) => item.size >= minCaptureSegmentBytes);
   const estimatedCoverageSeconds = usableSegments.reduce((sum, item) => sum + (Number(item.duration) || segmentSeconds), 0);
   if (estimatedCoverageSeconds < expectedForegroundSeconds * minCaptureCoverage) {
-    await log(`Capture incomplete: ${usableSegments.length}/${segments.length} usable segments cover about ${Math.round(estimatedCoverageSeconds)}s of ${expectedForegroundSeconds}s foreground time (${elapsedSeconds}s game, ${foregroundPauseSeconds}s paused). Not creating a misleading auto review clip.`);
+    await log(`Capture incomplete: ${usableSegments.length}/${cleanSegments.length} clean usable segments cover about ${Math.round(estimatedCoverageSeconds)}s of ${expectedForegroundSeconds}s foreground time (${elapsedSeconds}s game, ${foregroundPauseSeconds}s paused). Not creating a misleading auto review clip.`);
     await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture looked incomplete, so it was rejected instead of publishing a misleading review."), progress: 100 }, { force: true });
     return;
   }
 
   const replay = await latestReplay(session.startedMs, session.endedMs) || await latestLocalMatch(session.startedMs, session.endedMs);
   const outputPath = await nextOutputPath(replay?.matchId);
-  const importantIndexes = importantSegmentIndexes(segments);
+  const importantIndexes = importantSegmentIndexes(cleanSegments);
   const processed = [];
-  for (const segment of segments) {
+  for (const segment of cleanSegments) {
     await waitForNoGame("Post-game video processing paused");
     processed.push(await processSegment(segment, importantIndexes, session.sessionRoot));
   }
@@ -911,7 +936,17 @@ async function finalizeSession(session) {
     captureRect: session.captureRect || null,
     foregroundPauseSeconds,
     expectedForegroundSeconds,
-    allSegmentsPreserved: true,
+    allSegmentsPreserved: taintedSegmentIndexes.size === 0,
+    allLeagueForegroundSegmentsPreserved: true,
+    desktopSegmentsExcluded: taintedSegmentIndexes.size > 0,
+    excludedSegments: segments
+      .filter((item) => item.tainted)
+      .map((item) => ({
+        index: item.index,
+        size: item.size,
+        durationSeconds: Math.round(Number(item.duration || 0) * 1000) / 1000,
+        reason: "non-League foreground during region capture"
+      })),
     segments: processed.map((item) => ({
       index: item.index,
       size: item.size,
@@ -920,7 +955,7 @@ async function finalizeSession(session) {
       important: item.important
     })),
     validForPublish: true,
-    privacyPolicy: "Default capture records the League window area when League is foreground. It pauses instead of recording desktop/browser content while League is not foreground.",
+    privacyPolicy: "Default capture records the League window area when League is foreground. If alt-tab happens during a capture segment, that segment is excluded before the review clip is published.",
     inputPolicy: "Screen and mouse cursor are recorded. Raw keyboard text is not logged."
   };
   await fs.writeFile(path.join(session.sessionRoot, "review-clip.json"), `${JSON.stringify(sidecar, null, 2)}\n`, "utf8");
