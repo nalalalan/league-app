@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-21T14:17:24.328Z",
+  "generatedAt": "2026-05-21T15:11:13.035Z",
   "source": "League of Legends Highlights folder",
-  "match": "8 matches",
+  "match": "9 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -10,11 +10,12 @@
     "NA1-5564259818",
     "NA1-5564718141",
     "NA1-5564835832",
-    "NA1-5565025543"
+    "NA1-5565025543",
+    "NA1-5565044205"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 9:50 AM ET",
-  "totalDuration": "41:51",
-  "totalRecordings": 20,
+  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 11:08 AM ET",
+  "totalDuration": "50:36",
+  "totalRecordings": 21,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira: stop giving wins back",
@@ -35,13 +36,90 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 20,
+      "recordings": 21,
       "evidence": "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
       "improvementTitle": "Ask for the payout first",
       "improvement": "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565044205_01.mp4",
+      "publicFile": "auto_NA1-5565044205_01.mp4",
+      "cacheKey": "181249338:1779376131481",
+      "fingerprint": "f68545b7b81c",
+      "matchId": "NA1-5565044205",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779374864352,
+      "gameHappenedAt": "2026-05-21T14:47:44.352Z",
+      "gameHappenedAtLabel": "May 21, 2026, 10:47 AM",
+      "recordedAt": "2026-05-21T15:08:51.828Z",
+      "recordedAtLabel": "May 21, 2026, 11:08 AM",
+      "recordedAtTimeLabel": "11:08 AM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Major Structure Conversion Miss: Chase vs Nexus Push",
+      "duration": "8:45",
+      "durationSeconds": 525,
+      "gameLength": "16:26",
+      "gameLengthSeconds": 986,
+      "kda": "19/6/2",
+      "kills": 19,
+      "deaths": 6,
+      "assists": 2,
+      "cs": 113,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Major Structure Conversion Miss: Chase vs Nexus Push",
+      "feedback": "Mistake: After breaking into the enemy base, you chased remaining enemies instead of focusing on killing open structures (inhibitor and Nexus towers) or ending the game. Fix: Once the base is open and enemies are dead or zoned, immediately turn to hit inhibitor/Nexus towers instead of chasing for kills or walking away from objectives.",
+      "gameDetail": "Samira snowballed through early lane fights and used her reset timings well to get strong, but late-game sequences showed a habit of chasing away from open objectives. The game got extended with unnecessary fighting and kill hunting around the enemy base, which could have risked a comeback if death timers synced for the enemy team. Lesson: Always hit open structures when the enemy base is free and you have numbers or tempo.",
+      "eventEvidence": "11:57 Champion moving near jungle entrance, three allies dead; HUD and clock visible.",
+      "goodThing": "Early resets were timed decently and Samira played fights with confidence when ahead.",
+      "whyTrust": "Securing the win by hitting Nexus towers directly is the most reliable way to convert a lead; evidence from this recording shows you repeatedly walked past or away from winnable objectives.",
+      "focusTag": "structure conversion",
+      "evidence": "11:57 Champion moving near jungle entrance, three allies dead; HUD and clock visible.",
+      "pattern": "Winning fights near the enemy base but then chasing for additional kills or repositioning, instead of immediately securing objectives and ending the game when possible.",
+      "diamondRule": "Always hit inhibs or Nexus towers before chasing kills if the enemy base is open and your wave is in.",
+      "drill": "Next game, after killing two or more enemy base defenders, immediately hit the closest available inhibitor or Nexus tower until it falls.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "11:57",
+          "videoSeconds": 308.25,
+          "description": "Champion moving near jungle entrance, three allies dead; HUD and clock visible."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "11:57",
+          "videoSeconds": 308.25,
+          "description": "Champion moving near jungle entrance, three allies dead; HUD and clock visible."
+        }
+      ],
+      "nuance": [
+        "Samira handled early laning exchanges well and took good resets for item spikes.",
+        "On key fights that cracked open the base, minion waves were present and enemy respawn timers were favorable.",
+        "At least two moments showed a shift to chasing remaining enemies after an advantage rather than immediately hitting objectives.",
+        "Allied members were present and could tank towers, making structure focus possible and optimal.",
+        "No sudden waveclear threat or flank made the delay necessary, so hitting towers was the safest close."
+      ],
+      "reviewLimit": "Sampling misses some micro and may hide a few critical rotations, but the habit of skipping structure hits after base entry is unmistakable in visible frames.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-19-direct-coach-evidence-v2",
+      "sampledFrames": 24,
+      "publicVideoBytes": 83119960,
+      "src": "/recordings/auto_NA1-5565044205_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565044205-01.jpg"
+    },
     {
       "file": "auto_NA1-5565025543_01.mp4",
       "publicFile": "auto_NA1-5565025543_01.mp4",
@@ -248,7 +326,7 @@
       "cs": 45,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Lingered with gold, low HP, and no reset discipline",
