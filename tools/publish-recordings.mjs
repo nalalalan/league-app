@@ -63,6 +63,26 @@ async function run(command, args, options = {}) {
   return result;
 }
 
+async function runWithStatusHeartbeat(command, args, status, fields = {}, options = {}) {
+  let posting = null;
+  const intervalMs = Number(options.intervalMs || 30000);
+  const post = () => {
+    if (posting) return;
+    posting = publishStatus(status, fields).finally(() => {
+      posting = null;
+    });
+  };
+  await publishStatus(status, fields);
+  const timer = setInterval(post, intervalMs);
+  timer.unref?.();
+  try {
+    return await run(command, args, options.runOptions || {});
+  } finally {
+    clearInterval(timer);
+    if (posting) await posting.catch(() => {});
+  }
+}
+
 function clean(value, limit = 180) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, limit);
 }
@@ -268,7 +288,11 @@ async function main() {
       detail: "Reading the recording and writing the site feedback.",
       progress: 84
     });
-    await run(npmBin, ["run", "sync:recordings"]);
+    await runWithStatusHeartbeat(npmBin, ["run", "sync:recordings"], "processing", {
+      label: "analyzing review",
+      detail: "Still reading the recording and writing the site feedback.",
+      progress: 84
+    });
     if (!(await hasGitChanges())) {
       await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
       console.log("League recordings synced; no public changes.");

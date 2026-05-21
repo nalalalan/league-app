@@ -8,8 +8,8 @@ $StartupDir = [Environment]::GetFolderPath("Startup")
 $RecorderTaskName = "AO Labs League live recorder"
 $PublisherTaskName = "AO Labs League recording publisher"
 $RecorderScript = Join-Path $AppRoot "tools\league-live-recorder.mjs"
+$RecorderStartScript = Join-Path $AppRoot "tools\start-live-recorder.ps1"
 $PublisherScript = Join-Path $AppRoot "tools\publish-recordings.ps1"
-$RecorderLaunchCommand = "`$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','User'); if (-not `$statusToken) { `$statusToken=[Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','Machine') }; if (`$statusToken) { `$env:LEAGUE_STATUS_TOKEN=`$statusToken }; `$env:LEAGUE_LIVE_CAPTURE_MODE='desktop'; `$env:LEAGUE_LIVE_POLL_MS='1000'; `$env:LEAGUE_LIVE_SEGMENT_SECONDS='6'; `$env:LEAGUE_LIVE_FPS='6'; `$env:LEAGUE_LIVE_CAPTURE_SCALE='1600:-2'; `$env:LEAGUE_LIVE_CAPTURE_CQ='20'; `$env:LEAGUE_LIVE_CAPTURE_BITRATE='12000k'; `$env:LEAGUE_LIVE_CAPTURE_MAXRATE='18000k'; `$env:LEAGUE_LIVE_CAPTURE_BUFSIZE='24000k'; & '$Node' '$RecorderScript'"
 
 function Quote-Vbs([string]$Value) {
   return $Value.Replace('"', '""')
@@ -54,7 +54,7 @@ $LongRunningSettings = New-ScheduledTaskSettingsSet `
 
 $RecorderAction = New-ScheduledTaskAction `
   -Execute $PowerShell `
-  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$RecorderLaunchCommand`"" `
+  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$RecorderStartScript`"" `
   -WorkingDirectory $AppRoot
 
 $RecorderTrigger = New-ScheduledTaskTrigger -AtLogOn
@@ -66,7 +66,7 @@ $RecorderTaskOk = Try-RegisterTask `
   -Description "Watches for League of Legends games, captures the screen at low priority, creates one review clip, and hands it to league.aolabs.io."
 
 if (-not $RecorderTaskOk) {
-  $RecorderCommand = "`"$PowerShell`" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$RecorderLaunchCommand`""
+  $RecorderCommand = "`"$PowerShell`" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$RecorderStartScript`""
   $RecorderStartup = Install-StartupVbs -Name "AO Labs League live recorder" -Command $RecorderCommand -WorkingDirectory $AppRoot
   Write-Host "Installed startup recorder: $RecorderStartup"
 }
@@ -112,7 +112,7 @@ if ($RecorderTaskOk) {
     Where-Object { $_.CommandLine -match [regex]::Escape($RecorderScript) } |
     Select-Object -First 1
   if (-not $ExistingRecorder) {
-    Start-Process -FilePath $PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$RecorderLaunchCommand`"" -WorkingDirectory $AppRoot -WindowStyle Hidden
+    Start-Process -FilePath $PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$RecorderStartScript`"" -WorkingDirectory $AppRoot -WindowStyle Hidden
   }
 }
 

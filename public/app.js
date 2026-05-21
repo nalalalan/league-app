@@ -2127,13 +2127,16 @@ function renderRecordingLiveStatus(data = {}) {
   if (!recordingLiveStatus) return;
   const status = String(data.status || "unknown").toLowerCase();
   const stale = Boolean(data.stale);
-  const visibleStatus = stale ? "unknown" : status;
-  const label = stale ? "status stale" : (data.label || fallbackRecordingStatusLabel(visibleStatus));
+  const hasKnownStatus = status && status !== "unknown";
+  const visibleStatus = stale ? (hasKnownStatus ? status : "unknown") : status;
+  const label = stale && !hasKnownStatus
+    ? "recorder heartbeat delayed"
+    : (data.label || fallbackRecordingStatusLabel(visibleStatus));
   const age = statusAgeLabel(data.ageSeconds);
   const progress = Number.isFinite(Number(data.progress)) ? Math.max(0, Math.min(100, Number(data.progress))) : 0;
-  const showProgress = !stale && ["waiting", "recording", "paused", "processing", "publishing", "published"].includes(visibleStatus);
+  const showProgress = ["waiting", "recording", "paused", "processing", "publishing", "published"].includes(visibleStatus);
   const detail = stale
-    ? (age ? `last update ${age}` : "no recent heartbeat")
+    ? [data.detail, age ? `last update ${age}` : "heartbeat delayed"].filter(Boolean).join(" | ")
     : (data.detail || (age ? `updated ${age}` : ""));
   recordingLiveStatus.hidden = false;
   recordingLiveStatus.className = `recording-live-status is-${visibleStatus}`;

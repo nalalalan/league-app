@@ -359,9 +359,34 @@ async function exists(filePath) {
   }
 }
 
+async function lowerProcessPriority(pid) {
+  if (process.platform !== "win32" || !pid) return;
+  await execFileAsync("powershell.exe", [
+    "-NoProfile",
+    "-WindowStyle", "Hidden",
+    "-Command",
+    `$p = Get-Process -Id ${Number(pid)} -ErrorAction SilentlyContinue; if ($p) { $p.PriorityClass = 'Idle' }`
+  ], { windowsHide: true }).catch(() => {});
+}
+
 async function run(command, args) {
-  const { stdout } = await execFileAsync(command, args, { maxBuffer: 16 * 1024 * 1024 });
-  return stdout;
+  return await new Promise((resolve, reject) => {
+    const child = execFile(command, args, {
+      maxBuffer: 16 * 1024 * 1024,
+      windowsHide: true
+    }, (error, stdout, stderr) => {
+      if (error) {
+        error.stdout = stdout;
+        error.stderr = stderr;
+        reject(error);
+        return;
+      }
+      resolve(stdout || "");
+    });
+    if (/^ffmpeg(?:\.exe)?$/i.test(path.basename(command))) {
+      lowerProcessPriority(child.pid);
+    }
+  });
 }
 
 function delay(ms) {
