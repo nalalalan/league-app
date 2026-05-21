@@ -49,6 +49,14 @@ The live recorder is intended to run without Codex in the loop. It watches for t
 
 The site exposes a compact recorder heartbeat at `/api/recording-status`. The local recorder posts `watching`, `recording`, `processing`, `publishing`, `published`, `blocked`, or `error`, plus a coarse progress value, so the recordings header can show whether a game is being captured, processed, or uploaded before the final review appears. Automatic captures with a recorder sidecar are accepted when the sidecar proves enough real segment coverage, even if the compressed title-window output is small.
 
+Run:
+
+```bash
+npm run verify:league-automation
+```
+
+The verification checks the local recorder process, hidden Startup launcher, local status token, scheduled publisher, fresh local/live recorder status, live manifest, and latest live video route. It fails loudly if the next automatic game is unlikely to publish without Codex.
+
 ## Paper
 
 The public paper artifacts are:
