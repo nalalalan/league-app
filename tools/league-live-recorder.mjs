@@ -46,6 +46,10 @@ let lastStatusKey = "";
 let lastStatusPostMs = 0;
 let lastStatusErrorMs = 0;
 
+function clean(value, fallback = "") {
+  return String(value || fallback).replace(/\s+/g, " ").trim();
+}
+
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -260,10 +264,12 @@ async function releaseLock() {
 async function gameIsRunning() {
   try {
     const stdout = await run("tasklist", ["/FI", "IMAGENAME eq League of Legends.exe", "/FO", "CSV", "/NH"]);
-    return /League of Legends\.exe/i.test(stdout);
+    if (/League of Legends\.exe/i.test(stdout)) return true;
   } catch {
-    return false;
+    // Fall through to the League Client gameflow state below.
   }
+  const phase = clean(await localLeagueJson("/lol-gameflow/v1/gameflow-phase"));
+  return /^(InProgress|Reconnect)$/i.test(phase);
 }
 
 function stamp(date = new Date()) {
