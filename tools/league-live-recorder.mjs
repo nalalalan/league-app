@@ -42,6 +42,7 @@ const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || "https://league.aolabs.io/api/recording-status").trim();
 const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const statusPath = path.join(analysisRoot, "recording-status.json");
+const postGameQueuePath = path.join(analysisRoot, "post-game-queue.json");
 const postGameStatusHoldMs = Number(process.env.LEAGUE_POST_GAME_STATUS_HOLD_MS || 3 * 60 * 1000);
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 let encoderProfilePromise;
@@ -49,6 +50,8 @@ let lastStatusKey = "";
 let lastStatusPostMs = 0;
 let lastStatusErrorMs = 0;
 let idleHoldStatus = null;
+let postGameQueue = [];
+let postGameQueueRunning = false;
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -56,6 +59,67 @@ function clean(value, fallback = "") {
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function serializeSession(session) {
+  return {
+    sessionRoot: session.sessionRoot,
+    encoder: session.encoder || "",
+    inputTarget: session.inputTarget || "desktop",
+    captureMode: session.captureMode || captureModePreference,
+    captureRect: session.captureRect || null,
+    startedAt: session.startedAt?.toISOString?.() || new Date(session.startedMs || Date.now()).toISOString(),
+    endedAt: session.endedAt?.toISOString?.() || new Date(session.endedMs || Date.now()).toISOString(),
+    startedMs: Number(session.startedMs || Date.parse(session.startedAt || "")),
+    endedMs: Number(session.endedMs || Date.parse(session.endedAt || "")),
+    foregroundPauseMs: Number(session.foregroundPauseMs || 0),
+    taintedSegmentIndexes: [...(session.taintedSegmentIndexes instanceof Set ? session.taintedSegmentIndexes : new Set(session.taintedSegmentIndexes || []))],
+    queuedAt: new Date().toISOString()
+  };
+}
+
+function deserializeSession(item) {
+  const startedAt = new Date(item.startedAt || item.startedMs || Date.now());
+  const endedAt = new Date(item.endedAt || item.endedMs || Date.now());
+  return {
+    sessionRoot: item.sessionRoot,
+    encoder: item.encoder || "",
+    inputTarget: item.inputTarget || "desktop",
+    captureMode: item.captureMode || captureModePreference,
+    captureRect: item.captureRect || null,
+    startedAt,
+    endedAt,
+    startedMs: Number.isFinite(Number(item.startedMs)) ? Number(item.startedMs) : startedAt.getTime(),
+    endedMs: Number.isFinite(Number(item.endedMs)) ? Number(item.endedMs) : endedAt.getTime(),
+    foregroundPauseMs: Number(item.foregroundPauseMs || 0),
+    foregroundPauseStartedMs: null,
+    pausedForForeground: false,
+    taintedSegmentIndexes: new Set(Array.isArray(item.taintedSegmentIndexes) ? item.taintedSegmentIndexes : [])
+  };
+}
+
+async function loadPostGameQueue() {
+  const parsed = JSON.parse(await fs.readFile(postGameQueuePath, "utf8").catch(() => "[]"));
+  postGameQueue = Array.isArray(parsed)
+    ? parsed.filter((item) => item?.sessionRoot)
+    : [];
+}
+
+async function savePostGameQueue() {
+  await fs.mkdir(analysisRoot, { recursive: true });
+  await fs.writeFile(postGameQueuePath, `${JSON.stringify(postGameQueue, null, 2)}\n`, "utf8");
+}
+
+async function enqueuePostGameSession(session) {
+  const item = serializeSession(session);
+  if (!postGameQueue.some((queued) => queued.sessionRoot === item.sessionRoot)) {
+    postGameQueue.push(item);
+    await savePostGameQueue();
+    await log(`Queued post-game processing for ${item.sessionRoot}.`);
+  }
+  processPostGameQueue().catch((error) => {
+    log(`Post-game queue worker failed: ${error.stack || error.message}`).catch(() => {});
+  });
 }
 
 function holdIdleStatus(status, fields = {}) {
@@ -1166,6 +1230,25 @@ async function finalizeSession(session) {
   }
 }
 
+async function processPostGameQueue() {
+  if (postGameQueueRunning) return;
+  postGameQueueRunning = true;
+  try {
+    while (postGameQueue.length) {
+      const item = postGameQueue[0];
+      const session = deserializeSession(item);
+      await waitForNoGame("Queued post-game processing paused");
+      await log(`Processing queued review ${session.sessionRoot}.`);
+      await finalizeSession(session);
+      postGameQueue.shift();
+      await savePostGameQueue();
+      await log(`Queued review finished ${session.sessionRoot}.`);
+    }
+  } finally {
+    postGameQueueRunning = false;
+  }
+}
+
 async function main() {
   await acquireLock();
   process.on("exit", () => {
@@ -1176,6 +1259,10 @@ async function main() {
     process.exit(0);
   });
 
+  await loadPostGameQueue();
+  processPostGameQueue().catch((error) => {
+    log(`Post-game queue worker failed: ${error.stack || error.message}`).catch(() => {});
+  });
   await log("League live recorder is watching for game process.");
   await publishRecorderStatus("watching", {
     label: "recorder ready",
@@ -1209,7 +1296,7 @@ async function main() {
       session = null;
       try {
         await stopSession(current);
-        await finalizeSession(current);
+        await enqueuePostGameSession(current);
       } catch (error) {
         await log(`Finalize failed: ${error.message}`);
         const errorFields = { ...sessionStatusFields(current, "Post-game processing failed. Check recorder log."), label: "recorder error", progress: 100 };
