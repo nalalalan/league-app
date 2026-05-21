@@ -1406,12 +1406,19 @@ function recordingDeepDetails(item) {
   return details;
 }
 
+function recordingAssetUrl(url, item) {
+  const cacheKey = item.cacheKey || item.sourceModifiedAt || item.updatedAt || "";
+  if (!url || !cacheKey) return url || "";
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}v=${encodeURIComponent(String(cacheKey))}`;
+}
+
 function recordingVideo(item) {
   const video = document.createElement("video");
   video.controls = true;
   video.preload = "metadata";
-  video.poster = item.poster;
-  video.src = item.src;
+  video.poster = recordingAssetUrl(item.poster, item);
+  video.src = recordingAssetUrl(item.src, item);
   video.setAttribute("playsinline", "");
   return video;
 }

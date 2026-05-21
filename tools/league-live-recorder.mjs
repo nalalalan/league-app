@@ -32,6 +32,7 @@ const x264CaptureCrf = String(process.env.LEAGUE_LIVE_CAPTURE_CRF || 36);
 const captureBitrate = String(process.env.LEAGUE_LIVE_CAPTURE_BITRATE || "12000k");
 const captureMaxrate = String(process.env.LEAGUE_LIVE_CAPTURE_MAXRATE || "18000k");
 const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "24000k");
+const captureGop = String(Math.max(1, Math.round((Number(fps) || 6) * (Number(segmentSeconds) || 6))));
 const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "1600:-2").trim();
 const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
@@ -162,6 +163,7 @@ function encoderArgs(profile, purpose = "review") {
       "-b:v", captureBitrate,
       "-maxrate", captureMaxrate,
       "-bufsize", captureBufsize,
+      ...(isCapture ? ["-g", captureGop, "-bf", "0"] : []),
       "-pix_fmt", "yuv420p"
     ];
   }
@@ -171,6 +173,16 @@ function encoderArgs(profile, purpose = "review") {
     "-preset", preset,
     "-crf", isCapture ? x264CaptureCrf : x264Crf,
     "-threads", isCapture ? "1" : "0",
+    ...(isCapture ? ["-g", captureGop, "-keyint_min", captureGop, "-sc_threshold", "0"] : []),
+    "-pix_fmt", "yuv420p"
+  ];
+}
+
+function finalReviewEncoderArgs() {
+  return [
+    "-c:v", "libx264",
+    "-preset", "veryfast",
+    "-crf", x264Crf,
     "-pix_fmt", "yuv420p"
   ];
 }
@@ -401,6 +413,39 @@ async function frameVisibility(filePath, second) {
   }
 }
 
+async function frameGreenArtifactRatio(filePath, second) {
+  try {
+    const { stdout } = await execFileAsync("ffmpeg", [
+      "-v", "error",
+      "-ss", String(Math.max(0, second)),
+      "-i", filePath,
+      "-frames:v", "1",
+      "-vf", "scale=96:60,format=rgb24",
+      "-f", "rawvideo",
+      "-"
+    ], {
+      windowsHide: true,
+      encoding: "buffer",
+      maxBuffer: 1024 * 1024
+    });
+    const pixels = Buffer.from(stdout || []);
+    if (pixels.length < 3) return null;
+    let greenBlocks = 0;
+    const total = Math.floor(pixels.length / 3);
+    for (let offset = 0; offset + 2 < pixels.length; offset += 3) {
+      const r = pixels[offset];
+      const g = pixels[offset + 1];
+      const b = pixels[offset + 2];
+      if (g > 90 && r < 55 && b < 55 && g > r * 1.8 && g > b * 1.8) {
+        greenBlocks += 1;
+      }
+    }
+    return total ? greenBlocks / total : null;
+  } catch {
+    return null;
+  }
+}
+
 async function videoHasVisibleFrames(filePath, duration) {
   const total = Number(duration) || 0;
   if (!(total > 0)) return true;
@@ -416,6 +461,27 @@ async function videoHasVisibleFrames(filePath, duration) {
   }
   if (!stats.length) return true;
   return stats.some((item) => item.mean > 8 && item.stdev > 4);
+}
+
+async function videoHasGreenArtifacts(filePath, duration) {
+  const total = Number(duration) || 0;
+  if (!(total > 0)) return false;
+  const samples = [
+    total * 0.12,
+    total * 0.22,
+    total * 0.35,
+    total * 0.5,
+    total * 0.65,
+    total * 0.8
+  ];
+  const ratios = [];
+  for (const second of samples) {
+    const ratio = await frameGreenArtifactRatio(filePath, second);
+    if (Number.isFinite(ratio)) ratios.push(ratio);
+  }
+  if (!ratios.length) return false;
+  const badFrames = ratios.filter((ratio) => ratio > 0.08).length;
+  return badFrames >= 2 || ratios.some((ratio) => ratio > 0.2);
 }
 
 function captureModes() {
@@ -621,7 +687,6 @@ async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop")
     "-segment_time", String(segmentSeconds),
     "-segment_format", "matroska",
     "-segment_start_number", String(startNumber),
-    "-break_non_keyframes", "1",
     "-reset_timestamps", "1",
     outputPattern
   ];
@@ -829,17 +894,32 @@ function importantSegmentIndexes(segments) {
   return selected;
 }
 
-async function processSegment(segment, importantIndexes, sessionRoot) {
+async function processSegment(segment, importantIndexes, sessionRoot, previousSegment = null) {
   const isImportant = importantIndexes.has(segment.index);
   const speed = isImportant ? 1 : Math.max(1, fastForwardSpeed);
   const encoder = await encoderProfile();
   const outputPath = path.join(sessionRoot, `processed-${String(segment.index).padStart(4, "0")}.mp4`);
+  const inputArgs = [];
+  const filterParts = [];
+  const duration = Number(segment.duration) || segmentSeconds;
+  if (previousSegment?.filePath) {
+    const preRollDuration = Number(previousSegment.duration) || segmentSeconds;
+    const preRollListPath = path.join(sessionRoot, `preroll-${String(segment.index).padStart(4, "0")}.txt`);
+    await writeConcatList(preRollListPath, [previousSegment.filePath, segment.filePath]);
+    inputArgs.push("-f", "concat", "-safe", "0", "-i", preRollListPath);
+    filterParts.push(`trim=start=${preRollDuration.toFixed(3)}:duration=${duration.toFixed(3)}`);
+    filterParts.push("setpts=PTS-STARTPTS");
+  } else {
+    inputArgs.push("-i", segment.filePath);
+  }
+  filterParts.push(`setpts=PTS/${speed}`);
+  filterParts.push(`fps=${fps}`);
   await run("ffmpeg", [
     "-y",
     "-hide_banner",
     "-loglevel", "error",
-    "-i", segment.filePath,
-    "-vf", `setpts=PTS/${speed},fps=${fps}`,
+    ...inputArgs,
+    "-vf", filterParts.join(","),
     "-an",
     ...encoderArgs(encoder, "review"),
     "-movflags", "+faststart",
@@ -909,15 +989,15 @@ async function finalizeSession(session) {
   const outputPath = await nextOutputPath(replay?.matchId);
   const importantIndexes = importantSegmentIndexes(cleanSegments);
   const processed = [];
-  for (const segment of cleanSegments) {
+  for (let index = 0; index < cleanSegments.length; index += 1) {
+    const segment = cleanSegments[index];
+    const previousSegment = cleanSegments[index - 1] || null;
     await waitForNoGame("Post-game video processing paused");
-    processed.push(await processSegment(segment, importantIndexes, session.sessionRoot));
+    processed.push(await processSegment(segment, importantIndexes, session.sessionRoot, previousSegment));
   }
   const listPath = path.join(session.sessionRoot, "processed.txt");
   const joinedPath = path.join(session.sessionRoot, "processed.mp4");
   await writeConcatList(listPath, processed.map((item) => item.outputPath));
-  await waitForNoGame("Post-game video join paused");
-  await run("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", listPath, "-c", "copy", joinedPath]);
   await fs.mkdir(sourceDir, { recursive: true });
   const encoder = await encoderProfile();
   await waitForNoGame("Post-game final encode paused");
@@ -925,17 +1005,26 @@ async function finalizeSession(session) {
     "-y",
     "-hide_banner",
     "-loglevel", "error",
-    "-i", joinedPath,
-    ...encoderArgs(encoder, "review"),
+    "-f", "concat",
+    "-safe", "0",
+    "-i", listPath,
+    ...finalReviewEncoderArgs(),
     "-an",
     "-movflags", "+faststart",
     outputPath
   ]);
+  await fs.copyFile(outputPath, joinedPath).catch(() => {});
   const duration = await probeDuration(outputPath);
   if (!(await videoHasVisibleFrames(outputPath, duration))) {
     await fs.unlink(outputPath).catch(() => {});
     await log("Review clip was black-screen capture; rejected before publish.");
     await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture was black, so no review was published."), progress: 100 }, { force: true });
+    return;
+  }
+  if (await videoHasGreenArtifacts(outputPath, duration)) {
+    await fs.unlink(outputPath).catch(() => {});
+    await log("Review clip had green block corruption; rejected before publish.");
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture had video corruption, so no review was published."), progress: 100 }, { force: true });
     return;
   }
   const sidecar = {
@@ -949,7 +1038,7 @@ async function finalizeSession(session) {
     durationSeconds: duration,
     sourceDurationSeconds: elapsedSeconds,
     encoder: encoder.name,
-    videoQuality: encoder.name === "h264_nvenc" ? `capture CQ ${liveCaptureCq}, review CQ ${liveCq}` : `capture CRF ${x264CaptureCrf}, review CRF ${x264Crf}`,
+    videoQuality: encoder.name === "h264_nvenc" ? `capture CQ ${liveCaptureCq}, intermediate CQ ${liveCq}, final CRF ${x264Crf}` : `capture CRF ${x264CaptureCrf}, final CRF ${x264Crf}`,
     segmentSeconds,
     fastForwardSpeed,
     captureFps: Number(fps),
