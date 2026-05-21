@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T13:53:42.375Z",
+  "generatedAt": "2026-05-21T14:10:18.425Z",
   "source": "League of Legends Highlights folder",
   "match": "8 matches",
   "matches": [
@@ -81,11 +81,11 @@
       "feedbackTitle": "Reset Discipline — Recalling and Map Presence",
       "feedback": "Mistake: You consistently overstay on the map after winning fights and breaking structures instead of resetting for resources and pressure. Fix: Immediately recall and reset after a successful fight or taking a key structure, especially when you have high gold or low HP.",
       "gameDetail": "The recording shows Alan's Samira pushing aggressive fights, snowballing, and breaking bot lane towers with support backup, but repeatedly staying on the map after kills or structure takes with no immediate threat present to force him off. This prevents cashing out leads, risks shutdowns, and loses tempo for key objectives. The direct lesson: no matter how fed you are, secure your advantage by recalling as soon as the wave/structure is done and enemy timers demand resets.",
-      "eventEvidence": "",
+      "eventEvidence": "Generated from sampled replay frames.",
       "goodThing": "You chained aggressive leads into tower and kill pressure, snowballing when you had tempo.",
       "whyTrust": "Resetting after a winning fight is the most repeatable way to keep Samira snowballing, avoid giving shutdowns, and guarantee pressure for dragon/baron rotations; every pro and top Samira player leaves lane or jungle after the win for this reason.",
       "focusTag": "reset discipline",
-      "evidence": "",
+      "evidence": "Generated from sampled replay frames.",
       "pattern": "Alan tended to stay pushing or hovering enemy territory after a big win, risking respawn timers and staggered deaths instead of recalling and regrouping with gold spent.",
       "diamondRule": "Always reset after a fight win or structure take unless an immediate map objective is guaranteed and safe.",
       "drill": "Next game, after every successful fight or tower, hard commit to a recall-protect reset before taking another fight.",
@@ -109,19 +109,14 @@
       ],
       "clockMoments": [
         {
-          "clock": "3:50",
-          "videoSeconds": 97.5,
-          "description": "Samira in lane near bot turret with enemy minions and enemy champion present"
-        },
-        {
           "clock": "5:57",
           "videoSeconds": 150,
-          "description": "Samira and allies fighting near enemy turret; ability, damage, and kills happening"
+          "description": "Overstaying after fight and enemy turret kill; doesn't reset despite opportunity for recall"
         },
         {
           "clock": "10:46",
           "videoSeconds": 283.75,
-          "description": "Samira in top lane after dragon spawn; no enemies immediately in view"
+          "description": "Still present on map in sidelane after prior successes, showing lack of immediate recall to cash in or set up next play"
         }
       ],
       "nuance": [
@@ -202,7 +197,7 @@
         {
           "clock": "19:16",
           "videoSeconds": 125.029,
-          "description": "Samira and allies attacking red nexus, one red champion nearby, combat ongoing"
+          "description": "Samira remains in base and fights after nexus turret down, instead of resetting; enemy respawns visible"
         }
       ],
       "nuance": [
@@ -288,14 +283,9 @@
       ],
       "clockMoments": [
         {
-          "clock": "0:31",
-          "videoSeconds": 1,
-          "description": "Player is moving alone in bottom lane; minions have spawned."
-        },
-        {
           "clock": "5:43",
           "videoSeconds": 220.435,
-          "description": "Player is clearing a wave in bottom lane as dragon is near."
+          "description": "Staying on the map to clear a wave with low HP and high gold after prior fights, risking shutdown with no reset."
         }
       ],
       "nuance": [
@@ -386,17 +376,17 @@
         {
           "clock": "14:21",
           "videoSeconds": 0.887,
-          "description": "Several champions fighting near destroyed inhibitor, health bars visible."
+          "description": "Engagement begins with allies, enemies, and minions in front of the nexus—fight is inside endgame window."
         },
         {
           "clock": "14:33",
           "videoSeconds": 12.5,
-          "description": "Triple kill notification shown, champions fighting among minions in base."
+          "description": "Triple kill shows Samira chaining resets as the brawl stays next to the base, highlighting full send at finish timing."
         },
         {
           "clock": "14:41",
           "videoSeconds": 21.2,
-          "description": "Pentakill notification shown, surviving blue champions moving away from fight."
+          "description": "Penta kill lands as fight never leaves nexus area, confirming this full commit works since every reset advances the win."
         }
       ],
       "nuance": [
@@ -480,19 +470,14 @@
       ],
       "clockMoments": [
         {
-          "clock": "11:51",
-          "videoSeconds": 9.3,
-          "description": "Champion with low health walking up lane after a shutdown event"
-        },
-        {
           "clock": "13:05",
           "videoSeconds": 83.3,
-          "description": "Champion moving mid lane, teammate channeling recall nearby"
+          "description": "Pause in action after base is opened, choice to hit structure or reset"
         },
         {
           "clock": "14:23",
           "videoSeconds": 161.224,
-          "description": "Team attacking the enemy Nexus after a kill"
+          "description": "Team correctly grouping and hitting Nexus for structure conversion"
         }
       ],
       "nuance": [
@@ -591,24 +576,19 @@
       ],
       "clockMoments": [
         {
-          "clock": "0:19",
-          "videoSeconds": 4,
-          "description": "Samira is leaving fountain near friendly top lane base turret."
-        },
-        {
           "clock": "1:09",
           "videoSeconds": 20.902,
-          "description": "Samira retreating from Braum and Gragas bots in bot lane after an ally death."
-        },
-        {
-          "clock": "3:35",
-          "videoSeconds": 105.415,
-          "description": "Samira gets a double kill among enemy minions in bot lane."
+          "description": "Post-fight position: Samira is still forward after the fight near tower, illustrating re-engage instead of reset or structure."
         },
         {
           "clock": "7:06",
           "videoSeconds": 189.927,
-          "description": "Both Samira and an ally with blue buff pushing bot lane against minions."
+          "description": "Good example: After winning, push turns to turret damage rather than chasing for another fight."
+        },
+        {
+          "clock": "10:32",
+          "videoSeconds": 288.269,
+          "description": "Low health stay: Samira remains in lane near enemies instead of resetting, risking shutdown."
         }
       ],
       "nuance": [
@@ -698,24 +678,9 @@
       ],
       "clockMoments": [
         {
-          "clock": "0:57",
-          "videoSeconds": 4,
-          "description": "Samira and allied minions approach the bottom lane near their tower."
-        },
-        {
           "clock": "3:13",
           "videoSeconds": 139.368,
-          "description": "Samira gains gold after a takedown in bot lane, with a shutdown event shown."
-        },
-        {
-          "clock": "11:18",
-          "videoSeconds": 432.666,
-          "description": "Samira destroys a red turret with many allied minions in bot lane."
-        },
-        {
-          "clock": "14:45",
-          "videoSeconds": 522.912,
-          "description": "Samira and allies destroy the final red turret in the enemy base near Nexus."
+          "description": "Staying in lane at lethal health after a fight, not recalling despite danger"
         }
       ],
       "nuance": [
@@ -834,24 +799,14 @@
       ],
       "clockMoments": [
         {
-          "clock": "0:42",
-          "videoSeconds": 4,
-          "description": "Minions have spawned text in base, scoreboard visible"
+          "clock": "7:22",
+          "videoSeconds": 53.987,
+          "description": "Structure conversion: first turret destroyed after fight win"
         },
         {
-          "clock": "1:39",
-          "videoSeconds": 11.141,
-          "description": "Caitlyn has slain Heimerdinger Bot notification in top lane fight"
-        },
-        {
-          "clock": "2:36",
-          "videoSeconds": 18.282,
-          "description": "Ezreal has slain Kayle Bot notification in bot lane fight"
-        },
-        {
-          "clock": "3:33",
-          "videoSeconds": 25.423,
-          "description": "Kayle Bot has slain Ezreal notification, bot lane skirmish"
+          "clock": "8:19",
+          "videoSeconds": 61.128,
+          "description": "Shutdown moment: high risk after fight win, death with gold bounty"
         }
       ],
       "nuance": [
@@ -940,22 +895,12 @@
         {
           "clock": "16:12",
           "videoSeconds": 2.023,
-          "description": "Ezreal destroys a red inhibitor amid a team fight near the inhibitor."
-        },
-        {
-          "clock": "16:25",
-          "videoSeconds": 14.715,
-          "description": "Shen destroys a red inhibitor with minions and Samira nearby."
+          "description": "Team focuses inhibitor during fight, prioritizing structure damage."
         },
         {
           "clock": "16:42",
           "videoSeconds": 31.636,
-          "description": "Samira attacks the red nexus as Gragas bot tries to defend."
-        },
-        {
-          "clock": "16:59",
-          "videoSeconds": 48.558,
-          "description": "Samira is killed for a shut down near top side of red nexus."
+          "description": "Samira attacks the nexus, converting the fight win into structure pressure."
         }
       ],
       "nuance": [
@@ -1031,14 +976,9 @@
       ],
       "clockMoments": [
         {
-          "clock": "8:47",
-          "videoSeconds": 1.696,
-          "description": "Samira is in lane near a tower as 'The Oceans bring life!' message is displayed."
-        },
-        {
           "clock": "9:12",
           "videoSeconds": 26.519,
-          "description": "Samira and teammates are fighting near mid-bot, with Kayle Bot 'RESURRECTING' and a large heal shield visible."
+          "description": "Edge entry enabled: fight unfolds with allies—perfect for collecting cooldowns, not blind dive."
         }
       ],
       "nuance": [
@@ -1144,24 +1084,14 @@
       ],
       "clockMoments": [
         {
-          "clock": "12:23",
-          "videoSeconds": 1.044,
-          "description": "Anivia Bot has slain Ezreal, combat near top inhibitor turret."
-        },
-        {
-          "clock": "12:27",
-          "videoSeconds": 4.476,
-          "description": "Samira has slain Gragas Bot, champion moving through jungle."
-        },
-        {
-          "clock": "12:30",
-          "videoSeconds": 7.908,
-          "description": "Kayle Bot has slain Samira, Nafiri moving in jungle."
-        },
-        {
           "clock": "12:34",
           "videoSeconds": 11.34,
-          "description": "Nafiri near allied jungle, allied team fights top side."
+          "description": "Nafiri near allied jungle after clearing side, not rotating toward teammates"
+        },
+        {
+          "clock": "12:37",
+          "videoSeconds": 14.772,
+          "description": "Nafiri starts moving toward mid as team fighting continues top, delayed join"
         }
       ],
       "nuance": [
@@ -1249,22 +1179,12 @@
         {
           "clock": "4:13",
           "videoSeconds": 0.719,
-          "description": "Samira is standing near an enemy turret and using an ability on two enemy champions."
-        },
-        {
-          "clock": "4:17",
-          "videoSeconds": 5.447,
-          "description": "Samira has slain Anivia Bot under the turret; slaying notification is visible."
+          "description": "Samira enters turret fight before the key CC (Swain root) is visibly used, risking interruption."
         },
         {
           "clock": "4:22",
           "videoSeconds": 10.174,
-          "description": "Samira and Caitlyn are fighting minions and enemy champions near the turret; ability effects visible."
-        },
-        {
-          "clock": "4:27",
-          "videoSeconds": 14.901,
-          "description": "Samira gets a shutdown on Swain Bot with gold and level up notifications on screen."
+          "description": "CC threat persists; the frame shows ability effects and brawl context before the play is safe."
         }
       ],
       "nuance": [
@@ -1352,22 +1272,12 @@
         {
           "clock": "10:39",
           "videoSeconds": 0.686,
-          "description": "Samira fights under allied turret near bot lane with multiple minions and effects."
-        },
-        {
-          "clock": "10:44",
-          "videoSeconds": 5.191,
-          "description": "Samira attacks minions and an enemy champion retreats in bot lane."
-        },
-        {
-          "clock": "10:48",
-          "videoSeconds": 9.697,
-          "description": "Samira is near minions after killing Heimerdinger Bot in bot lane."
+          "description": "Initiation: Samira enters fight near turret, context for rescue attempt"
         },
         {
           "clock": "10:53",
           "videoSeconds": 14.203,
-          "description": "Heimerdinger Bot has slain Samira, player character is dead in bot lane."
+          "description": "Death outcome: Samira is slain after engaging, shows result of not counting enemies"
         }
       ],
       "nuance": [
@@ -1453,24 +1363,14 @@
       ],
       "clockMoments": [
         {
-          "clock": "7:00",
-          "videoSeconds": 0.667,
-          "description": "Blue team destroyed the first turret; three champions near bottom lane jungle"
-        },
-        {
           "clock": "7:04",
           "videoSeconds": 5.049,
-          "description": "Samira fighting minions in bottom lane; enemy minions approaching"
+          "description": "Samira focusing on minion wave after kill to crash it, setting up tempo play."
         },
         {
-          "clock": "7:08",
-          "videoSeconds": 9.432,
-          "description": "Samira and Wukong fighting in bot lane, healing numbers visible"
-        },
-        {
-          "clock": "7:12",
-          "videoSeconds": 13.814,
-          "description": "Shutdown event; Samira killed, kill particles and gold visible"
+          "clock": "7:00",
+          "videoSeconds": 0.667,
+          "description": "First turret destroyed after wave crash, showing structure conversion as part of tempo advantage."
         }
       ],
       "nuance": [
@@ -1558,22 +1458,17 @@
         {
           "clock": "9:43",
           "videoSeconds": 0.527,
-          "description": "Red turret destroyed notification on screen, two champions near bot lane."
+          "description": "Tower destroyed—shutdown value earned, new risk context."
         },
         {
           "clock": "9:47",
           "videoSeconds": 3.993,
-          "description": "Swain Bot has slain Ezreal notification, one champion recalling near bot lane bushes."
+          "description": "Recall started—opportunity to leave safely with shutdown value."
         },
         {
           "clock": "9:50",
           "videoSeconds": 7.458,
-          "description": "Samira moving in bot lane, Kayle approaching from above."
-        },
-        {
-          "clock": "9:54",
-          "videoSeconds": 10.924,
-          "description": "Kayle using ability, targeting Samira in bot lane."
+          "description": "Samira stays—risking shutdown by not immediately leaving."
         }
       ],
       "nuance": [
@@ -1661,22 +1556,12 @@
         {
           "clock": "4:39",
           "videoSeconds": 0.508,
-          "description": "Samira is retreating under turret low on health, minions present near bottom lane."
+          "description": "Low target retreats into fog with wave and plate on screen, showing stop point for the lesson."
         },
         {
           "clock": "4:42",
           "videoSeconds": 3.844,
-          "description": "Samira and enemy engage in bottom lane with both at low health."
-        },
-        {
-          "clock": "4:46",
-          "videoSeconds": 7.181,
-          "description": "Samira and enemy continue fighting among minions in bottom lane."
-        },
-        {
-          "clock": "4:49",
-          "videoSeconds": 10.517,
-          "description": "Samira performs an ability with large blue visual effect during bottom lane fight."
+          "description": "Both champions are low; vision loss risk as chasing starts past wave instead of shoving or plating."
         }
       ],
       "nuance": [
@@ -1762,24 +1647,14 @@
       ],
       "clockMoments": [
         {
-          "clock": "14:24",
-          "videoSeconds": 0.495,
-          "description": "Blue team mid laner and minions are approaching red team's mid inhibitor turret, enemy Kayle is present."
-        },
-        {
           "clock": "14:27",
           "videoSeconds": 3.747,
-          "description": "Samira is fighting near the mid inhibitor turret against Kayle and Anivia bots."
-        },
-        {
-          "clock": "14:30",
-          "videoSeconds": 7,
-          "description": "Samira has slain Anivia Bot near the inhibitor turret, kill announcement present."
+          "description": "Samira is starting the fight at the choke with enemy CC threats still present"
         },
         {
           "clock": "14:34",
           "videoSeconds": 10.252,
-          "description": "Samira is shut down and killed by Gragas Bot near red team's mid inhibitor."
+          "description": "Samira is killed after going in first, showing the risk of not waiting for CC to be used"
         }
       ],
       "nuance": [
@@ -1857,12 +1732,12 @@
         {
           "clock": "13:41",
           "videoSeconds": 0.453,
-          "description": "Samira is mid lane as dragon spawns, standing near minions."
+          "description": "Samira is mid lane as dragon spawns; evidence for needing objective pressure before dueling."
         },
         {
           "clock": "13:48",
           "videoSeconds": 8.269,
-          "description": "Samira gets a kill on Kayle Bot mid, with a level up animation and minions around."
+          "description": "Just after a duel kill and level up, showing focus was on duel, not objective."
         }
       ],
       "nuance": [
@@ -1945,17 +1820,12 @@
         {
           "clock": "3:34",
           "videoSeconds": 0.3,
-          "description": "Samira and Caitlyn with allied minions pushing against red minions near bot lane."
-        },
-        {
-          "clock": "3:37",
-          "videoSeconds": 3.312,
-          "description": "Samira stunned in bot lane as an enemy teleports in; Caitlyn nearby with minions around."
+          "description": "Fight setup: allied minions push, showing potential payout windows like wave crash or plate."
         },
         {
           "clock": "3:40",
           "videoSeconds": 6.324,
-          "description": "Samira killed in bot lane during a shutdown; Caitlyn and an enemy remain with minions."
+          "description": "Post-commit: Samira killed, no payout secured, highlighting the need to define payout before the fight."
         }
       ],
       "nuance": [
