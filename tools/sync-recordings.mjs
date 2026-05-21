@@ -19,14 +19,14 @@ const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
 const analysisVersion = "2026-05-19-direct-coach-evidence-v2";
-const clockAnchorVersion = "2026-05-21-visible-clock-v2";
+const clockAnchorVersion = "2026-05-21-visible-clock-strict-v4";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
 const minAutoBytesPerSecond = Number(process.env.LEAGUE_MIN_AUTO_BYTES_PER_SECOND || 5000);
 const minAutoSidecarCoverage = Number(process.env.LEAGUE_MIN_AUTO_SIDECAR_COVERAGE || 0.6);
 const minSanitizedAutoSeconds = Number(process.env.LEAGUE_MIN_SANITIZED_AUTO_SECONDS || 90);
-const maxClockReadFrames = Number(process.env.LEAGUE_MAX_CLOCK_READ_FRAMES || 26);
+const maxClockReadFrames = Number(process.env.LEAGUE_MAX_CLOCK_READ_FRAMES || 34);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 const ignoredSourceVideoPattern = /\.with-desktop-pauses\.(webm|mp4)$/i;
 
@@ -699,9 +699,13 @@ function importantSegmentTimes(sidecar, duration) {
   }).filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
 }
 
-function clockReadTimes(duration, sidecar) {
+function clockReadTimes(duration, sidecar, candidateTimes = []) {
+  const prioritizedTimes = candidateTimes
+    .map(Number)
+    .filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
   const candidates = [
     ...importantSegmentTimes(sidecar, duration),
+    ...prioritizedTimes,
     ...sampleTimesFor(duration)
   ].filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
   const deduped = [];
@@ -711,9 +715,12 @@ function clockReadTimes(duration, sidecar) {
   }
   if (deduped.length <= maxClockReadFrames) return deduped;
   const important = importantSegmentTimes(sidecar, duration);
-  const importantSet = deduped.filter((time) => important.some((candidate) => Math.abs(candidate - time) < 1.5));
-  const remaining = deduped.filter((time) => !importantSet.includes(time));
-  return [...importantSet, ...remaining].slice(0, maxClockReadFrames).sort((a, b) => a - b);
+  const prioritySet = deduped.filter((time) => (
+    important.some((candidate) => Math.abs(candidate - time) < 1.5) ||
+    prioritizedTimes.some((candidate) => Math.abs(candidate - time) < 1.5)
+  ));
+  const remaining = deduped.filter((time) => !prioritySet.includes(time));
+  return [...prioritySet, ...remaining].slice(0, maxClockReadFrames).sort((a, b) => a - b);
 }
 
 function sourceSecondForVideoSecond(sidecar, videoSeconds) {
@@ -747,10 +754,56 @@ function clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds) 
   const visibleClock = clockSeconds(anchor.clock);
   if (!Number.isFinite(visibleClock)) return false;
   const gameLength = Number(gameLengthSeconds || 0);
-  if (gameLength > 0 && visibleClock > gameLength + 75) return false;
+  if (gameLength > 0 && visibleClock > gameLength + 120) return false;
   const expected = expectedGameClockSeconds(sidecar, matchTimeMs, Number(anchor.videoSeconds));
   if (!Number.isFinite(expected)) return true;
   return Math.abs(visibleClock - expected) <= 90;
+}
+
+function nearestClockReadTime(videoSeconds, readTimes) {
+  const target = Number(videoSeconds);
+  if (!Number.isFinite(target)) return null;
+  const nearest = readTimes
+    .map((time) => ({ time, delta: Math.abs(time - target) }))
+    .sort((a, b) => a.delta - b.delta)[0];
+  return nearest && nearest.delta <= 0.35 ? nearest.time : null;
+}
+
+function clockWithinSeconds(first, second, tolerance = 2.5) {
+  const firstSeconds = clockSeconds(first);
+  const secondSeconds = clockSeconds(second);
+  return Number.isFinite(firstSeconds) && Number.isFinite(secondSeconds) && Math.abs(firstSeconds - secondSeconds) <= tolerance;
+}
+
+function anchorMatchesClock(clock, clockAnchors, toleranceSeconds = 2.5) {
+  const seconds = clockSeconds(clock);
+  if (!Number.isFinite(seconds)) return false;
+  return cleanClockAnchors(clockAnchors).some((anchor) => {
+    const anchorSeconds = clockSeconds(anchor.clock);
+    return Number.isFinite(anchorSeconds) && Math.abs(anchorSeconds - seconds) <= toleranceSeconds;
+  });
+}
+
+function stripUnverifiedClockReferences(value, clockAnchors) {
+  const text = String(value || "");
+  if (!text) return "";
+  const verified = cleanClockAnchors(clockAnchors);
+  const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+  const kept = sentences.filter((sentence) => {
+    const clocks = String(sentence).match(/\b\d{1,2}:[0-5]\d\b/g) || [];
+    return clocks.every((clock) => anchorMatchesClock(clock, verified));
+  });
+  return coachClean(kept.join(" "))
+    .replace(/\s+([,.;:])/g, "$1")
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function stripUnverifiedTimelineItems(value, clockAnchors) {
+  return cleanList(value, 6)
+    .map((item) => stripUnverifiedClockReferences(item, clockAnchors))
+    .filter(Boolean);
 }
 
 async function readExistingManifest() {
@@ -1208,14 +1261,83 @@ function parseJsonText(text) {
   return JSON.parse(match[0]);
 }
 
-async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, cacheKey, frameDir, matchTimeMs, gameLengthSeconds }) {
+async function verifyVisibleClockAnchors({ file, sourcePath, anchors, frameDir }) {
+  const candidates = cleanClockAnchors(anchors);
+  if (!candidates.length) return [];
+  if (!process.env.OPENAI_API_KEY) return [];
+  const verifyDir = path.join(frameDir, "clock-verify");
+  await fs.mkdir(verifyDir, { recursive: true });
+  const images = [];
+  for (let index = 0; index < candidates.length; index += 1) {
+    const anchor = candidates[index];
+    const framePath = path.join(verifyDir, `verify-${String(index + 1).padStart(2, "0")}-${normalizeClock(anchor.clock).replace(":", "-")}.jpg`);
+    await extractFrame(sourcePath, framePath, Number(anchor.videoSeconds), 1280);
+    images.push({
+      type: "input_text",
+      text: `Frame ${index + 1}: expected League game clock ${anchor.clock}; review-video seek ${mmss(anchor.videoSeconds)} (${anchor.videoSeconds}s). Pass only if this exact frame visibly shows the expected League in-game clock or a clock within two seconds of it.`
+    });
+    images.push({
+      type: "input_image",
+      image_url: `data:image/jpeg;base64,${(await fs.readFile(framePath)).toString("base64")}`,
+      detail: "high"
+    });
+  }
+  const prompt = [
+    "Verify clickable timestamp anchors for league.aolabs.io.",
+    "For each frame, read only the current League of Legends in-game HUD clock. Ignore browser/player overlays and any other clocks.",
+    "Return pass=true only when the expected game clock is visibly readable in that exact frame, allowing at most two seconds of visual/OCR tolerance.",
+    "If the frame is blurry, cropped, alt-tabbed, green-blocked, or the clock is not visible/readable, pass=false.",
+    "Return only JSON:",
+    '{"checks":[{"index":1,"expected":"MM:SS","visibleClock":"MM:SS or unreadable","pass":true,"description":"what is visible"}]}',
+    `Recording file: ${file}.`
+  ].join("\n");
+  try {
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        store: false,
+        max_output_tokens: 1000,
+        input: [
+          {
+            role: "user",
+            content: [
+              { type: "input_text", text: prompt },
+              ...images
+            ]
+          }
+        ]
+      })
+    });
+    if (!response.ok) throw new Error(`OpenAI clock verification ${response.status}`);
+    const parsed = parseJsonText(extractOutputText(await response.json()));
+    const checks = Array.isArray(parsed.checks) ? parsed.checks : [];
+    return candidates.filter((anchor, index) => {
+      const check = checks.find((item) => Number(item?.index) === index + 1);
+      if (!check || check.pass !== true) return false;
+      if (!clockWithinSeconds(anchor.clock, check.visibleClock)) return false;
+      return true;
+    });
+  } catch (error) {
+    console.warn(`Clock anchor verification fallback for ${file}: ${error.message}`);
+    return [];
+  }
+}
+
+async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, cacheKey, frameDir, matchTimeMs, gameLengthSeconds, candidateAnchors = [] }) {
   const cachePath = path.join(frameDir, "visible-clock-anchors.json");
   const cached = await readJsonSafe(cachePath);
   if (cached?.cacheKey === cacheKey && cached?.clockAnchorVersion === clockAnchorVersion) {
-    return cleanClockAnchors(cached.clockAnchors);
+    return cleanClockAnchors(cached.clockAnchors)
+      .filter((anchor) => clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds));
   }
   if (!process.env.OPENAI_API_KEY) return [];
-  const readTimes = clockReadTimes(duration, sidecar);
+  const candidateTimes = cleanClockAnchors(candidateAnchors).map((anchor) => anchor.videoSeconds);
+  const readTimes = clockReadTimes(duration, sidecar, candidateTimes);
   if (!readTimes.length) return [];
   const clockDir = path.join(frameDir, "clock");
   await fs.mkdir(clockDir, { recursive: true });
@@ -1241,10 +1363,10 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
   const prompt = [
     "Read visible League of Legends in-game clock timestamps from these video frames.",
     "The clock is the game clock shown in the League HUD, usually near the top center/top right, formatted M:SS or MM:SS.",
-    "Return an anchor only when the game clock is actually visible and readable in that exact frame. Do not infer from match length, file time, frame order, or nearby frames.",
+    "Return an anchor only when the game clock is actually visible and readable in that exact frame. Do not infer from match length, file time, frame order, nearby frames, story text, file name, or expected hints.",
     "Some frames may contain desktop/browser/video-player overlays from alt-tabbed capture. Ignore those clocks. Only return the clock from the current League match HUD.",
     "Try to return at least two different game-clock moments if at least two are visible.",
-    "For each returned anchor, include a short description of what is visibly happening in that same frame. Keep the description factual and compact, not advice.",
+    "For each returned anchor, use the exact review-video time printed in that frame label as videoSeconds. Include a short description of what is visibly happening in that same frame. Keep the description factual and compact, not advice.",
     "If the frame is desktop/browser/launcher or the clock is not readable, omit it.",
     "Return only JSON with this shape:",
     '{"clockAnchors":[{"clock":"MM:SS","videoSeconds":0,"description":"short visible event in this frame"}]}',
@@ -1260,7 +1382,7 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
       body: JSON.stringify({
         model,
         store: false,
-        max_output_tokens: 900,
+        max_output_tokens: 2000,
         input: [
           {
             role: "user",
@@ -1274,16 +1396,24 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
     });
     if (!response.ok) throw new Error(`OpenAI clock response ${response.status}`);
     const parsed = parseJsonText(extractOutputText(await response.json()));
-    const anchors = dedupeClockAnchors(parsed.clockAnchors)
+    const anchors = dedupeClockAnchors(
+      cleanClockAnchors(parsed.clockAnchors)
+        .map((anchor) => {
+          const videoSeconds = nearestClockReadTime(anchor.videoSeconds, readTimes);
+          return videoSeconds === null ? null : { ...anchor, videoSeconds };
+        })
+        .filter(Boolean)
+    )
       .filter((anchor) => anchor.videoSeconds >= 0 && anchor.videoSeconds <= Math.max(0.25, duration))
       .filter((anchor) => clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds));
+    const verifiedAnchors = await verifyVisibleClockAnchors({ file, sourcePath, anchors, frameDir });
     await fs.writeFile(cachePath, `${JSON.stringify({
       cacheKey,
       clockAnchorVersion,
       generatedAt: new Date().toISOString(),
-      clockAnchors: anchors
+      clockAnchors: verifiedAnchors
     }, null, 2)}\n`, "utf8");
-    return anchors;
+    return verifiedAnchors;
   } catch (error) {
     console.warn(`Clock anchor fallback for ${file}: ${error.message}`);
     return [];
@@ -1592,9 +1722,9 @@ async function main() {
       analysis = await analyzeRecording({ file: name, duration, framePaths, frameTimes: sampleTimes, sequenceLabel, reviewPhase: phase });
     }
     const matchTimeMs = matchStats.matchTimeMs || replayMeta.matchTimeMs || stat.mtimeMs;
-    const analysisClockAnchors = cleanClockAnchors(analysis.clockAnchors)
+    const candidateClockAnchors = cleanClockAnchors(analysis.clockAnchors)
       .filter((anchor) => clockFitsCurrentMatch(anchor, entry.sidecar, matchTimeMs, matchStats.gameLengthSeconds || null));
-    const shouldReadVisibleClock = duration >= 8 && (analysisClockAnchors.length < 2 || /^auto_/i.test(name));
+    const shouldReadVisibleClock = duration >= 3;
     const visibleClockAnchors = shouldReadVisibleClock
       ? await detectVisibleClockAnchors({
         file: name,
@@ -1604,10 +1734,11 @@ async function main() {
         cacheKey,
         frameDir,
         matchTimeMs,
-        gameLengthSeconds: matchStats.gameLengthSeconds || null
+        gameLengthSeconds: matchStats.gameLengthSeconds || null,
+        candidateAnchors: candidateClockAnchors
       })
       : [];
-    const clockAnchors = dedupeClockAnchors(analysisClockAnchors, visibleClockAnchors);
+    const clockAnchors = dedupeClockAnchors(visibleClockAnchors);
     const clockMoments = cleanClockAnchors(clockAnchors)
       .filter((anchor) => anchor.description)
       .slice(0, 4);
@@ -1662,16 +1793,16 @@ async function main() {
       confidence: clean(analysis.confidence, "low"),
       feedbackTitle: coachClean(analysis.feedbackTitle, "Focus"),
       feedback: coachClean(analysis.feedback, "Review the clip and choose one safer next action."),
-      gameDetail: coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`),
-      eventEvidence: coachClean(analysis.eventEvidence, analysis.evidence || ""),
+      gameDetail: stripUnverifiedClockReferences(coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`), clockAnchors),
+      eventEvidence: stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), clockAnchors),
       goodThing: coachClean(analysis.goodThing, ""),
       whyTrust: coachClean(analysis.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
       focusTag: coachClean(analysis.focusTag, "review"),
-      evidence: coachClean(analysis.evidence, "Generated from sampled replay frames."),
-      pattern: coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."),
+      evidence: stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), clockAnchors),
+      pattern: stripUnverifiedClockReferences(coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."), clockAnchors),
       diamondRule: coachClean(analysis.diamondRule, "Convert the first winning moment before taking the next fight."),
       drill: coachClean(analysis.drill, "Name the payout before committing."),
-      timeline: cleanList(analysis.timeline, 6).map((item) => coachClean(item)),
+      timeline: stripUnverifiedTimelineItems(analysis.timeline, clockAnchors),
       clockAnchors,
       clockMoments,
       nuance: cleanList(analysis.nuance, 5).map((item) => coachClean(item)),

@@ -1780,10 +1780,6 @@ function seekSecondsForStoryTimestamp(timestamp, item) {
   const duration = secondsForRecording(item);
   const anchoredSeek = exactClockSeek(clockSeconds, item, duration);
   if (Number.isFinite(anchoredSeek)) return anchoredSeek;
-  const clipStart = Number(item?.clipTimestampSeconds);
-  if (Number.isFinite(clipStart) && clipStart > 0 && clockSeconds >= clipStart) {
-    return clampSeekSeconds(clockSeconds - clipStart, duration);
-  }
   return null;
 }
 
