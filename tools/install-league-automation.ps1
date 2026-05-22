@@ -3,6 +3,7 @@ $ErrorActionPreference = "Stop"
 $AppRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $Node = (Get-Command node.exe).Source
 $PowerShell = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
+$WScript = Join-Path $env:SystemRoot "System32\wscript.exe"
 $StartupDir = [Environment]::GetFolderPath("Startup")
 
 $RecorderTaskName = "AO Labs League live recorder"
@@ -10,6 +11,7 @@ $PublisherTaskName = "AO Labs League recording publisher"
 $RecorderScript = Join-Path $AppRoot "tools\league-live-recorder.mjs"
 $RecorderStartScript = Join-Path $AppRoot "tools\start-live-recorder.ps1"
 $PublisherScript = Join-Path $AppRoot "tools\publish-recordings.ps1"
+$PublisherHiddenScript = Join-Path $AppRoot "tools\run-publish-recordings-hidden.vbs"
 
 function Quote-Vbs([string]$Value) {
   return $Value.Replace('"', '""')
@@ -72,8 +74,8 @@ if (-not $RecorderTaskOk) {
 }
 
 $PublisherAction = New-ScheduledTaskAction `
-  -Execute $PowerShell `
-  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PublisherScript`"" `
+  -Execute $WScript `
+  -Argument "//B //Nologo `"$PublisherHiddenScript`"" `
   -WorkingDirectory $AppRoot
 
 $PublisherTrigger = New-ScheduledTaskTrigger `
@@ -97,7 +99,7 @@ $PublisherTaskOk = Try-RegisterTask `
   -Description "Publishes League recordings and retries fallback analysis so league.aolabs.io updates without Codex prompting."
 
 if (-not $PublisherTaskOk -and -not (Get-ScheduledTask -TaskName $PublisherTaskName -ErrorAction SilentlyContinue)) {
-  $PublisherLoop = "while (`$true) { & `"$PublisherScript`"; Start-Sleep -Seconds 300 }"
+  $PublisherLoop = "while (`$true) { & `"$WScript`" //B //Nologo `"$PublisherHiddenScript`"; Start-Sleep -Seconds 300 }"
   $PublisherCommand = "`"$PowerShell`" -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$PublisherLoop`""
   $PublisherStartup = Install-StartupVbs -Name "AO Labs League recording publisher" -Command $PublisherCommand -WorkingDirectory $AppRoot
   Write-Host "Installed startup publisher loop: $PublisherStartup"
@@ -119,7 +121,7 @@ if ($RecorderTaskOk) {
 if ($PublisherTaskOk) {
   Start-ScheduledTask -TaskName $PublisherTaskName
 } else {
-  Start-Process -FilePath $PowerShell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PublisherScript`"" -WorkingDirectory $AppRoot -WindowStyle Hidden
+  Start-Process -FilePath $WScript -ArgumentList "//B //Nologo `"$PublisherHiddenScript`"" -WorkingDirectory $AppRoot -WindowStyle Hidden
 }
 
 @($RecorderTaskName, $PublisherTaskName) |
