@@ -2443,15 +2443,8 @@ function recordingEtaLabel(data = {}, status = "") {
 
 function recordingQueueLabel(data = {}) {
   const count = Number(data.queueCount);
-  if (!Number.isFinite(count) || count <= 0) return "";
-  const items = Array.isArray(data.queueItems) ? data.queueItems : [];
-  const first = items[0] || {};
-  const endedAt = Date.parse(first.endedAt || "");
-  const firstEnded = Number.isFinite(endedAt)
-    ? new Date(endedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
-    : "";
-  const label = count === 1 ? "queue 1 review" : `queue ${count} reviews`;
-  return firstEnded ? `${label}, first ended ${firstEnded}` : label;
+  if (!Number.isFinite(count) || count <= 1) return "";
+  return `${count} reviews queued`;
 }
 
 function etaLabel(seconds) {
@@ -2471,9 +2464,9 @@ function timeLabel(value) {
 
 function queueStatusText(item = {}, index = 0) {
   const status = String(item.status || "").toLowerCase();
-  if (status === "recording") return "recording now";
-  if (status === "processing") return "processing now";
-  if (status === "publishing") return "publishing now";
+  if (status === "recording") return "recording";
+  if (status === "processing") return "processing";
+  if (status === "publishing") return "posting";
   return index === 0 ? "next" : `queued ${index + 1}`;
 }
 
@@ -2493,9 +2486,9 @@ function queueHeaderSummary(items, count, hasItems) {
 }
 
 function queueRowTitle(item = {}, status = "", index = 0) {
-  if (status === "recording") return "Current game recording";
-  if (status === "processing") return "Review processing";
-  if (status === "publishing") return "Posting review";
+  if (status === "recording") return "Current game";
+  if (status === "processing") return "Post-game review";
+  if (status === "publishing") return "Publishing to site";
   return item.stageLabel || item.label || `Queued review ${index + 1}`;
 }
 
@@ -2516,17 +2509,12 @@ function queueRowMeta(item = {}, status = "") {
 }
 
 function appendQueueEtas(container, item = {}, status = "") {
-  if (status === "recording") {
-    appendQueueMetric(container, "post ", etaLabel(item.etaSeconds));
-    appendQueueMetric(container, "game ", etaLabel(item.gameEtaSeconds || item.stageEtaSeconds));
-    return;
-  }
   if (status === "queued") {
     appendQueueMetric(container, "starts ", etaLabel(item.startEtaSeconds || item.stageEtaSeconds));
-    appendQueueMetric(container, "post ", etaLabel(item.etaSeconds));
+    appendQueueMetric(container, "ETA ", etaLabel(item.etaSeconds));
     return;
   }
-  appendQueueMetric(container, "post ", etaLabel(item.etaSeconds || item.stageEtaSeconds));
+  appendQueueMetric(container, "ETA ", etaLabel(item.etaSeconds || item.stageEtaSeconds));
 }
 
 function renderRecordingQueue(data = {}) {
@@ -2534,6 +2522,11 @@ function renderRecordingQueue(data = {}) {
   const items = Array.isArray(data.queueItems) ? data.queueItems : [];
   const count = Number(data.queueCount);
   const hasItems = items.length > 0 || count > 0;
+  recordingQueue.className = [
+    "recording-queue",
+    hasItems ? "has-items" : "is-clear",
+    items.length === 1 ? "is-single" : ""
+  ].filter(Boolean).join(" ");
 
   const header = document.createElement("div");
   header.className = "recording-queue-head";
