@@ -18,9 +18,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-21-visible-paragraph-teaching-standard-v7";
+const analysisVersion = "2026-05-22-primary-mistake-timestamp-v8";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-21-visible-paragraph-teaching-standard-v7",
   "2026-05-21-visible-paragraph-standard-v6",
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
@@ -1065,6 +1066,21 @@ function usefulEvidenceMoment(anchor, analysis, threshold = 8) {
   return anchorEvidenceScore(anchor, analysis) >= threshold;
 }
 
+function primaryMistakeTextPattern() {
+  return /\b(biggest|primary|main|clearest|real|actual|big)?\s*(mistake|leak|overstay|overstaying|stayed|stay|chase|chasing|chased|re-?engage|re-?enter|fight|fighting|accepted|accepting|drift|drifted|low[-\s]?hp|lethal|unspent|shutdown|reset|tempo|collapse|overextend|overextended|missed|delayed|risky|risk|danger|gave|died|death|stall|throw|window|blocked|alone|side lane|side fight)\b/i;
+}
+
+function primaryMistakeTimestampSeconds(...texts) {
+  const pattern = primaryMistakeTextPattern();
+  const sentences = texts
+    .flatMap((text) => sentenceParts(text))
+    .map((sentence) => coachClean(sentence, ""))
+    .filter(Boolean);
+  return sentences
+    .filter((sentence) => pattern.test(sentence) && timestampSecondsInText(sentence).length)
+    .flatMap((sentence) => timestampSecondsInText(sentence));
+}
+
 function contextualFallbackDescription(anchor, analysis) {
   const champion = clean(analysis?.champion, "Samira");
   const description = normalizeEvidenceDescription(anchor.description || "", champion).replace(/[.!?]+$/g, "");
@@ -1148,9 +1164,10 @@ async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameD
   }));
   const prompt = [
     "Choose the clickable timestamp moments that are actual evidence for the coaching claim, not just random readable game clocks.",
-    "Alan uses these timestamps to study what he did, what leaked, what happened next, and what he should do differently. If the advice is overstay/reset, choose frames that show staying, low HP, respawns, gold/recall context, or the reset window. If the advice is structure conversion, choose frames that show tower/inhib/nexus, a free structure, a blocked structure, or a chase away from it. If the advice is wave/objective/vision/CC, choose frames that visibly support that claim.",
-    "Use only the allowed anchors below. Do not invent clocks, videoSeconds, or events. Choose 2-4 moments when at least 2 allowed anchors can show setup, Alan's action, leak/consequence, or the correct contrasting habit.",
-    "Only return 1 moment if there is genuinely only 1 connected anchor. A setup anchor plus a consequence anchor is better than one perfect anchor.",
+    "The only mandatory timestamp is the beginning or nearest visible beginning of Alan's biggest mistake window. It does not have to be the exact click, but it must point him to the part of the game where the mistake starts.",
+    "Alan uses timestamps to study what he did, what leaked, what happened next, and what he should do differently. If the advice is overstay/reset, choose the first visible stay/reset-decision frame. If the advice is structure conversion, choose the first visible frame where structure access turns into delay, chase, or blocked conversion. If the advice is wave/objective/vision/CC, choose the first visible frame where that mistake begins.",
+    "Use only the allowed anchors below. Do not invent clocks, videoSeconds, or events. Return the primary mistake-start moment first. Add extra moments only when they genuinely clarify setup, consequence, or the correct contrasting habit.",
+    "One strong mistake-start timestamp is enough. Do not include weak extra timestamps just to pad the review.",
     "If an allowed anchor is only normal gameplay, walking, farming, shop, respawn, or a random fight unrelated to the coaching claim, reject it.",
     "Reject shop, fountain, scoreboard, game-start, or item-selection anchors unless the coaching claim is literally about buying, recalling, or spending.",
     "Descriptions should be short evidence labels tied to the lesson, not generic frame captions. Say Samira, not Player or Champion. A good structure/objective moment should be labeled as good evidence, not treated as a chase.",
@@ -1303,7 +1320,7 @@ function momentEvidenceSentence(clockMoments, champion = "Samira") {
   const moments = cleanClockAnchors(clockMoments)
     .filter((moment) => moment.description)
     .slice(0, 3);
-  if (moments.length < 2) return "";
+  if (!moments.length) return "";
   const leadWords = ["Around", "By", "Then around"];
   const clauses = moments.map((moment, index) => {
     const description = clauseDescription(moment.description, champion);
@@ -1315,13 +1332,14 @@ function momentEvidenceSentence(clockMoments, champion = "Samira") {
 function integrateMomentEvidence(gameDetail, clockMoments, champion = "Samira") {
   const cleaned = normalizeVisibleCoachText(gameDetail, champion);
   const moments = cleanClockAnchors(clockMoments).filter((moment) => moment.description);
-  if (moments.length < 2) return cleaned;
+  if (!moments.length) return cleaned;
+  if (primaryMistakeTimestampSeconds(cleaned).length) return cleaned;
   const strippedSentences = sentenceParts(cleaned).filter((sentence) => {
     const clocks = timestampSecondsInText(sentence);
     return !(clocks.length >= 2 && sentenceUsesMomentClock(sentence, moments));
   });
   const base = normalizeVisibleCoachText(strippedSentences.join(" "), champion);
-  if (usefulMomentCountInText(base, moments) >= Math.min(2, moments.length)) return base;
+  if (primaryMistakeTimestampSeconds(base).length) return base;
   const evidenceSentence = momentEvidenceSentence(moments, champion);
   if (!evidenceSentence) return base;
   const sentences = sentenceParts(base);
@@ -1355,15 +1373,14 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
   const moments = cleanClockAnchors(clockMoments)
     .filter((moment) => moment.description)
     .slice(0, 4);
-  if (moments.length < 3) return "";
-  const [first, second, third, fourth] = moments;
+  if (!moments.length) return "";
+  const primary = moments.find((moment) => primaryMistakeTextPattern().test(moment.description || "")) || moments[0];
+  const rest = moments.filter((moment) => moment !== primary);
   const clauses = [
-    `At ${first.clock}, ${clauseDescription(first.description, champion)}`,
-    `by ${second.clock}, ${clauseDescription(second.description, champion)}`,
-    `by ${third.clock}, ${clauseDescription(third.description, champion)}`
+    `Around ${primary.clock}, ${clauseDescription(primary.description, champion)}; this is the start or nearest visible start of the main mistake window`
   ];
-  if (fourth) {
-    clauses.push(`and by ${fourth.clock}, ${clauseDescription(fourth.description, champion)}`);
+  for (const moment of rest.slice(0, 3)) {
+    clauses.push(`by ${moment.clock}, ${clauseDescription(moment.description, champion)}`);
   }
   const advice = adviceTextForTeaching(analysis, champion);
   const shorthand = shorthandTeachingSentence(analysis);
@@ -1380,7 +1397,7 @@ function eventEvidenceFromMoments(clockMoments, champion = "Samira") {
   const moments = cleanClockAnchors(clockMoments)
     .filter((moment) => moment.description)
     .slice(0, 4);
-  if (moments.length < 2) return "";
+  if (!moments.length) return "";
   return coachClean(moments
     .map((moment) => `${moment.clock} shows ${clauseDescription(moment.description, champion)}`)
     .join(". ") + ".");
@@ -1418,6 +1435,15 @@ function matchingClockAnchorCount(text, anchors) {
   return textSeconds.filter((seconds) => anchorSeconds.some((anchorSecond) => Math.abs(anchorSecond - seconds) <= 2.5)).length;
 }
 
+function hasMatchingPrimaryMistakeAnchor(recording) {
+  const primarySeconds = [...new Set(primaryMistakeTimestampSeconds(recording.gameDetail, recording.eventEvidence || recording.evidence).map((seconds) => Math.round(seconds)))];
+  if (!primarySeconds.length) return false;
+  const anchorSeconds = cleanClockAnchors(recording.clockAnchors)
+    .map((anchor) => clockSeconds(anchor.clock))
+    .filter((seconds) => Number.isFinite(seconds));
+  return primarySeconds.some((seconds) => anchorSeconds.some((anchorSecond) => Math.abs(anchorSecond - seconds) <= 5));
+}
+
 function requiresVisibleParagraphStandard(fileName, recording = {}) {
   const isAuto = /^auto_/i.test(fileName || recording?.file || "");
   const duration = Number(recording?.durationSeconds || 0);
@@ -1433,11 +1459,8 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (detail.length < 240) {
     issues.push("visible paragraph is too short");
   }
-  if (uniqueTimestampCount(detail) < 3) {
-    issues.push("visible paragraph needs at least three game-clock timestamps");
-  }
-  if (!/^(?:Honest read:\s*)?(At|Around|By|Then|After)\s+\d{1,2}:[0-5]\d\b/i.test(detail)) {
-    issues.push("visible paragraph must start from a timestamped visible moment");
+  if (!primaryMistakeTimestampSeconds(detail, eventEvidence).length) {
+    issues.push("primary mistake window must have a game-clock timestamp");
   }
   if (!/\b(leak|cost|punish|punished|shutdown|tempo|missed|risk|risky|death|died|gave|lost|blocked|blocker|mistake|danger|punishment|consequence|window|delay|stall|throw)\b/i.test(detail)) {
     issues.push("visible paragraph must name the leak or consequence");
@@ -1454,11 +1477,11 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (needsTeachingReason && /\b(grouped mid|group mid|mid pressure)\b/i.test(detail) && !/\b(mid[^.]*because|because[^.]*mid|mid[^.]*shortest|mid[^.]*team|mid[^.]*allies|mid[^.]*base|mid[^.]*tower|mid[^.]*fog|mid[^.]*collapse)\b/i.test(detail)) {
     issues.push("visible paragraph must explain why mid/grouping is better in this state");
   }
-  if (eventEvidence.length < 80 || uniqueTimestampCount(eventEvidence) < 2) {
-    issues.push("eventEvidence must contain timestamped proof");
+  if (eventEvidence.length < 60) {
+    issues.push("eventEvidence must name visible proof");
   }
-  if (matchingClockAnchorCount(detail, recording.clockAnchors) < Math.min(3, uniqueTimestampCount(detail))) {
-    issues.push("visible timestamps must have matching verified clock anchors");
+  if (!hasMatchingPrimaryMistakeAnchor(recording)) {
+    issues.push("primary mistake timestamp must have a matching verified clock anchor");
   }
   if (/\b(this leads|the consequence|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(detail.slice(0, 80))) {
     issues.push("visible paragraph starts with a conclusion instead of evidence");
@@ -2152,16 +2175,8 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (/\b(shop interface|shop open|stealth ward selected|standing at (the )?fountain|fountain at game start|game start)\b/i.test([gameDetail, eventEvidence].join(" "))) {
     issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
   }
-  if (isAutoFullReview && uniqueTimestampCount(gameDetail) < 3) {
-    issues.push("gameDetail must include at least three visible game-clock timestamps for auto full reviews");
-  } else if (!/\b\d{1,2}:\d{2}\b/.test([gameDetail, eventEvidence, pattern].join(" ")) && !coachClean(parsed?.reviewLimit, "").toLowerCase().includes("timestamp")) {
-    issues.push("missing timestamped anchor or timestamp limit");
-  }
-  if (isAutoFullReview && !/^(?:Honest read:\s*)?(At|Around|By|Then|After)\s+\d{1,2}:[0-5]\d\b/i.test(gameDetail)) {
-    issues.push("gameDetail must start from a timestamped visible moment");
-  }
-  if (isAutoFullReview && uniqueTimestampCount(eventEvidence) < 2) {
-    issues.push("eventEvidence must include timestamped proof, not only advice");
+  if (isAutoFullReview && !primaryMistakeTimestampSeconds(gameDetail, eventEvidence, pattern).length) {
+    issues.push("the beginning of the main mistake window must have a visible game-clock timestamp");
   }
   if (nuance.length < 3) {
     issues.push("nuance needs at least three specific bullets");
@@ -2454,15 +2469,15 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include eventEvidence: one compact sentence naming the actual visible things that prove the coaching claim. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, missed reset window, or tempo leak; if the advice is structure conversion, the evidence must show structure access, a free structure, a blocked structure, or the chase away from it. This is proof, not advice.",
     "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
-    "Write gameDetail like a useful replay-review paragraph, not a stat audit: include three to six notable visible moments if the frames support them, enough timestamped evidence to show the mistake chain, no K/D/A, no CS count, and one final simple lesson sentence. It must include setup -> Alan's action -> leak/consequence -> better next check when the frames support those parts.",
+    "Write gameDetail like a useful replay-review paragraph, not a stat audit: include the main visible mistake window, what leaked, what happened next or almost happened, and one final simple lesson sentence. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp. Extra timestamps are optional and should appear only when they make the critique clearer.",
     "Do not use coaching shorthand without teaching it. If you use words like conversion, convert, sync, grouped mid, mid pressure, tempo, or payout, define the word in plain League terms inside the same paragraph.",
     "If you recommend grouping mid or pressuring mid, explain why mid is better in that visible state: for example, allies are already there, mid is the shortest lane to towers/base, it reduces fog-collapse risk, it lets teammates peel, or it forces enemies to defend structure instead of chasing Samira in a side lane. Tie the reason to the frames; do not say group mid as generic advice.",
     "Every full-game review must include the reason Alan should do the fix, not just the instruction. A good sentence sounds like: 'This matters because ...' or 'That route is better because ...'.",
     "Alan explicitly wants Master-level critique. You may mention Master-climb punishment when it names a concrete consequence, but do not use rank labels as vague authority. Name the exact visible habit and exact in-game payoff.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty. A limited review is better than a vague confident one.",
-    "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
+    "For the biggest mistake event, include the visible game-clock timestamp from the top right when it is visible. It can be the beginning or nearest visible beginning of the mistake window; it does not have to be the exact click. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
     "If any visible game-clock timestamp appears in gameDetail, eventEvidence, timeline, evidence, or pattern, include a matching clockAnchors item: {\"clock\":\"MM:SS\",\"videoSeconds\":number}. Use the review-video time from the labeled frame where that clock is visible. Timestamps should be evidence anchors for the lesson, not decorative time labels. If you are not sure the clock is visible or useful for the lesson, do not include the timestamp in visible copy.",
-    "When timestamps are available, include at least three useful timestamps: one for the setup/good habit, one for the mistake/leak, and one for the consequence or corrected next check. If only one or two useful timestamps are visible, say why in reviewLimit.",
+    "The only mandatory timestamp is the start of the main mistake window. Do not add extra timestamps just to pad the review; add another only if it explains the consequence or the corrected habit.",
     "Do not use shop, fountain, scoreboard, game-start, or item-selection frames as proof unless the actual coaching point is buying, recalling, or spending. They are not valid setup anchors for objective, chase, wave, or fight feedback.",
     "The first sentence of gameDetail must start with the visible game state or Alan's action, not a conclusion like 'This leaks...' or 'The better play...'.",
     "Prioritize repeatable habits that stop the gameplay from transferring to harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
@@ -2483,7 +2498,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and what any shorthand term means. Use only visible frame evidence and useful timestamps. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and what any shorthand term means. Timestamp the start or nearest visible start of the main mistake window, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
@@ -2780,7 +2795,7 @@ async function main() {
     const cleanedEventEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), narrativeClockAnchors), championName);
     const cleanedEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), narrativeClockAnchors), championName);
     let finalEventEvidence = clockMomentEvidence || (isGenericEvidenceText(cleanedEventEvidence) ? "" : cleanedEventEvidence);
-    if (!isManualAnalysis && isFullReview && clockMoments.length >= 3) {
+    if (!isManualAnalysis && isFullReview && clockMoments.length >= 1) {
       const projectedIssues = visibleParagraphStandardIssues({
         file: name,
         durationSeconds: duration,
