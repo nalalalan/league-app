@@ -1108,7 +1108,7 @@ function normalizeVisibleCoachText(text, champion = "Samira") {
 }
 
 function hasRepeatedConversionGlossary(recording = {}) {
-  return /\bConversion means turning a fight win or gold lead into something that remains after the fight ends\b/i.test(recording.gameDetail || "");
+  return /\b(?:A\s+)?conversion\s+(?:just\s+)?means\b/i.test(recording.gameDetail || "");
 }
 
 function normalizeCoachPunctuation(text) {
@@ -1121,10 +1121,9 @@ function normalizeCoachPunctuation(text) {
 }
 
 function stripRepeatedConversionGlossary(text) {
-  return normalizeCoachPunctuation(String(text || "").replace(
-    /\s*Conversion means turning a fight win or gold lead into something that remains after the fight ends: tower damage, base damage, dragon\/Baron setup, or a safe reset with spent gold\.\s*/gi,
-    " "
-  ));
+  return normalizeCoachPunctuation(String(text || "")
+    .replace(/\s*Conversion means turning a fight win or gold lead into something that remains after the fight ends: tower damage, base damage, dragon\/Baron setup, or a safe reset with spent gold\.\s*/gi, " ")
+    .replace(/\s*A conversion just means turning your lead into a concrete payout: tower damage, base damage, dragon\/Baron setup, or a safe reset with spent gold\.\s*/gi, " "));
 }
 
 function stripRedundantLessonEcho(text) {
@@ -1602,7 +1601,7 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (!/\b(instead|because|so|which|then|after|before|when)\b/i.test(detail)) {
     issues.push("visible paragraph must explain the decision chain");
   }
-  if (needsTeachingReason && !/\b(because|so that|this matters because|the reason|which makes|meaning|means)\b/i.test(detail)) {
+  if (needsTeachingReason && !/\b(because|so that|this matters because|the reason|which makes|which means|which proves|meaning|means|so\s+(?:the|a|every|your|you))\b/i.test(detail)) {
     issues.push("visible paragraph must explain why the advice is correct");
   }
   if (needsTeachingReason && /\b(sync(?:ed|ing)?|conversion|convert|grouped mid|group mid|mid pressure)\b/i.test(detail) && !/\b(mean|means|meaning|because|so that|the reason|this matters because)\b/i.test(detail)) {
@@ -2050,7 +2049,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Turn the shutdown into a grouped push",
       feedback: "Mistake: after spending a huge lead, you let side fights test your shutdown before your team was set up to take tower or base. Fix: choose the safest visible payout first: group with the wave and allies, hit free structure, or reset if teammates cannot follow.",
-      gameDetail: "At 09:11 you are in base/shop after a strong 4/0/2 start, and that part is good because you actually spend instead of dragging raw gold around the map. At 10:25 you are 6/0/2 with 1285 gold in a bot-side lane fight while a shutdown has just happened, so the leak is that your biggest asset, the fed Samira shutdown, is being tested in a side lane before the team is organized to take something guaranteed. A conversion just means turning your lead into a concrete payout: tower damage, base damage, dragon/Baron setup, or a safe reset with spent gold. At 11:12 the better version appears because you are grouped mid behind allies with enemies in front; mid is better in this visible state because allies are already there, the lane points straight toward towers/base, and your team can body-block while enemies have to defend instead of collapsing from fog on a side-lane Samira. At 12:42 you are 8/0/2 mid while several allies are dead or on timers, so the correct next check is wait for allies, reset, or hold the wave until the next push is together, because clearing one more wave alone does not matter if it gives enemies your shutdown. By 13:10 and 13:24 you do convert with the team inside the enemy base, which proves the ending instinct is there; the Master-climb lesson is to make the earlier 10:25 and 12:42 windows look like that ending shape sooner.",
+      gameDetail: "At 09:11 you are in base/shop after a strong 4/0/2 start, and that part is good because you spend instead of dragging raw gold around. At 10:25 you are 6/0/2 with 1285 gold in a bot-side lane fight right after a shutdown, so the leak is testing the fed Samira shutdown in a side lane before the team is organized around a guaranteed tower, objective setup, or reset. At 11:12 the better shape appears: you are grouped mid behind allies with enemies in front; mid is better here because allies are already there, the lane points to towers/base, and enemies must defend structure instead of collapsing from fog. At 12:42 you are 8/0/2 mid while several allies are dead or on timers, so the next check is wait, reset, or hold the wave until the next push is together, because one more solo wave does not matter if it gives away your shutdown. By 13:10 and 13:24 you do enter base with the team, which proves the ending instinct is there; make the earlier 10:25 and 12:42 windows look like that team-linked ending sooner.",
       whyTrust: "The frames show both the good habit and the leak: you bought at 09:11 and ended with the team at 13:24, but the risky windows were the side-fight exposure at 10:25 and the alone-before-team state at 12:42.",
       eventEvidence: "09:11 shows Samira in shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold. 10:25 shows Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present. 11:12 shows Samira grouped mid behind allies while enemies are in front. 12:42 shows Samira 8/0/2 mid while multiple allies are dead or on timers. 13:10 to 13:24 shows the team turning the lead into enemy-base damage.",
       goodThing: "You did spend, you did group with allies, and you did end through the base. The improvement is protecting the shutdown lead between those good moments.",
@@ -2684,7 +2683,7 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (!/\b(then|after|before|because|instead|next|when)\b/i.test(gameDetail)) {
     issues.push("missing decision sequence");
   }
-  if (isAutoFullReview && !/\b(because|so that|this matters because|the reason|which makes|meaning|means)\b/i.test(gameDetail)) {
+  if (isAutoFullReview && !/\b(because|so that|this matters because|the reason|which makes|which means|which proves|meaning|means|so\s+(?:the|a|every|your|you))\b/i.test(gameDetail)) {
     issues.push("gameDetail must explain why the advice is correct, not only what to do");
   }
   if (isAutoFullReview && /\b(sync(?:ed|ing)?|conversion|convert|grouped mid|group mid|mid pressure)\b/i.test(gameDetail) && !/\b(mean|means|meaning|because|so that|the reason|this matters because)\b/i.test(gameDetail)) {
@@ -2698,6 +2697,9 @@ function analysisSpecificityIssues(parsed, context = {}) {
   }
   if (hasRedundantLessonEcho({ gameDetail })) {
     issues.push("gameDetail repeats the Mistake/Fix feedback instead of adding new evidence");
+  }
+  if (/\bAlan\b/.test(combined)) {
+    issues.push("visible feedback must address the player as you or Samira, not Alan in third person");
   }
   if (/\b(shop interface|shop open|stealth ward selected|standing at (the )?fountain|fountain at game start|game start)\b/i.test([gameDetail, eventEvidence].join(" "))) {
     issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
@@ -3028,6 +3030,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "The nuance bullets must be specific coaching facts, not paraphrases: include what was good, what leaked, what happened, what the harder-game or Master-climb punishment would be, and the next repeatable check when the frames support them.",
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
+    "Visible output must address the player as 'you' or 'Samira', never 'Alan' in third person.",
     "Return only JSON with this shape:",
     '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, better next check, and one simple lesson sentence","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`

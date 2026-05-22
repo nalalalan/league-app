@@ -413,6 +413,17 @@ async function main() {
       progress: 84,
       ...(await etaFor("publisher_to_live", publisherToLiveEtaFallbackSeconds, publishStartedAt, latestContext))
     });
+    try {
+      await run(npmBin, ["run", "audit:feedback"]);
+    } catch (error) {
+      await publishStatus("blocked", {
+        label: "publish blocked",
+        detail: "Feedback quality audit failed.",
+        progress: 100,
+        ...clearEtaFields()
+      });
+      throw error;
+    }
     if (!(await hasPublishPathChanges())) {
       await reconcileBlockedStatusIfLive(currentState);
       await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
