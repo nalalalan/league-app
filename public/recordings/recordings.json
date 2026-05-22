@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T04:51:25.557Z",
+  "generatedAt": "2026-05-22T05:39:30.837Z",
   "source": "League of Legends Highlights folder",
   "match": "20 matches",
   "matches": [
@@ -162,7 +162,7 @@
       "analysisSource": "openai",
       "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
       "sampledFrames": 29,
-      "publicVideoBytes": 27369609,
+      "publicVideoBytes": 27622246,
       "src": "/recordings/auto_NA1-5565518539_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565518539-01.jpg"
     },
@@ -310,7 +310,7 @@
       "analysisSource": "manual",
       "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
       "sampledFrames": 34,
-      "publicVideoBytes": 24121346,
+      "publicVideoBytes": 24317981,
       "src": "/recordings/auto_NA1-5565445744_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565445744-01.jpg"
     },
@@ -439,7 +439,7 @@
       "analysisSource": "manual",
       "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
       "sampledFrames": 34,
-      "publicVideoBytes": 25162620,
+      "publicVideoBytes": 25268675,
       "src": "/recordings/auto_NA1-5565387627_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565387627-01.jpg"
     },
@@ -571,7 +571,7 @@
       "analysisSource": "openai",
       "analysisVersion": "2026-05-21-visible-paragraph-standard-v6",
       "sampledFrames": 36,
-      "publicVideoBytes": 25187886,
+      "publicVideoBytes": 25344462,
       "src": "/recordings/auto_NA1-5565356454_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565356454-01.jpg"
     },
@@ -725,7 +725,7 @@
       "analysisSource": "manual",
       "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
       "sampledFrames": 36,
-      "publicVideoBytes": 27356475,
+      "publicVideoBytes": 27604601,
       "src": "/recordings/auto_NA1-5565308644_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565308644-01.jpg"
     },
@@ -884,7 +884,7 @@
       "analysisSource": "manual",
       "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
       "sampledFrames": 36,
-      "publicVideoBytes": 73122270,
+      "publicVideoBytes": 73707816,
       "src": "/recordings/auto_NA1-5565242641_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565242641-01.jpg"
     },
@@ -1904,7 +1904,7 @@
       "analysisSource": "openai",
       "analysisVersion": "2026-05-21-specific-decision-chain-v4",
       "sampledFrames": 25,
-      "publicVideoBytes": 46327920,
+      "publicVideoBytes": 48461876,
       "src": "/recordings/auto_NA1-5564835832_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564835832-01.jpg"
     },
@@ -2259,7 +2259,7 @@
       "analysisSource": "manual",
       "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
       "sampledFrames": 18,
-      "publicVideoBytes": 25780055,
+      "publicVideoBytes": 30104756,
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
       "poster": "/recordings/posters/auto-na1-5563660362-01.jpg"
     },
