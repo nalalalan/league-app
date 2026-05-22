@@ -14,6 +14,21 @@ function hasTimestamp(value) {
   return /\b\d{1,2}:[0-5]\d\b/.test(value || "");
 }
 
+function timestampedActionScriptSentences(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g)?.filter((sentence) => (
+      /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
+      /\b(?:next\s+(?:click|move|job|decision|check)|job\s+is|is\s+to|should|do|walk|path|move|stand|hold|wait|recall|reset|base|leave|back|kite|hit|clear|catch|push|defend|hover|group|stop|stay|enter|save|let|keep)\b/i.test(sentence)
+    )) || [];
+}
+
+function hasTimestampedActionScript(text) {
+  return timestampedActionScriptSentences(text).some((sentence) => (
+    /\b(?:instead|rather than|not|never|should|job\s+is|is\s+to|next\s+(?:click|move|job|decision|check)|do|walk|stand|hold|wait|recall|reset|leave|back|kite|hit|clear|catch|push|defend|stop|stay|save|let|keep)\b/i.test(sentence)
+  ));
+}
+
 function isFullReview(recording = {}) {
   return /full/i.test(recording.kind || "") || Number(recording.durationSeconds || 0) > 90;
 }
@@ -42,10 +57,12 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-22-action-script-coaching-v13",
     "2026-05-22-two-focus-coaching-v11",
     "2026-05-22-challenger-direct-coaching-v12"
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
+  const needsActionScript = recording.analysisVersion === "2026-05-22-action-script-coaching-v13";
 
   if (/\bAlan\b/.test(allVisible)) {
     issues.push("visible feedback refers to Alan in third person");
@@ -73,6 +90,9 @@ function feedbackIssues(recording = {}) {
   }
   if (!/\b(leak|cost|punish|punished|shutdown|tempo|risk|risky|death|died|missed|delay|stall|throw|collapse|window|lost|gave|overstay|alone)\b/i.test(allVisible)) {
     issues.push("full review does not name the leak or consequence");
+  }
+  if (needsActionScript && !hasTimestampedActionScript(detail)) {
+    issues.push("full review missing a timestamped do-this-instead action script");
   }
   if (!evidence || evidence.length < 55 || /generated from sampled|limited to sampled|conservative read|match-level/i.test(evidence)) {
     issues.push("full review evidence is too weak");

@@ -12,6 +12,7 @@ const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-22-action-script-coaching-v13",
   "2026-05-22-two-focus-coaching-v11",
   "2026-05-22-challenger-direct-coaching-v12"
 ]);
@@ -66,6 +67,21 @@ function primaryMistakeTimestampSeconds(...texts) {
     .map(clean)
     .filter((sentence) => sentence && pattern.test(sentence))
     .flatMap(timestampSecondsInText);
+}
+
+function timestampedActionScriptSentences(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g)?.filter((sentence) => (
+      /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
+      /\b(?:next\s+(?:click|move|job|decision|check)|job\s+is|is\s+to|should|do|walk|path|move|stand|hold|wait|recall|reset|base|leave|back|kite|hit|clear|catch|push|defend|hover|group|stop|stay|enter|save|let|keep)\b/i.test(sentence)
+    )) || [];
+}
+
+function hasTimestampedActionScript(text) {
+  return timestampedActionScriptSentences(text).some((sentence) => (
+    /\b(?:instead|rather than|not|never|should|job\s+is|is\s+to|next\s+(?:click|move|job|decision|check)|do|walk|stand|hold|wait|recall|reset|leave|back|kite|hit|clear|catch|push|defend|stop|stay|save|let|keep)\b/i.test(sentence)
+  ));
 }
 
 function mmss(seconds) {
@@ -145,6 +161,9 @@ function visibleParagraphStandardIssues(recording, anchors) {
   }
   if (!/\b(instead|because|so|which|then|after|before|when)\b/i.test(detail)) {
     issues.push("visible paragraph must explain the decision chain");
+  }
+  if (recording.analysisVersion === "2026-05-22-action-script-coaching-v13" && !hasTimestampedActionScript(detail)) {
+    issues.push("visible paragraph must include a timestamped replacement action script");
   }
   if (eventEvidence.length < 60) {
     issues.push("eventEvidence must name visible proof");
