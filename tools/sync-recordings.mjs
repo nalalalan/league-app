@@ -18,9 +18,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-21-specific-decision-chain-v5";
+const analysisVersion = "2026-05-21-visible-paragraph-standard-v6";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
 const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v2";
@@ -1303,6 +1304,64 @@ function sameManifestContent(a, b) {
   return JSON.stringify(stableManifest(a)) === JSON.stringify(stableManifest(b));
 }
 
+function uniqueTimestampCount(text) {
+  return new Set(timestampSecondsInText(text).map((seconds) => Math.round(seconds))).size;
+}
+
+function matchingClockAnchorCount(text, anchors) {
+  const anchorSeconds = cleanClockAnchors(anchors)
+    .map((anchor) => clockSeconds(anchor.clock))
+    .filter((seconds) => Number.isFinite(seconds));
+  const textSeconds = [...new Set(timestampSecondsInText(text).map((seconds) => Math.round(seconds)))];
+  return textSeconds.filter((seconds) => anchorSeconds.some((anchorSecond) => Math.abs(anchorSecond - seconds) <= 2.5)).length;
+}
+
+function requiresVisibleParagraphStandard(fileName, recording = {}) {
+  const isAuto = /^auto_/i.test(fileName || recording?.file || "");
+  const duration = Number(recording?.durationSeconds || 0);
+  const isNewStandard = recording?.analysisVersion === analysisVersion || !recording?.analysisVersion || manualFeedback(fileName || recording?.file);
+  return isAuto && duration >= 90 && isNewStandard;
+}
+
+function visibleParagraphStandardIssues(recording = {}) {
+  const detail = coachClean(recording.gameDetail, "");
+  const eventEvidence = coachClean(recording.eventEvidence || recording.evidence, "");
+  const issues = [];
+  if (detail.length < 240) {
+    issues.push("visible paragraph is too short");
+  }
+  if (uniqueTimestampCount(detail) < 3) {
+    issues.push("visible paragraph needs at least three game-clock timestamps");
+  }
+  if (!/^(?:Honest read:\s*)?(At|Around|By|Then|After)\s+\d{1,2}:[0-5]\d\b/i.test(detail)) {
+    issues.push("visible paragraph must start from a timestamped visible moment");
+  }
+  if (!/\b(leak|cost|punish|punished|shutdown|tempo|missed|risk|risky|death|died|gave|lost|blocked|blocker|mistake|danger|punishment|consequence|window|delay|stall|throw)\b/i.test(detail)) {
+    issues.push("visible paragraph must name the leak or consequence");
+  }
+  if (!/\b(instead|because|so|which|then|after|before|when)\b/i.test(detail)) {
+    issues.push("visible paragraph must explain the decision chain");
+  }
+  if (eventEvidence.length < 80 || uniqueTimestampCount(eventEvidence) < 2) {
+    issues.push("eventEvidence must contain timestamped proof");
+  }
+  if (matchingClockAnchorCount(detail, recording.clockAnchors) < Math.min(3, uniqueTimestampCount(detail))) {
+    issues.push("visible timestamps must have matching verified clock anchors");
+  }
+  if (/\b(this leads|the consequence|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(detail.slice(0, 80))) {
+    issues.push("visible paragraph starts with a conclusion instead of evidence");
+  }
+  return issues;
+}
+
+function enforceVisibleParagraphStandard(recording, fileName) {
+  if (!requiresVisibleParagraphStandard(fileName, recording)) return;
+  const issues = visibleParagraphStandardIssues(recording);
+  if (issues.length) {
+    throw new Error(`${fileName} failed visible feedback standard: ${issues.join("; ")}`);
+  }
+}
+
 function cacheKeyFor(stat) {
   return `${stat.size}:${Math.round(stat.mtimeMs)}`;
 }
@@ -1318,6 +1377,7 @@ function cachedRecording(existing, fileName, cacheKey) {
   const cached = existingRecording(existing, fileName, cacheKey);
   if (!cached) return null;
   if (!compatibleAnalysisVersions.has(cached.analysisVersion)) return null;
+  if (requiresVisibleParagraphStandard(fileName, cached) && visibleParagraphStandardIssues(cached).length) return null;
   if (manualFeedback(fileName)) return null;
   if (cached.analysisSource === "fallback" && process.env.LEAGUE_RETRY_FALLBACK === "1" && process.env.OPENAI_API_KEY) return null;
   if (process.env.LEAGUE_FORCE_ANALYSIS === "1") return null;
@@ -1325,6 +1385,49 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5565308644_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Base break became a delayed sync",
+      feedback: "Mistake: after the base was cracked, you let the next minute become mid-wave cleanup and a late rejoin instead of an immediate finish-or-reset call. Fix: once the inhibitor/nexus area opens, say finish, reset, or sync next wave before touching another mid wave.",
+      gameDetail: "At 11:12 you and your team are already inside the enemy base with the structure line cracked, so the objective habit is real and that part is good. At 11:27 you correctly fight with allies in the base and get the takedown instead of chasing somewhere useless. At 11:47 the next decision point appears: the tower is down, you have about 3034 gold, minions and allies are still in the base, and the clean Master-climb call is either finish now or reset on the same timing as the team. At 12:32 and 12:42 you are back mid collecting waves after spending, which means the old reset critique was too vague; the actual leak is that the next base hit is no longer clearly synced. By 12:52 your team is fighting again near the opened base while you are still arriving from mid, and at 13:00 the rejoin works in this game, but stronger teams use that delay to clear waves, respawn, or collapse on the late carry. The lesson is: after base breaks, do not let a correct reset turn into a disconnected re-entry.",
+      whyTrust: "The evidence changes the diagnosis: visible gold drops after the base break, so the mistake is not simply refusing to spend; it is losing team sync on the next push.",
+      eventEvidence: "11:12 shows the base already cracked with Samira and allies inside; 11:27 shows the base fight working with allies; 11:47 shows about 3034 gold and a fresh tower-down window; 12:32 to 12:42 shows mid-wave cleanup after spending; 12:52 to 13:00 shows the late rejoin into the next base fight.",
+      goodThing: "You did create real base pressure with the team and appear to spend before the next mid wave; the fix is the re-entry timing after that, not pretending the whole sequence was bad.",
+      focusTag: "base re-entry sync",
+      evidence: "Manual frame review of the May 21 8:23 PM auto capture: base pressure at 11:12 and 11:27, tower-down/gold state at 11:47, mid-wave cleanup at 12:32-12:42, and rejoin at 12:52-13:00.",
+      pattern: "The repeated climb leak is not only chasing; it is letting a won base state turn into an unclear next state. Once the base is open, every next action should preserve finish pressure, reset value, or team sync.",
+      diamondRule: "After a base break, the next wave only matters if it syncs the next base hit.",
+      drill: "After inhibitor/base pressure, call one word before the next click: finish, reset, or sync.",
+      timeline: [
+        "11:12 - Samira and allies are already inside the enemy base with the structure line cracked.",
+        "11:27 - Samira takes the base fight with allies and converts a takedown.",
+        "11:47 - The tower is down, Samira has about 3034 gold, and the clean call is finish now or reset together.",
+        "12:32 - Samira is mid with low spent-down gold, so the old no-reset critique is not fully supported.",
+        "12:52 - The team is fighting again near the opened base while Samira is arriving from mid.",
+        "13:00 - The rejoin works here, but it is the delay window stronger teams punish."
+      ],
+      clockAnchors: [
+        { clock: "11:12", videoSeconds: 300, description: "Samira and allies are inside the enemy base as an enemy structure falls." },
+        { clock: "11:27", videoSeconds: 315, description: "Samira fights with allies in the enemy base and converts another takedown." },
+        { clock: "11:47", videoSeconds: 335, description: "The base tower is down, Samira has about 3034 gold, and allies/minions are still in base." },
+        { clock: "12:32", videoSeconds: 345, description: "Samira is back mid collecting a wave after spending down to low gold." },
+        { clock: "12:42", videoSeconds: 355, description: "Samira continues mid-wave cleanup after the base break." },
+        { clock: "12:52", videoSeconds: 365, description: "Allies are fighting near the opened base while Samira is still arriving from mid." },
+        { clock: "13:00", videoSeconds: 373, description: "Samira rejoins the fight near the enemy base as the cleanup succeeds." }
+      ],
+      nuance: [
+        "Good: the base break and first base fight are real objective conversion, not random fighting.",
+        "Correction: the old review overclaimed that you failed to spend; the frame evidence shows your gold drops before the next mid wave.",
+        "Leak: after spending, the next action becomes mid-wave cleanup and a delayed rejoin instead of a clearly synced next base hit.",
+        "Master-climb punishment: stronger teams use the delay between 12:32 and 12:52 to clear the wave, respawn, or catch the carry arriving late.",
+        "Next check: after base breaks, every wave must answer whether it creates the next synced base hit."
+      ],
+      reviewLimit: "This review uses sampled visible frames, not raw clicks or comms. The exact recall channel is not visible, so the critique is narrowed to the visible spend-down and re-entry sync window.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5565242641_01.mp4") {
     return {
       champion: "Samira",
@@ -1414,7 +1517,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "You drift after base opens",
       feedback: "Mistake: you chase sideways after the base is already open. Fix: stand behind the first body in and hit the structure as soon as space is made.",
-      gameDetail: "Honest read: the useful footage starts after a desktop-capture section, and the lesson is still clear. Around 12:10 Samira is low below the enemy base entrance while allies are already fighting inside the cracked base; the next valuable movement is backward-to-safe or forward-to-structure with the team, not a solo side angle. Around 13:05 the map slows down: Mordekaiser walks away mid, an ally is channeling recall, and Samira is full HP with the lane already open, which is exactly the moment to choose wave/base route before another target appears. Around 13:15 the camera follows Mordekaiser again and Samira casts Q/Flair into him from close range; the spell connects, but the important part is that the fight is sideways while the open base is still the real payout. Around 14:19 the clean version finally shows up: multiple enemies are dead, minions are in the base, Samira is behind the front body, and the team is hitting the ending area instead of wandering after another duel.",
+      gameDetail: "Around 12:10 Samira is low below the enemy base entrance while allies are already fighting inside the cracked base; the next valuable movement is backward-to-safe or forward-to-structure with the team, not a solo side angle. Around 13:05 the map slows down: Mordekaiser walks away mid, an ally is channeling recall, and Samira is full HP with the lane already open, which is exactly the moment to choose wave/base route before another target appears. Around 13:15 the camera follows Mordekaiser again and Samira casts Q/Flair into him from close range; the spell connects, but the leak is that the fight is sideways while the open base is still the real payout. Around 14:19 the clean version finally shows up: multiple enemies are dead, minions are in the base, Samira is behind the front body, and the team is hitting the ending area instead of wandering after another duel. The lesson is to treat the open base as the destination and only fight bodies that block that destination.",
       whyTrust: "The win came from returning to the open base, not from a cleaner combo. Your damage was not the limiting factor; target discipline was.",
       eventEvidence: "12:10 low Samira below the open enemy base entrance; 13:15 Q/Flair into Mordekaiser during a sideways mid fight; 14:19 team and minions are back inside the base to end.",
       goodThing: "You did group back toward the base and finish the game instead of letting the push fully dissolve.",
@@ -1429,14 +1532,14 @@ function manualFeedback(file) {
         "14:19 - The team has minions inside the base and Samira is behind the first body, which is the clean ending shape."
       ],
       clockAnchors: [
-        { clock: "11:51", videoSeconds: 9.300 },
-        { clock: "12:10", videoSeconds: 27.800 },
-        { clock: "13:05", videoSeconds: 83.300 },
-        { clock: "13:15", videoSeconds: 92.500 },
-        { clock: "13:52", videoSeconds: 129.500 },
-        { clock: "14:01", videoSeconds: 138.800 },
-        { clock: "14:10", videoSeconds: 148.000 },
-        { clock: "14:19", videoSeconds: 157.300 }
+        { clock: "11:51", videoSeconds: 9.300, description: "Samira is near the enemy base approach before the cracked-base decision window." },
+        { clock: "12:10", videoSeconds: 27.800, description: "Samira is low below the enemy base entrance while allies are already inside the cracked base." },
+        { clock: "13:05", videoSeconds: 83.300, description: "The map slows as Mordekaiser walks away mid and an ally channels recall." },
+        { clock: "13:15", videoSeconds: 92.500, description: "Samira follows Mordekaiser with Q/Flair during a sideways mid fight while the open base remains the payout." },
+        { clock: "13:52", videoSeconds: 129.500, description: "Samira is rotating back through mid toward the open-base pressure window." },
+        { clock: "14:01", videoSeconds: 138.800, description: "Allies and minions are moving back toward the enemy base for the ending push." },
+        { clock: "14:10", videoSeconds: 148.000, description: "The team is grouped near the enemy base with minions available to pressure structures." },
+        { clock: "14:19", videoSeconds: 157.300, description: "Multiple enemies are dead, minions are inside the base, and Samira is behind the front body for the finish." }
       ],
       nuance: [
         "The most useful footage is the late-game base decision, not the scoreboard line.",
@@ -1811,7 +1914,7 @@ async function requestOpenAiJson(prompt, images, maxOutputTokens = 1800) {
   return parseJsonText(extractOutputText(await response.json()));
 }
 
-function analysisSpecificityIssues(parsed) {
+function analysisSpecificityIssues(parsed, context = {}) {
   const feedback = coachClean(parsed?.feedback, "");
   const gameDetail = coachClean(parsed?.gameDetail, "");
   const eventEvidence = coachClean(parsed?.eventEvidence, "");
@@ -1819,6 +1922,7 @@ function analysisSpecificityIssues(parsed) {
   const nuance = cleanList(parsed?.nuance, 5);
   const combined = [feedback, gameDetail, eventEvidence, pattern, nuance.join(" ")].join(" ");
   const issues = [];
+  const isAutoFullReview = /^auto_/i.test(context.file || "") && Number(context.duration || 0) >= 90;
   if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback)) {
     issues.push("feedback must keep Mistake/Fix shape");
   }
@@ -1840,8 +1944,16 @@ function analysisSpecificityIssues(parsed) {
   if (/\b(shop interface|shop open|stealth ward selected|standing at (the )?fountain|fountain at game start|game start)\b/i.test([gameDetail, eventEvidence].join(" "))) {
     issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
   }
-  if (!/\b\d{1,2}:\d{2}\b/.test([gameDetail, eventEvidence, pattern].join(" ")) && !coachClean(parsed?.reviewLimit, "").toLowerCase().includes("timestamp")) {
+  if (isAutoFullReview && uniqueTimestampCount(gameDetail) < 3) {
+    issues.push("gameDetail must include at least three visible game-clock timestamps for auto full reviews");
+  } else if (!/\b\d{1,2}:\d{2}\b/.test([gameDetail, eventEvidence, pattern].join(" ")) && !coachClean(parsed?.reviewLimit, "").toLowerCase().includes("timestamp")) {
     issues.push("missing timestamped anchor or timestamp limit");
+  }
+  if (isAutoFullReview && !/^(?:Honest read:\s*)?(At|Around|By|Then|After)\s+\d{1,2}:[0-5]\d\b/i.test(gameDetail)) {
+    issues.push("gameDetail must start from a timestamped visible moment");
+  }
+  if (isAutoFullReview && uniqueTimestampCount(eventEvidence) < 2) {
+    issues.push("eventEvidence must include timestamped proof, not only advice");
   }
   if (nuance.length < 3) {
     issues.push("nuance needs at least three specific bullets");
@@ -2064,7 +2176,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
 
   try {
     let parsed = await requestOpenAiJson(prompt, images, 1800);
-    const detailIssues = analysisSpecificityIssues(parsed);
+    const detailIssues = analysisSpecificityIssues(parsed, { file, duration });
     if (detailIssues.length) {
       const retryPrompt = [
         prompt,
@@ -2074,7 +2186,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
-    const finalDetailIssues = analysisSpecificityIssues(parsed);
+    const finalDetailIssues = analysisSpecificityIssues(parsed, { file, duration });
     if (finalDetailIssues.length) {
       parsed.reviewLimit = coachClean(
         [parsed.reviewLimit, `Detail gate still limited by: ${finalDetailIssues.join("; ")}.`].filter(Boolean).join(" "),
@@ -2325,8 +2437,9 @@ async function main() {
       analysis = await analyzeRecording({ file: name, duration, framePaths, frameTimes: sampleTimes, sequenceLabel, reviewPhase: phase, previousAnalysis });
     }
     const matchTimeMs = matchStats.matchTimeMs || replayMeta.matchTimeMs || stat.mtimeMs;
+    const isManualAnalysis = analysis.analysisSource === "manual";
     const candidateClockAnchors = cleanClockAnchors(analysis.clockAnchors)
-      .filter((anchor) => clockFitsCurrentMatch(anchor, entry.sidecar, matchTimeMs, matchStats.gameLengthSeconds || null));
+      .filter((anchor) => isManualAnalysis || clockFitsCurrentMatch(anchor, entry.sidecar, matchTimeMs, matchStats.gameLengthSeconds || null));
     const shouldReadVisibleClock = duration >= 3;
     const visibleClockAnchors = shouldReadVisibleClock
       ? await detectVisibleClockAnchors({
@@ -2353,7 +2466,6 @@ async function main() {
       cacheKey
     });
     const annotatedClockAnchors = annotateClockAnchorsWithMoments(clockAnchors, clockMoments);
-    const isManualAnalysis = analysis.analysisSource === "manual";
     const narrativeClockAnchors = isManualAnalysis ? clockAnchors : clockMoments;
     const championName = clean(analysis.champion, "Samira");
     const clockMomentEvidence = isManualAnalysis ? "" : evidenceTextFromMoments(clockMoments);
@@ -2377,7 +2489,7 @@ async function main() {
     const clipWindow = Number.isFinite(clipStart)
       ? `${shortClock(clipStart)}-${shortClock(clipStart + duration)}`
       : "";
-    recordings.push({
+    const recording = {
       file: name,
       publicFile: destName,
       cacheKey,
@@ -2435,7 +2547,9 @@ async function main() {
       publicVideoBytes,
       src: publicPath(destPath),
       poster: publicPath(posterPath)
-    });
+    };
+    enforceVisibleParagraphStandard(recording, name);
+    recordings.push(recording);
     console.log(`${name}: ${recordings.at(-1).reviewPhase} - ${recordings.at(-1).champion} - ${recordings.at(-1).feedbackTitle}`);
   }
 
