@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T21:34:46.148Z",
+  "generatedAt": "2026-05-22T22:09:14.046Z",
   "source": "League of Legends Highlights folder",
-  "match": "27 matches",
+  "match": "28 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -29,11 +29,12 @@
     "NA1-5565779781",
     "NA1-5565804951",
     "NA1-5565818690",
-    "NA1-5565856492"
+    "NA1-5565856492",
+    "NA1-5565905533"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 5:12 PM ET",
-  "totalDuration": "275:29",
-  "totalRecordings": 39,
+  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 6:08 PM ET",
+  "totalDuration": "276:58",
+  "totalRecordings": 40,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira overall state",
@@ -152,13 +153,112 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 39,
+      "recordings": 40,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565905533_01.mp4",
+      "publicFile": "auto_NA1-5565905533_01.mp4",
+      "cacheKey": "2449843:1779487726334",
+      "fingerprint": "583753abc382",
+      "matchId": "NA1-5565905533",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779487560279,
+      "gameHappenedAt": "2026-05-22T22:06:00.279Z",
+      "gameHappenedAtLabel": "May 22, 2026, 6:06 PM",
+      "recordedAt": "2026-05-22T22:08:46.390Z",
+      "recordedAtLabel": "May 22, 2026, 6:08 PM",
+      "recordedAtTimeLabel": "6:08 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Passive Level 1 Botlane (Remake Situation)",
+      "duration": "1:29",
+      "durationSeconds": 89,
+      "gameLength": "1:38",
+      "gameLengthSeconds": 98,
+      "kda": "0/0/0",
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 4,
+      "statsSource": "League Client match history",
+      "kind": "highlight",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Passive Level 1 Botlane (Remake Situation)",
+      "feedback": "Mistake: You did not contest early lane state or pressure for level 2 when the enemy botlane was present and your support was AFK, conceding full wave and lane control. Fix: Auto-pilot AFK waits lose you both pressure and tempo in every game; instead, if your support is absent, focus on maximizing safe XP soak without ceding full control, using tower cover to grab as much gold/XP as possible or threaten with your range, and be alert for remake with minimal risk.",
+      "gameDetail": "At 01:05 in botlane, enemy Nautilus and Senna arrive first to lane while your Karma is AFK in fountain/base, as seen on minimap and remake bar. You remain far back, not contesting any last hits or threatening from bush/under-tower, which hands complete wave control to Nautilus/Senna and will snowball lane state against you in any non-remake scenario. Level 1 Samira is weak, but leaving two champions uncontested guarantees they get prio, crash, and zone you—especially critical versus a ranged + engaged support where staying in XP range with minimal risk is mandatory. Challenger-level botlaners maximize whatever XP, single last hits, and bush vision they can grab even in a lost 2v1, because ceding 1-2 minutes of lane XP is unrecoverable. Around 1:04, at and , you hover well behind your minion wave while Nautilus/Senna step up uncontested; By 1:16, at and , you hover well behind your minion wave while Nautilus/Senna step up uncontested. Even in remake games, build the discipline to claim auto-range last hits and punish enemy over-aggression under turret to prevent permanent low-tempo habits from forming.",
+      "secondaryFocus": "Second focus: Lane posturing and A-click/camera discipline—your camera and positioning snap to max distance from Nautilus/Senna with zero check of their spellcast animations or fog threat; in future games, hold camera at spell range and A-click toward melee minions just out of hook range to pressure every possible XP safely, even at low FPS.",
+      "eventEvidence": "1:04 At and , you hover well behind your minion wave while Nautilus/Senna step up uncontested; 1:16 At and , you hover well behind your minion wave while Nautilus/Senna step up uncontested",
+      "goodThing": "You do not greed forward or die to a likely Nautilus hook/trap in a doomed 1v2.",
+      "whyTrust": "In Challenger bot lanes, players denied from level 2 lose all ability to control crash, XP, and safe farm for 5+ minutes; claiming wave XP and exerting even minimal threat is the only way to prevent snowball disasters.",
+      "focusTag": "lane control discipline",
+      "evidence": "1:04 At and , you hover well behind your minion wave while Nautilus/Senna step up uncontested; 1:16 At and , you hover well behind your minion wave while Nautilus/Senna step up uncontested",
+      "pattern": "The main issue is complete surrender of lane presence in AFK support/remake scenarios, with no attempt to maximize XP or contest single last hits. Camera stays far back with no spell-range active threat checks, and no defensive posture for recoverable XP.",
+      "diamondRule": "Never surrender full wave XP and pressure without at least testing safe last hits or auto-range trade windows, especially versus engage supports—every uncontested push doubles the lane bleed.",
+      "drill": "Next time support is AFK or lane is lost, hold tower and auto-range for as many minions/XP ticks as safely possible, using camera toggle and A-click to check for engages.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "0:50",
+          "videoSeconds": 1,
+          "description": "Scoreboard open at start of game, no combat, all players listed"
+        },
+        {
+          "clock": "1:04",
+          "videoSeconds": 15,
+          "description": "First Blood notification appears in center, minions fighting in lane"
+        },
+        {
+          "clock": "1:16",
+          "videoSeconds": 26.954,
+          "description": "Two champions per team in lane, chat active, no direct fighting"
+        },
+        {
+          "clock": "1:28",
+          "videoSeconds": 38.651,
+          "description": "Two enemy champions visible, minion wave battle under lane brush"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "1:04",
+          "videoSeconds": 15,
+          "description": "At and , you hover well behind your minion wave while Nautilus/Senna step up uncontested"
+        },
+        {
+          "clock": "1:16",
+          "videoSeconds": 26.954,
+          "description": "At and , you hover well behind your minion wave while Nautilus/Senna step up uncontested"
+        }
+      ],
+      "nuance": [
+        "Good: You do not walk up blindly into Nautilus/Senna 2v1 kill zone.",
+        "Leak: No effort made to maximize XP or contest first wave last hits at safe range.",
+        "Consequence: Enemy gets uncontested push; in real ranked, this guarantees permanent lane prio loss.",
+        "Harder game: Good bot duos freeze you at level 1/2 and zone for 3+ waves, creating unrecoverable lane.",
+        "Next check: Hold camera and threat at auto-range, punish overpush, and test all XP edges even in doomed/AFK lanes."
+      ],
+      "reviewLimit": "Remake bar and AFK support limit game decisions here; no mid/late-game habits or extended lane phase can be judged. Micro (trading or spell dodge) cannot be critiqued meaningfully at 2 FPS in this low-action opener.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-22-challenger-direct-coaching-v12",
+      "sampledFrames": 11,
+      "publicVideoBytes": 2449843,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5565905533_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565905533-01.jpg"
+    },
     {
       "file": "auto_NA1-5565856492_01.mp4",
       "publicFile": "auto_NA1-5565856492_01.mp4",
@@ -308,7 +408,7 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 98,
+        "confidenceScore": 88,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -316,7 +416,6 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
@@ -484,7 +583,7 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 98,
+        "confidenceScore": 88,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -492,7 +591,6 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
