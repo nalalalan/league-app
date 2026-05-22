@@ -1632,6 +1632,26 @@ function stripCoachPrefix(text) {
   return cleaned.replace(/(^|[.!?]\s+)([a-z])/g, (_, prefix, letter) => `${prefix}${letter.toUpperCase()}`);
 }
 
+function normalizedLessonEcho(text) {
+  return stripCoachPrefix(text)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isRedundantStorySentence(sentence, item, critique) {
+  if (/^\s*(Mistake|Fix):/i.test(sentence)) return true;
+  const normalized = normalizedLessonEcho(sentence);
+  if (normalized.length < 34) return false;
+  const lesson = normalizedLessonEcho(recordingLesson(item));
+  const visibleCritique = normalizedLessonEcho(critique);
+  return (
+    (lesson && (lesson.includes(normalized) || normalized.includes(lesson))) ||
+    (visibleCritique && (visibleCritique.includes(normalized) || normalized.includes(visibleCritique)))
+  );
+}
+
 function displayCritique(item) {
   const byFile = {
     "auto_NA1-5563660362_01.mp4": "The throw risk is drifting sideways after the base is already open; stand behind the first body in and hit the structure as soon as space is made.",
@@ -1896,8 +1916,9 @@ function recordingStoryParagraph(item) {
     compactGameLength(item)
   ].join(" | ") + ".");
   appendStorySpan(paragraph, recordingRankSentence(item), "recording-story-rank");
-  const sentences = storySentences(recordingParagraph(item));
   const critique = displayCritique(item);
+  const sentences = storySentences(recordingParagraph(item))
+    .filter((sentence) => !isRedundantStorySentence(sentence, item, critique));
   const praise = displayPraise(item);
   const critiqueIndex = critiqueInsertIndex(sentences);
   const praiseIndex = praise ? praiseInsertIndex(sentences) : -1;

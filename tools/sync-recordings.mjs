@@ -18,9 +18,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-22-full-game-sampling-v9";
+const analysisVersion = "2026-05-22-nonredundant-macro-review-v10";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-22-full-game-sampling-v9",
   "2026-05-22-primary-mistake-timestamp-v8",
   "2026-05-21-visible-paragraph-teaching-standard-v7",
   "2026-05-21-visible-paragraph-standard-v6",
@@ -1126,9 +1127,18 @@ function stripRepeatedConversionGlossary(text) {
   ));
 }
 
+function stripRedundantLessonEcho(text) {
+  const sentences = sentenceParts(text).filter((sentence) => !/^\s*(Mistake|Fix):/i.test(sentence));
+  return normalizeCoachPunctuation(sentences.join(" "));
+}
+
+function hasRedundantLessonEcho(recording = {}) {
+  return sentenceParts(recording.gameDetail || "").some((sentence) => /^\s*(Mistake|Fix):/i.test(sentence));
+}
+
 function needsCachedTextRepair(recording = {}) {
   const text = [recording.gameDetail, recording.eventEvidence, recording.evidence].filter(Boolean).join(" ");
-  return hasRepeatedConversionGlossary(recording) || /[.!?]\s*;|;\s*[.!?]|[.!?]{2,}/.test(text);
+  return hasRepeatedConversionGlossary(recording) || hasRedundantLessonEcho(recording) || /[.!?]\s*;|;\s*[.!?]|[.!?]{2,}/.test(text);
 }
 
 function usefulEvidenceMoment(anchor, analysis, threshold = 8) {
@@ -1600,6 +1610,9 @@ function visibleParagraphStandardIssues(recording = {}) {
   }
   if (needsTeachingReason && /\b(grouped mid|group mid|mid pressure)\b/i.test(detail) && !/\b(mid[^.]*because|because[^.]*mid|mid[^.]*shortest|mid[^.]*team|mid[^.]*allies|mid[^.]*base|mid[^.]*tower|mid[^.]*fog|mid[^.]*collapse)\b/i.test(detail)) {
     issues.push("visible paragraph must explain why mid/grouping is better in this state");
+  }
+  if (hasRedundantLessonEcho(recording)) {
+    issues.push("visible paragraph repeats the Mistake/Fix feedback instead of adding new evidence");
   }
   if (eventEvidence.length < 60) {
     issues.push("eventEvidence must name visible proof");
@@ -2683,6 +2696,9 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (/^(this|each time|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(gameDetail)) {
     issues.push("gameDetail starts with conclusion instead of visible action");
   }
+  if (hasRedundantLessonEcho({ gameDetail })) {
+    issues.push("gameDetail repeats the Mistake/Fix feedback instead of adding new evidence");
+  }
   if (/\b(shop interface|shop open|stealth ward selected|standing at (the )?fountain|fountain at game start|game start)\b/i.test([gameDetail, eventEvidence].join(" "))) {
     issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
   }
@@ -2996,6 +3012,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like a useful replay-review paragraph, not a stat audit: include the main visible mistake window, what leaked, what happened next or almost happened, and one final simple lesson sentence. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp. Extra timestamps are optional and should appear only when they make the critique clearer.",
+    "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
     "Do not over-explain common coaching terms Alan already knows. Only define grouped mid, sync, tempo, payout, or conversion when the advice would otherwise be unclear; prioritize why the decision is better in this visible state.",
     "If you recommend grouping mid or pressuring mid, explain why mid is better in that visible state: for example, allies are already there, mid is the shortest lane to towers/base, it reduces fog-collapse risk, it lets teammates peel, or it forces enemies to defend structure instead of chasing Samira in a side lane. Tie the reason to the frames; do not say group mid as generic advice.",
     "Every full-game review must include the reason Alan should do the fix, not just the instruction. A good sentence sounds like: 'This matters because ...' or 'That route is better because ...'.",
@@ -3024,7 +3041,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and what any shorthand term means. Timestamp the start or nearest visible start of the main mistake window, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and what any shorthand term means. Timestamp the start or nearest visible start of the main mistake window, keep Mistake/Fix labels out of gameDetail, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
@@ -3396,7 +3413,7 @@ async function main() {
     let integratedGameDetail = isManualAnalysis
       ? cleanedGameDetail
       : integrateMomentEvidence(cleanedGameDetail, clockMoments, championName);
-    integratedGameDetail = stripRepeatedConversionGlossary(integratedGameDetail);
+    integratedGameDetail = stripRedundantLessonEcho(stripRepeatedConversionGlossary(integratedGameDetail));
     const cleanedEventEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), narrativeClockAnchors), championName);
     const cleanedEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), narrativeClockAnchors), championName);
     let finalEventEvidence = normalizeCoachPunctuation(clockMomentEvidence || (isGenericEvidenceText(cleanedEventEvidence) ? "" : cleanedEventEvidence));
@@ -3414,7 +3431,7 @@ async function main() {
       if (projectedIssues.length && repairMoments.length) {
         const repairedDetail = teachingDetailFromMoments(analysis, repairMoments, championName);
         const repairedEvidence = eventEvidenceFromMoments(repairMoments, championName);
-        if (repairedDetail) integratedGameDetail = repairedDetail;
+        if (repairedDetail) integratedGameDetail = stripRedundantLessonEcho(repairedDetail);
         if (repairedEvidence) finalEventEvidence = repairedEvidence;
         projectedIssues = visibleParagraphStandardIssues({
           file: name,
