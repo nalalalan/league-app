@@ -20,6 +20,8 @@ const liveBase = (process.env.LEAGUE_SITE_URL || "https://league.aolabs.io").rep
 const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || `${liveBase}/api/recording-status`).trim();
 const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const livePublishWaitMs = Number(process.env.LEAGUE_LIVE_PUBLISH_WAIT_MS || 5 * 60 * 1000);
+const publisherToLiveEtaFallbackSeconds = Number(process.env.LEAGUE_PUBLISHER_TO_LIVE_ETA_FALLBACK_SECONDS || 6 * 60);
+const deployToLiveEtaFallbackSeconds = Number(process.env.LEAGUE_DEPLOY_TO_LIVE_ETA_FALLBACK_SECONDS || 4 * 60);
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 const fallbackRetryMs = Number(process.env.LEAGUE_ANALYSIS_RETRY_MINUTES || 60) * 60 * 1000;
 const expectedSourceFile = String(process.env.LEAGUE_EXPECT_SOURCE_FILE || "").trim();
@@ -327,7 +329,7 @@ async function waitForLiveRecording(currentState, options = {}) {
       label: "publishing review",
       detail: "Waiting for live site.",
       progress: 98,
-      ...(await etaFor("deploy_to_live", 4 * 60, options.deployStartedAt, options.context))
+      ...(await etaFor("deploy_to_live", deployToLiveEtaFallbackSeconds, options.deployStartedAt, options.context))
     });
     if (await liveManifestContains(latest.name).catch(() => false)) return true;
     await new Promise((resolve) => setTimeout(resolve, 10000));
@@ -372,7 +374,7 @@ async function main() {
         label: "publishing review",
         detail: "Publishing recording files only.",
         progress: 82,
-        ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
+        ...(await etaFor("publisher_to_live", publisherToLiveEtaFallbackSeconds, publishStartedAt, latestContext))
       });
     }
 
@@ -382,13 +384,13 @@ async function main() {
       label: "analyzing review",
       detail: "Writing feedback.",
       progress: 84,
-      ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
+      ...(await etaFor("publisher_to_live", publisherToLiveEtaFallbackSeconds, publishStartedAt, latestContext))
     });
     await runWithStatusHeartbeat(npmBin, ["run", "sync:recordings"], "processing", {
       label: "analyzing review",
       detail: "Writing feedback.",
       progress: 84,
-      ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
+      ...(await etaFor("publisher_to_live", publisherToLiveEtaFallbackSeconds, publishStartedAt, latestContext))
     });
     if (!(await hasPublishPathChanges())) {
       await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
@@ -400,7 +402,7 @@ async function main() {
       label: "publishing review",
       detail: "Saving recording.",
       progress: 92,
-      ...(await etaFor("publisher_to_live", 12 * 60, publishStartedAt, latestContext))
+      ...(await etaFor("publisher_to_live", publisherToLiveEtaFallbackSeconds, publishStartedAt, latestContext))
     });
     await run("git", ["add", "-f", "--", ...publishPaths]);
     if (!(await hasStagedChanges())) {
@@ -415,7 +417,7 @@ async function main() {
       label: "deploying review",
       detail: "Deploying site.",
       progress: 96,
-      ...(await etaFor("deploy_to_live", 4 * 60, deployStartedAt, latestContext))
+      ...(await etaFor("deploy_to_live", deployToLiveEtaFallbackSeconds, deployStartedAt, latestContext))
     });
     await run(railwayBin, ["up", "--detach", "--message", "Update League recordings"]);
     if (!(await waitForLiveRecording(currentState, { deployStartedAt, context: latestContext }))) {

@@ -34,8 +34,9 @@ const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 
 const minAutoBytesPerSecond = Number(process.env.LEAGUE_MIN_AUTO_BYTES_PER_SECOND || 5000);
 const minAutoSidecarCoverage = Number(process.env.LEAGUE_MIN_AUTO_SIDECAR_COVERAGE || 0.6);
 const minSanitizedAutoSeconds = Number(process.env.LEAGUE_MIN_SANITIZED_AUTO_SECONDS || 90);
-const maxClockReadFrames = Number(process.env.LEAGUE_MAX_CLOCK_READ_FRAMES || 34);
-const maxAnalysisFrames = Number(process.env.LEAGUE_MAX_ANALYSIS_FRAMES || 36);
+const maxClockReadFrames = Number(process.env.LEAGUE_MAX_CLOCK_READ_FRAMES || 12);
+const maxAnalysisFrames = Number(process.env.LEAGUE_MAX_ANALYSIS_FRAMES || 14);
+const fastMacroReview = process.env.LEAGUE_FAST_MACRO_REVIEW !== "0";
 const sourceVideoPattern = /\.(webm|mp4)$/i;
 const ignoredSourceVideoPattern = /\.with-desktop-pauses\.(webm|mp4)$/i;
 
@@ -645,8 +646,19 @@ async function ensurePublicVideo(sourcePath, destPath, sourceStat) {
   const alternatePath = path.join(parsedDest.dir, `${parsedDest.name}${alternateExt}`);
   const current = await exists(destPath) ? await fs.stat(destPath) : null;
   const stale = !current || Math.round(current.mtimeMs) < Math.round(sourceStat.mtimeMs) || current.size === 0;
+  const sourceIsMp4 = path.extname(sourcePath).toLowerCase() === ".mp4";
   if (!needsEncode) {
     if (!current || current.size !== sourceStat.size) {
+      await fs.copyFile(sourcePath, destPath);
+      await fs.utimes(destPath, sourceStat.atime, sourceStat.mtime);
+    }
+    if (await exists(alternatePath)) {
+      await fs.unlink(alternatePath);
+    }
+    return sourceStat.size;
+  }
+  if (sourceIsMp4 && sourceStat.size <= targetPublicVideoBytes) {
+    if (stale || current.size !== sourceStat.size) {
       await fs.copyFile(sourcePath, destPath);
       await fs.utimes(destPath, sourceStat.atime, sourceStat.mtime);
     }
@@ -670,7 +682,7 @@ async function ensurePublicVideo(sourcePath, destPath, sourceStat) {
 
 function sampleTimesFor(duration) {
   if (duration < 3) return [Math.max(0.2, duration * 0.5)];
-  const count = duration > 240 ? 24 : duration > 90 ? 18 : duration > 35 ? 12 : duration > 12 ? 8 : 5;
+  const count = duration > 240 ? 14 : duration > 90 ? 12 : duration > 35 ? 8 : duration > 12 ? 5 : 4;
   const start = Math.min(Math.max(0.3, duration * 0.04), 4);
   const end = Math.max(start + 0.2, duration - Math.min(Math.max(0.3, duration * 0.04), 4));
   if (count === 1) return [duration * 0.5];
@@ -1155,6 +1167,20 @@ async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameD
       selectUsefulEvidenceMoments(analysis, anchors, cached.clockMoments)
     );
     if (cachedMoments.length) return cachedMoments;
+  }
+  if (fastMacroReview) {
+    const textMoments = evidenceMomentsFromText(analysis, anchors, 3);
+    const deterministicMoments = ensureMinimumEvidenceMoments(
+      analysis,
+      anchors,
+      selectUsefulEvidenceMoments(analysis, anchors, textMoments, 3, 5),
+      1
+    ).slice(0, 3);
+    if (deterministicMoments.length) return deterministicMoments;
+    const bestAnchor = anchors
+      .map((anchor, index) => ({ anchor, score: anchorEvidenceScore(anchor, analysis, index) }))
+      .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)[0]?.anchor;
+    if (bestAnchor) return [bestAnchor];
   }
   if (!process.env.OPENAI_API_KEY) return fallbackEvidenceClockMoments(analysis, anchors);
   const allowed = anchors.map((anchor) => ({
@@ -2405,8 +2431,10 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
     )
       .filter((anchor) => anchor.videoSeconds >= 0 && anchor.videoSeconds <= Math.max(0.25, duration))
       .filter((anchor) => clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds));
-    const verifiedAnchors = await verifyVisibleClockAnchors({ file, sourcePath, anchors, frameDir });
-    const timelineAnchors = verifiedAnchors.length >= 3
+    const verifiedAnchors = fastMacroReview
+      ? anchors
+      : await verifyVisibleClockAnchors({ file, sourcePath, anchors, frameDir });
+    const timelineAnchors = fastMacroReview || verifiedAnchors.length >= 3
       ? []
       : await describeTimelineClockAnchors({
         file,
@@ -2462,6 +2490,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Use capture order internally to distinguish earlier leak evidence from later implementation attempts, but do not mention recency weighting in visible output.",
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
+    "The recorder is intentionally low-FPS for low-lag macro review. Prioritize decisions that unfold over seconds or minutes: resets, objective conversion, side-lane drift, base pressure, shutdown protection, and map tempo. Do not over-index on single-frame mechanics.",
     "Coach like a blunt but serious League coach: name the actual mistake, do not soften it, and do not insult Alan. Be direct enough that he knows exactly where he messed up.",
     "Give exactly one highest-value improvement for this recording, plus the specific visible mistake moments that make the advice trustworthy. The top advice must stay direct, narrow, and playable in the next queue.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
@@ -2679,22 +2708,39 @@ async function main() {
   for (const entry of sourceFiles) {
     const sourcePath = path.join(sourceDir, entry.name);
     const stat = await fs.stat(sourcePath);
-    const health = await probeVideoHealth(sourcePath).catch(() => null);
+    const cacheKey = cacheKeyFor(stat);
+    const existingEntry = existingRecording(existing, entry.name, cacheKey);
+    const cachedTrusted = Boolean(existingEntry) &&
+      compatibleAnalysisVersions.has(existingEntry.analysisVersion) &&
+      process.env.LEAGUE_FORCE_ANALYSIS !== "1" &&
+      process.env.LEAGUE_RETRY_FALLBACK !== "1";
+    const health = cachedTrusted
+      ? {
+        duration: Number(existingEntry.durationSeconds) || 0,
+        size: stat.size,
+        bytesPerSecond: Number(existingEntry.durationSeconds) > 0 ? stat.size / Number(existingEntry.durationSeconds) : 0
+      }
+      : await probeVideoHealth(sourcePath).catch(() => null);
     const sidecar = await readJsonSafe(`${sourcePath}.json`);
-    const visual = /^auto_/i.test(entry.name) && health?.duration > 60
-      ? await videoVisibility(sourcePath, health.duration)
-      : null;
+    const visual = cachedTrusted
+      ? { visible: true, samples: [] }
+      : /^auto_/i.test(entry.name) && health?.duration > 60
+        ? await videoVisibility(sourcePath, health.duration)
+        : null;
     discoveredEntries.push({
       name: entry.name,
       sourcePath,
       stat,
       health,
       sidecar,
-      visual
+      visual,
+      cachedTrusted,
+      existingEntry
     });
   }
   const sourceEntries = discoveredEntries
     .filter((entry) => {
+      if (entry.cachedTrusted) return true;
       const rejectReason = autoCaptureRejectReason(entry.name, entry.health, entry.sidecar, entry.visual);
       if (!rejectReason) return true;
       console.log(`Skipping invalid auto capture ${entry.name}: ${rejectReason}.`);
@@ -2730,13 +2776,27 @@ async function main() {
     const posterPath = path.join(posterRoot, `${slug}.jpg`);
     const cacheKey = cacheKeyFor(stat);
     const previousAnalysis = existingRecording(existing, name, cacheKey);
-    const cached = cachedRecording(existing, name, cacheKey);
+    const cached = entry.cachedTrusted ? entry.existingEntry : cachedRecording(existing, name, cacheKey);
 
     const publicVideoBytes = await ensurePublicVideo(sourcePath, destPath, stat);
-    const duration = Number(entry.health?.duration) || await probeDuration(sourcePath);
+    const duration = Number(cached?.durationSeconds) || Number(entry.health?.duration) || await probeDuration(sourcePath);
     totalSeconds += duration;
     if (!(await exists(posterPath))) {
       await extractFrame(sourcePath, posterPath, Math.max(0.2, duration * 0.5), 640);
+    }
+    if (entry.cachedTrusted && cached) {
+      const recordedMs = Date.parse(cached.recordedAt || cached.gameHappenedAt || "");
+      sourceStats.push({ mtimeMs: Number.isFinite(recordedMs) ? recordedMs : stat.mtimeMs });
+      if (duration > 90) fullGameCount += 1;
+      else highlightCount += 1;
+      recordings.push({
+        ...cached,
+        publicVideoBytes,
+        src: publicPath(destPath),
+        poster: publicPath(posterPath)
+      });
+      console.log(`${name}: ${recordings.at(-1).reviewPhase || phase} - ${recordings.at(-1).champion} - ${recordings.at(-1).feedbackTitle}`);
+      continue;
     }
 
     let analysis = cached;
@@ -2757,8 +2817,13 @@ async function main() {
     const isManualAnalysis = analysis.analysisSource === "manual";
     const candidateClockAnchors = cleanClockAnchors(analysis.clockAnchors)
       .filter((anchor) => isManualAnalysis || clockFitsCurrentMatch(anchor, entry.sidecar, matchTimeMs, matchStats.gameLengthSeconds || null));
+    const candidateHasPrimaryMistake = hasMatchingPrimaryMistakeAnchor({
+      gameDetail: analysis.gameDetail,
+      eventEvidence: analysis.eventEvidence || analysis.evidence,
+      clockAnchors: candidateClockAnchors
+    });
     const shouldReadVisibleClock = duration >= 3;
-    const visibleClockAnchors = shouldReadVisibleClock
+    const visibleClockAnchors = shouldReadVisibleClock && !(fastMacroReview && candidateHasPrimaryMistake)
       ? await detectVisibleClockAnchors({
         file: name,
         sourcePath,
@@ -2773,7 +2838,7 @@ async function main() {
       : [];
     const clockAnchors = dedupeClockAnchors(
       visibleClockAnchors,
-      analysis.analysisSource === "manual" ? candidateClockAnchors : []
+      (analysis.analysisSource === "manual" || (fastMacroReview && candidateHasPrimaryMistake)) ? candidateClockAnchors : []
     );
     const clockMoments = await selectEvidenceClockMoments({
       file: name,

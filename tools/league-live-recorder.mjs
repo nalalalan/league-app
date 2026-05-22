@@ -40,6 +40,7 @@ const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim(
 const captureApiPreference = String(process.env.LEAGUE_LIVE_CAPTURE_API || "dda").trim().toLowerCase();
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
 const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "region").trim().toLowerCase();
+const reviewBuildMode = String(process.env.LEAGUE_REVIEW_BUILD_MODE || "copy").trim().toLowerCase();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const skipCurrentGameOnRestart = process.env.LEAGUE_LIVE_SKIP_CURRENT_GAME !== "0";
 const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || "https://league.aolabs.io/api/recording-status").trim();
@@ -47,6 +48,8 @@ const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE
 const statusPath = path.join(analysisRoot, "recording-status.json");
 const postGameQueuePath = path.join(analysisRoot, "post-game-queue.json");
 const postGameStatusHoldMs = Number(process.env.LEAGUE_POST_GAME_STATUS_HOLD_MS || 3 * 60 * 1000);
+const postGameEtaFallbackSeconds = Number(process.env.LEAGUE_POST_GAME_ETA_FALLBACK_SECONDS || 6 * 60);
+const clipToLiveEtaFallbackSeconds = Number(process.env.LEAGUE_CLIP_TO_LIVE_ETA_FALLBACK_SECONDS || 5 * 60);
 const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 let encoderProfilePromise;
 let lastStatusKey = "";
@@ -132,9 +135,9 @@ function sourceDurationSecondsForQueueItem(item) {
 
 async function estimateQueuedReviewSeconds(item) {
   const sourceDurationSeconds = sourceDurationSecondsForQueueItem(item);
-  const fields = await etaFor("post_game_total", 14 * 60, new Date().toISOString(), { sourceDurationSeconds });
+  const fields = await etaFor("post_game_total", postGameEtaFallbackSeconds, new Date().toISOString(), { sourceDurationSeconds });
   return {
-    seconds: Math.max(20, Number(fields.etaSeconds) || 14 * 60),
+    seconds: Math.max(20, Number(fields.etaSeconds) || postGameEtaFallbackSeconds),
     basis: fields.etaBasis || "trained from recent post-game history"
   };
 }
@@ -1110,7 +1113,7 @@ async function stopSession(session) {
   await publishRecorderStatus("processing", {
     ...sessionStatusFields(session, "Building review clip."),
     progress: 70,
-    ...(await etaFor("post_game_total", 14 * 60, session.endedAt.toISOString(), { sourceDurationSeconds }))
+    ...(await etaFor("post_game_total", postGameEtaFallbackSeconds, session.endedAt.toISOString(), { sourceDurationSeconds }))
   }, { force: true });
   if (session.pausedForForeground && session.foregroundPauseStartedMs) {
     session.foregroundPauseMs += Date.now() - Number(session.foregroundPauseStartedMs || Date.now());
@@ -1182,6 +1185,34 @@ async function processSegment(segment, importantIndexes, sessionRoot, previousSe
   };
 }
 
+async function copySegmentsToReviewClip(segments, outputPath, sessionRoot) {
+  const listPath = path.join(sessionRoot, "clean-segments.txt");
+  await writeConcatList(listPath, segments.map((item) => item.filePath));
+  await fs.mkdir(sourceDir, { recursive: true });
+  await run("ffmpeg", [
+    "-y",
+    "-hide_banner",
+    "-loglevel", "error",
+    "-fflags", "+genpts",
+    "-f", "concat",
+    "-safe", "0",
+    "-i", listPath,
+    "-map", "0:v:0",
+    "-c:v", "copy",
+    "-an",
+    "-avoid_negative_ts", "make_zero",
+    "-movflags", "+faststart",
+    outputPath
+  ]);
+  return segments.map((item) => ({
+    ...item,
+    outputPath: item.filePath,
+    speed: 1,
+    important: true,
+    streamCopied: true
+  }));
+}
+
 async function nextOutputPath(matchId) {
   const safeMatch = matchId && /^NA1-\d+$/i.test(matchId) ? matchId.toUpperCase() : `NA1-${Date.now()}`;
   for (let index = 1; index <= 99; index += 1) {
@@ -1236,15 +1267,31 @@ async function finalizeSession(session) {
 
   const replay = await latestReplay(session.startedMs, session.endedMs) || await latestLocalMatch(session.startedMs, session.endedMs);
   const outputPath = await nextOutputPath(replay?.matchId);
-  const importantIndexes = importantSegmentIndexes(usableSegments);
-  const processed = [];
-  for (let index = 0; index < usableSegments.length; index += 1) {
-    const segment = usableSegments[index];
-    const previousSegment = usableSegments[index - 1] || null;
+  const joinedPath = path.join(session.sessionRoot, "processed.mp4");
+  let processed = [];
+  let reviewBuild = "stream-copy";
+  let reviewEncoderName = session.encoder || "capture";
+  let reviewVideoQuality = `capture ${fps} fps, stream-copied review`;
+  if (/^(copy|stream|stream-copy|concat)$/i.test(reviewBuildMode)) {
     try {
-      processed.push(await processSegment(segment, importantIndexes, session.sessionRoot, previousSegment));
+      processed = await copySegmentsToReviewClip(usableSegments, outputPath, session.sessionRoot);
     } catch (error) {
-      await log(`Skipping corrupt segment ${segment.index}: ${error.message}`);
+      await log(`Stream-copy review build failed; falling back to processed review: ${error.message}`);
+      processed = [];
+      reviewBuild = "processed";
+    }
+  }
+  if (!processed.length) {
+    reviewBuild = "processed";
+    const importantIndexes = importantSegmentIndexes(usableSegments);
+    for (let index = 0; index < usableSegments.length; index += 1) {
+      const segment = usableSegments[index];
+      const previousSegment = usableSegments[index - 1] || null;
+      try {
+        processed.push(await processSegment(segment, importantIndexes, session.sessionRoot, previousSegment));
+      } catch (error) {
+        await log(`Skipping corrupt segment ${segment.index}: ${error.message}`);
+      }
     }
   }
   if (!processed.length) {
@@ -1252,23 +1299,26 @@ async function finalizeSession(session) {
     await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "No review clip could be built from the usable segments."), progress: 100, ...clearEtaFields() }, { force: true });
     return;
   }
-  const listPath = path.join(session.sessionRoot, "processed.txt");
-  const joinedPath = path.join(session.sessionRoot, "processed.mp4");
-  await writeConcatList(listPath, processed.map((item) => item.outputPath));
-  await fs.mkdir(sourceDir, { recursive: true });
-  const encoder = await encoderProfile();
-  await run("ffmpeg", [
-    "-y",
-    "-hide_banner",
-    "-loglevel", "error",
-    "-f", "concat",
-    "-safe", "0",
-    "-i", listPath,
-    ...finalReviewEncoderArgs(),
-    "-an",
-    "-movflags", "+faststart",
-    outputPath
-  ]);
+  if (reviewBuild === "processed") {
+    const listPath = path.join(session.sessionRoot, "processed.txt");
+    await writeConcatList(listPath, processed.map((item) => item.outputPath));
+    await fs.mkdir(sourceDir, { recursive: true });
+    const encoder = await encoderProfile();
+    reviewEncoderName = encoder.name;
+    reviewVideoQuality = encoder.name === "h264_nvenc" ? `capture CQ ${liveCaptureCq}, intermediate CQ ${liveCq}, final CRF ${x264Crf}` : `capture CRF ${x264CaptureCrf}, final CRF ${x264Crf}`;
+    await run("ffmpeg", [
+      "-y",
+      "-hide_banner",
+      "-loglevel", "error",
+      "-f", "concat",
+      "-safe", "0",
+      "-i", listPath,
+      ...finalReviewEncoderArgs(),
+      "-an",
+      "-movflags", "+faststart",
+      outputPath
+    ]);
+  }
   await fs.copyFile(outputPath, joinedPath).catch(() => {});
   const duration = await probeDuration(outputPath);
   if (!(await videoHasVisibleFrames(outputPath, duration))) {
@@ -1301,8 +1351,9 @@ async function finalizeSession(session) {
     outputPath,
     durationSeconds: duration,
     sourceDurationSeconds: elapsedSeconds,
-    encoder: encoder.name,
-    videoQuality: encoder.name === "h264_nvenc" ? `capture CQ ${liveCaptureCq}, intermediate CQ ${liveCq}, final CRF ${x264Crf}` : `capture CRF ${x264CaptureCrf}, final CRF ${x264Crf}`,
+    encoder: reviewEncoderName,
+    videoQuality: reviewVideoQuality,
+    reviewBuildMode: reviewBuild,
     segmentSeconds,
     fastForwardSpeed,
     captureFps: Number(fps),
@@ -1329,7 +1380,8 @@ async function finalizeSession(session) {
       size: item.size,
       durationSeconds: Math.round(Number(item.duration || 0) * 1000) / 1000,
       speed: item.speed,
-      important: item.important
+      important: item.important,
+      streamCopied: Boolean(item.streamCopied)
     })),
     validForPublish: true,
     privacyPolicy: session.captureMode === "desktop"
@@ -1348,7 +1400,7 @@ async function finalizeSession(session) {
       label: "publishing review",
       progress: 90,
       matchId: replay?.matchId || "",
-      ...(await etaFor("clip_to_live", 10 * 60, clipCreatedAt.toISOString(), publishEtaContext))
+      ...(await etaFor("clip_to_live", clipToLiveEtaFallbackSeconds, clipCreatedAt.toISOString(), publishEtaContext))
     };
     if (session.sessionRoot === activeQueueSessionRoot) {
       activeQueueStage = "publishing";
@@ -1417,7 +1469,7 @@ async function processPostGameQueue() {
       activeQueueStage = "processing";
       activeQueueStageLabel = "building review clip";
       activeQueueStartedAt = new Date().toISOString();
-      activeQueueEta = await etaFor("post_game_total", 14 * 60, session.endedAt.toISOString(), {
+      activeQueueEta = await etaFor("post_game_total", postGameEtaFallbackSeconds, session.endedAt.toISOString(), {
         sourceDurationSeconds: Math.max(0, Math.round((session.endedMs - session.startedMs) / 1000))
       });
       activeQueueProgress = 65;
