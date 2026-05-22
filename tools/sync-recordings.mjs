@@ -25,8 +25,8 @@ const compatibleAnalysisVersions = new Set([
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
-const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v2";
-const coachEvidenceVersion = "2026-05-21-specific-evidence-useful-v4";
+const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v3";
+const coachEvidenceVersion = "2026-05-21-specific-evidence-useful-v5";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -881,6 +881,35 @@ function clockWithinSeconds(first, second, tolerance = 2.5) {
   return Number.isFinite(firstSeconds) && Number.isFinite(secondSeconds) && Math.abs(firstSeconds - secondSeconds) <= tolerance;
 }
 
+function expectedClockAnchorsFromTimes(readTimes, sidecar, matchTimeMs, gameLengthSeconds) {
+  const gameLength = Number(gameLengthSeconds || 0);
+  const anchors = [];
+  for (const videoSeconds of readTimes) {
+    const expected = expectedGameClockSeconds(sidecar, matchTimeMs, Number(videoSeconds));
+    if (!Number.isFinite(expected) || expected < 0) continue;
+    if (gameLength > 0 && expected > gameLength + 120) continue;
+    anchors.push({
+      clock: mmss(expected),
+      videoSeconds: Math.round(Number(videoSeconds) * 1000) / 1000
+    });
+  }
+  return dedupeClockAnchors(anchors);
+}
+
+function spacedClockAnchors(anchors, maxItems = 10, minClockGapSeconds = 35) {
+  const sorted = cleanClockAnchors(anchors)
+    .sort((a, b) => a.videoSeconds - b.videoSeconds);
+  const kept = [];
+  for (const anchor of sorted) {
+    const seconds = clockSeconds(anchor.clock);
+    if (!Number.isFinite(seconds)) continue;
+    if (kept.some((item) => Math.abs(clockSeconds(item.clock) - seconds) < minClockGapSeconds)) continue;
+    kept.push(anchor);
+    if (kept.length >= maxItems) break;
+  }
+  return kept;
+}
+
 function anchorMatchesClock(clock, clockAnchors, toleranceSeconds = 2.5) {
   const seconds = clockSeconds(clock);
   if (!Number.isFinite(seconds)) return false;
@@ -1285,6 +1314,60 @@ function integrateMomentEvidence(gameDetail, clockMoments, champion = "Samira") 
   return coachClean(sentences.join(" "));
 }
 
+function adviceTextForTeaching(analysis, champion = "Samira") {
+  return normalizeVisibleCoachText(
+    coachClean(analysis?.feedback, "Mistake: the lead did not become a concrete map payout. Fix: use the next safe wave, tower, base, objective, or reset before taking another fight."),
+    champion
+  );
+}
+
+function shorthandTeachingSentence(analysis) {
+  const text = analysisCoachText(analysis);
+  const parts = [];
+  if (/\b(sync(?:ed|ing)?|conversion|convert|payout|tempo)\b/i.test(text)) {
+    parts.push("Conversion means turning a fight win or gold lead into something that remains after the fight ends: tower damage, base damage, dragon/Baron setup, or a safe reset with spent gold.");
+  }
+  if (/\b(grouped mid|group mid|mid pressure)\b/i.test(text)) {
+    parts.push("Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between Samira and the collapse, and enemies have to defend structure instead of chasing through fog.");
+  }
+  return parts.join(" ");
+}
+
+function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") {
+  const moments = cleanClockAnchors(clockMoments)
+    .filter((moment) => moment.description)
+    .slice(0, 4);
+  if (moments.length < 3) return "";
+  const [first, second, third, fourth] = moments;
+  const clauses = [
+    `At ${first.clock}, ${clauseDescription(first.description, champion)}`,
+    `by ${second.clock}, ${clauseDescription(second.description, champion)}`,
+    `by ${third.clock}, ${clauseDescription(third.description, champion)}`
+  ];
+  if (fourth) {
+    clauses.push(`and by ${fourth.clock}, ${clauseDescription(fourth.description, champion)}`);
+  }
+  const advice = adviceTextForTeaching(analysis, champion);
+  const shorthand = shorthandTeachingSentence(analysis);
+  const why = "This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.";
+  return coachClean([
+    `${clauses.join("; ")}.`,
+    advice,
+    shorthand,
+    why
+  ].filter(Boolean).join(" "));
+}
+
+function eventEvidenceFromMoments(clockMoments, champion = "Samira") {
+  const moments = cleanClockAnchors(clockMoments)
+    .filter((moment) => moment.description)
+    .slice(0, 4);
+  if (moments.length < 2) return "";
+  return coachClean(moments
+    .map((moment) => `${moment.clock} shows ${clauseDescription(moment.description, champion)}`)
+    .join(". ") + ".");
+}
+
 async function readExistingManifest() {
   try {
     return JSON.parse(await fs.readFile(manifestPath, "utf8"));
@@ -1437,6 +1520,49 @@ function manualFeedback(file) {
         "Master-climb punishment: better enemies do not need many openings; one side re-fight or one late solo wave is enough to take your shutdown."
       ],
       reviewLimit: "This review uses sampled visible frames and game-clock anchors. It does not infer hidden clicks, voice calls, or cooldowns that are not visible in the recording.",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5565445744_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Spend the base win before the next fight",
+      feedback: "Mistake: after turning the lead into enemy-base pressure, you kept the next fight window alive while carrying a large unspent shutdown. Fix: after the base kill or tower damage, reset unless nexus is immediately finishable.",
+      gameDetail: "At 1:31 you are already farming bot safely with the wave in front, and by 3:23 you take the first bot-side fight instead of only bleeding CS; that early pressure is good. At 4:36 you correctly turn the lane win into bot tower damage with allies and minions, and at 6:56 you are still converting through bot-side structure pressure. The leak starts after the map is already cracked: at 9:47 you are walking near the enemy base with multiple enemies alive, and at 10:36 you get another kill inside the base while holding about 2497 gold. That fight works in beginner bots, but the Master-climb reason to reset is simple: unspent gold is not real power yet, and giving a shutdown before buying would erase the tempo you already earned. At 12:21 you are back on the map after spending, which is the cleaner version; the repeatable rule is base damage or a base kill first, then spend the gold unless the nexus is free right now.",
+      whyTrust: "The evidence is tied to visible state: wave-first lane pressure, tower conversion, then a large unspent-gold base fight before the reset.",
+      eventEvidence: "1:31 shows Samira safely farming bot with wave control. 4:36 shows Samira hitting bot tower with allies and minions. 9:47 shows Samira near the enemy base while enemies are still alive. 10:36 shows a base kill while Samira is holding about 2497 gold. 12:21 shows Samira back on the map after spending.",
+      goodThing: "You did convert the lane lead into tower/base pressure instead of only chasing kills.",
+      focusTag: "spend after base payout",
+      evidence: "Manual frame review of the May 21 full-game clip: 1:31 bot wave control, 4:36 bot tower conversion, 9:47 enemy-base pressure, 10:36 base kill with about 2497 gold, and 12:21 post-spend map return.",
+      pattern: "The improvement is real: you are finding waves, towers, and the base. The next leak is staying available for one more base fight after the payout while your gold is still unspent.",
+      diamondRule: "After a base kill or structure payout, reset with big gold unless the nexus is free on the current wave.",
+      drill: "Next game, when your gold is above 2000 after a base fight, say 'nexus or reset' before clicking forward.",
+      timeline: [
+        "1:31 - Samira farms bot with wave in front.",
+        "3:23 - Samira takes the first bot-side fight window.",
+        "4:36 - Samira and allies hit bot tower.",
+        "6:56 - Samira keeps structure pressure bot side.",
+        "9:47 - Samira is near the enemy base with defenders alive.",
+        "10:36 - Samira gets a base kill while holding about 2497 gold.",
+        "12:21 - Samira is back on the map after spending."
+      ],
+      clockAnchors: [
+        { clock: "1:31", videoSeconds: 4, description: "Samira farms bot safely with wave in front." },
+        { clock: "3:23", videoSeconds: 76.826, description: "Samira takes the first bot-side fight window." },
+        { clock: "4:36", videoSeconds: 149.652, description: "Samira and allies hit bot tower with minions." },
+        { clock: "6:56", videoSeconds: 182.875, description: "Samira keeps bot-side structure pressure after the lane win." },
+        { clock: "9:47", videoSeconds: 251.609, description: "Samira walks near the enemy base while defenders are alive." },
+        { clock: "10:36", videoSeconds: 295.304, description: "Samira gets a base kill while holding about 2497 gold." },
+        { clock: "12:21", videoSeconds: 339, description: "Samira is back on the map after spending." }
+      ],
+      nuance: [
+        "Good: you converted early lane pressure into bot tower and later base pressure.",
+        "Leak: the extra base fight happened before the big gold was spent.",
+        "Consequence: stronger enemies punish that by taking shutdown gold before your lead becomes items.",
+        "Next check: after a base payout, choose nexus now or reset now."
+      ],
+      reviewLimit: "This review uses visible replay frames and match-clock anchors; it cannot prove exact clicks or voice comms.",
       analysisSource: "manual"
     };
   }
@@ -2092,6 +2218,82 @@ async function verifyVisibleClockAnchors({ file, sourcePath, anchors, frameDir }
   }
 }
 
+async function describeTimelineClockAnchors({ file, sourcePath, duration, sidecar, frameDir, matchTimeMs, gameLengthSeconds, readTimes }) {
+  const timedCandidates = spacedClockAnchors(
+    expectedClockAnchorsFromTimes(readTimes, sidecar, matchTimeMs, gameLengthSeconds),
+    10
+  );
+  if (timedCandidates.length < 3 || !process.env.OPENAI_API_KEY) return [];
+  const timelineDir = path.join(frameDir, "clock-timeline");
+  await fs.mkdir(timelineDir, { recursive: true });
+  const images = [];
+  for (let index = 0; index < timedCandidates.length; index += 1) {
+    const anchor = timedCandidates[index];
+    const framePath = path.join(timelineDir, `timeline-${String(index + 1).padStart(2, "0")}-${normalizeClock(anchor.clock).replace(":", "-")}.jpg`);
+    await extractFrame(sourcePath, framePath, Number(anchor.videoSeconds), 1280);
+    images.push({
+      type: "input_text",
+      text: `Frame ${index + 1}: capture-timeline League game clock ${anchor.clock}; review-video time ${mmss(anchor.videoSeconds)} (${anchor.videoSeconds}s). Describe only visible League gameplay in this exact frame.`
+    });
+    images.push({
+      type: "input_image",
+      image_url: `data:image/jpeg;base64,${(await fs.readFile(framePath)).toString("base64")}`,
+      detail: "high"
+    });
+  }
+  const prompt = [
+    "Alan needs timestamped League feedback even when OCR misses the tiny HUD clock.",
+    "The clock labels below are computed from Riot match start time plus the capture segment timeline. Use them only as labels for the exact frames provided; do not invent events outside the frame.",
+    "Choose 4-8 useful coaching evidence frames. Prefer frames showing setup, Alan's action, a fight, a wave/structure state, a reset/spend, a side-lane risk, a collapse risk, or a consequence. Avoid shop/fountain/scoreboard frames unless the visible coaching point is spending, resetting, or protecting gold.",
+    "Each description must be factual and visible. Say Samira, not Player. Do not write advice in descriptions.",
+    "Return only JSON with this shape:",
+    '{"clockAnchors":[{"clock":"MM:SS","videoSeconds":0,"description":"visible evidence in that exact frame"}]}',
+    `Recording file: ${file}. Duration: ${mmss(duration)}.`
+  ].join("\n");
+  try {
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        store: false,
+        max_output_tokens: 1200,
+        input: [
+          {
+            role: "user",
+            content: [
+              { type: "input_text", text: prompt },
+              ...images
+            ]
+          }
+        ]
+      })
+    });
+    if (!response.ok) throw new Error(`OpenAI timeline clock response ${response.status}`);
+    const parsed = parseJsonText(extractOutputText(await response.json()));
+    const byKey = new Map(timedCandidates.map((anchor) => [`${anchor.clock}@${anchor.videoSeconds}`, anchor]));
+    return cleanClockAnchors(parsed.clockAnchors)
+      .map((anchor) => {
+        const match = byKey.get(`${anchor.clock}@${anchor.videoSeconds}`) ||
+          timedCandidates.find((candidate) => candidate.clock === anchor.clock && Math.abs(candidate.videoSeconds - anchor.videoSeconds) <= 0.35);
+        if (!match) return null;
+        return {
+          ...match,
+          description: normalizeEvidenceDescription(anchor.description || match.description || "", "Samira")
+        };
+      })
+      .filter(Boolean)
+      .filter((anchor) => anchor.description && !anchorDescriptionLooksWeak(anchor.description))
+      .slice(0, 8);
+  } catch (error) {
+    console.warn(`Timeline clock fallback failed for ${file}: ${error.message}`);
+    return [];
+  }
+}
+
 async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, cacheKey, frameDir, matchTimeMs, gameLengthSeconds, candidateAnchors = [] }) {
   const cachePath = path.join(frameDir, "visible-clock-anchors.json");
   const cached = await readJsonSafe(cachePath);
@@ -2171,13 +2373,27 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
       .filter((anchor) => anchor.videoSeconds >= 0 && anchor.videoSeconds <= Math.max(0.25, duration))
       .filter((anchor) => clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds));
     const verifiedAnchors = await verifyVisibleClockAnchors({ file, sourcePath, anchors, frameDir });
+    const timelineAnchors = verifiedAnchors.length >= 3
+      ? []
+      : await describeTimelineClockAnchors({
+        file,
+        sourcePath,
+        duration,
+        sidecar,
+        frameDir,
+        matchTimeMs,
+        gameLengthSeconds,
+        readTimes
+      });
+    const finalAnchors = dedupeClockAnchors([...verifiedAnchors, ...timelineAnchors])
+      .filter((anchor) => clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds));
     await fs.writeFile(cachePath, `${JSON.stringify({
       cacheKey,
       clockAnchorVersion,
       generatedAt: new Date().toISOString(),
-      clockAnchors: verifiedAnchors
+      clockAnchors: finalAnchors
     }, null, 2)}\n`, "utf8");
-    return verifiedAnchors;
+    return finalAnchors;
   } catch (error) {
     console.warn(`Clock anchor fallback for ${file}: ${error.message}`);
     return [];
@@ -2536,15 +2752,33 @@ async function main() {
     const narrativeClockAnchors = isManualAnalysis ? clockAnchors : clockMoments;
     const championName = clean(analysis.champion, "Samira");
     const clockMomentEvidence = isManualAnalysis ? "" : evidenceTextFromMoments(clockMoments);
+    const isFullReview = duration > 90;
     const rawGameDetail = coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`);
     const cleanedGameDetail = stripUnverifiedClockReferences(rawGameDetail, narrativeClockAnchors);
-    const integratedGameDetail = isManualAnalysis
+    let integratedGameDetail = isManualAnalysis
       ? cleanedGameDetail
       : integrateMomentEvidence(cleanedGameDetail, clockMoments, championName);
     const cleanedEventEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), narrativeClockAnchors), championName);
     const cleanedEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), narrativeClockAnchors), championName);
+    let finalEventEvidence = clockMomentEvidence || (isGenericEvidenceText(cleanedEventEvidence) ? "" : cleanedEventEvidence);
+    if (!isManualAnalysis && isFullReview && clockMoments.length >= 3) {
+      const projectedIssues = visibleParagraphStandardIssues({
+        file: name,
+        durationSeconds: duration,
+        analysisSource: analysis.analysisSource || "openai",
+        analysisVersion,
+        gameDetail: integratedGameDetail,
+        eventEvidence: finalEventEvidence,
+        clockAnchors: annotatedClockAnchors
+      });
+      if (projectedIssues.length) {
+        const repairedDetail = teachingDetailFromMoments(analysis, clockMoments, championName);
+        const repairedEvidence = eventEvidenceFromMoments(clockMoments, championName);
+        if (repairedDetail) integratedGameDetail = repairedDetail;
+        if (repairedEvidence) finalEventEvidence = repairedEvidence;
+      }
+    }
 
-    const isFullReview = duration > 90;
     const shortTitle = isFullReview
       ? `full review ${String(++fullGameCount).padStart(2, "0")}`
       : `highlight ${String(++highlightCount).padStart(2, "0")}`;
@@ -2595,7 +2829,7 @@ async function main() {
       feedbackTitle: normalizeVisibleCoachText(analysis.feedbackTitle || "Focus", championName),
       feedback: normalizeVisibleCoachText(analysis.feedback || "Review the clip and choose one safer next action.", championName),
       gameDetail: integratedGameDetail,
-      eventEvidence: clockMomentEvidence || (isGenericEvidenceText(cleanedEventEvidence) ? "" : cleanedEventEvidence),
+      eventEvidence: finalEventEvidence,
       goodThing: normalizeVisibleCoachText(analysis.goodThing || "", championName),
       whyTrust: normalizeVisibleCoachText(analysis.whyTrust || "This feedback is tied to the visible replay pattern and one controllable in-game decision.", championName),
       focusTag: normalizeVisibleCoachText(analysis.focusTag || "review", championName),

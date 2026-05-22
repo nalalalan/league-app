@@ -37,6 +37,30 @@ function activeQueueItems(items) {
   });
 }
 
+function queueFileItems(queue) {
+  return queue
+    .filter((item) => item?.sessionRoot)
+    .slice(0, 5)
+    .map((item, index) => ({
+      label: `review ${index + 1}`,
+      status: index === 0 ? "processing" : "queued",
+      stage: index === 0 ? "processing" : "queued",
+      stageLabel: index === 0 ? "building review clip" : "waiting behind earlier review",
+      startedAt: item.startedAt || "",
+      endedAt: item.endedAt || "",
+      queuedAt: item.queuedAt || "",
+      estimatedGameEndAt: "",
+      estimatedStartAt: "",
+      estimatedReadyAt: "",
+      gameEtaSeconds: null,
+      startEtaSeconds: null,
+      etaSeconds: null,
+      stageEtaSeconds: null,
+      etaBasis: "waiting for active recorder",
+      progress: index === 0 ? 65 : 0
+    }));
+}
+
 function normalizeCurrentGame(item) {
   const now = Date.now();
   const estimatedGameEndEta = Math.round((Date.parse(item.estimatedGameEndAt || "") - now) / 1000);
@@ -63,14 +87,14 @@ while (Date.now() < untilMs) {
   const status = await readJson(statusPath, null);
   const queue = await readJson(queuePath, []);
   const lockPid = (await fs.readFile(lockPath, "utf8").catch(() => "")).trim();
-  if (status && Array.isArray(queue) && queue.length === 0 && Array.isArray(status.queueItems)) {
-    const active = activeQueueItems(status.queueItems).map(normalizeCurrentGame);
-    if (status.queueCount !== active.length || status.queueItems.length !== active.length || !status.recorderPid) {
+  if (status && Array.isArray(queue) && Array.isArray(status.queueItems)) {
+    const correctedItems = queue.length ? queueFileItems(queue) : activeQueueItems(status.queueItems).map(normalizeCurrentGame);
+    if (!status.recorderPid || status.queueCount !== correctedItems.length || status.queueItems.length !== correctedItems.length) {
       await fs.writeFile(statusPath, `${JSON.stringify({
         ...status,
         recorderPid: status.recorderPid || lockPid || "",
-        queueCount: active.length,
-        queueItems: active,
+        queueCount: correctedItems.length,
+        queueItems: correctedItems,
         updatedAt: new Date().toISOString()
       }, null, 2)}\n`, "utf8").catch(() => {});
     }
