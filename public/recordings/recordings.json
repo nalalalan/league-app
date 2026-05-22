@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T17:07:11.636Z",
+  "generatedAt": "2026-05-22T17:24:24.166Z",
   "source": "League of Legends Highlights folder",
-  "match": "21 matches",
+  "match": "22 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -23,19 +23,20 @@
     "NA1-5565387627",
     "NA1-5565445744",
     "NA1-5565518539",
-    "NA1-5565578420"
+    "NA1-5565578420",
+    "NA1-5565758308"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 2:01 AM ET",
-  "totalDuration": "164:42",
-  "totalRecordings": 33,
+  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 1:23 PM ET",
+  "totalDuration": "176:51",
+  "totalRecordings": 34,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira overall state",
-    "focus": "Current read: Gold II on the newest full game; Silver III across the last 5 full-game reads; Bronze I median across 20 full games. The latest game is above your recent baseline.",
+    "focus": "Current read: Gold III on the newest full game; Silver II across the last 5 full-game reads; Bronze I median across 21 full games. The latest game is above your recent baseline.",
     "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is finding fights and base pressure and grouping with allies when the play is clear.",
     "nextRep": "Next game: after the first won fight or open structure, choose only free structure, body blocking that structure, or reset.",
     "whyTrust": "This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.",
-    "pattern": "Latest file auto_NA1-5565578420_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
+    "pattern": "Latest file auto_NA1-5565758308_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
     "checklist": [
       "Read the latest rank point.",
       "Check the repeated leak.",
@@ -48,21 +49,21 @@
     "method": "research-calibrated macro rank estimate with confidence gates",
     "highConfidenceReady": false,
     "currentLimitation": "No current full review has PvP or ranked opponent pressure, so the system can be confident about repeated review evidence but cannot honestly make a high-confidence ranked-MMR claim yet.",
-    "fullReviewGames": 20,
+    "fullReviewGames": 21,
     "queueCounts": {
       "unknown": 4,
-      "bot": 16
+      "bot": 17
     },
     "rankedFullGames": 0,
     "pvpFullGames": 0,
-    "botFullGames": 16,
-    "anchoredFullGames": 20,
-    "statFullGames": 20,
+    "botFullGames": 17,
+    "anchoredFullGames": 21,
+    "statFullGames": 21,
     "rankLabelCounts": {
       "Bronze": 9,
       "Silver": 5,
       "Iron": 5,
-      "Gold": 1
+      "Gold": 2
     },
     "exactRankScale": [
       "Iron IV",
@@ -145,13 +146,133 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 33,
+      "recordings": 34,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565758308_01.mp4",
+      "publicFile": "auto_NA1-5565758308_01.mp4",
+      "cacheKey": "18105160:1779470634477",
+      "fingerprint": "dc4cc1ad75fc",
+      "matchId": "NA1-5565758308",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779469538729,
+      "gameHappenedAt": "2026-05-22T17:05:38.729Z",
+      "gameHappenedAtLabel": "May 22, 2026, 1:05 PM",
+      "recordedAt": "2026-05-22T17:23:54.540Z",
+      "recordedAtLabel": "May 22, 2026, 1:23 PM",
+      "recordedAtTimeLabel": "1:23 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Did not reset after inhibitor -- forced with 3k+ gold and low tempo.",
+      "duration": "12:09",
+      "durationSeconds": 729,
+      "gameLength": "17:15",
+      "gameLengthSeconds": 1035,
+      "kda": "14/3/3",
+      "kills": 14,
+      "deaths": 3,
+      "assists": 3,
+      "cs": 95,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Did not reset after inhibitor -- forced with 3k+ gold and low tempo.",
+      "feedback": "Mistake: After taking mid inhibitor, you stayed for the nexus siege with over 3,000 gold and no reset, leaving you stuck with a long fight and weaker stats than possible. Fix: Instantly reset after the inhibitor falls unless the enemy cannot defend or you have a guaranteed end, to buy power and regroup before the final push.",
+      "gameDetail": "Around 3:12, Samira and support pushing minion wave near enemy tower; this is the start or nearest visible start of the main mistake window. Mistake: After taking mid inhibitor, you stayed for the nexus siege with over 3,000 gold and no reset, leaving you stuck with a long fight and weaker stats than possible. Fix: Instantly reset after the inhibitor falls unless the enemy cannot defend or you have a guaranteed end, to buy power and regroup before the final push. Conversion means turning a fight win or gold lead into something that remains after the fight ends: tower damage, base damage, dragon/Baron setup, or a safe reset with spent gold. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
+      "eventEvidence": "3:12 shows Samira and support pushing minion wave near enemy tower.",
+      "goodThing": "Correctly grouped mid and pressured inhib with team, not splitting or mis-grouping.",
+      "whyTrust": "This habit upgrade directly turns your lane and fight wins into game-ending pressure and removes one of the easiest Master punishments—dying with a shutdown when you could have reset to spend gold.",
+      "focusTag": "reset discipline",
+      "evidence": "3:12 Samira and support pushing minion wave near enemy tower",
+      "pattern": "Alan cashes out kills and objectives mid, but repeats the common block of not resetting after the inhibitor despite a huge gold stack, risking shut downs and blunting possible item spikes in the critical endgame sequence.",
+      "diamondRule": "After you break an inhibitor, instantly reset if you have over 1,500 gold unless the enemy is full dead and the end is guaranteed—do not autopilot siege.",
+      "drill": "After any inhibitor take, press B immediately if you have more than a component’s worth of gold; check item buy, regroup with team and pinks for next push.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "0:43",
+          "videoSeconds": 4,
+          "description": "Champion walking towards lane at game start"
+        },
+        {
+          "clock": "1:38",
+          "videoSeconds": 59.462,
+          "description": "Two champions fighting minions in bottom lane"
+        },
+        {
+          "clock": "3:12",
+          "videoSeconds": 114.923,
+          "description": "Champion and support pushing minion wave near enemy tower"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "3:12",
+          "videoSeconds": 114.923,
+          "description": "Samira and support pushing minion wave near enemy tower"
+        }
+      ],
+      "nuance": [
+        "Grouping for the mid inhib was correct and you played the fight with your team.",
+        "After the inhib fell, you had over 3,000 gold (frames 12/13) and skipped reset, pushing up for nexus.",
+        "The enemy has respawn timers nearly up, and your team is still locked into the base siege with gold unspent, which would be lethal at stronger games.",
+        "If you reset instantly, you’d deny a comeback, secure vision/deep wards, and stack another major item for the game-ending fight, with your team defending map state outside base if end isn’t on.",
+        "Master-level teams instantly punish unreset sieges and large shutdowns, often turning one bad base siege into Baron or Elder and flipping the match."
+      ],
+      "reviewLimit": "The sampled frames cover lane phase, fights, and objective conversion, but are too sparse to fully evaluate early wave management or specific fight mechanics beyond macro resets and team grouping.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-22-primary-mistake-timestamp-v8",
+      "sampledFrames": 14,
+      "publicVideoBytes": 18105160,
+      "src": "/recordings/auto_NA1-5565758308_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565758308-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-exact-rank-trend-v4",
+        "label": "Gold",
+        "range": "Silver I-Gold II",
+        "exactRank": "Gold III",
+        "exactRankValue": 13,
+        "score": 59,
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "confidenceScore": 60,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "upper middle",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Gold III read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+      }
+    },
     {
       "file": "auto_NA1-5565578420_01.mp4",
       "publicFile": "auto_NA1-5565578420_01.mp4",
