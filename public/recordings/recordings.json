@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T01:11:21.424Z",
+  "generatedAt": "2026-05-22T01:41:45.346Z",
   "source": "League of Legends Highlights folder",
-  "match": "16 matches",
+  "match": "17 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -18,11 +18,12 @@
     "NA1-5565193158",
     "NA1-5565226188",
     "NA1-5565242641",
-    "NA1-5565308644"
+    "NA1-5565308644",
+    "NA1-5565356454"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 8:41 PM ET",
-  "totalDuration": "124:20",
-  "totalRecordings": 28,
+  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 9:38 PM ET",
+  "totalDuration": "130:07",
+  "totalRecordings": 29,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira: stop giving wins back",
@@ -43,13 +44,202 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 28,
+      "recordings": 29,
       "evidence": "3:37 Enemy Teleport channels onto a minion while Samira stands in melee range, gets stunned—shows the mistake of not backing off as TP appears.; 3:40 Samira is killed for a shutdown—shows the consequence of not respecting the incoming Teleport and staying too far forward.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565356454_01.mp4",
+      "publicFile": "auto_NA1-5565356454_01.mp4",
+      "cacheKey": "25344462:1779413897273",
+      "fingerprint": "f57407da2171",
+      "matchId": "NA1-5565356454",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779412970053,
+      "gameHappenedAt": "2026-05-22T01:22:50.053Z",
+      "gameHappenedAtLabel": "May 21, 2026, 9:22 PM",
+      "recordedAt": "2026-05-22T01:38:17.368Z",
+      "recordedAtLabel": "May 21, 2026, 9:38 PM",
+      "recordedAtTimeLabel": "9:38 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Overstaying after successful map events",
+      "duration": "5:47",
+      "durationSeconds": 347,
+      "gameLength": "14:19",
+      "gameLengthSeconds": 859,
+      "kda": "4/3/7",
+      "kills": 4,
+      "deaths": 3,
+      "assists": 7,
+      "cs": 78,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Overstaying after successful map events",
+      "feedback": "Mistake: After winning trades or securing kills, Alan repeatedly stays for extended time with low HP and no clear play, risking enemy return and losing reset tempo. Fix: Immediately recall and spend gold after a successful fight or turret objective unless there is a guaranteed safe map play (tower hit or clear wave with body protection), especially when HP is low or the enemy spawns are up.",
+      "gameDetail": "Around 1:37, first Blood notification, Samira near enemy minion wave; By 1:48, alan is left extremely low HP in bot lane after a risky stay, clear evidence of overextending after a map win without immediate reset; Then around 1:52, champions near blue tower, retreating from minion wave. Staying on map with gold and low HP leaks pressure and exposes you to respawn timings or jungle collapse—the lesson is to recall right after you force enemy off the map or take a tower, unless you directly hit the next structure or have absolute vision control.",
+      "eventEvidence": "1:37 First Blood notification, Samira near enemy minion wave; 1:48 Alan is left extremely low HP in bot lane after a risky stay, clear evidence of overextending after a map win without immediate reset.; 1:52 Champions near blue tower, retreating from minion wave",
+      "goodThing": "Alan correctly pushes for tower when it's free (02:31–02:46), converting win to structure.",
+      "whyTrust": "Samira with a high gold bank gets far more aggressive power and survival from immediate purchases; Master players abuse slow resets for easy kills and map swaps.",
+      "focusTag": "reset discipline",
+      "evidence": "1:37 First Blood notification, Samira near enemy minion wave; 1:48 Alan is left extremely low HP in bot lane after a risky stay, clear evidence of overextending after a map win without immediate reset.; 1:52 Champions near blue tower, retreating from minion wave",
+      "pattern": "When ahead, Alan chases more waves or jungle after tower and fight wins, delaying his buy and re-entry and exposing himself to enemy respawns or collapses.",
+      "diamondRule": "When you finish a fight or take a tower and have over 1000g or 30% HP, reset immediately unless the next structure is directly free and unguarded.",
+      "drill": "Next game, recall immediately after your first tower or big fight win unless there is a clear tower hit or guaranteed safe map play.",
+      "timeline": [
+        "01:48 - Leaves lane low HP, delayed recall after failed risk."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "0:58",
+          "videoSeconds": 4,
+          "description": "Champion and minions advancing down bot lane, HUD visible"
+        },
+        {
+          "clock": "1:27",
+          "videoSeconds": 8.5,
+          "description": "Champion attacking minions, taking damage in bot lane"
+        },
+        {
+          "clock": "1:37",
+          "videoSeconds": 18.739,
+          "description": "First Blood notification, champion near enemy minion wave"
+        },
+        {
+          "clock": "1:48",
+          "videoSeconds": 30,
+          "description": "Two enemy champions in lane, one blue champion low HP and retreating"
+        },
+        {
+          "clock": "1:52",
+          "videoSeconds": 33.478,
+          "description": "Champions near blue tower, retreating from minion wave"
+        },
+        {
+          "clock": "2:07",
+          "videoSeconds": 48.217,
+          "description": "Champion healing at fountain in base"
+        },
+        {
+          "clock": "2:10",
+          "videoSeconds": 51.5,
+          "description": "Champion leaving base fountain, healing over time"
+        },
+        {
+          "clock": "3:13",
+          "videoSeconds": 62.957,
+          "description": "Fighting in bot lane, ability effects visible"
+        },
+        {
+          "clock": "3:28",
+          "videoSeconds": 77.696,
+          "description": "Champion at fountain area in base"
+        },
+        {
+          "clock": "3:33",
+          "videoSeconds": 82.5,
+          "description": "Champion moving from base towards lane, tooltip popup"
+        },
+        {
+          "clock": "3:43",
+          "videoSeconds": 92.435,
+          "description": "Champion running down bot lane past allied tower"
+        },
+        {
+          "clock": "3:54",
+          "videoSeconds": 104,
+          "description": "Champion fighting enemy champion in bot lane, both low health"
+        },
+        {
+          "clock": "4:10",
+          "videoSeconds": 107.174,
+          "description": "Champion farming minions near bot lane after fight"
+        },
+        {
+          "clock": "4:52",
+          "videoSeconds": 121.875,
+          "description": "Two champions advancing together under enemy tower in bot lane"
+        },
+        {
+          "clock": "5:07",
+          "videoSeconds": 136.652,
+          "description": "Champion using ability on minion wave, two visible enemies"
+        },
+        {
+          "clock": "5:17",
+          "videoSeconds": 141.625,
+          "description": "Champion pushing lane, allied minions under enemy tower"
+        },
+        {
+          "clock": "5:27",
+          "videoSeconds": 151.391,
+          "description": "Champion auto-attacking enemy tower with minion wave"
+        },
+        {
+          "clock": "5:31",
+          "videoSeconds": 155.625,
+          "description": "Champion and minions damaging low HP enemy tower"
+        },
+        {
+          "clock": "5:42",
+          "videoSeconds": 166.13,
+          "description": "Champion and allies have destroyed enemy tower"
+        },
+        {
+          "clock": "5:45",
+          "videoSeconds": 169.625,
+          "description": "Allies under enemy tower, one ally at low health"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "1:37",
+          "videoSeconds": 18.739,
+          "description": "First Blood notification, Samira near enemy minion wave"
+        },
+        {
+          "clock": "1:48",
+          "videoSeconds": 30,
+          "description": "Alan is left extremely low HP in bot lane after a risky stay, clear evidence of overextending after a map win without immediate reset."
+        },
+        {
+          "clock": "1:52",
+          "videoSeconds": 33.478,
+          "description": "Champions near blue tower, retreating from minion wave"
+        },
+        {
+          "clock": "2:07",
+          "videoSeconds": 48.217,
+          "description": "Alan finally recalling and healing at fountain after a significant delay, illustrating lost tempo from not resetting immediately when safe."
+        }
+      ],
+      "nuance": [
+        "Alan correctly hits tower when it's open and unguarded (02:31), showing structure awareness.",
+        "At 01:48, remains in bot lane with low HP after losing lane control, risking collapse.",
+        "After wins at 03:54 and 04:04, Alan doesn't immediately recall, leaking tempo and opening up to respawned enemy or jungle collapse.",
+        "Buying with a large gold bank translates directly into lane and fight power on Samira.",
+        "In Master, these slow resets will get instantly punished by enemy jungle pathing and lost objective swaps."
+      ],
+      "reviewLimit": "The sequence doesn't show Alan dying from the overstay, but the risk and tempo loss are both clear in the sampled maps; can't verify deeper vision or enemy jungle path for specific punish.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-visible-paragraph-standard-v6",
+      "sampledFrames": 36,
+      "publicVideoBytes": 25187886,
+      "src": "/recordings/auto_NA1-5565356454_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565356454-01.jpg"
+    },
     {
       "file": "auto_NA1-5565308644_01.mp4",
       "publicFile": "auto_NA1-5565308644_01.mp4",
@@ -366,7 +556,7 @@
       "cs": 59,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Cash out after the first win",
@@ -944,7 +1134,7 @@
       "confidence": "high",
       "feedbackTitle": "Missed tower conversion after bot push",
       "feedback": "Mistake: After winning lane fights and getting lane priority, you often leave bot lane before taking or finishing the turret when it is open and your wave is in position. Fix: When the enemy bot lane is dead or zoned off and your wave is at their turret, immediately convert that window into plate or turret damage instead of leaving the lane or walking to fog.",
-      "gameDetail": "This leaks early local gold and denies crucial tempo for opening the map. The correct next click was to stay and convert the wave crash into plates/tower, then take a fast safe reset or rotate only after the structure damage window closes. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. Around 1:25, the wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here; By 5:50, bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification. If you win lane and crash the wave, always check for free structure before considering a rotate or recall.",
+      "gameDetail": "This leaks early local gold and denies crucial tempo for opening the map. The correct next click was to stay and convert the wave crash into plates/tower, then take a fast safe reset or rotate only after the structure damage window closes. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. Around 1:25, the wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here; By 5:50, bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification. If you win lane and crash the wave, always check for free structure before considering a rotate or recall.",
       "eventEvidence": "1:25 Wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here.; 5:50 Bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; 10:16 Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification",
       "goodThing": "You consistently win bot lane trades and push waves into tower, showing lane control and good fight selection.",
       "whyTrust": "Samira snowballs hardest when bot lane turret falls early, unlocking the map for dives and roams—if you want reliable climb, punish every free turret window.",
