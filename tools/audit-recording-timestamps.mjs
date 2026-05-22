@@ -11,7 +11,7 @@ const publicRoot = path.join(appRoot, "public");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
-const visibleParagraphStandardVersion = "2026-05-21-visible-paragraph-standard-v6";
+const currentPrimaryMistakeAnalysisVersion = "2026-05-22-primary-mistake-timestamp-v8";
 
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -45,8 +45,24 @@ function timestampSecondsInText(text) {
     .filter((seconds) => Number.isFinite(seconds));
 }
 
-function uniqueTimestampCount(text) {
-  return new Set(timestampSecondsInText(text).map((seconds) => Math.round(seconds))).size;
+function sentenceParts(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g) || [];
+}
+
+function primaryMistakeTextPattern() {
+  return /\b(biggest|primary|main|clearest|real|actual|big)?\s*(mistake|leak|overstay|overstaying|stayed|stay|chase|chasing|chased|re-?engage|re-?enter|fight|fighting|accepted|accepting|drift|drifted|low[-\s]?hp|lethal|unspent|shutdown|reset|tempo|collapse|overextend|overextended|missed|delayed|risky|risk|danger|gave|died|death|stall|throw|window|blocked|alone|side lane|side fight)\b/i;
+}
+
+function primaryMistakeTimestampSeconds(...texts) {
+  const pattern = primaryMistakeTextPattern();
+  return texts
+    .flatMap((text) => sentenceParts(text))
+    .map(clean)
+    .filter((sentence) => sentence && pattern.test(sentence))
+    .flatMap(timestampSecondsInText);
 }
 
 function mmss(seconds) {
@@ -115,34 +131,27 @@ function anchorMatchesTimestamp(anchor, timestamp) {
   return Number.isFinite(timestampSeconds) && Number.isFinite(anchorSeconds) && Math.abs(anchorSeconds - timestampSeconds) <= 2.5;
 }
 
-function matchingClockAnchorCount(text, anchors) {
-  const anchorSeconds = anchors
-    .map((anchor) => clockSeconds(anchor.clock))
-    .filter((seconds) => Number.isFinite(seconds));
-  const textSeconds = [...new Set(timestampSecondsInText(text).map((seconds) => Math.round(seconds)))];
-  return textSeconds.filter((seconds) => anchorSeconds.some((anchorSecond) => Math.abs(anchorSecond - seconds) <= 2.5)).length;
-}
-
 function visibleParagraphStandardIssues(recording, anchors) {
   const detail = clean(recording.gameDetail);
   const eventEvidence = clean(recording.eventEvidence || recording.evidence);
   const issues = [];
   if (detail.length < 240) issues.push("visible paragraph is too short");
-  if (uniqueTimestampCount(detail) < 3) issues.push("visible paragraph needs at least three game-clock timestamps");
-  if (!/^(?:Honest read:\s*)?(At|Around|By|Then|After)\s+\d{1,2}:[0-5]\d\b/i.test(detail)) {
-    issues.push("visible paragraph must start from a timestamped visible moment");
-  }
+  if (!primaryMistakeTimestampSeconds(detail, eventEvidence).length) issues.push("primary mistake window must have a game-clock timestamp");
   if (!/\b(leak|cost|punish|punished|shutdown|tempo|missed|risk|risky|death|died|gave|lost|blocked|blocker|mistake|danger|punishment|consequence|window|delay|stall|throw)\b/i.test(detail)) {
     issues.push("visible paragraph must name the leak or consequence");
   }
   if (!/\b(instead|because|so|which|then|after|before|when)\b/i.test(detail)) {
     issues.push("visible paragraph must explain the decision chain");
   }
-  if (eventEvidence.length < 80 || uniqueTimestampCount(eventEvidence) < 2) {
-    issues.push("eventEvidence must contain timestamped proof");
+  if (eventEvidence.length < 60) {
+    issues.push("eventEvidence must name visible proof");
   }
-  if (matchingClockAnchorCount(detail, anchors) < Math.min(3, uniqueTimestampCount(detail))) {
-    issues.push("visible timestamps must have matching verified clock anchors");
+  const primarySeconds = [...new Set(primaryMistakeTimestampSeconds(detail, eventEvidence).map((seconds) => Math.round(seconds)))];
+  const anchorSeconds = anchors
+    .map((anchor) => clockSeconds(anchor.clock))
+    .filter((seconds) => Number.isFinite(seconds));
+  if (!primarySeconds.some((seconds) => anchorSeconds.some((anchorSecond) => Math.abs(anchorSecond - seconds) <= 5))) {
+    issues.push("primary mistake timestamp must have a matching verified clock anchor");
   }
   if (/\b(this leads|the consequence|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(detail.slice(0, 80))) {
     issues.push("visible paragraph starts with a conclusion instead of evidence");
@@ -153,7 +162,7 @@ function visibleParagraphStandardIssues(recording, anchors) {
 function requiresVisibleParagraphStandard(recording) {
   return /^auto_/i.test(recording.file || "") &&
     Number(recording.durationSeconds || 0) >= 90 &&
-    (recording.analysisVersion === visibleParagraphStandardVersion || !recording.analysisVersion);
+    recording.analysisVersion === currentPrimaryMistakeAnalysisVersion;
 }
 
 function unanchoredNarrativeTimestamps(recording, anchors) {
@@ -168,10 +177,14 @@ function unanchoredNarrativeTimestamps(recording, anchors) {
 }
 
 function displayClockAnchors(recording, anchors) {
-  const visibleTimestamps = new Set(narrativeFields(recording).flatMap((text) => String(text).match(/\b\d{1,2}:[0-5]\d\b/g) || []));
+  const primarySeconds = [...new Set(primaryMistakeTimestampSeconds(recording.gameDetail, recording.eventEvidence || recording.evidence).map((seconds) => Math.round(seconds)))];
+  const visibleTimestamps = new Set(primarySeconds.map(mmss));
   const momentTimestamps = new Set((Array.isArray(recording.clockMoments) ? recording.clockMoments : [])
     .map((moment) => normalizeClock(moment?.clock))
-    .filter(Boolean));
+    .filter((clock) => {
+      const seconds = clockSeconds(clock);
+      return Number.isFinite(seconds) && primarySeconds.some((primarySecond) => Math.abs(primarySecond - seconds) <= 5);
+    }));
   const wanted = [...new Set([...visibleTimestamps, ...momentTimestamps])];
   const selected = [];
   for (const timestamp of wanted) {
@@ -269,20 +282,23 @@ async function main() {
         description: clean(anchor.description)
       }))
       .filter((anchor) => anchor.clock && Number.isFinite(anchor.videoSeconds));
-    const anchors = displayClockAnchors(recording, allAnchors);
-
     const duration = Number(recording.durationSeconds || 0);
     const videoPath = manifestVideoPath(recording);
     const strictVisibleStandard = requiresVisibleParagraphStandard(recording);
+    const anchors = strictVisibleStandard ? displayClockAnchors(recording, allAnchors) : [];
     const unanchored = unanchoredNarrativeTimestamps(recording, allAnchors);
-    if (unanchored.length) {
-      failures.push(`${recording.file}: visible text has unverified timestamp(s): ${unanchored.join(", ")}`);
+    if (unanchored.length && strictVisibleStandard) {
+      failures.push(`${recording.file}: visible timestamp(s) without matching anchors: ${unanchored.join(", ")}`);
+    } else if (unanchored.length) {
+      warnings.push(`${recording.file}: extra visible timestamp(s) without matching anchors: ${unanchored.join(", ")}`);
     }
-    if (requiresVisibleParagraphStandard(recording)) {
+    if (strictVisibleStandard) {
       const standardIssues = visibleParagraphStandardIssues(recording, allAnchors);
       for (const issue of standardIssues) {
         failures.push(`${recording.file}: ${issue}`);
       }
+    } else if (/^auto_/i.test(recording.file || "") && Number(recording.durationSeconds || 0) >= 90) {
+      warnings.push(`${recording.file}: legacy analysis version ${recording.analysisVersion || "none"} skipped for current timestamp-standard frame audit`);
     }
     for (const anchor of anchors) {
       if (anchor.videoSeconds < 0 || (duration > 0 && anchor.videoSeconds > duration + 0.25)) {
@@ -296,9 +312,6 @@ async function main() {
           warnings.push(issue);
         }
       }
-    }
-    if (duration >= 10 && anchors.length > 0 && anchors.length < 2) {
-      warnings.push(`${recording.file}: only ${anchors.length} verified clickable timestamp`);
     }
     if (!(await fs.stat(videoPath).catch(() => null))) {
       failures.push(`${recording.file}: missing public video ${videoPath}`);

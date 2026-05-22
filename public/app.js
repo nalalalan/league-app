@@ -1860,6 +1860,16 @@ function recordingClockMomentText(item, existingTimes = new Set()) {
   return parts.join("; ");
 }
 
+function recordingRankSentence(item) {
+  const estimate = item?.rankEstimate || {};
+  const label = String(estimate.label || "").trim();
+  if (!label) return "";
+  const range = String(estimate.range || "").trim();
+  const confidence = String(estimate.confidence || "").trim();
+  const detail = [range, confidence ? `${confidence} confidence` : ""].filter(Boolean).join(", ");
+  return detail ? `Approx rank read: ${label} (${detail}).` : `Approx rank read: ${label}.`;
+}
+
 function recordingStoryParagraph(item) {
   const paragraph = document.createElement("p");
   paragraph.className = "recording-list-story";
@@ -1869,6 +1879,7 @@ function recordingStoryParagraph(item) {
     compactRecordingDate(item),
     compactGameLength(item)
   ].join(" | ") + ".");
+  appendStorySpan(paragraph, recordingRankSentence(item), "recording-story-rank");
   const sentences = storySentences(recordingParagraph(item));
   const critique = displayCritique(item);
   const praise = displayPraise(item);

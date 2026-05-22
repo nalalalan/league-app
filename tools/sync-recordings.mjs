@@ -26,6 +26,7 @@ const compatibleAnalysisVersions = new Set([
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
+const rankEstimateVersion = "2026-05-22-macro-rank-v2";
 const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v3";
 const coachEvidenceVersion = "2026-05-21-specific-evidence-useful-v5";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
@@ -1523,6 +1524,158 @@ function enforceVisibleParagraphStandard(recording, fileName) {
   }
 }
 
+function scoreRankBand(score) {
+  const bands = [
+    { min: 98, label: "Challenger", range: "Grandmaster-Challenger", percentile: "elite ladder" },
+    { min: 95, label: "Grandmaster", range: "Master-Grandmaster", percentile: "top 0.1%" },
+    { min: 91, label: "Master", range: "Diamond I-Master", percentile: "top 1%" },
+    { min: 85, label: "Diamond", range: "Emerald I-Diamond III", percentile: "top 4%" },
+    { min: 77, label: "Emerald", range: "Platinum I-Emerald II", percentile: "top 10%" },
+    { min: 68, label: "Platinum", range: "Gold I-Platinum II", percentile: "top 22%" },
+    { min: 56, label: "Gold", range: "Silver I-Gold II", percentile: "upper middle" },
+    { min: 40, label: "Silver", range: "Bronze I-Silver II", percentile: "middle" },
+    { min: 24, label: "Bronze", range: "Iron I-Bronze II", percentile: "developing" },
+    { min: 0, label: "Iron", range: "Iron IV-Iron II", percentile: "new ranked fundamentals" }
+  ];
+  return bands.find((band) => score >= band.min) || bands.at(-1);
+}
+
+function rankTextFlags(recording) {
+  const text = [
+    recording.feedbackTitle,
+    recording.feedback,
+    recording.gameDetail,
+    recording.eventEvidence || recording.evidence,
+    recording.pattern,
+    recording.diamondRule,
+    ...(Array.isArray(recording.nuance) ? recording.nuance : [])
+  ].filter(Boolean).join(" ").toLowerCase();
+  return {
+    text,
+    lethalHp: /\b(lethal hp|low[-\s]?hp|low health|one hit|one enemy auto|one spell|death timer)\b/i.test(text),
+    overstayReset: /\b(overstay|overstayed|stayed|lingering|missed reset|missed recall|reset window|recall window|refight|re-fight|re-enter|reentry|re-entry)\b/i.test(text),
+    conversion: /\b(missed structure|structure conversion|conversion gap|free structure|open (?:inhibitor|tower|base|nexus)|hit (?:the )?(?:tower|structure|inhibitor|nexus)|objective conversion)\b/i.test(text),
+    chaseDrift: /\b(chase|chasing|side chase|side jungle|side[-\s]?lane|drift|fog|away from (?:structure|tower|base)|solo bot|alone)\b/i.test(text),
+    shutdownGold: /\b(shutdown|unspent gold|big gold|spend|spent|shop|item tempo)\b/i.test(text),
+    syncedTeamplay: /\b(grouped|with allies|behind allies|sync|synced|team|body-block|body block)\b/i.test(text),
+    positiveConversion: /\b(good|correctly|converted|created real|base pressure|tower damage|structure pressure|ending pressure|did spend|did group|ended)\b/i.test(text)
+  };
+}
+
+function rankedEquivalentForRecording(recording = {}) {
+  const duration = Number(recording.durationSeconds || 0);
+  const isFullReview = recording.kind === "full review" || duration > 90;
+  if (!isFullReview) return null;
+  if (recording.rankEstimate?.version === rankEstimateVersion) return recording.rankEstimate;
+
+  const flags = rankTextFlags(recording);
+  const queueText = clean(recording.gameType || recording.kind || "").toLowerCase();
+  const beginnerBot = /co-?op|ai|beginner|bot/.test(queueText);
+  const deaths = Number(recording.deaths);
+  const kills = Number(recording.kills);
+  const assists = Number(recording.assists);
+  const cs = Number(recording.cs);
+  const gameLengthSeconds = Number(recording.gameLengthSeconds);
+  const csPerMinute = Number.isFinite(cs) && Number.isFinite(gameLengthSeconds) && gameLengthSeconds > 0
+    ? cs / (gameLengthSeconds / 60)
+    : null;
+  const kda = Number.isFinite(kills) || Number.isFinite(assists) || Number.isFinite(deaths)
+    ? (Math.max(0, kills || 0) + Math.max(0, assists || 0)) / Math.max(1, deaths || 0)
+    : null;
+
+  let score = 50;
+  const strengths = [];
+  const leaks = [];
+
+  if (Number.isFinite(deaths)) {
+    if (deaths >= 10) {
+      score -= 22;
+      leaks.push("very high death count for a bot game");
+    } else if (deaths >= 7) {
+      score -= 15;
+      leaks.push("too many punishable deaths");
+    } else if (deaths >= 5) {
+      score -= 8;
+      leaks.push("avoidable deaths still show up");
+    } else if (deaths <= 3) {
+      score += 7;
+      strengths.push("death count stayed controlled");
+    }
+  }
+  if (Number.isFinite(kills) && kills >= 18) {
+    score += 5;
+    strengths.push("fight conversion and damage output are clearly above beginner mechanics");
+  } else if (Number.isFinite(kills) && kills <= 5) {
+    score -= 4;
+    leaks.push("kill pressure is not yet consistent");
+  }
+  if (Number.isFinite(kda)) {
+    if (kda >= 5) score += 5;
+    else if (kda < 1.8) score -= 6;
+  }
+  if (Number.isFinite(csPerMinute)) {
+    if (csPerMinute >= 6.5) {
+      score += 6;
+      strengths.push("farm pace is a real strength");
+    } else if (csPerMinute >= 5.2) {
+      score += 2;
+    } else if (csPerMinute < 4) {
+      score -= 8;
+      leaks.push("farm pace is too low for reliable ranked climbing");
+    } else if (csPerMinute < 5) {
+      score -= 3;
+    }
+  }
+  if (flags.lethalHp) {
+    score -= 8;
+    leaks.push("lethal-health stays");
+  }
+  if (flags.overstayReset) {
+    score -= 11;
+    leaks.push("reset discipline after wins");
+  }
+  if (flags.conversion) {
+    score -= 8;
+    leaks.push("missed structure/objective conversion");
+  }
+  if (flags.chaseDrift) {
+    score -= 7;
+    leaks.push("side chase or fog drift");
+  }
+  if (flags.shutdownGold) {
+    score -= 4;
+    leaks.push("shutdown or unspent-gold protection");
+  }
+  if (flags.syncedTeamplay) {
+    score += 5;
+    strengths.push("team grouping or sync appears in the review");
+  }
+  if (flags.positiveConversion) {
+    score += 5;
+    strengths.push("you are already finding fights, waves, towers, or base pressure");
+  }
+
+  const cap = beginnerBot ? 68 : 100;
+  const cappedScore = Math.max(0, Math.min(cap, Math.round(score)));
+  const band = scoreRankBand(cappedScore);
+  const confidence = beginnerBot ? "low" : (duration >= 540 ? "medium" : "low");
+  const leakText = [...new Set(leaks)].slice(0, 3).join(", ") || "the review does not show enough ranked-punishable leaks";
+  const strengthText = [...new Set(strengths)].slice(0, 2).join(", ") || "the recording still shows playable fighting instincts";
+  const reason = beginnerBot
+    ? `${band.label} read from macro habits: ${strengthText}; held down by ${leakText}. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling.`
+    : `${band.label} read from macro habits: ${strengthText}; held down by ${leakText}.`;
+  return {
+    version: rankEstimateVersion,
+    label: band.label,
+    range: band.range,
+    score: cappedScore,
+    confidence,
+    basis: "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+    percentile: band.percentile,
+    reason
+  };
+}
+
 function cacheKeyFor(stat) {
   return `${stat.size}:${Math.round(stat.mtimeMs)}`;
 }
@@ -2789,8 +2942,10 @@ async function main() {
       sourceStats.push({ mtimeMs: Number.isFinite(recordedMs) ? recordedMs : stat.mtimeMs });
       if (duration > 90) fullGameCount += 1;
       else highlightCount += 1;
+      const cachedRankEstimate = rankedEquivalentForRecording(cached);
       recordings.push({
         ...cached,
+        ...(cachedRankEstimate ? { rankEstimate: cachedRankEstimate } : {}),
         publicVideoBytes,
         src: publicPath(destPath),
         poster: publicPath(posterPath)
@@ -2948,6 +3103,8 @@ async function main() {
       src: publicPath(destPath),
       poster: publicPath(posterPath)
     };
+    const rankEstimate = rankedEquivalentForRecording(recording);
+    if (rankEstimate) recording.rankEstimate = rankEstimate;
     enforceVisibleParagraphStandard(recording, name);
     recordings.push(recording);
     console.log(`${name}: ${recordings.at(-1).reviewPhase} - ${recordings.at(-1).champion} - ${recordings.at(-1).feedbackTitle}`);

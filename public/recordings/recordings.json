@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T06:03:01.938Z",
+  "generatedAt": "2026-05-22T06:28:08.715Z",
   "source": "League of Legends Highlights folder",
   "match": "21 matches",
   "matches": [
@@ -140,7 +140,17 @@
       "sampledFrames": 14,
       "publicVideoBytes": 24741296,
       "src": "/recordings/auto_NA1-5565578420_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565578420-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565578420-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Gold",
+        "range": "Silver I-Gold II",
+        "score": 61,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "upper middle",
+        "reason": "Gold read from macro habits: death count stayed controlled, fight conversion and damage output are clearly above beginner mechanics; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565518539_01.mp4",
@@ -252,7 +262,17 @@
       "sampledFrames": 29,
       "publicVideoBytes": 27622246,
       "src": "/recordings/auto_NA1-5565518539_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565518539-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565518539-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 34,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, reset discipline after wins, missed structure/objective conversion. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565445744_01.mp4",
@@ -400,7 +420,17 @@
       "sampledFrames": 34,
       "publicVideoBytes": 24317981,
       "src": "/recordings/auto_NA1-5565445744_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565445744-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565445744-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "score": 45,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "middle",
+        "reason": "Silver read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, shutdown or unspent-gold protection. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565387627_01.mp4",
@@ -529,7 +559,17 @@
       "sampledFrames": 34,
       "publicVideoBytes": 25268675,
       "src": "/recordings/auto_NA1-5565387627_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565387627-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565387627-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "score": 45,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "middle",
+        "reason": "Silver read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565356454_01.mp4",
@@ -661,7 +701,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 25344462,
       "src": "/recordings/auto_NA1-5565356454_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565356454-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565356454-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 37,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by kill pressure is not yet consistent, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565308644_01.mp4",
@@ -815,7 +865,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 27604601,
       "src": "/recordings/auto_NA1-5565308644_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565308644-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565308644-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "score": 44,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "middle",
+        "reason": "Silver read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, side chase or fog drift. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565242641_01.mp4",
@@ -974,7 +1034,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 73707816,
       "src": "/recordings/auto_NA1-5565242641_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565242641-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565242641-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "score": 0,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "reason": "Iron read from macro habits: farm pace is a real strength, you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565226188_01.mp4",
@@ -1098,7 +1168,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 80518700,
       "src": "/recordings/auto_NA1-5565226188_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565226188-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565226188-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 26,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by lethal-health stays, reset discipline after wins, missed structure/objective conversion. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565193158_01.mp4",
@@ -1190,7 +1270,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 91418422,
       "src": "/recordings/auto_NA1-5565193158_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565193158-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565193158-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 39,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, shutdown or unspent-gold protection. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565145132_01.mp4",
@@ -1324,7 +1414,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 78269244,
       "src": "/recordings/auto_NA1-5565145132_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565145132-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565145132-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "score": 0,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "reason": "Iron read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, farm pace is too low for reliable ranked climbing, lethal-health stays. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565058943_01.mp4",
@@ -1436,7 +1536,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 78244571,
       "src": "/recordings/auto_NA1-5565058943_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565058943-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565058943-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "score": 43,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "middle",
+        "reason": "Silver read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565048601_01.mp4",
@@ -1573,7 +1683,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 79203118,
       "src": "/recordings/auto_NA1-5565048601_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565048601-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565048601-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 36,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565044205_01.mp4",
@@ -1695,7 +1815,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 83857975,
       "src": "/recordings/auto_NA1-5565044205_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565044205-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565044205-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 32,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5565025543_01.mp4",
@@ -1817,7 +1947,17 @@
       "sampledFrames": 36,
       "publicVideoBytes": 92445880,
       "src": "/recordings/auto_NA1-5565025543_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565025543-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565025543-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 29,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5564835832_01.mp4",
@@ -1994,7 +2134,17 @@
       "sampledFrames": 25,
       "publicVideoBytes": 48461876,
       "src": "/recordings/auto_NA1-5564835832_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5564835832-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5564835832-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "score": 11,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "reason": "Iron read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "auto_NA1-5564718141_01.mp4",
@@ -2106,7 +2256,17 @@
       "sampledFrames": 27,
       "publicVideoBytes": 88166283,
       "src": "/recordings/auto_NA1-5564718141_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5564718141-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5564718141-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "score": 0,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "reason": "Iron read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+      }
     },
     {
       "file": "16-10_NA1-5564259818_01.webm",
@@ -2349,7 +2509,17 @@
       "sampledFrames": 18,
       "publicVideoBytes": 30104756,
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5563660362-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5563660362-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "score": 14,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "reason": "Iron read from macro habits: team grouping or sync appears in the review; held down by avoidable deaths still show up, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing."
+      }
     },
     {
       "file": "16-10_NA1-5563352800_01.webm",
@@ -2547,7 +2717,17 @@
       "sampledFrames": 24,
       "publicVideoBytes": 79026136,
       "src": "/recordings/16-10_NA1-5563352800_01.mp4",
-      "poster": "/recordings/posters/16-10-na1-5563352800-01.jpg"
+      "poster": "/recordings/posters/16-10-na1-5563352800-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 37,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection."
+      }
     },
     {
       "file": "16-10_NA1-5563301586_01.webm",
@@ -2744,7 +2924,17 @@
       "sampledFrames": 24,
       "publicVideoBytes": 91217492,
       "src": "/recordings/16-10_NA1-5563301586_01.mp4",
-      "poster": "/recordings/posters/16-10-na1-5563301586-01.jpg"
+      "poster": "/recordings/posters/16-10-na1-5563301586-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "score": 47,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "middle",
+        "reason": "Silver read from macro habits: farm pace is a real strength, team grouping or sync appears in the review; held down by lethal-health stays, reset discipline after wins."
+      }
     },
     {
       "file": "16-10_NA1-5563247854_13.webm",
@@ -2916,7 +3106,17 @@
       "sampledFrames": 18,
       "publicVideoBytes": 83856038,
       "src": "/recordings/16-10_NA1-5563247854_13.mp4",
-      "poster": "/recordings/posters/16-10-na1-5563247854-13.jpg"
+      "poster": "/recordings/posters/16-10-na1-5563247854-13.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-macro-rank-v2",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "score": 36,
+        "confidence": "low",
+        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "percentile": "developing",
+        "reason": "Bronze read from macro habits: farm pace is a real strength, team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, shutdown or unspent-gold protection."
+      }
     },
     {
       "file": "16-10_NA1-5563247854_12.webm",

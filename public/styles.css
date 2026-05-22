@@ -2246,8 +2246,13 @@ h1 {
 }
 
 .recording-story-critique,
-.recording-story-praise {
+.recording-story-praise,
+.recording-story-rank {
   font-weight: 900;
+}
+
+.recording-story-rank {
+  color: #4c5f86;
 }
 
 .recording-story-critique {
