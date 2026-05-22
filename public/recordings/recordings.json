@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T21:12:58.565Z",
+  "generatedAt": "2026-05-22T21:34:46.148Z",
   "source": "League of Legends Highlights folder",
   "match": "27 matches",
   "matches": [
@@ -329,7 +329,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
-      }
+      },
+      "captureFps": 1
     },
     {
       "file": "auto_NA1-5565818690_01.mp4",
@@ -504,7 +505,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Iron III read from macro habits: the recording still shows playable fighting instincts; held down by too many punishable deaths, lethal-health stays, reset discipline after wins. Ranked-transfer confidence is high from ranked solo evidence."
-      }
+      },
+      "captureFps": 1
     },
     {
       "file": "auto_NA1-5565804951_01.mp4",
@@ -672,7 +674,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, reset discipline after wins. Ranked-transfer confidence is high from ranked solo evidence."
-      }
+      },
+      "captureFps": 1
     },
     {
       "file": "auto_NA1-5565779781_01.mp4",
@@ -845,7 +848,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Iron II read from macro habits: team grouping or sync appears in the review; held down by very high death count for a bot game, kill pressure is not yet consistent, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
-      }
+      },
+      "captureFps": 1
     },
     {
       "file": "auto_NA1-5565766659_01.mp4",
@@ -1006,7 +1010,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze III read from macro habits: death count stayed controlled; held down by farm pace is too low for reliable ranked climbing, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 1
     },
     {
       "file": "auto_NA1-5565758308_01.mp4",
@@ -1125,7 +1130,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Silver I read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 1
     },
     {
       "file": "auto_NA1-5565578420_01.mp4",
@@ -1244,7 +1250,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Gold IV read from macro habits: death count stayed controlled, fight conversion and damage output are clearly above beginner mechanics; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 1
     },
     {
       "file": "auto_NA1-5565518539_01.mp4",
@@ -1388,7 +1395,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze III read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, reset discipline after wins, missed structure/objective conversion. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 2
     },
     {
       "file": "auto_NA1-5565445744_01.mp4",
@@ -1569,7 +1577,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Silver III read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 2
     },
     {
       "file": "auto_NA1-5565387627_01.mp4",
@@ -1731,7 +1740,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Silver III read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 2
     },
     {
       "file": "auto_NA1-5565356454_01.mp4",
@@ -1890,7 +1900,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze I read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by kill pressure is not yet consistent, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 2
     },
     {
       "file": "auto_NA1-5565308644_01.mp4",
@@ -2077,7 +2088,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Silver III read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 2
     },
     {
       "file": "auto_NA1-5565242641_01.mp4",
@@ -2269,7 +2281,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Iron IV read from macro habits: farm pace is a real strength, you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 2
     },
     {
       "file": "auto_NA1-5565226188_01.mp4",
@@ -2425,7 +2438,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Iron I read from macro habits: death count stayed controlled; held down by lethal-health stays, reset discipline after wins, missed structure/objective conversion. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 4
     },
     {
       "file": "auto_NA1-5565193158_01.mp4",
@@ -2549,7 +2563,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze I read from macro habits: team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 4
     },
     {
       "file": "auto_NA1-5565145132_01.mp4",
@@ -2708,7 +2723,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Iron IV read from macro habits: the recording still shows playable fighting instincts; held down by very high death count for a bot game, farm pace is too low for reliable ranked climbing, missed structure/objective conversion. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 6
     },
     {
       "file": "auto_NA1-5565058943_01.mp4",
@@ -2852,7 +2868,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze I read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 6
     },
     {
       "file": "auto_NA1-5565048601_01.mp4",
@@ -3016,7 +3033,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze I read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 6
     },
     {
       "file": "auto_NA1-5565044205_01.mp4",
@@ -3165,7 +3183,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Iron I read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 6
     },
     {
       "file": "auto_NA1-5565025543_01.mp4",
@@ -3324,7 +3343,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Bronze III read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 6
     },
     {
       "file": "auto_NA1-5564835832_01.mp4",
@@ -3498,7 +3518,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Iron III read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 6
     },
     {
       "file": "auto_NA1-5564718141_01.mp4",
@@ -3642,7 +3663,8 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Iron IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      }
+      },
+      "captureFps": 10
     },
     {
       "file": "16-10_NA1-5564259818_01.webm",

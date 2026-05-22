@@ -915,6 +915,14 @@ function clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds) 
   return Math.abs(visibleClock - expected) <= 360;
 }
 
+function captureFpsForEntry(entry, fallback = null) {
+  const sidecarFps = Number(entry?.sidecar?.captureFps);
+  if (Number.isFinite(sidecarFps) && sidecarFps > 0) return sidecarFps;
+  const fallbackFps = Number(fallback);
+  if (Number.isFinite(fallbackFps) && fallbackFps > 0) return fallbackFps;
+  return null;
+}
+
 function nearestClockReadTime(videoSeconds, readTimes) {
   const target = Number(videoSeconds);
   if (!Number.isFinite(target)) return null;
@@ -2747,7 +2755,7 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (isAutoFullReview) {
     issues.push(...secondaryFocusStandardIssues({
       secondaryFocus,
-      captureFps: Number(process.env.LEAGUE_LIVE_FPS || 1)
+      captureFps: Number(process.env.LEAGUE_LIVE_FPS || 2)
     }));
   }
   if (nuance.length < 3) {
@@ -3045,7 +3053,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Use capture order internally to distinguish earlier leak evidence from later implementation attempts, but do not mention recency weighting in visible output.",
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
-    "The recorder is intentionally low-FPS for low-lag macro review. Prioritize decisions that unfold over seconds or minutes: resets, objective conversion, side-lane drift, base pressure, shutdown protection, and map tempo. Do not over-index on single-frame mechanics.",
+    "The recorder is intentionally low-FPS for low-lag review. At 2 FPS, prioritize decisions and mechanics-adjacent habits that unfold over seconds: resets, objective conversion, side-lane drift, base pressure, shutdown protection, map tempo, camera stability, spacing, entry timing, target choice, and repeated cursor/pathing patterns. Do not over-index on single-frame mechanics.",
     "Coach like a blunt but serious League coach: name the actual mistake, do not soften it, and do not insult Alan. Be direct enough that he knows exactly where he messed up.",
     "Give exactly two improvement areas for this recording. The first is the highest-value main mistake and stays in feedback/gameDetail. The second goes in secondaryFocus as one separate easy thing Alan can work on right away.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
@@ -3056,7 +3064,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Write gameDetail like a useful replay-review paragraph, not a stat audit: include the main visible mistake window, what leaked, what happened next or almost happened, and one final simple lesson sentence. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp. Extra timestamps are optional and should appear only when they make the critique clearer.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
     "secondaryFocus must be one concise sentence and must not repeat the main mistake. Choose a second lane from visible mechanics-adjacent habits, camera stability, spacing, target choice, cursor/click pattern when visible, entry timing, cooldown/CC accounting, lane trade discipline, wave handling, pathing, fog/vision, or reset pattern. Include an easy next-game action.",
-    "At 1 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, or using dash before the fight is ready. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
+    "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not over-explain common coaching terms Alan already knows. Only define grouped mid, sync, tempo, payout, or conversion when the advice would otherwise be unclear; prioritize why the decision is better in this visible state.",
     "If you recommend grouping mid or pressuring mid, explain why mid is better in that visible state: for example, allies are already there, mid is the shortest lane to towers/base, it reduces fog-collapse risk, it lets teammates peel, or it forces enemies to defend structure instead of chasing Samira in a side lane. Tie the reason to the frames; do not say group mid as generic advice.",
     "Every full-game review must include the reason Alan should do the fix, not just the instruction. A good sentence sounds like: 'This matters because ...' or 'That route is better because ...'.",
@@ -3389,9 +3397,11 @@ async function main() {
       if (duration > 90) fullGameCount += 1;
       else highlightCount += 1;
       const cachedRankEstimate = rankedEquivalentForRecording(cached);
+      const cachedCaptureFps = captureFpsForEntry(entry, cached.captureFps);
       recordings.push({
         ...cached,
         ...(cachedRankEstimate ? { rankEstimate: cachedRankEstimate } : {}),
+        ...(cachedCaptureFps ? { captureFps: cachedCaptureFps } : {}),
         publicVideoBytes,
         src: publicPath(destPath),
         poster: publicPath(posterPath)
@@ -3504,6 +3514,7 @@ async function main() {
     const clipWindow = Number.isFinite(clipStart)
       ? `${shortClock(clipStart)}-${shortClock(clipStart + duration)}`
       : "";
+    const entryCaptureFps = captureFpsForEntry(entry, process.env.LEAGUE_LIVE_FPS || 2);
     const recording = {
       file: name,
       publicFile: destName,
@@ -3561,6 +3572,7 @@ async function main() {
       analysisVersion: analysis.analysisVersion || analysisVersion,
       sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : analysisSampleTimes(duration, entry.sidecar).length),
       publicVideoBytes,
+      ...(entryCaptureFps ? { captureFps: entryCaptureFps } : {}),
       src: publicPath(destPath),
       poster: publicPath(posterPath)
     };

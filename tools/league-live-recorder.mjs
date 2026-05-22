@@ -24,8 +24,8 @@ const minCaptureCoverage = Number(process.env.LEAGUE_LIVE_MIN_CAPTURE_COVERAGE |
 const maxCaptureRestarts = Number(process.env.LEAGUE_LIVE_MAX_CAPTURE_RESTARTS || 20);
 const captureStallMs = Number(process.env.LEAGUE_LIVE_CAPTURE_STALL_MS || 45000);
 const minCaptureGrowthBytes = Number(process.env.LEAGUE_LIVE_MIN_GROWTH_BYTES || 8 * 1024);
-// Defaults favor in-game FPS over review smoothness. The site review only needs readable decisions.
-const fps = String(process.env.LEAGUE_LIVE_FPS || 1);
+// Defaults favor in-game FPS over review smoothness. Two FPS improves camera, spacing, and entry reads while staying low-impact.
+const fps = String(process.env.LEAGUE_LIVE_FPS || 2);
 const encoderPreference = String(process.env.LEAGUE_LIVE_ENCODER || "auto").toLowerCase();
 const liveCq = String(process.env.LEAGUE_LIVE_CQ || 20);
 const liveCaptureCq = String(process.env.LEAGUE_LIVE_CAPTURE_CQ || 30);
