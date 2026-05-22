@@ -1887,43 +1887,6 @@ function recordingStoryParagraph(item) {
   return paragraph;
 }
 
-function recordingEvidencePanel(item) {
-  const timeline = Array.isArray(item?.timeline) ? item.timeline.filter(hasText).slice(0, 6) : [];
-  const rows = [
-    item?.eventEvidence ? ["evidence", item.eventEvidence] : null,
-    item?.diamondRule ? ["rule", item.diamondRule] : null,
-    item?.drill ? ["rep", item.drill] : null,
-    item?.reviewLimit ? ["limit", item.reviewLimit] : null
-  ].filter(Boolean);
-  if (!timeline.length && !rows.length) return null;
-
-  const panel = document.createElement("div");
-  panel.className = "recording-evidence-panel";
-
-  if (timeline.length) {
-    const list = document.createElement("ol");
-    list.className = "recording-evidence-list";
-    for (const event of timeline) {
-      const itemNode = document.createElement("li");
-      appendTextWithTimestampLinks(itemNode, event, item);
-      list.append(itemNode);
-    }
-    panel.append(list);
-  }
-
-  rows.forEach(([label, value]) => {
-    const row = document.createElement("p");
-    row.className = "recording-evidence-row";
-    const key = document.createElement("b");
-    key.textContent = label;
-    row.append(key, document.createTextNode(" "));
-    appendTextWithTimestampLinks(row, value, item);
-    panel.append(row);
-  });
-
-  return panel;
-}
-
 function seekRecordingVideo(button) {
   const seconds = Number(button?.dataset?.seekSeconds);
   const card = button?.closest(".recording-list-card");
@@ -2004,9 +1967,7 @@ function recordingListCard(item) {
   const title = document.createElement("h3");
   title.textContent = item.feedbackTitle || "Focus";
 
-  const evidencePanel = recordingEvidencePanel(item);
   copy.append(title, recordingStoryParagraph(item));
-  if (evidencePanel) copy.append(evidencePanel);
 
   const videoWrap = document.createElement("div");
   videoWrap.className = "recording-list-video";
