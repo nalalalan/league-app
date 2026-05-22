@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T17:24:24.166Z",
+  "generatedAt": "2026-05-22T17:44:39.218Z",
   "source": "League of Legends Highlights folder",
-  "match": "22 matches",
+  "match": "23 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -24,19 +24,20 @@
     "NA1-5565445744",
     "NA1-5565518539",
     "NA1-5565578420",
-    "NA1-5565758308"
+    "NA1-5565758308",
+    "NA1-5565766659"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 1:23 PM ET",
-  "totalDuration": "176:51",
-  "totalRecordings": 34,
+  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 1:42 PM ET",
+  "totalDuration": "184:14",
+  "totalRecordings": 35,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira overall state",
-    "focus": "Current read: Gold III on the newest full game; Silver II across the last 5 full-game reads; Bronze I median across 21 full games. The latest game is above your recent baseline.",
+    "focus": "Current read: Bronze I on the newest full game; Silver II across the last 5 full-game reads; Bronze I median across 22 full games. The latest game is below your recent baseline.",
     "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is finding fights and base pressure and grouping with allies when the play is clear.",
     "nextRep": "Next game: after the first won fight or open structure, choose only free structure, body blocking that structure, or reset.",
     "whyTrust": "This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.",
-    "pattern": "Latest file auto_NA1-5565758308_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
+    "pattern": "Latest file auto_NA1-5565766659_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
     "checklist": [
       "Read the latest rank point.",
       "Check the repeated leak.",
@@ -49,18 +50,18 @@
     "method": "research-calibrated macro rank estimate with confidence gates",
     "highConfidenceReady": false,
     "currentLimitation": "No current full review has PvP or ranked opponent pressure, so the system can be confident about repeated review evidence but cannot honestly make a high-confidence ranked-MMR claim yet.",
-    "fullReviewGames": 21,
+    "fullReviewGames": 22,
     "queueCounts": {
       "unknown": 4,
-      "bot": 17
+      "bot": 18
     },
     "rankedFullGames": 0,
     "pvpFullGames": 0,
-    "botFullGames": 17,
-    "anchoredFullGames": 21,
-    "statFullGames": 21,
+    "botFullGames": 18,
+    "anchoredFullGames": 22,
+    "statFullGames": 22,
     "rankLabelCounts": {
-      "Bronze": 9,
+      "Bronze": 10,
       "Silver": 5,
       "Iron": 5,
       "Gold": 2
@@ -146,13 +147,175 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 34,
+      "recordings": 35,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565766659_01.mp4",
+      "publicFile": "auto_NA1-5565766659_01.mp4",
+      "cacheKey": "10627792:1779471751648",
+      "fingerprint": "529f3bd5350a",
+      "matchId": "NA1-5565766659",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779471118237,
+      "gameHappenedAt": "2026-05-22T17:31:58.237Z",
+      "gameHappenedAtLabel": "May 22, 2026, 1:31 PM",
+      "recordedAt": "2026-05-22T17:42:31.703Z",
+      "recordedAtLabel": "May 22, 2026, 1:42 PM",
+      "recordedAtTimeLabel": "1:42 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Stayed in lane at low HP after a close 2v2/dive, risking shutdown and losing tempo",
+      "duration": "7:23",
+      "durationSeconds": 443,
+      "gameLength": "9:33",
+      "gameLengthSeconds": 573,
+      "kda": "6/1/2",
+      "kills": 6,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 38,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Stayed in lane at low HP after a close 2v2/dive, risking shutdown and losing tempo",
+      "feedback": "Mistake: You stayed on the bot lane map with low HP and no supporting bodies after surviving the enemy engage, exposing yourself to repeat threat and delaying your reset. Fix: Immediately hard recall after surviving the initial gank when your HP and teammate presence make you unplayable, to safely cash in your gold and reset your wave.",
+      "gameDetail": "Around 0:42, Samira is near bot lane tower, moving away from it; this is the start or nearest visible start of the main mistake window; by 1:16, Samira and Rakan are in lane with minion waves meeting; by 2:59, at , Samira is half HP, solo, with enemy Kha’Zix and Rakan both bot, yet does not recall after the engage—she stays in lane farming, exposing herself to a repeat play.;. Mistake: You stayed on the bot lane map with low HP and no supporting bodies after surviving the enemy engage, exposing yourself to repeat threat and delaying your reset. Fix: Immediately hard recall after surviving the initial gank when your HP and teammate presence make you unplayable, to safely cash in your gold and reset your wave. Conversion means turning a fight win or gold lead into something that remains after the fight ends: tower damage, base damage, dragon/Baron setup, or a safe reset with spent gold. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
+      "eventEvidence": "0:42 shows Samira is near bot lane tower, moving away from it. 1:16 shows Samira and Rakan are in lane with minion waves meeting. 2:59 shows at , Samira is half HP, solo, with enemy Kha’Zix and Rakan both bot, yet does not recall after the engage—she stays in lane farming, exposing herself to a repeat play.;.",
+      "goodThing": "You survived the initial 2v2 dive despite heavy enemy pressure and minimized deaths early.",
+      "whyTrust": "Samira's carry value is highest when she spends early gold and returns with tempo—staying on the map at low HP risks your shutdown and makes it impossible to use your item lead before the next fight.",
+      "focusTag": "reset discipline",
+      "evidence": "0:42 Samira is near bot lane tower, moving away from it; 1:16 Samira and Rakan are in lane with minion waves meeting; 2:59 At , Samira is half HP, solo, with enemy Kha’Zix and Rakan both bot, yet does not recall after the engage—she stays in lane farming, exposing herself to a repeat play.;",
+      "pattern": "You consistently remain on the map after close trades or gank survivals instead of respecting your reset window, overstaying in lane despite being pushable, which would be instantly exploited at higher levels.",
+      "diamondRule": "If you are low HP and lower numbers after a failed fight or gank, recall instantly unless you see and count every enemy and can confirm the next wave is uncontestable.",
+      "drill": "Next game, after every won or neutralized bot gank, check your HP and backup. If you’re below half HP and alone, recall on the first safe timer instead of touching the next wave.",
+      "timeline": [
+        "02:59 - Survived engage at 40% HP, stayed bot versus visible enemy instead of recalling."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "0:42",
+          "videoSeconds": 4,
+          "description": "Samira is near bot lane tower, moving away from it"
+        },
+        {
+          "clock": "1:16",
+          "videoSeconds": 37.462,
+          "description": "Samira and Rakan are in lane with minion waves meeting"
+        },
+        {
+          "clock": "1:49",
+          "videoSeconds": 70.923,
+          "description": "Samira retreats from minions and Rakan after being damaged"
+        },
+        {
+          "clock": "2:59",
+          "videoSeconds": 104.385,
+          "description": "Samira is being chased by Rakan and Kha'Zix as a fight starts in bot lane"
+        },
+        {
+          "clock": "3:32",
+          "videoSeconds": 137.846,
+          "description": "Samira is last-hitting minions in lane, Kha'Zix nearby"
+        },
+        {
+          "clock": "4:06",
+          "videoSeconds": 171.308,
+          "description": "Samira is in base with the shop window open"
+        },
+        {
+          "clock": "4:38",
+          "videoSeconds": 204,
+          "description": "Samira uses E on Rakan in an engage in bot lane"
+        },
+        {
+          "clock": "4:56",
+          "videoSeconds": 221.5,
+          "description": "Samira fights Kha'Zix near bot river bush, Kha'Zix almost dead"
+        },
+        {
+          "clock": "5:13",
+          "videoSeconds": 238.231,
+          "description": "Samira is dead, revive timer shown, grey screen"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "0:42",
+          "videoSeconds": 4,
+          "description": "Samira is near bot lane tower, moving away from it"
+        },
+        {
+          "clock": "1:16",
+          "videoSeconds": 37.462,
+          "description": "Samira and Rakan are in lane with minion waves meeting"
+        },
+        {
+          "clock": "2:59",
+          "videoSeconds": 104.385,
+          "description": "At , Samira is half HP, solo, with enemy Kha’Zix and Rakan both bot, yet does not recall after the engage—she stays in lane farming, exposing herself to a repeat play.;"
+        }
+      ],
+      "nuance": [
+        "You survived the first heavy gank and did not throw your lead instantly.",
+        "You stayed in lane at half HP with no support after both enemies engaged and remained present.",
+        "This risks a second death, losing all shutdown gold and waves for free.",
+        "Master-level opponents will always punish low-HP overstayers with repeat dives or lane freezes.",
+        "The correct next check: after barely surviving a play, immediately judge if you can contest the next wave—if not, press B and reset, even if you miss a few CS."
+      ],
+      "reviewLimit": "This sampling doesn't show the exact consequence (death, zone, or lost CS), but does show a full wave of visible post-dive overstay with no immediate reset, which allows for a solid call on reset leak. Not all possible threats or enemy rotations are visible, so the review focuses on the clear risk and best practice. Detail gate still limited by: the beginning of the main mistake window must have a visible game-clock timestamp.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-22-primary-mistake-timestamp-v8",
+      "sampledFrames": 14,
+      "publicVideoBytes": 10627792,
+      "src": "/recordings/auto_NA1-5565766659_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565766659-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-exact-rank-trend-v4",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "score": 36,
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "confidenceScore": 60,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "developing",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze I read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by farm pace is too low for reliable ranked climbing, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+      }
+    },
     {
       "file": "auto_NA1-5565758308_01.mp4",
       "publicFile": "auto_NA1-5565758308_01.mp4",
