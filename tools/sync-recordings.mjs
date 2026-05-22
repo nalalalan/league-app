@@ -26,7 +26,7 @@ const compatibleAnalysisVersions = new Set([
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
-const rankEstimateVersion = "2026-05-22-research-calibrated-rank-v3";
+const rankEstimateVersion = "2026-05-22-exact-rank-trend-v4";
 const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v3";
 const coachEvidenceVersion = "2026-05-21-specific-evidence-useful-v5";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
@@ -1540,6 +1540,53 @@ function scoreRankBand(score) {
   return bands.find((band) => score >= band.min) || bands.at(-1);
 }
 
+const exactRankScale = [
+  "Iron IV", "Iron III", "Iron II", "Iron I",
+  "Bronze IV", "Bronze III", "Bronze II", "Bronze I",
+  "Silver IV", "Silver III", "Silver II", "Silver I",
+  "Gold IV", "Gold III", "Gold II", "Gold I",
+  "Platinum IV", "Platinum III", "Platinum II", "Platinum I",
+  "Emerald IV", "Emerald III", "Emerald II", "Emerald I",
+  "Diamond IV", "Diamond III", "Diamond II", "Diamond I",
+  "Master", "Grandmaster", "Challenger"
+];
+
+const exactRankBands = [
+  { tier: "Challenger", min: 98, value: 30 },
+  { tier: "Grandmaster", min: 95, value: 29 },
+  { tier: "Master", min: 91, value: 28 },
+  { tier: "Diamond", min: 85, cuts: [85, 87, 89, 90] },
+  { tier: "Emerald", min: 77, cuts: [77, 79, 81, 83] },
+  { tier: "Platinum", min: 68, cuts: [68, 70, 72, 75] },
+  { tier: "Gold", min: 56, cuts: [56, 59, 61, 65] },
+  { tier: "Silver", min: 40, cuts: [40, 44, 48, 52] },
+  { tier: "Bronze", min: 24, cuts: [24, 28, 32, 36] },
+  { tier: "Iron", min: 0, cuts: [0, 6, 12, 18] }
+];
+
+function exactRankForScore(score) {
+  const safeScore = Math.max(0, Math.min(100, Math.round(Number(score) || 0)));
+  for (const band of exactRankBands) {
+    if (safeScore < band.min) continue;
+    if (Number.isFinite(band.value)) {
+      const name = exactRankScale[band.value] || band.tier;
+      return { name, value: band.value };
+    }
+    const divisions = ["IV", "III", "II", "I"];
+    let divisionIndex = 0;
+    for (let index = band.cuts.length - 1; index >= 0; index -= 1) {
+      if (safeScore >= band.cuts[index]) {
+        divisionIndex = index;
+        break;
+      }
+    }
+    const name = `${band.tier} ${divisions[divisionIndex]}`;
+    const value = exactRankScale.indexOf(name);
+    return { name, value: value >= 0 ? value : 0 };
+  }
+  return { name: "Iron IV", value: 0 };
+}
+
 const rankCalibrationResearch = [
   {
     id: "riot-ranked-tiers-2026",
@@ -1650,6 +1697,7 @@ function rankCalibrationSummary(recordings = []) {
     anchoredFullGames: context.anchoredFullGames,
     statFullGames: context.statFullGames,
     rankLabelCounts: context.rankLabelCounts,
+    exactRankScale,
     highConfidenceRequirements: context.highConfidenceRequirements,
     researchBasis: rankCalibrationResearch
   };
@@ -1822,6 +1870,7 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   const cap = beginnerBot ? 68 : (queueClass === "unknown" ? 85 : 100);
   const cappedScore = Math.max(0, Math.min(cap, Math.round(score)));
   const band = scoreRankBand(cappedScore);
+  const exactRank = exactRankForScore(cappedScore);
   const rankedComparableQueue = ["ranked_solo", "ranked_flex", "pvp"].includes(queueClass);
   const rankedTransferConfidence = confidenceScore >= 78 && rankedComparableQueue && (context.rankedFullGames >= 3 || context.pvpFullGames >= 5)
     ? "high"
@@ -1830,12 +1879,14 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   const leakText = [...new Set(leaks)].slice(0, 3).join(", ") || "the review does not show enough ranked-punishable leaks";
   const strengthText = [...new Set(strengths)].slice(0, 2).join(", ") || "the recording still shows playable fighting instincts";
   const reason = beginnerBot
-    ? `${band.label} read from macro habits: ${strengthText}; held down by ${leakText}. Evidence across the bot-game review set is ${evidenceConfidence}, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment.`
-    : `${band.label} read from macro habits: ${strengthText}; held down by ${leakText}. Ranked-transfer confidence is ${rankedTransferConfidence} from ${queueClass.replace("_", " ")} evidence.`;
+    ? `${exactRank.name} read from macro habits: ${strengthText}; held down by ${leakText}. Evidence across the bot-game review set is ${evidenceConfidence}, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment.`
+    : `${exactRank.name} read from macro habits: ${strengthText}; held down by ${leakText}. Ranked-transfer confidence is ${rankedTransferConfidence} from ${queueClass.replace("_", " ")} evidence.`;
   return {
     version: rankEstimateVersion,
     label: band.label,
     range: band.range,
+    exactRank: exactRank.name,
+    exactRankValue: exactRank.value,
     score: cappedScore,
     confidence: rankedTransferConfidence,
     rankedTransferConfidence,
@@ -2903,46 +2954,8 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
 }
 
 async function summarizeRecordings(recordings, detectedChampions) {
-  const latest = recordings.at(-1);
-  const simplePayoutFocus = {
-    title: "Samira",
-    focus: "Name the payout before the dash.",
-    rule: "Before E/R: wave, tower, dragon, recall, or nexus. If none is real, hold the dash.",
-    nextRep: "Next game: payout first.",
-    whyTrust: "The newest recording already shows kills turning into turret, inhibitor, and nexus pressure; repeating that without handing shutdowns back is the ranked-transfer skill.",
-    pattern: "The damage is already enough for beginner bots. Samira is not more fighting; it is choosing the fight that creates a map payout, then leaving or ending cleanly.",
-    checklist: ["Name the payout.", "Enter second if CC is unknown.", "After the payout, reset or hit the next structure."],
-    reviewLimit: "Main read combines manual storyboard review, replay timing, and visible frame evidence."
-  };
-  const fallback = latest?.focusTag === "finish-only all-in" ? {
-    title: "Samira: all-in only when it pays",
-    focus: "The newest clip is the good version: the penta works because the fight is already inside their base, with allies and minions pushing toward nexus.",
-    rule: "Only take the full Samira all-in when the reset path and the payout point the same direction.",
-    nextRep: "Next game: before E/R, ask whether the reset moves toward tower, nexus, objective, or safety.",
-    whyTrust: "The penta clip shows real cleanup mechanics, but the condition that made it reliable was the map: enemy base open, defenders trapped, allies and minions in front.",
-    pattern: "Earlier games showed the leak: extra fights after the win. The newest highlight shows the upgrade: when the fight is already a finish, staying in and cleaning is exactly the right job.",
-    checklist: ["Base or objective must be real.", "Allies/minions in front.", "Each reset moves toward payout."],
-    reviewLimit: "The newest Riot highlight is only about 22 seconds, so this summary trusts the visible base-fight cleanup and does not invent the lane setup."
-  } : latest?.focusTag === "payout before dash" ? simplePayoutFocus : latest?.focusTag === "lethal hp reset" ? {
-    title: "Samira: reset before lethal HP",
-    focus: "The new game already shows better conversion later; the next climb rep is leaving lane when one enemy auto or spell kills Samira.",
-    rule: "Below lethal HP, the wave is no longer the objective: recall unless the enemy bot lane is dead or fully gone.",
-    nextRep: "Next game: one hit kills me -> reset.",
-    whyTrust: "This targets the visible early death without nerfing the later aggression that produced kills, turret pressure, inhibitor pressure, and the win.",
-    pattern: "The latest recording is not a damage problem. It shows a lane health-gate problem early, followed by much better conversion once Samira has items and teammates nearby.",
-    checklist: ["At low HP, count enemy autos before minions.", "Give the crash if one hit kills Samira.", "Return with the item, then convert kills into structures."],
-    reviewLimit: "Main read combines generated clip review with manual storyboard review of the newest full recording."
-  } : {
-    title: "Samira: stop giving wins back",
-    focus: "Honest read: your biggest leak is not damage. It is refusing to cash out: staying at lethal HP, re-fighting after winning, and chasing sideways when structure is already open.",
-    rule: "If the next action does not create HP safety, wave crash, turret, or nexus pressure, do not take it.",
-    nextRep: "Next game: cash out before the second fight.",
-    whyTrust: "The clips show the same leak in three forms: lethal-HP lane stay, low-health re-fight, and open-base drift. That is specific enough to practice immediately.",
-    pattern: "You already find fights. The coachable problem is making the second decision boring enough to actually win: reset, crash, hit tower, hit nexus, then fight again only if it protects that payout.",
-    checklist: ["One-hit HP means recall.", "First win becomes wave or structure.", "Open base means no sideways chase."],
-    reviewLimit: "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
-  };
-  if (!recordings.length || detectedChampions.some((item) => championId(item.name) === "samira")) return fallback;
+  const fallback = dynamicOverallFeedback(recordings, detectedChampions);
+  if (!recordings.length || process.env.LEAGUE_AI_MAIN_FEEDBACK !== "1") return fallback;
   const notes = recordings.map((item, index) => (
     `${index + 1}. ${item.title} [${item.reviewPhase || "baseline"}] (${item.champion}, ${item.duration}): ${item.feedbackTitle} - ${item.feedback}. Pattern: ${item.pattern || ""} Rule: ${item.diamondRule || ""}`
   )).join("\n");
@@ -2990,6 +3003,80 @@ async function summarizeRecordings(recordings, detectedChampions) {
     console.warn(`Summary fallback: ${error.message}`);
     return fallback;
   }
+}
+
+function rankNameFromValue(value) {
+  const index = Math.max(0, Math.min(exactRankScale.length - 1, Math.round(Number(value) || 0)));
+  return exactRankScale[index] || "Iron IV";
+}
+
+function recordingRankValue(recording = {}) {
+  const value = Number(recording.rankEstimate?.exactRankValue);
+  if (Number.isFinite(value)) return value;
+  if (Number.isFinite(Number(recording.rankEstimate?.score))) return exactRankForScore(Number(recording.rankEstimate.score)).value;
+  return null;
+}
+
+function dynamicOverallFeedback(recordings = [], detectedChampions = []) {
+  const full = recordings
+    .filter((recording) => isFullReviewRecording(recording) && championId(recording.champion) === "samira")
+    .map((recording) => ({ ...recording, rankValue: recordingRankValue(recording) }))
+    .filter((recording) => Number.isFinite(recording.rankValue))
+    .sort((a, b) => (
+      Number(a.matchTimeMs || 0) - Number(b.matchTimeMs || 0) ||
+      Number(a.durationSeconds || 0) - Number(b.durationSeconds || 0) ||
+      String(a.file || "").localeCompare(String(b.file || ""))
+    ));
+
+  const latest = full.at(-1) || recordings.at(-1);
+  const values = full.map((recording) => recording.rankValue);
+  const recent = full.slice(-5);
+  const recentValues = recent.map((recording) => recording.rankValue);
+  const medianValue = values.length ? [...values].sort((a, b) => a - b)[Math.floor((values.length - 1) / 2)] : null;
+  const recentAverage = recentValues.length
+    ? recentValues.reduce((sum, value) => sum + value, 0) / recentValues.length
+    : medianValue;
+  const latestRank = latest?.rankEstimate?.exactRank || (Number.isFinite(latest?.rankValue) ? rankNameFromValue(latest.rankValue) : "unranked");
+  const baselineRank = Number.isFinite(medianValue) ? rankNameFromValue(medianValue) : "unranked";
+  const recentRank = Number.isFinite(recentAverage) ? rankNameFromValue(recentAverage) : baselineRank;
+
+  const leakCounts = new Map();
+  const strengthCounts = new Map();
+  for (const recording of full) {
+    const flags = rankTextFlags(recording);
+    if (flags.overstayReset) leakCounts.set("reset/overstay after a won moment", (leakCounts.get("reset/overstay after a won moment") || 0) + 1);
+    if (flags.conversion) leakCounts.set("missed structure conversion", (leakCounts.get("missed structure conversion") || 0) + 1);
+    if (flags.chaseDrift) leakCounts.set("side chase or fog drift", (leakCounts.get("side chase or fog drift") || 0) + 1);
+    if (flags.lethalHp) leakCounts.set("lethal-HP stay", (leakCounts.get("lethal-HP stay") || 0) + 1);
+    if (flags.shutdownGold) leakCounts.set("shutdown or unspent-gold exposure", (leakCounts.get("shutdown or unspent-gold exposure") || 0) + 1);
+    if (flags.positiveConversion) strengthCounts.set("finding fights and base pressure", (strengthCounts.get("finding fights and base pressure") || 0) + 1);
+    if (flags.syncedTeamplay) strengthCounts.set("grouping with allies when the play is clear", (strengthCounts.get("grouping with allies when the play is clear") || 0) + 1);
+    if (Number(recording.kills) >= 12) strengthCounts.set("enough damage to win bot-game fights", (strengthCounts.get("enough damage to win bot-game fights") || 0) + 1);
+  }
+  const topLeaks = [...leakCounts.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
+  const topStrengths = [...strengthCounts.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
+  const latestVsRecent = Number.isFinite(latest?.rankValue) && Number.isFinite(recentAverage)
+    ? latest.rankValue - recentAverage
+    : 0;
+  const direction = latestVsRecent >= 2
+    ? "The latest game is above your recent baseline"
+    : (latestVsRecent <= -2 ? "The latest game is below your recent baseline" : "The latest game is near your recent baseline");
+  const limit = rankCalibrationContext(recordings).currentLimitation ||
+    "Rank read is a macro-equivalent estimate, not Riot MMR.";
+  const gamesLabel = full.length === 1 ? "1 full game" : `${full.length} full games`;
+  const leakText = topLeaks.slice(0, 2).join(" and ") || "not enough repeated leak evidence yet";
+  const strengthText = topStrengths.slice(0, 2).join(" and ") || "not enough repeated strength evidence yet";
+
+  return {
+    title: "Samira overall state",
+    focus: `Current read: ${latestRank} on the newest full game; ${recentRank} across the last ${Math.min(5, recent.length)} full-game reads; ${baselineRank} median across ${gamesLabel}. ${direction}.`,
+    rule: `The recurring blocker is ${leakText}; the reliable strength is ${strengthText}.`,
+    nextRep: "Next game: after the first won fight or open structure, choose only free structure, body blocking that structure, or reset.",
+    whyTrust: `This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.`,
+    pattern: `Latest file ${latest?.file || "unknown"} drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.`,
+    checklist: ["Read the latest rank point.", "Check the repeated leak.", "Play one rep against that leak."],
+    reviewLimit: limit
+  };
 }
 
 function championId(name) {

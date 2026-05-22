@@ -372,10 +372,10 @@ const champions = [
   {
     id: "samira",
     name: "Samira",
-    skin: "Ningning Samira",
-    person: "Ningning",
-    snippet: "Life's Too Short",
-    image: "/assets/champions/samira-ningning-life-short.webp",
+    skin: "hat photo Samira",
+    person: "Samira",
+    snippet: "Cash out",
+    image: "/assets/champions/samira-hat-exact.png",
     focus: "Recording review is the current queue plan.",
     note: "Samira can mash in, but she cannot always leave. Her escape is killing, resetting, lifestealing, blocking the real spell, or using Flash.",
     situations: [
@@ -514,10 +514,10 @@ const champions = [
   {
     id: "fizz",
     name: "Fizz",
-    skin: "Hanni Fizz",
-    person: "Hanni",
-    snippet: "Cookie",
-    image: "/assets/champions/fizz-hanni-pham.jpg",
+    skin: "peace sign Fizz",
+    person: "Fizz",
+    snippet: "Exit shape",
+    image: "/assets/champions/fizz-peace-exact.png",
     focus: "Mark, enter, stab, dodge, leave.",
     note: "Fizz is the reference loop because every button has a body job and a clean exit shape.",
     situations: [
@@ -729,6 +729,7 @@ const recordingGrid = document.querySelector("#recording-grid");
 const recordingPreview = document.querySelector("#recording-preview");
 const recordingLiveStatus = document.querySelector("#recording-live-status");
 const recordingQueue = document.querySelector("#recording-queue");
+const rankTrend = document.querySelector("#rank-trend");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -1343,7 +1344,7 @@ function recordingMainCard(review) {
   article.className = "recording-main";
 
   const title = document.createElement("h3");
-  title.textContent = (review.detectedChampions || []).map((champion) => champion.name).filter(Boolean)[0] || "Samira";
+  title.textContent = item.title || (review.detectedChampions || []).map((champion) => champion.name).filter(Boolean)[0] || "Samira";
 
   const focus = document.createElement("p");
   focus.className = "recording-main-focus";
@@ -1548,6 +1549,24 @@ const recordingDateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
   hour: "numeric",
   minute: "2-digit"
+});
+
+const rankTrendScale = [
+  "Iron IV", "Iron III", "Iron II", "Iron I",
+  "Bronze IV", "Bronze III", "Bronze II", "Bronze I",
+  "Silver IV", "Silver III", "Silver II", "Silver I",
+  "Gold IV", "Gold III", "Gold II", "Gold I",
+  "Platinum IV", "Platinum III", "Platinum II", "Platinum I",
+  "Emerald IV", "Emerald III", "Emerald II", "Emerald I",
+  "Diamond IV", "Diamond III", "Diamond II", "Diamond I",
+  "Master", "Grandmaster", "Challenger"
+];
+
+const rankTrendValueByName = new Map(rankTrendScale.map((rank, index) => [rank.toLowerCase(), index]));
+const rankTrendMonthFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  month: "numeric",
+  day: "numeric"
 });
 
 function compactRecordingDate(item) {
@@ -1862,13 +1881,9 @@ function recordingClockMomentText(item, existingTimes = new Set()) {
 
 function recordingRankSentence(item) {
   const estimate = item?.rankEstimate || {};
-  const label = String(estimate.label || "").trim();
-  if (!label) return "";
-  const range = String(estimate.range || "").trim();
-  const transferConfidence = String(estimate.rankedTransferConfidence || estimate.confidence || "").trim();
-  const confidenceLabel = transferConfidence ? `ranked-transfer ${transferConfidence}` : "";
-  const detail = [range, confidenceLabel].filter(Boolean).join("; ");
-  return detail ? `Approx rank read: ${label} (${detail}).` : `Approx rank read: ${label}.`;
+  const exact = recordingExactRank(item);
+  const label = exact?.rank || String(estimate.label || "").trim();
+  return label ? `Approx rank read: ${label}.` : "";
 }
 
 function recordingStoryParagraph(item) {
@@ -1950,6 +1965,263 @@ function championId(value) {
 function recordingsForChampion(review, selectedChampionId) {
   return sortedRecordings(review.recordings || [])
     .filter((item) => championId(item.champion) === selectedChampionId);
+}
+
+const rankTrendBands = [
+  { tier: "Challenger", min: 98, value: 30 },
+  { tier: "Grandmaster", min: 95, value: 29 },
+  { tier: "Master", min: 91, value: 28 },
+  { tier: "Diamond", min: 85, cuts: [85, 87, 89, 90] },
+  { tier: "Emerald", min: 77, cuts: [77, 79, 81, 83] },
+  { tier: "Platinum", min: 68, cuts: [68, 70, 72, 75] },
+  { tier: "Gold", min: 56, cuts: [56, 59, 61, 65] },
+  { tier: "Silver", min: 40, cuts: [40, 44, 48, 52] },
+  { tier: "Bronze", min: 24, cuts: [24, 28, 32, 36] },
+  { tier: "Iron", min: 0, cuts: [0, 6, 12, 18] }
+];
+
+function rankFromScore(score) {
+  const safeScore = Math.max(0, Math.min(100, Math.round(Number(score) || 0)));
+  for (const band of rankTrendBands) {
+    if (safeScore < band.min) continue;
+    if (Number.isFinite(band.value)) {
+      const rank = rankTrendScale[band.value] || band.tier;
+      return { rank, value: band.value };
+    }
+    const divisions = ["IV", "III", "II", "I"];
+    let divisionIndex = 0;
+    for (let index = band.cuts.length - 1; index >= 0; index -= 1) {
+      if (safeScore >= band.cuts[index]) {
+        divisionIndex = index;
+        break;
+      }
+    }
+    const rank = `${band.tier} ${divisions[divisionIndex]}`;
+    const value = rankTrendValueByName.get(rank.toLowerCase());
+    return { rank, value: Number.isFinite(value) ? value : 0 };
+  }
+  return { rank: "Iron IV", value: 0 };
+}
+
+function recordingExactRank(item) {
+  const estimate = item?.rankEstimate || {};
+  const exactRank = String(estimate.exactRank || estimate.mostLikelyRank || "").trim();
+  const exactValue = Number(estimate.exactRankValue);
+  if (exactRank) {
+    const mappedValue = rankTrendValueByName.get(exactRank.toLowerCase());
+    return {
+      rank: exactRank,
+      value: Number.isFinite(exactValue) ? exactValue : (Number.isFinite(mappedValue) ? mappedValue : null)
+    };
+  }
+  if (Number.isFinite(Number(estimate.score))) return rankFromScore(Number(estimate.score));
+  const label = String(estimate.label || "").trim();
+  if (!label) return null;
+  const mappedValue = rankTrendValueByName.get(`${label} II`.toLowerCase()) ?? rankTrendValueByName.get(label.toLowerCase());
+  return { rank: label, value: Number.isFinite(mappedValue) ? mappedValue : null };
+}
+
+function recordingRankTime(item) {
+  const matchTime = Number(item?.matchTimeMs);
+  if (Number.isFinite(matchTime) && matchTime > 0) return matchTime;
+  const source = item?.gameHappenedAt || item?.recordedAt || item?.updatedAt || "";
+  const date = source ? new Date(source) : null;
+  if (date && !Number.isNaN(date.getTime())) return date.getTime();
+  return 0;
+}
+
+function isFullRankPoint(item) {
+  if (!item?.rankEstimate) return false;
+  return item.kind === "full review" || Number(item.durationSeconds || 0) > 90;
+}
+
+function rankTrendPoints(review, selectedChampionId) {
+  return recordingsForChampion(review, selectedChampionId)
+    .filter(isFullRankPoint)
+    .map((item) => {
+      const exact = recordingExactRank(item);
+      const time = recordingRankTime(item);
+      if (!exact || !Number.isFinite(exact.value) || time <= 0) return null;
+      return {
+        item,
+        rank: exact.rank,
+        value: exact.value,
+        time,
+        dateLabel: compactRecordingDate(item)
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.time - b.time || a.value - b.value || String(a.item.file || "").localeCompare(String(b.item.file || "")));
+}
+
+function rankTrendTickValues(points, minValue, maxValue) {
+  const present = new Set(points.map((point) => point.value));
+  const domainRanks = rankTrendScale
+    .map((rank, value) => ({ rank, value }))
+    .filter((point) => point.value >= minValue && point.value <= maxValue);
+  if (domainRanks.length <= 16) return domainRanks;
+  return domainRanks.filter((point) => (
+    present.has(point.value) ||
+    /\bIV$/.test(point.rank) ||
+    point.rank === "Master" ||
+    point.rank === "Challenger"
+  ));
+}
+
+function svgNode(name, attributes = {}) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+  for (const [key, value] of Object.entries(attributes)) {
+    node.setAttribute(key, String(value));
+  }
+  return node;
+}
+
+function rankTrendDateLabel(time) {
+  const date = new Date(time);
+  return rankTrendMonthFormatter.format(date);
+}
+
+function rankTrendSvg(points) {
+  const width = 560;
+  const height = 260;
+  const margin = { top: 16, right: 54, bottom: 34, left: 76 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const values = points.map((point) => point.value);
+  let minValue = Math.max(0, Math.min(...values) - 1);
+  let maxValue = Math.min(rankTrendScale.length - 1, Math.max(...values) + 1);
+  while (maxValue - minValue < 4 && (minValue > 0 || maxValue < rankTrendScale.length - 1)) {
+    if (minValue > 0) minValue -= 1;
+    if (maxValue < rankTrendScale.length - 1) maxValue += 1;
+  }
+  const timeMin = Math.min(...points.map((point) => point.time));
+  const timeMax = Math.max(...points.map((point) => point.time));
+  const timePadding = timeMax === timeMin ? 0 : (timeMax - timeMin) * 0.035;
+  const paddedTimeMin = timeMin - timePadding;
+  const paddedTimeMax = timeMax + timePadding;
+  const yRange = Math.max(1, maxValue - minValue);
+  const xScale = (time) => {
+    if (timeMax === timeMin) return margin.left + plotWidth / 2;
+    return margin.left + ((time - paddedTimeMin) / (paddedTimeMax - paddedTimeMin)) * plotWidth;
+  };
+  const yScale = (value) => margin.top + plotHeight - ((value - minValue) / yRange) * plotHeight;
+
+  const svg = svgNode("svg", {
+    viewBox: `0 0 ${width} ${height}`,
+    role: "img",
+    "aria-label": "Exact estimated rank over time"
+  });
+
+  const ticks = rankTrendTickValues(points, minValue, maxValue);
+  for (const tick of ticks) {
+    const y = yScale(tick.value);
+    svg.append(svgNode("line", {
+      x1: margin.left,
+      x2: margin.left + plotWidth,
+      y1: y,
+      y2: y,
+      class: "rank-trend-grid"
+    }));
+    const text = svgNode("text", {
+      x: margin.left - 9,
+      y: y + 3,
+      class: "rank-trend-y-label",
+      "text-anchor": "end"
+    });
+    text.textContent = tick.rank;
+    svg.append(text);
+  }
+
+  svg.append(svgNode("line", {
+    x1: margin.left,
+    x2: margin.left,
+    y1: margin.top,
+    y2: margin.top + plotHeight,
+    class: "rank-trend-axis"
+  }));
+  svg.append(svgNode("line", {
+    x1: margin.left,
+    x2: margin.left + plotWidth,
+    y1: margin.top + plotHeight,
+    y2: margin.top + plotHeight,
+    class: "rank-trend-axis"
+  }));
+
+  const tickIndexes = [...new Set([0, Math.floor((points.length - 1) / 2), points.length - 1])];
+  for (const index of tickIndexes) {
+    const point = points[index];
+    const text = svgNode("text", {
+      x: xScale(point.time),
+      y: height - 10,
+      class: "rank-trend-x-label",
+      "text-anchor": index === 0 ? "start" : (index === points.length - 1 ? "end" : "middle")
+    });
+    text.textContent = rankTrendDateLabel(point.time);
+    svg.append(text);
+  }
+
+  const linePoints = points.map((point) => `${xScale(point.time).toFixed(1)},${yScale(point.value).toFixed(1)}`).join(" ");
+  if (points.length > 1) {
+    svg.append(svgNode("polyline", {
+      points: linePoints,
+      class: "rank-trend-line"
+    }));
+  }
+
+  for (const point of points) {
+    const circle = svgNode("circle", {
+      cx: xScale(point.time),
+      cy: yScale(point.value),
+      r: 4.2,
+      class: "rank-trend-point"
+    });
+    const title = svgNode("title");
+    title.textContent = `${point.dateLabel}: ${point.rank}`;
+    circle.append(title);
+    svg.append(circle);
+  }
+
+  const latest = points.at(-1);
+  const latestText = svgNode("text", {
+    x: xScale(latest.time) - 6,
+    y: Math.max(12, yScale(latest.value) - 9),
+    class: "rank-trend-point-label",
+    "text-anchor": "end"
+  });
+  latestText.textContent = latest.rank;
+  svg.append(latestText);
+
+  return svg;
+}
+
+function renderRankTrend(review = recordingReview, selectedChampionId = currentChampionId || "samira") {
+  if (!rankTrend) return;
+  const champion = pageChampionById(selectedChampionId);
+  const points = rankTrendPoints(review, champion.id);
+  const heading = document.createElement("div");
+  heading.className = "rank-trend-head";
+  const title = document.createElement("h2");
+  title.textContent = `${champion.name} rank trend`;
+  const meta = document.createElement("p");
+  meta.textContent = points.length ? `${points.length} full-game reads` : "no full-game rank reads";
+  heading.append(title, meta);
+
+  if (!points.length) {
+    const empty = document.createElement("p");
+    empty.className = "rank-trend-empty";
+    empty.textContent = "No exact rank points yet.";
+    rankTrend.replaceChildren(heading, empty);
+    return;
+  }
+
+  const latest = points.at(-1);
+  const latestLine = document.createElement("p");
+  latestLine.className = "rank-trend-latest";
+  latestLine.textContent = `Latest: ${latest.rank} on ${latest.dateLabel}.`;
+  const chart = document.createElement("div");
+  chart.className = "rank-trend-chart";
+  chart.append(rankTrendSvg(points));
+  rankTrend.replaceChildren(heading, chart, latestLine);
 }
 
 function recordingEmptyCard(champion) {
@@ -2045,6 +2317,7 @@ function renderRecordings(review = recordingReview, selectedChampionId = current
   if (!recordingSummary || !recordingFocus || !recordingGrid) return;
   const champion = pageChampionById(selectedChampionId);
   const championRecordings = recordingsForChampion(review, champion.id);
+  renderRankTrend(review, champion.id);
   if (recordingTitle) recordingTitle.textContent = `${champion.name} recordings`;
   if (page) page.dataset.recordingChampion = champion.id;
 
@@ -2083,6 +2356,7 @@ function renderRecordingLoading() {
   recordingSummary.textContent = "loading current recordings";
   recordingGrid.replaceChildren();
   recordingFocus.replaceChildren();
+  renderRankTrend(recordingReviewData, currentChampionId || "samira");
 }
 
 async function hydrateRecordings() {

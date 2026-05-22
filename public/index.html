@@ -48,8 +48,12 @@
     </header>
 
     <main class="page">
-      <section class="champion-picker" aria-label="champion">
-        <div class="portrait-row" id="champion-picker"></div>
+      <section class="champion-overview" aria-label="champion and rank trend">
+        <section class="champion-picker" aria-label="champion">
+          <div class="portrait-row" id="champion-picker"></div>
+        </section>
+        <aside class="rank-trend" id="rank-trend" aria-live="polite"></aside>
+        <aside class="recording-focus overall-state" id="recording-focus"></aside>
       </section>
 
       <section class="selected-champion" id="champion-panel" aria-live="polite">
@@ -61,7 +65,6 @@
       </section>
 
       <section class="recordings" id="recordings" aria-labelledby="recordings-title">
-        <div class="recording-focus" id="recording-focus"></div>
         <div class="plain-head recording-head">
           <div class="recording-head-title">
             <h2 id="recordings-title">recordings</h2>

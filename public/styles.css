@@ -203,10 +203,26 @@ summary {
   animation: runeLock 2.08s cubic-bezier(.16, .9, .18, 1);
 }
 
+.champion-overview {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 26px;
+  align-items: stretch;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .champion-picker {
   position: relative;
+  min-width: 0;
+  box-sizing: border-box;
   margin-bottom: 26px;
   padding: 8px 0 12px;
+}
+
+.champion-overview .champion-picker {
+  margin-bottom: 0;
 }
 
 .champion-picker::before {
@@ -264,6 +280,119 @@ summary {
 
 .page.is-bursting .selected-champion {
   animation: panelLock 1.4s .08s cubic-bezier(.16, .9, .18, 1);
+}
+
+.rank-trend {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 100%;
+  min-height: 348px;
+  box-sizing: border-box;
+  padding: 14px 14px 12px;
+  border: 1px solid rgba(72, 65, 57, .24);
+  border-radius: 6px;
+  background: rgba(255, 253, 248, .82);
+  color: #302a25;
+  box-shadow: 0 10px 28px rgba(42, 33, 22, .08);
+}
+
+.rank-trend-head {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
+.rank-trend h2 {
+  margin: 0;
+  color: #2d2723;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.rank-trend-head p,
+.rank-trend-latest,
+.rank-trend-empty {
+  margin: 0;
+  color: #665b50;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.rank-trend-chart {
+  width: 100%;
+  overflow: hidden;
+}
+
+.rank-trend svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: inherit;
+}
+
+.rank-trend-grid {
+  stroke: rgba(78, 70, 62, .14);
+  stroke-width: 1;
+}
+
+.rank-trend-axis {
+  stroke: rgba(42, 37, 32, .58);
+  stroke-width: 1.1;
+}
+
+.rank-trend-line {
+  fill: none;
+  stroke: #24211e;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+}
+
+.rank-trend-point {
+  fill: #fffdf8;
+  stroke: #24211e;
+  stroke-width: 1.6;
+}
+
+.rank-trend-y-label,
+.rank-trend-x-label,
+.rank-trend-point-label {
+  fill: #5b5149;
+  font-size: 10px;
+  font-weight: 760;
+}
+
+.rank-trend-point-label {
+  fill: #25211d;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.rank-trend-latest {
+  padding-top: 5px;
+  color: #3e3731;
+}
+
+.overall-state {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  align-self: stretch;
+  justify-self: stretch;
+  justify-items: stretch;
+  overflow: hidden;
+}
+
+.overall-state .recording-main {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  box-shadow: 0 10px 28px rgba(42, 33, 22, .08);
 }
 
 .page.is-bursting .situation-card {
@@ -1015,11 +1144,11 @@ summary {
   --ry: 0deg;
   --mx: 50%;
   --my: 42%;
-  --portrait-scale: 1.01;
-  --portrait-hover-scale: 1.045;
-  --portrait-selected-scale: 1.035;
+  --portrait-scale: 1;
+  --portrait-hover-scale: 1;
+  --portrait-selected-scale: 1;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 5;
   height: auto;
   max-height: 390px;
   border: 1px solid rgba(104, 87, 68, .24);
@@ -1074,22 +1203,22 @@ summary {
   height: 100%;
   object-fit: cover;
   object-position: center center;
-  filter: saturate(.98) contrast(1.01);
+  filter: none;
   transform-origin: 50% 50%;
   transform: translateZ(12px) scale(var(--portrait-scale));
   transition: transform .34s cubic-bezier(.18, .72, .2, 1), filter .3s ease;
 }
 
 .portrait-button[data-champion="samira"] img {
-  object-position: 50% 22%;
+  object-position: 50% 50%;
 }
 
 .portrait-button[data-champion="fizz"] img {
-  --portrait-scale: 1.08;
-  --portrait-hover-scale: 1.115;
-  --portrait-selected-scale: 1.095;
-  object-position: 50% 18%;
-  transform-origin: 50% 18%;
+  --portrait-scale: 1;
+  --portrait-hover-scale: 1;
+  --portrait-selected-scale: 1;
+  object-position: 50% 50%;
+  transform-origin: 50% 50%;
 }
 
 .portrait-ambient {
@@ -1274,9 +1403,9 @@ summary {
 .portrait-button[data-champion="fizz"] {
   --bubble-a: rgba(121, 232, 255, .72);
   --bubble-b: rgba(255, 151, 212, .58);
-  --portrait-scale: 1.25;
-  --portrait-hover-scale: 1.29;
-  --portrait-selected-scale: 1.26;
+  --portrait-scale: 1;
+  --portrait-hover-scale: 1;
+  --portrait-selected-scale: 1;
 }
 
 .portrait-button[data-champion="samira"] {
@@ -3568,6 +3697,10 @@ h1 {
 }
 
 @media (max-width: 900px) {
+  .champion-overview {
+    gap: 12px;
+  }
+
   .portrait-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(150px, 1fr));
@@ -3594,6 +3727,10 @@ h1 {
     min-height: 300px;
   }
 
+  .rank-trend {
+    min-height: 0;
+  }
+
   .selected-copy {
     width: min(72%, 520px);
   }
@@ -3610,6 +3747,25 @@ h1 {
 }
 
 @media (max-width: 560px) {
+  .champion-overview,
+  .champion-picker,
+  .rank-trend,
+  .overall-state,
+  .overall-state .recording-main {
+    width: 100%;
+    max-width: calc(100vw - 24px);
+    min-width: 0;
+    justify-self: stretch;
+  }
+
+  .overall-state .recording-main-focus {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
   .paper-strip {
     grid-template-columns: 1fr;
     gap: 9px;
@@ -3632,6 +3788,34 @@ h1 {
   .page {
     width: min(1180px, calc(100% - 22px));
     padding-top: 16px;
+  }
+
+  .rank-trend {
+    padding: 11px 10px 10px;
+  }
+
+  .rank-trend-head {
+    display: grid;
+    gap: 3px;
+  }
+
+  .rank-trend h2 {
+    font-size: 16px;
+  }
+
+  .rank-trend svg {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .rank-trend-point-label {
+    display: none;
+  }
+
+  .overall-state .recording-main {
+    width: 100%;
+    max-width: 100%;
+    justify-self: stretch;
   }
 
   .champion-picker::before {
@@ -3982,13 +4166,20 @@ h1 {
     align-items: stretch;
   }
 
-  .champion-picker {
+  .champion-overview {
     grid-column: 1 / -1;
     grid-row: 1;
-    margin: 0 0 4px;
-    padding: 0;
+    grid-template-columns: minmax(0, 584px) minmax(390px, 1fr) minmax(300px, 360px);
+    gap: clamp(14px, 1.45vw, 22px);
+    align-items: stretch;
     justify-self: center;
-    width: min(100%, 620px);
+    width: min(100%, calc(100% - clamp(24px, 3vw, 52px)));
+    margin: 0 0 4px;
+  }
+
+  .champion-picker {
+    margin: 0;
+    padding: 0;
   }
 
   .recordings {
@@ -3997,25 +4188,32 @@ h1 {
 
   .recording-focus {
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 1;
     margin: 0;
     align-self: auto;
   }
 
+  .overall-state.recording-focus {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+    justify-self: stretch;
+  }
+
   .recording-head {
     grid-column: 1 / -1;
-    grid-row: 3;
+    grid-row: 2;
     margin-top: 6px;
   }
 
   .recording-queue {
     grid-column: 1 / -1;
-    grid-row: 4;
+    grid-row: 3;
   }
 
   .recording-grid {
     grid-column: 1 / -1;
-    grid-row: 5;
+    grid-row: 4;
   }
 
   .recording-focus,
@@ -4024,6 +4222,10 @@ h1 {
   .recording-grid {
     width: min(100%, calc(100% - clamp(24px, 3vw, 52px)));
     justify-self: center;
+  }
+
+  .champion-overview .recording-focus {
+    width: 100%;
   }
 
   .situations,
