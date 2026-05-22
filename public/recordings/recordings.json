@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T20:23:41.870Z",
+  "generatedAt": "2026-05-22T21:12:58.565Z",
   "source": "League of Legends Highlights folder",
-  "match": "26 matches",
+  "match": "27 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -28,19 +28,20 @@
     "NA1-5565766659",
     "NA1-5565779781",
     "NA1-5565804951",
-    "NA1-5565818690"
+    "NA1-5565818690",
+    "NA1-5565856492"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 4:00 PM ET",
-  "totalDuration": "248:31",
-  "totalRecordings": 38,
+  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 5:12 PM ET",
+  "totalDuration": "275:29",
+  "totalRecordings": 39,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira overall state",
-    "focus": "Current read: Iron III on the newest full game; Bronze III across the last 5 full-game reads; Bronze III median across 25 full games. The latest game is below your recent baseline.",
+    "focus": "Current read: Bronze IV on the newest full game; Iron I across the last 5 full-game reads; Bronze III median across 26 full games. The latest game is near your recent baseline.",
     "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is grouping with allies when the play is clear and enough damage to win bot-game fights.",
     "nextRep": "Next game: after the first won fight or open structure, choose only free structure, body blocking that structure, or reset.",
     "whyTrust": "This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.",
-    "pattern": "Latest file auto_NA1-5565818690_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
+    "pattern": "Latest file auto_NA1-5565856492_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
     "checklist": [
       "Read the latest rank point.",
       "Check the repeated leak.",
@@ -53,19 +54,19 @@
     "method": "research-calibrated macro rank estimate with confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 25,
+    "fullReviewGames": 26,
     "queueCounts": {
       "unknown": 4,
       "bot": 18,
-      "ranked_solo": 3
+      "ranked_solo": 4
     },
-    "rankedFullGames": 3,
-    "pvpFullGames": 3,
+    "rankedFullGames": 4,
+    "pvpFullGames": 4,
     "botFullGames": 18,
-    "anchoredFullGames": 25,
-    "statFullGames": 25,
+    "anchoredFullGames": 26,
+    "statFullGames": 26,
     "rankLabelCounts": {
-      "Bronze": 10,
+      "Bronze": 11,
       "Silver": 5,
       "Iron": 9,
       "Gold": 1
@@ -151,13 +152,185 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 38,
+      "recordings": 39,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565856492_01.mp4",
+      "publicFile": "auto_NA1-5565856492_01.mp4",
+      "cacheKey": "38992220:1779484332120",
+      "fingerprint": "62b5700c8f26",
+      "matchId": "NA1-5565856492",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779482199444,
+      "gameHappenedAt": "2026-05-22T20:36:39.444Z",
+      "gameHappenedAtLabel": "May 22, 2026, 4:36 PM",
+      "recordedAt": "2026-05-22T21:12:12.191Z",
+      "recordedAtLabel": "May 22, 2026, 5:12 PM",
+      "recordedAtTimeLabel": "5:12 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Failed to Rotate Off Sidelane to Pressure Mid",
+      "duration": "26:58",
+      "durationSeconds": 1618,
+      "gameLength": "33:52",
+      "gameLengthSeconds": 2032,
+      "kda": "15/7/5",
+      "kills": 15,
+      "deaths": 7,
+      "assists": 5,
+      "cs": 192,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Failed to Rotate Off Sidelane to Pressure Mid",
+      "feedback": "Mistake: You stayed bot and continued farming long after the bot turret fell and your team grouped for mid/inhib plays. Fix: After first turret and the wave is past river, you must rotate to mid to pressure with your team and threaten objectives instead of leaking time farming bot alone.",
+      "gameDetail": "After 13:16 (frame 6) you and your enchanter crash down the last hits on bot outer with all dragon-side objectives cleared and enemy pressure breaking, but you stay bot side for multiple minutes in the following frames, chasing bot wave and jungle instead of rotating mid where your teammates group for a heavy push (frame 10, 24:28 clock visible). This indecision means you arrive late to mid plays and miss the highest-value window to threaten inner turrets or help your team snowball with numbers—especially risky because Samira’s mid-game threat is highest when grouped. Sticking to a dead lane after tower is down delays your tempo advantage, risks unnecessary 1vX catches, and stalls snowball; the higher-level payoff is collapsing mid, using pushed bot to force rotates, and fighting around your team or objective. That route is better because mid is shortest for rotations, connects with teammates for both safety and max pressure, and applies the kind of tempo punishment Master players expect.",
+      "secondaryFocus": "Second focus: Fix late recalls and wasted time low in lane—when low HP and after fighting or objective, recall immediately rather than half-heartedly farming dead waves; next game, recall as soon as your productive play is over or you’re at risk.",
+      "eventEvidence": "13:15 From onward, bot turret is gone, wave is pushed, team groups mid, but Samira is caught farming bot and hovering alone with no dragon or tower to take. 21:21 Samira in the middle of a recall at outer bot turret, ally lane minions and enemies nearby. 24:28 After (frame 6) you and your enchanter crash down the last hits on bot outer with all dragon-side objectives cleared and enemy pressure breaking, but you stay bot side for multiple minutes in the following frames, chasing bot wave and jungle instead of rotating mid where your teammates group for a heavy push (frame 10, clock visible).",
+      "goodThing": "You correctly converted early bot tower pressure with support backup and did not greed-dive post-tower, showing some conversion discipline.",
+      "whyTrust": "This feedback tracks with visible team groupings, minimap rotations, and open structures: not rotating to mid means you miss the team snowball timing and risk solo deaths when you are needed to punch through mid or defend; this is a repeatable core ADC habit at all ranks.",
+      "focusTag": "mid-group-after-tower",
+      "evidence": "13:15 From onward, bot turret is gone, wave is pushed, team groups mid, but Samira is caught farming bot and hovering alone with no dragon or tower to take. 21:21 Samira in the middle of a recall at outer bot turret, ally lane minions and enemies nearby. 24:28 After (frame 6) you and your enchanter crash down the last hits on bot outer with all dragon-side objectives cleared and enemy pressure breaking, but you stay bot side for multiple minutes in the following frames, chasing bot wave and jungle instead of rotating mid where your teammates group for a heavy push (frame 10, clock visible).",
+      "pattern": "After securing bot tower with help, you stay bot side and farm past lane expiration, instead of joining team for mid pressure and conversion. This leaks your threat window and delays your team’s ability to break open the map.",
+      "diamondRule": "Never stay in dead lane solo after tower when teammates are grouping mid—rotate through mid and show for team pressure or objectives.",
+      "drill": "In your next 3 games, after taking bot outer, push wave past river then hard-rotate mid at the next recall or lane reset and group for at least two mid waves and one turret push.",
+      "timeline": [
+        "13:16 - bot outer turret is down, Samira stays bot lane to farm while team begins grouping mid"
+      ],
+      "clockAnchors": [
+        {
+          "clock": "2:38",
+          "videoSeconds": 127.846,
+          "description": "A champion is retreating near bot turret while being chased by two enemy champions; level up animation is visible."
+        },
+        {
+          "clock": "5:53",
+          "videoSeconds": 251.692,
+          "description": "The champion is positioned near the lower side of bot lane, with several minions and a fight occurring closer to the enemy turret."
+        },
+        {
+          "clock": "7:57",
+          "videoSeconds": 375.538,
+          "description": "Champion is running out of base along the bottom lane after respawning or returning to lane."
+        },
+        {
+          "clock": "10:35",
+          "videoSeconds": 499.385,
+          "description": "Champion is in the bot lane near allied minions, preparing to farm and no enemies visible nearby."
+        },
+        {
+          "clock": "13:15",
+          "videoSeconds": 623,
+          "description": "Two allied champions are attacking the enemy bot turret with minions enforcing the push."
+        },
+        {
+          "clock": "17:14",
+          "videoSeconds": 747.077,
+          "description": "Teamfight near the bot side jungle, several ability effects and champion health bars visible."
+        },
+        {
+          "clock": "19:17",
+          "videoSeconds": 870.923,
+          "description": "Champion and an ally move together through bot lane jungle near bottom outer turret area."
+        },
+        {
+          "clock": "21:21",
+          "videoSeconds": 994.769,
+          "description": "Champion in the middle of a recall at outer bot turret, ally lane minions and enemies nearby."
+        },
+        {
+          "clock": "24:28",
+          "videoSeconds": 1118.615,
+          "description": "Champion and two allies are attacking the enemy inhibitor turret in mid lane."
+        },
+        {
+          "clock": "26:32",
+          "videoSeconds": 1242.462,
+          "description": "Champion and allies are near Baron pit, one ally is channeling recall, no immediate combat."
+        },
+        {
+          "clock": "29:21",
+          "videoSeconds": 1366.308,
+          "description": "Team grouping in mid jungle, multiple champion ult indicators visible, heavy action imminent."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "13:15",
+          "videoSeconds": 623,
+          "description": "From onward, bot turret is gone, wave is pushed, team groups mid, but Samira is caught farming bot and hovering alone with no dragon or tower to take."
+        },
+        {
+          "clock": "21:21",
+          "videoSeconds": 994.769,
+          "description": "Samira in the middle of a recall at outer bot turret, ally lane minions and enemies nearby."
+        },
+        {
+          "clock": "24:28",
+          "videoSeconds": 1118.615,
+          "description": "After (frame 6) you and your enchanter crash down the last hits on bot outer with all dragon-side objectives cleared and enemy pressure breaking, but you stay bot side for multiple minutes in the following frames, chasing bot wave and jungle instead of rotating mid where your teammates group for a heavy push (frame 10, clock visible)."
+        }
+      ],
+      "nuance": [
+        "You successfully crashed bot outer with lane and support help, not overchasing the post-tower play.",
+        "You leak tempo by not rotating mid after dead lane, causing you to miss the strongest grouped 5v5 windows and risking being split while your team fights.",
+        "At Master level, staying bot after tower = you are late to every mid snowball and miss gold/xp from forced fights, potentially baiting your team into bad 4v5s or missing timers for Baron and dragon.",
+        "The next check after a bot tower take is: can I get anything else bot—if not, rotate mid for numbers, tempo, and safety.",
+        "This mid-group rule maximizes pressure, minimizes risk, and puts you on the biggest payoff map path every game."
+      ],
+      "reviewLimit": "Cannot prove single-frame micro misplays, exact fight entries, or mid/late fights from 1Hz frames; macro direction and lane timing are clear, but individual kill/escape mechanics may not be visible.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-22-two-focus-coaching-v11",
+      "sampledFrames": 14,
+      "publicVideoBytes": 38992220,
+      "src": "/recordings/auto_NA1-5565856492_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565856492-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-exact-rank-trend-v4",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "score": 24,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 98,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "developing",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
+      }
+    },
     {
       "file": "auto_NA1-5565818690_01.mp4",
       "publicFile": "auto_NA1-5565818690_01.mp4",
@@ -479,7 +652,7 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 98,
+        "confidenceScore": 88,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -487,7 +660,6 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
@@ -653,7 +825,7 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 98,
+        "confidenceScore": 88,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -661,7 +833,6 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
