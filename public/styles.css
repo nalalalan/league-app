@@ -2178,8 +2178,8 @@ h1 {
 
 .recording-list-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, .44fr);
-  gap: 12px;
+  grid-template-columns: minmax(360px, .95fr) minmax(560px, .85fr);
+  gap: 14px;
   align-items: start;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -2304,8 +2304,8 @@ h1 {
 .recording-list-video video {
   display: block;
   width: 100%;
-  min-height: 340px;
-  max-height: 600px;
+  min-height: 430px;
+  max-height: 760px;
   aspect-ratio: 16 / 9;
   border-radius: 6px;
   background: #15110e;
@@ -4025,6 +4025,17 @@ h1 {
   .notes-panel,
   .notice {
     grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1180px) {
+  .recording-list-card {
+    grid-template-columns: 1fr;
+  }
+
+  .recording-list-video video {
+    min-height: 0;
+    max-height: none;
   }
 }
 
