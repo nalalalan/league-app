@@ -1,4 +1,5 @@
 import { spawn, execFile } from "node:child_process";
+import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import https from "node:https";
 import path from "node:path";
@@ -39,6 +40,7 @@ const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim(
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
 const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "region").trim().toLowerCase();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
+const skipCurrentGameOnRestart = process.env.LEAGUE_LIVE_SKIP_CURRENT_GAME !== "0";
 const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || "https://league.aolabs.io/api/recording-status").trim();
 const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const statusPath = path.join(analysisRoot, "recording-status.json");
@@ -60,6 +62,7 @@ let activeQueueEta = {};
 let activeQueueProgress = null;
 let activeRecordingSession = null;
 let gameLengthEstimateCache = null;
+let shuttingDownForLostLock = false;
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -107,10 +110,11 @@ function deserializeSession(item) {
 }
 
 async function loadPostGameQueue() {
-  const parsed = JSON.parse(await fs.readFile(postGameQueuePath, "utf8").catch(() => "[]"));
-  postGameQueue = Array.isArray(parsed)
-    ? parsed.filter((item) => item?.sessionRoot)
-    : [];
+  const raw = (await fs.readFile(postGameQueuePath, "utf8").catch(() => "[]")).replace(/^\uFEFF/, "");
+  const parsed = JSON.parse(raw);
+  const rows = Array.isArray(parsed) ? parsed : (parsed?.sessionRoot ? [parsed] : []);
+  postGameQueue = rows.filter((item) => item?.sessionRoot);
+  if (!Array.isArray(parsed)) await savePostGameQueue();
 }
 
 async function savePostGameQueue() {
@@ -275,6 +279,7 @@ async function publishRecorderStatus(status, fields = {}, options = {}) {
     status,
     updatedAt: new Date().toISOString(),
     mode: captureModePreference,
+    recorderPid: process.pid,
     ...fields,
     ...queue
   };
@@ -481,7 +486,24 @@ async function acquireLock() {
 }
 
 async function releaseLock() {
-  await fs.unlink(lockPath).catch(() => {});
+  if (await stillOwnsLock()) await fs.unlink(lockPath).catch(() => {});
+}
+
+async function stillOwnsLock() {
+  const lockPid = (await fs.readFile(lockPath, "utf8").catch(() => "")).trim();
+  return lockPid === String(process.pid);
+}
+
+async function stopForLostLock(session) {
+  if (shuttingDownForLostLock) return true;
+  shuttingDownForLostLock = true;
+  await log(`Live recorder lock moved to another pid; recorder ${process.pid} is exiting.`);
+  if (session) {
+    await stopCapture(session).catch(() => {});
+    activeRecordingSession = null;
+  }
+  process.exit(0);
+  return true;
 }
 
 async function gameIsRunning() {
@@ -1183,7 +1205,7 @@ async function finalizeSession(session) {
     await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "Capture only had alt-tab-tainted segments, so no review was published."), progress: 100, ...clearEtaFields() }, { force: true });
     return;
   }
-  const usableSegments = cleanSegments.filter((item) => item.size >= minCaptureSegmentBytes);
+  const usableSegments = cleanSegments.filter((item) => item.size >= minCaptureSegmentBytes && Number(item.duration) > 0);
   const estimatedCoverageSeconds = usableSegments.reduce((sum, item) => sum + (Number(item.duration) || segmentSeconds), 0);
   if (estimatedCoverageSeconds < expectedForegroundSeconds * minCaptureCoverage) {
     await log(`Capture incomplete: ${usableSegments.length}/${cleanSegments.length} clean usable segments cover about ${Math.round(estimatedCoverageSeconds)}s of ${expectedForegroundSeconds}s foreground time (${elapsedSeconds}s game, ${foregroundPauseSeconds}s paused). Not creating a misleading auto review clip.`);
@@ -1193,12 +1215,21 @@ async function finalizeSession(session) {
 
   const replay = await latestReplay(session.startedMs, session.endedMs) || await latestLocalMatch(session.startedMs, session.endedMs);
   const outputPath = await nextOutputPath(replay?.matchId);
-  const importantIndexes = importantSegmentIndexes(cleanSegments);
+  const importantIndexes = importantSegmentIndexes(usableSegments);
   const processed = [];
-  for (let index = 0; index < cleanSegments.length; index += 1) {
-    const segment = cleanSegments[index];
-    const previousSegment = cleanSegments[index - 1] || null;
-    processed.push(await processSegment(segment, importantIndexes, session.sessionRoot, previousSegment));
+  for (let index = 0; index < usableSegments.length; index += 1) {
+    const segment = usableSegments[index];
+    const previousSegment = usableSegments[index - 1] || null;
+    try {
+      processed.push(await processSegment(segment, importantIndexes, session.sessionRoot, previousSegment));
+    } catch (error) {
+      await log(`Skipping corrupt segment ${segment.index}: ${error.message}`);
+    }
+  }
+  if (!processed.length) {
+    await log("No segments survived post-game processing.");
+    await publishRecorderStatus("blocked", { ...sessionStatusFields(session, "No review clip could be built from the usable segments."), progress: 100, ...clearEtaFields() }, { force: true });
+    return;
   }
   const listPath = path.join(session.sessionRoot, "processed.txt");
   const joinedPath = path.join(session.sessionRoot, "processed.mp4");
@@ -1375,16 +1406,26 @@ async function processPostGameQueue() {
         progress: 65,
         ...activeQueueEta
       }, { force: true });
-      await finalizeSession(session);
-      postGameQueue.shift();
-      await savePostGameQueue();
-      await log(`Queued review finished ${session.sessionRoot}.`);
-      activeQueueSessionRoot = "";
-      activeQueueStage = "";
-      activeQueueStageLabel = "";
-      activeQueueStartedAt = "";
-      activeQueueEta = {};
-      activeQueueProgress = null;
+      try {
+        await finalizeSession(session);
+        await log(`Queued review finished ${session.sessionRoot}.`);
+      } catch (error) {
+        await log(`Queued review failed and will not block later reviews: ${error.stack || error.message}`);
+        await publishRecorderStatus("blocked", {
+          ...sessionStatusFields(session, "Queued review failed while building the clip; the next queued review will continue."),
+          progress: 100,
+          ...clearEtaFields()
+        }, { force: true });
+      } finally {
+        postGameQueue.shift();
+        await savePostGameQueue();
+        activeQueueSessionRoot = "";
+        activeQueueStage = "";
+        activeQueueStageLabel = "";
+        activeQueueStartedAt = "";
+        activeQueueEta = {};
+        activeQueueProgress = null;
+      }
     }
   } finally {
     postGameQueueRunning = false;
@@ -1394,7 +1435,11 @@ async function processPostGameQueue() {
 async function main() {
   await acquireLock();
   process.on("exit", () => {
-    fs.unlink(lockPath).catch(() => {});
+    try {
+      if (fsSync.readFileSync(lockPath, "utf8").trim() === String(process.pid)) fsSync.unlinkSync(lockPath);
+    } catch {
+      // Process exit cannot wait on async cleanup.
+    }
   });
   process.on("SIGINT", async () => {
     await releaseLock();
@@ -1406,7 +1451,7 @@ async function main() {
     log(`Post-game queue worker failed: ${error.stack || error.message}`).catch(() => {});
   });
   await log("League live recorder is watching for game process.");
-  let skipCurrentGame = await gameIsRunning();
+  let skipCurrentGame = skipCurrentGameOnRestart && await gameIsRunning();
   await publishRecorderStatus(skipCurrentGame ? "waiting" : "watching", {
     label: skipCurrentGame ? "waiting for next game" : "recorder ready",
     detail: skipCurrentGame ? "restarted mid-game; current game ignored" : "waiting for League",
@@ -1415,6 +1460,10 @@ async function main() {
   }, { force: true });
   let session = null;
   while (true) {
+    if (!(await stillOwnsLock())) {
+      await stopForLostLock(session);
+      break;
+    }
     const running = await gameIsRunning();
     if (skipCurrentGame) {
       if (!running) {

@@ -18,9 +18,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-21-visible-paragraph-standard-v6";
+const analysisVersion = "2026-05-21-visible-paragraph-teaching-standard-v7";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-21-visible-paragraph-standard-v6",
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
@@ -1327,6 +1328,7 @@ function visibleParagraphStandardIssues(recording = {}) {
   const detail = coachClean(recording.gameDetail, "");
   const eventEvidence = coachClean(recording.eventEvidence || recording.evidence, "");
   const issues = [];
+  const needsTeachingReason = recording.analysisSource !== "manual" || recording.file === "auto_NA1-5565387627_01.mp4";
   if (detail.length < 240) {
     issues.push("visible paragraph is too short");
   }
@@ -1341,6 +1343,15 @@ function visibleParagraphStandardIssues(recording = {}) {
   }
   if (!/\b(instead|because|so|which|then|after|before|when)\b/i.test(detail)) {
     issues.push("visible paragraph must explain the decision chain");
+  }
+  if (needsTeachingReason && !/\b(because|so that|this matters because|the reason|which makes|meaning|means)\b/i.test(detail)) {
+    issues.push("visible paragraph must explain why the advice is correct");
+  }
+  if (needsTeachingReason && /\b(sync(?:ed|ing)?|conversion|convert|grouped mid|group mid|mid pressure)\b/i.test(detail) && !/\b(mean|means|meaning|because|so that|the reason|this matters because)\b/i.test(detail)) {
+    issues.push("visible paragraph must define coaching shorthand in plain terms");
+  }
+  if (needsTeachingReason && /\b(grouped mid|group mid|mid pressure)\b/i.test(detail) && !/\b(mid[^.]*because|because[^.]*mid|mid[^.]*shortest|mid[^.]*team|mid[^.]*allies|mid[^.]*base|mid[^.]*tower|mid[^.]*fog|mid[^.]*collapse)\b/i.test(detail)) {
+    issues.push("visible paragraph must explain why mid/grouping is better in this state");
   }
   if (eventEvidence.length < 80 || uniqueTimestampCount(eventEvidence) < 2) {
     issues.push("eventEvidence must contain timestamped proof");
@@ -1385,6 +1396,50 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5565387627_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Turn the shutdown into a grouped push",
+      feedback: "Mistake: after spending a huge lead, you let side fights test your shutdown before your team was set up to take tower or base. Fix: choose the safest visible payout first: group with the wave and allies, hit free structure, or reset if teammates cannot follow.",
+      gameDetail: "At 09:11 you are in base/shop after a strong 4/0/2 start, and that part is good because you actually spend instead of dragging raw gold around the map. At 10:25 you are 6/0/2 with 1285 gold in a bot-side lane fight while a shutdown has just happened, so the leak is that your biggest asset, the fed Samira shutdown, is being tested in a side lane before the team is organized to take something guaranteed. A conversion just means turning your lead into a concrete payout: tower damage, base damage, dragon/Baron setup, or a safe reset with spent gold. At 11:12 the better version appears because you are grouped mid behind allies with enemies in front; mid is better in this visible state because allies are already there, the lane points straight toward towers/base, and your team can body-block while enemies have to defend instead of collapsing from fog on a side-lane Samira. At 12:42 you are 8/0/2 mid while several allies are dead or on timers, so the correct next check is wait for allies, reset, or hold the wave until the next push is together, because clearing one more wave alone does not matter if it gives enemies your shutdown. By 13:10 and 13:24 you do convert with the team inside the enemy base, which proves the ending instinct is there; the Master-climb lesson is to make the earlier 10:25 and 12:42 windows look like that ending shape sooner.",
+      whyTrust: "The frames show both the good habit and the leak: you bought at 09:11 and ended with the team at 13:24, but the risky windows were the side-fight exposure at 10:25 and the alone-before-team state at 12:42.",
+      eventEvidence: "09:11 shows Samira in shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold. 10:25 shows Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present. 11:12 shows Samira grouped mid behind allies while enemies are in front. 12:42 shows Samira 8/0/2 mid while multiple allies are dead or on timers. 13:10 to 13:24 shows the team turning the lead into enemy-base damage.",
+      goodThing: "You did spend, you did group with allies, and you did end through the base. The improvement is protecting the shutdown lead between those good moments.",
+      focusTag: "shutdown lead conversion",
+      evidence: "Manual frame review of the May 21 queued auto capture: shop/spend at 09:11, side-fight shutdown state at 10:25, grouped mid pressure at 11:12, unsynced mid wave with ally death timers at 12:42, and base conversion at 13:10-13:24.",
+      pattern: "The repeated climb leak is letting a won personal lead pass through extra side fights before the next team objective is organized. The fix is not always mid; it is whichever visible route turns the lead into structure, objective setup, or a clean reset with the least shutdown exposure.",
+      diamondRule: "After a big Samira spend, do not take a fair side fight until you have first checked the guaranteed payout: group, structure, objective, or reset.",
+      drill: "When you are 4/0 or better, say payout first before accepting the next side fight.",
+      timeline: [
+        "09:11 - Samira is in shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold.",
+        "10:25 - Samira is 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present.",
+        "11:12 - Samira is grouped mid behind allies while enemies are in front, which is the safer pressure shape.",
+        "12:42 - Samira is 8/0/2 mid while multiple allies are dead or on timers, making sync/reset more important than another solo wave.",
+        "13:10 - The team is entering the enemy base area together.",
+        "13:24 - Samira and allies hit the enemy base as the conversion finally becomes clean."
+      ],
+      clockAnchors: [
+        { clock: "09:11", videoSeconds: 234.217, description: "Samira is in base shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold." },
+        { clock: "10:25", videoSeconds: 249.565, description: "Samira is 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present." },
+        { clock: "11:12", videoSeconds: 278.375, description: "Samira is grouped mid behind allies while multiple enemies are in front." },
+        { clock: "12:42", videoSeconds: 318.75, description: "Samira is 8/0/2 mid while multiple allies are dead or on timers." },
+        { clock: "12:54", videoSeconds: 326.304, description: "Samira is still moving through the next mid/side pressure window with the shutdown lead." },
+        { clock: "13:10", videoSeconds: 341.652, description: "Samira and allies reach the enemy base area together." },
+        { clock: "13:24", videoSeconds: 355.25, description: "Samira and allies convert inside the enemy base." }
+      ],
+      nuance: [
+        "Good: the 09:11 shop frame shows you did spend your lead instead of ignoring items.",
+        "Good: the 11:12 and 13:24 frames show you can play behind allies and convert the base with the team.",
+        "Leak: the 10:25 side fight keeps the shutdown lead exposed before the next objective state is clean.",
+        "Meaning: conversion is the concrete payout after the fight, not a vague call; it is tower, base, objective setup, or reset.",
+        "Why mid here: at 11:12 allies are already mid and enemies are in front, so mid lets teammates protect Samira and turns the lead toward structure faster than another side-lane fight.",
+        "Master-climb punishment: better enemies do not need many openings; one side re-fight or one late solo wave is enough to take your shutdown."
+      ],
+      reviewLimit: "This review uses sampled visible frames and game-clock anchors. It does not infer hidden clicks, voice calls, or cooldowns that are not visible in the recording.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5565308644_01.mp4") {
     return {
       champion: "Samira",
@@ -1938,6 +1993,15 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (!/\b(then|after|before|because|instead|next|when)\b/i.test(gameDetail)) {
     issues.push("missing decision sequence");
   }
+  if (isAutoFullReview && !/\b(because|so that|this matters because|the reason|which makes|meaning|means)\b/i.test(gameDetail)) {
+    issues.push("gameDetail must explain why the advice is correct, not only what to do");
+  }
+  if (isAutoFullReview && /\b(sync(?:ed|ing)?|conversion|convert|grouped mid|group mid|mid pressure)\b/i.test(gameDetail) && !/\b(mean|means|meaning|because|so that|the reason|this matters because)\b/i.test(gameDetail)) {
+    issues.push("gameDetail uses coaching shorthand without a plain-language explanation");
+  }
+  if (isAutoFullReview && /\b(grouped mid|group mid|mid pressure)\b/i.test(gameDetail) && !/\b(mid[^.]*because|because[^.]*mid|mid[^.]*shortest|mid[^.]*team|mid[^.]*allies|mid[^.]*base|mid[^.]*tower|mid[^.]*fog|mid[^.]*collapse)\b/i.test(gameDetail)) {
+    issues.push("gameDetail must explain why mid/grouping is better in this map state");
+  }
   if (/^(this|each time|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(gameDetail)) {
     issues.push("gameDetail starts with conclusion instead of visible action");
   }
@@ -2157,6 +2221,9 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like a useful replay-review paragraph, not a stat audit: include three to six notable visible moments if the frames support them, enough timestamped evidence to show the mistake chain, no K/D/A, no CS count, and one final simple lesson sentence. It must include setup -> Alan's action -> leak/consequence -> better next check when the frames support those parts.",
+    "Do not use coaching shorthand without teaching it. If you use words like conversion, convert, sync, grouped mid, mid pressure, tempo, or payout, define the word in plain League terms inside the same paragraph.",
+    "If you recommend grouping mid or pressuring mid, explain why mid is better in that visible state: for example, allies are already there, mid is the shortest lane to towers/base, it reduces fog-collapse risk, it lets teammates peel, or it forces enemies to defend structure instead of chasing Samira in a side lane. Tie the reason to the frames; do not say group mid as generic advice.",
+    "Every full-game review must include the reason Alan should do the fix, not just the instruction. A good sentence sounds like: 'This matters because ...' or 'That route is better because ...'.",
     "Alan explicitly wants Master-level critique. You may mention Master-climb punishment when it names a concrete consequence, but do not use rank labels as vague authority. Name the exact visible habit and exact in-game payoff.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty. A limited review is better than a vague confident one.",
     "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
@@ -2182,7 +2249,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, and the better next click/check. Use only visible frame evidence and useful timestamps. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and what any shorthand term means. Use only visible frame evidence and useful timestamps. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }

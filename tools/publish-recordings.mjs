@@ -35,6 +35,7 @@ const codePublishPaths = [
   "server.js",
   "tools/sync-recordings.mjs",
   "tools/league-live-recorder.mjs",
+  "tools/local-status-guard.mjs",
   "tools/publish-recordings.mjs",
   "tools/publish-recordings.ps1",
   "tools/install-live-recorder-task.ps1",
@@ -117,6 +118,7 @@ async function publishStatus(status, fields = {}) {
   const payload = {
     ...existing,
     status,
+    recorderPid: existing.recorderPid || process.pid,
     label: clean(fields.label || status, 80),
     detail: clean(fields.detail || "", 180),
     mode: clean(fields.mode || existing.mode || "publisher", 40),

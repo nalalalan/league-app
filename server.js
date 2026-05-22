@@ -137,8 +137,19 @@ async function loadRecordingStatus() {
 
   if (!isRailway) {
     const queue = await readJsonFile(localPostGameQueuePath, []);
-    const hasCurrentQueueSnapshot = Array.isArray(status.queueItems) && Date.now() - statusUpdatedMs(status) < 2 * 60 * 1000;
-    if (Array.isArray(queue) && !hasCurrentQueueSnapshot) {
+    if (Array.isArray(queue) && queue.length === 0 && Array.isArray(status.queueItems)) {
+      const activeItems = status.queueItems.filter((item) => {
+        const label = String(item?.label || "").toLowerCase();
+        const stage = String(item?.stage || "").toLowerCase();
+        const itemStatus = String(item?.status || "").toLowerCase();
+        return label === "current game" || stage === "recording" || itemStatus === "recording";
+      });
+      status = {
+        ...status,
+        queueCount: activeItems.length,
+        queueItems: activeItems
+      };
+    } else if (Array.isArray(queue) && (!Array.isArray(status.queueItems) || Date.now() - statusUpdatedMs(status) >= 2 * 60 * 1000)) {
       status = {
         ...status,
         queueCount: queue.length,
@@ -197,6 +208,12 @@ function cleanQueueItem(item, index) {
     etaBasis: cleanText(item?.etaBasis, 180),
     progress: cleanProgress(item?.progress)
   };
+}
+
+function cleanRecorderPid(value) {
+  const pid = Number(value);
+  if (!Number.isFinite(pid) || pid <= 0) return "";
+  return String(Math.round(pid)).slice(0, 20);
 }
 
 function publicQueueFields(raw = {}) {
@@ -368,11 +385,17 @@ async function handleApi(req, res, url) {
     }
     const payload = await readJsonBody(req);
     const queue = publicQueueFields(payload);
+    const recorderPid = cleanRecorderPid(payload.recorderPid);
+    if (!recorderPid && queue.queueCount > 0) {
+      sendJson(res, 409, { error: "stale recorder status rejected" });
+      return true;
+    }
     const status = {
       status: cleanStatus(payload.status),
       label: cleanText(payload.label, 80),
       detail: cleanText(payload.detail, 180),
       mode: cleanText(payload.mode, 40),
+      recorderPid,
       matchId: cleanText(payload.matchId, 40),
       startedAt: cleanText(payload.startedAt, 40),
       progress: cleanProgress(payload.progress),
