@@ -12,11 +12,12 @@ $statusToken = [Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','User
 if (-not $statusToken) { $statusToken = [Environment]::GetEnvironmentVariable('LEAGUE_STATUS_TOKEN','Machine') }
 if ($statusToken) { $env:LEAGUE_STATUS_TOKEN = $statusToken }
 
-$env:LEAGUE_LIVE_CAPTURE_MODE = 'desktop'
+$env:LEAGUE_LIVE_CAPTURE_MODE = 'region'
 $env:LEAGUE_LIVE_POLL_MS = '1000'
 $env:LEAGUE_LIVE_SEGMENT_SECONDS = '15'
-$env:LEAGUE_LIVE_FPS = '2'
+$env:LEAGUE_LIVE_FPS = '1'
 $env:LEAGUE_LIVE_CAPTURE_SCALE = '960:-2'
+$env:LEAGUE_LIVE_CAPTURE_CRF = '36'
 $env:LEAGUE_LIVE_CAPTURE_CQ = '30'
 $env:LEAGUE_LIVE_CAPTURE_BITRATE = '2500k'
 $env:LEAGUE_LIVE_CAPTURE_MAXRATE = '3500k'
