@@ -23,6 +23,7 @@ function visibleFields(recording = {}) {
     ["feedbackTitle", recording.feedbackTitle],
     ["feedback", recording.feedback],
     ["gameDetail", recording.gameDetail],
+    ["secondaryFocus", recording.secondaryFocus || recording.secondaryImprovement],
     ["eventEvidence", recording.eventEvidence || recording.evidence],
     ["goodThing", recording.goodThing],
     ["whyTrust", recording.whyTrust]
@@ -37,8 +38,10 @@ function feedbackIssues(recording = {}) {
   const issues = [];
   const title = clean(recording.feedbackTitle);
   const detail = clean(recording.gameDetail);
+  const secondaryFocus = clean(recording.secondaryFocus || recording.secondaryImprovement);
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
+  const needsSecondaryFocus = recording.analysisVersion === "2026-05-22-two-focus-coaching-v11";
 
   if (/\bAlan\b/.test(allVisible)) {
     issues.push("visible feedback refers to Alan in third person");
@@ -72,6 +75,23 @@ function feedbackIssues(recording = {}) {
   }
   if (!recording.rankEstimate?.exactRank) {
     issues.push("full review missing exact rank read");
+  }
+  if (needsSecondaryFocus) {
+    if (!secondaryFocus) {
+      issues.push("full review missing secondary improvement area");
+    } else {
+      if (secondaryFocus.length < 70) issues.push("secondary improvement is too thin");
+      if (secondaryFocus.length > 380) issues.push("secondary improvement is too long");
+      if (!/\b(second|also|another|extra|mechanic|mechanics|camera|spacing|position|target|path|wave|vision|fog|click|cursor|kite|entry|cooldown|hp|health|trade|lane|map|objective|reset|recall|timing|pattern)\b/i.test(secondaryFocus)) {
+        issues.push("secondary improvement does not name a distinct improvement lane");
+      }
+      if (!/\b(next|rep|drill|work|practice|hold|keep|stop|watch|check|click|space|kite|reset|path|use|wait|leave|enter)\b/i.test(secondaryFocus)) {
+        issues.push("secondary improvement does not include an easy next-game action");
+      }
+      if (/\b(frame[-\s]?perfect|animation cancel|exact combo|reaction time|orbwalk)\b/i.test(secondaryFocus) && Number(recording.captureFps || 1) < 10) {
+        issues.push("secondary improvement overclaims micro-mechanics from low-FPS capture");
+      }
+    }
   }
   if (/^(?:Focus|Review|Bad\b|Overstaying after successful map events\b)/i.test(title)) {
     issues.push("title is vague or judgmental");

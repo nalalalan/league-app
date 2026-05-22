@@ -18,9 +18,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-22-nonredundant-macro-review-v10";
+const analysisVersion = "2026-05-22-two-focus-coaching-v11";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-22-nonredundant-macro-review-v10",
   "2026-05-22-full-game-sampling-v9",
   "2026-05-22-primary-mistake-timestamp-v8",
   "2026-05-21-visible-paragraph-teaching-standard-v7",
@@ -1589,6 +1590,7 @@ function visibleParagraphStandardIssues(recording = {}) {
   const allVisibleText = [recording.feedback, detail, eventEvidence, recording.pattern].filter(Boolean).join(" ");
   const issues = [];
   const needsTeachingReason = recording.analysisSource !== "manual" || recording.file === "auto_NA1-5565387627_01.mp4";
+  const needsSecondaryFocus = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
   if (detail.length < 240) {
     issues.push("visible paragraph is too short");
   }
@@ -1629,6 +1631,37 @@ function visibleParagraphStandardIssues(recording = {}) {
   }
   if (!/^(?:At|Around|By|Then|In|During|After|When|Samira|You|\d{1,2}:[0-5]\d)\b/i.test(detail)) {
     issues.push("visible paragraph starts with a broken fragment instead of evidence");
+  }
+  if (needsSecondaryFocus) {
+    issues.push(...secondaryFocusStandardIssues(recording));
+  }
+  return issues;
+}
+
+function secondaryFocusStandardIssues(recording = {}) {
+  const issues = [];
+  const secondaryFocus = coachClean(recording.secondaryFocus || recording.secondaryImprovement || "");
+  if (!secondaryFocus) {
+    issues.push("secondaryFocus must name a second improvement area");
+    return issues;
+  }
+  if (secondaryFocus.length < 70) {
+    issues.push("secondaryFocus is too thin");
+  }
+  if (secondaryFocus.length > 380) {
+    issues.push("secondaryFocus is too long");
+  }
+  if (/\bAlan\b/.test(secondaryFocus)) {
+    issues.push("secondaryFocus refers to Alan in third person");
+  }
+  if (!/\b(second|also|another|extra|mechanic|mechanics|camera|spacing|position|target|path|wave|vision|fog|click|cursor|kite|entry|cooldown|hp|health|trade|lane|map|objective|reset|recall|timing|pattern)\b/i.test(secondaryFocus)) {
+    issues.push("secondaryFocus must name a distinct improvement lane");
+  }
+  if (!/\b(next|rep|drill|work|practice|hold|keep|stop|watch|check|click|space|kite|reset|path|use|wait|leave|enter)\b/i.test(secondaryFocus)) {
+    issues.push("secondaryFocus must include an easy next-game action");
+  }
+  if (/\b(frame[-\s]?perfect|animation cancel|exact combo|reaction time|orbwalk)\b/i.test(secondaryFocus) && Number(recording.captureFps || 1) < 10) {
+    issues.push("secondaryFocus overclaims micro-mechanics from low-FPS capture");
   }
   return issues;
 }
@@ -2663,9 +2696,10 @@ function analysisSpecificityIssues(parsed, context = {}) {
   const feedback = coachClean(parsed?.feedback, "");
   const gameDetail = coachClean(parsed?.gameDetail, "");
   const eventEvidence = coachClean(parsed?.eventEvidence, "");
+  const secondaryFocus = coachClean(parsed?.secondaryFocus || parsed?.secondaryImprovement, "");
   const pattern = coachClean(parsed?.pattern, "");
   const nuance = cleanList(parsed?.nuance, 5);
-  const combined = [feedback, gameDetail, eventEvidence, pattern, nuance.join(" ")].join(" ");
+  const combined = [feedback, gameDetail, eventEvidence, secondaryFocus, pattern, nuance.join(" ")].join(" ");
   const issues = [];
   const isAutoFullReview = /^auto_/i.test(context.file || "") && Number(context.duration || 0) >= 90;
   if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback)) {
@@ -2709,6 +2743,12 @@ function analysisSpecificityIssues(parsed, context = {}) {
   }
   if (isAutoFullReview && !primaryMistakeTimestampSeconds(gameDetail, eventEvidence, pattern).length) {
     issues.push("the beginning of the main mistake window must have a visible game-clock timestamp");
+  }
+  if (isAutoFullReview) {
+    issues.push(...secondaryFocusStandardIssues({
+      secondaryFocus,
+      captureFps: Number(process.env.LEAGUE_LIVE_FPS || 1)
+    }));
   }
   if (nuance.length < 3) {
     issues.push("nuance needs at least three specific bullets");
@@ -3007,7 +3047,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
     "The recorder is intentionally low-FPS for low-lag macro review. Prioritize decisions that unfold over seconds or minutes: resets, objective conversion, side-lane drift, base pressure, shutdown protection, and map tempo. Do not over-index on single-frame mechanics.",
     "Coach like a blunt but serious League coach: name the actual mistake, do not soften it, and do not insult Alan. Be direct enough that he knows exactly where he messed up.",
-    "Give exactly one highest-value improvement for this recording, plus the specific visible mistake moments that make the advice trustworthy. The top advice must stay direct, narrow, and playable in the next queue.",
+    "Give exactly two improvement areas for this recording. The first is the highest-value main mistake and stays in feedback/gameDetail. The second goes in secondaryFocus as one separate easy thing Alan can work on right away.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
     "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
     "Also include eventEvidence: one compact sentence naming the actual visible things that prove the coaching claim. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, missed reset window, or tempo leak; if the advice is structure conversion, the evidence must show structure access, a free structure, a blocked structure, or the chase away from it. This is proof, not advice.",
@@ -3015,6 +3055,8 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like a useful replay-review paragraph, not a stat audit: include the main visible mistake window, what leaked, what happened next or almost happened, and one final simple lesson sentence. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp. Extra timestamps are optional and should appear only when they make the critique clearer.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
+    "secondaryFocus must be one concise sentence and must not repeat the main mistake. Choose a second lane from visible mechanics-adjacent habits, camera stability, spacing, target choice, cursor/click pattern when visible, entry timing, cooldown/CC accounting, lane trade discipline, wave handling, pathing, fog/vision, or reset pattern. Include an easy next-game action.",
+    "At 1 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, or using dash before the fight is ready. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not over-explain common coaching terms Alan already knows. Only define grouped mid, sync, tempo, payout, or conversion when the advice would otherwise be unclear; prioritize why the decision is better in this visible state.",
     "If you recommend grouping mid or pressuring mid, explain why mid is better in that visible state: for example, allies are already there, mid is the shortest lane to towers/base, it reduces fog-collapse risk, it lets teammates peel, or it forces enemies to defend structure instead of chasing Samira in a side lane. Tie the reason to the frames; do not say group mid as generic advice.",
     "Every full-game review must include the reason Alan should do the fix, not just the instruction. A good sentence sounds like: 'This matters because ...' or 'That route is better because ...'.",
@@ -3032,7 +3074,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
     "Visible output must address the player as 'you' or 'Samira', never 'Alan' in third person.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, better next check, and one simple lesson sentence","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, better next check, and one simple lesson sentence","secondaryFocus":"Second focus: one distinct mechanics/camera/spacing/pathing/wave/vision/target-choice improvement plus one easy next-game action; mention FPS limits if micro-mechanics cannot be judged","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -3044,7 +3086,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and what any shorthand term means. Timestamp the start or nearest visible start of the main mistake window, keep Mistake/Fix labels out of gameDetail, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and what any shorthand term means. Timestamp the start or nearest visible start of the main mistake window, include one separate secondaryFocus that does not repeat the main mistake, keep Mistake/Fix labels out of gameDetail, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
@@ -3061,6 +3103,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
       feedbackTitle: coachClean(parsed.feedbackTitle, "Focus"),
       feedback: coachClean(parsed.feedback, "Review the clip and choose one safer next action."),
       gameDetail: coachClean(parsed.gameDetail, `${coachClean(parsed.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(parsed.feedback, "Choose one safer next action.")}`),
+      secondaryFocus: coachClean(parsed.secondaryFocus || parsed.secondaryImprovement, ""),
       eventEvidence: coachClean(parsed.eventEvidence, coachClean(parsed.evidence, "Generated from sampled replay frames.")),
       goodThing: coachClean(parsed.goodThing, ""),
       whyTrust: coachClean(parsed.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
@@ -3428,6 +3471,7 @@ async function main() {
         analysisSource: analysis.analysisSource || "openai",
         analysisVersion,
         gameDetail: integratedGameDetail,
+        secondaryFocus: analysis.secondaryFocus || analysis.secondaryImprovement || "",
         eventEvidence: finalEventEvidence,
         clockAnchors: annotatedClockAnchors
       });
@@ -3442,6 +3486,7 @@ async function main() {
           analysisSource: analysis.analysisSource || "openai",
           analysisVersion,
           gameDetail: integratedGameDetail,
+          secondaryFocus: analysis.secondaryFocus || analysis.secondaryImprovement || "",
           eventEvidence: finalEventEvidence,
           clockAnchors: annotatedClockAnchors
         });
@@ -3498,6 +3543,7 @@ async function main() {
       feedbackTitle: normalizeVisibleCoachText(analysis.feedbackTitle || "Focus", championName),
       feedback: normalizeVisibleCoachText(stripUnmatchedClockTokens(analysis.feedback || "Review the clip and choose one safer next action.", annotatedClockAnchors), championName),
       gameDetail: integratedGameDetail,
+      secondaryFocus: normalizeVisibleCoachText(stripUnmatchedClockTokens(stripUnverifiedClockReferences(analysis.secondaryFocus || analysis.secondaryImprovement || "", narrativeClockAnchors), annotatedClockAnchors), championName),
       eventEvidence: finalEventEvidence,
       goodThing: normalizeVisibleCoachText(analysis.goodThing || "", championName),
       whyTrust: normalizeVisibleCoachText(analysis.whyTrust || "This feedback is tied to the visible replay pattern and one controllable in-game decision.", championName),

@@ -1659,7 +1659,9 @@ function displayCritique(item) {
     "16-10_NA1-5563301586_01.webm": "The leak is playing the wave when one auto or spell kills Samira; give the wave and recall before the lane turns into a death timer."
   };
   if (byFile[item.file]) return byFile[item.file];
-  return stripCoachPrefix(recordingLesson(item))
+  const lesson = recordingLesson(item);
+  const mistakeOnly = String(lesson || "").match(/\bMistake:\s*([\s\S]*?)(?:\s*\bFix:|$)/i)?.[1] || lesson;
+  return stripCoachPrefix(mistakeOnly)
     .replace(/^You\s+/i, "The leak is that you ")
     .replace(/^Your\s+/i, "The leak is ")
     .replace(/\s+/g, " ")
@@ -1679,6 +1681,13 @@ function displayPraise(item) {
     .replace(/^The useful positive sign is that\s*/i, "The strong part is that ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function displaySecondaryFocus(item) {
+  const text = stripCoachPrefix(item.secondaryFocus || item.secondaryImprovement || "");
+  if (!hasText(text)) return "";
+  if (/^Second focus:/i.test(text)) return text;
+  return `Second focus: ${text.replace(/^Also\s+/i, "").trim()}`;
 }
 
 function storySentences(text) {
@@ -1920,6 +1929,7 @@ function recordingStoryParagraph(item) {
   const sentences = storySentences(recordingParagraph(item))
     .filter((sentence) => !isRedundantStorySentence(sentence, item, critique));
   const praise = displayPraise(item);
+  const secondaryFocus = displaySecondaryFocus(item);
   const critiqueIndex = critiqueInsertIndex(sentences);
   const praiseIndex = praise ? praiseInsertIndex(sentences) : -1;
   const timestampOptions = { linkTimestamps: true, item };
@@ -1932,6 +1942,7 @@ function recordingStoryParagraph(item) {
     appendStorySpan(paragraph, critique, "recording-story-critique", timestampOptions);
     appendStorySpan(paragraph, praise, "recording-story-praise", timestampOptions);
   }
+  appendStorySpan(paragraph, secondaryFocus, "recording-story-secondary", timestampOptions);
   return paragraph;
 }
 

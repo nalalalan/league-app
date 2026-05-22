@@ -11,7 +11,7 @@ const publicRoot = path.join(appRoot, "public");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
-const currentPrimaryMistakeAnalysisVersion = "2026-05-22-nonredundant-macro-review-v10";
+const currentPrimaryMistakeAnalysisVersion = "2026-05-22-two-focus-coaching-v11";
 
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();

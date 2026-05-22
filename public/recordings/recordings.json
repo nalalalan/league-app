@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T20:00:46.830Z",
+  "generatedAt": "2026-05-22T20:23:41.870Z",
   "source": "League of Legends Highlights folder",
   "match": "26 matches",
   "matches": [
@@ -197,6 +197,7 @@
       "feedbackTitle": "Overstayed After Teamfight Win",
       "feedback": "Mistake: You overstayed after a successful fight mid at 16:29 with very low health and no pressure advantage, leading to a delayed reset and unnecessary death. Fix: After winning a fight and taking out key threats, immediately reset if low HP and there's no immediate structure or high-priority objective to convert, instead of greedily staying for more mid wave or minor map pressure.",
       "gameDetail": "After a skirmish near mid at 16:29, Samira is left low HP, but instead of resetting, she stays in the mid lane and continues to pressure while enemies are respawning or collapsing. This greedy stay results in a death that could have been avoided by recalling after the fight win. The immediate consequence is a shutdown payout and loss of map tempo, giving the enemy a free push window. The more disciplined play is to recall the moment the area is won and HP is low, so you can spend gold, refill resources, and return before the enemy can force a numbers advantage. That reset buys you both tempo and safety for the next objective setup, especially when your shutdown is a real risk.",
+      "secondaryFocus": "Second focus: lane spacing and HP-trade discipline; at 10:42 both bot-lane sides are still trading while you and support are low, so the next rep is to stop taking extra forward steps once health bars say one clean spell can end the lane.",
       "eventEvidence": "0:36 Samira is at bot lane near turret with a support, both moving towards lane. 4:35 Bot lane farming; two allies retreating, enemy duo near their tower, Samira attacking minions. 16:27 Samira is dead in mid river after a fight win, with the death timer open, showing she did not reset after the initial win.",
       "goodThing": "You won the initial fight and took out a major threat before the overstayed death.",
       "whyTrust": "This habit directly controls how often you give shutdowns and how many fights you take without resources—one of the main ways Samira games collapse in harder ranks.",
@@ -294,7 +295,7 @@
       ],
       "reviewLimit": "Some lane and early macro details (such as deep warding, jungle cover, or roams) are not provable due to the large interval between frames, but the post-fight reset pattern is visible and clear.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-nonredundant-macro-review-v10",
+      "analysisVersion": "2026-05-22-two-focus-coaching-v11",
       "sampledFrames": 14,
       "publicVideoBytes": 31469760,
       "src": "/recordings/auto_NA1-5565818690_01.mp4",

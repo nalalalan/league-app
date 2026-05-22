@@ -2385,6 +2385,7 @@ h1 {
 
 .recording-story-critique,
 .recording-story-praise,
+.recording-story-secondary,
 .recording-story-rank {
   font-weight: 900;
 }
@@ -2399,6 +2400,10 @@ h1 {
 
 .recording-story-praise {
   color: #2d7a43;
+}
+
+.recording-story-secondary {
+  color: #6c4d26;
 }
 
 .recording-time-link {
@@ -2430,6 +2435,11 @@ h1 {
 .recording-story-praise .recording-time-link:hover,
 .recording-story-praise .recording-time-link:focus-visible {
   color: #1f6133;
+}
+
+.recording-story-secondary .recording-time-link:hover,
+.recording-story-secondary .recording-time-link:focus-visible {
+  color: #5f3714;
 }
 
 .recording-list-description,
