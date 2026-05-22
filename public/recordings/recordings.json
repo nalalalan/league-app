@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T06:28:08.715Z",
+  "generatedAt": "2026-05-22T06:39:22.429Z",
   "source": "League of Legends Highlights folder",
   "match": "21 matches",
   "matches": [
@@ -42,6 +42,70 @@
       "Open base means no sideways chase."
     ],
     "reviewLimit": "Replay review is based on sampled frames and visible state, not raw inputs or full cooldown telemetry."
+  },
+  "rankCalibration": {
+    "version": "2026-05-22-research-calibrated-rank-v3",
+    "method": "research-calibrated macro rank estimate with confidence gates",
+    "highConfidenceReady": false,
+    "currentLimitation": "No current full review has PvP or ranked opponent pressure, so the system can be confident about repeated review evidence but cannot honestly make a high-confidence ranked-MMR claim yet.",
+    "fullReviewGames": 20,
+    "queueCounts": {
+      "unknown": 4,
+      "bot": 16
+    },
+    "rankedFullGames": 0,
+    "pvpFullGames": 0,
+    "botFullGames": 16,
+    "anchoredFullGames": 20,
+    "statFullGames": 20,
+    "rankLabelCounts": {
+      "Bronze": 9,
+      "Silver": 5,
+      "Iron": 5,
+      "Gold": 1
+    },
+    "highConfidenceRequirements": {
+      "rankedFullGames": 3,
+      "pvpFullGames": 5,
+      "perGame": [
+        "full game or near-full macro recording",
+        "K/D/A, CS, and game length from the League client",
+        "visible timestamped main mistake window",
+        "PvP or ranked opponent pressure, not only Co-op vs AI"
+      ]
+    },
+    "researchBasis": [
+      {
+        "id": "riot-ranked-tiers-2026",
+        "title": "Riot ranked tiers, divisions, and queue restrictions",
+        "url": "https://support-leagueoflegends.riotgames.com/hc/en-us/articles/4406004330643-Ranked-Tiers-Divisions-and-Queues",
+        "use": "official current tier ladder, solo/duo queue meaning, and rank-neighbor restrictions"
+      },
+      {
+        "id": "riot-apex-tiers-2026",
+        "title": "Riot Master, Grandmaster, and Challenger apex tier rules",
+        "url": "https://support-leagueoflegends.riotgames.com/hc/en-us/articles/4405776545427-Master-Grandmaster-and-Challenger-The-Apex-Tiers",
+        "use": "apex tiers are below one percent, single-division, decay-sensitive, and require daily ranked pressure"
+      },
+      {
+        "id": "bennett-poulus-novak-2025",
+        "title": "The Practice Behaviors of Expert League of Legends Players",
+        "url": "https://opus.lib.uts.edu.au/handle/10453/189269",
+        "use": "high-skill players show more frequent and consistent ranked practice across recent match windows"
+      },
+      {
+        "id": "srl-league-2021",
+        "title": "Because I'm Bad at the Game: self-regulated learning in League of Legends",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2021.780234/full",
+        "use": "CS, gold, kill counts, and post-game statistics support self-monitoring and review"
+      },
+      {
+        "id": "kpi-objective-vision-2025",
+        "title": "League of Legends KPI, map navigation, and vision-control study",
+        "url": "https://doaj.org/article/dc43dcec52764f6fbd06ce940fd9ae72",
+        "use": "higher-skill play is associated with objective proximity, map movement, and vision-control behavior"
+      }
+    ]
   },
   "detectedChampions": [
     {
@@ -142,14 +206,35 @@
       "src": "/recordings/auto_NA1-5565578420_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565578420-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Gold",
         "range": "Silver I-Gold II",
         "score": 61,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "confidenceScore": 60,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "upper middle",
-        "reason": "Gold read from macro habits: death count stayed controlled, fight conversion and damage output are clearly above beginner mechanics; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Gold read from macro habits: death count stayed controlled, fight conversion and damage output are clearly above beginner mechanics; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -264,14 +349,34 @@
       "src": "/recordings/auto_NA1-5565518539_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565518539-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 34,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 36,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, reset discipline after wins, missed structure/objective conversion. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, reset discipline after wins, missed structure/objective conversion. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -422,14 +527,35 @@
       "src": "/recordings/auto_NA1-5565445744_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565445744-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "score": 45,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 46,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "middle",
-        "reason": "Silver read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, shutdown or unspent-gold protection. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Silver read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, shutdown or unspent-gold protection. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -561,14 +687,35 @@
       "src": "/recordings/auto_NA1-5565387627_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565387627-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "score": 45,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 46,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "middle",
-        "reason": "Silver read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Silver read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -703,14 +850,34 @@
       "src": "/recordings/auto_NA1-5565356454_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565356454-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 37,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 36,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by kill pressure is not yet consistent, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by kill pressure is not yet consistent, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -867,14 +1034,35 @@
       "src": "/recordings/auto_NA1-5565308644_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565308644-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "score": 44,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 46,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "middle",
-        "reason": "Silver read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, side chase or fog drift. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Silver read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -1036,14 +1224,35 @@
       "src": "/recordings/auto_NA1-5565242641_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565242641-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "score": 0,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "confidenceScore": 60,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
-        "reason": "Iron read from macro habits: farm pace is a real strength, you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Iron read from macro habits: farm pace is a real strength, you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -1170,14 +1379,34 @@
       "src": "/recordings/auto_NA1-5565226188_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565226188-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 26,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by lethal-health stays, reset discipline after wins, missed structure/objective conversion. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by lethal-health stays, reset discipline after wins, missed structure/objective conversion. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -1272,14 +1501,34 @@
       "src": "/recordings/auto_NA1-5565193158_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565193158-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 39,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, shutdown or unspent-gold protection. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, shutdown or unspent-gold protection. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -1416,14 +1665,34 @@
       "src": "/recordings/auto_NA1-5565145132_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565145132-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "score": 0,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
-        "reason": "Iron read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, farm pace is too low for reliable ranked climbing, lethal-health stays. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Iron read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, farm pace is too low for reliable ranked climbing, lethal-health stays. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -1538,14 +1807,34 @@
       "src": "/recordings/auto_NA1-5565058943_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565058943-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "score": 43,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "middle",
-        "reason": "Silver read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Silver read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -1685,14 +1974,34 @@
       "src": "/recordings/auto_NA1-5565048601_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565048601-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 36,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -1817,14 +2126,34 @@
       "src": "/recordings/auto_NA1-5565044205_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565044205-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 32,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -1949,14 +2278,34 @@
       "src": "/recordings/auto_NA1-5565025543_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565025543-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 29,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: fight conversion and damage output are clearly above beginner mechanics; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -2136,14 +2485,34 @@
       "src": "/recordings/auto_NA1-5564835832_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564835832-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "score": 11,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 36,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
-        "reason": "Iron read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, reset discipline after wins. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Iron read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -2258,14 +2627,34 @@
       "src": "/recordings/auto_NA1-5564718141_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564718141-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "score": 0,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 36,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
-        "reason": "Iron read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Iron read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -2511,14 +2900,35 @@
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
       "poster": "/recordings/posters/auto-na1-5563660362-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "score": 14,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 46,
+        "queueClass": "unknown",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
-        "reason": "Iron read from macro habits: team grouping or sync appears in the review; held down by avoidable deaths still show up, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "queue type is unknown",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Iron read from macro habits: team grouping or sync appears in the review; held down by avoidable deaths still show up, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Ranked-transfer confidence is low from unknown evidence."
       }
     },
     {
@@ -2719,14 +3129,35 @@
       "src": "/recordings/16-10_NA1-5563352800_01.mp4",
       "poster": "/recordings/posters/16-10-na1-5563352800-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 37,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 46,
+        "queueClass": "unknown",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "queue type is unknown",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Ranked-transfer confidence is low from unknown evidence."
       }
     },
     {
@@ -2926,14 +3357,35 @@
       "src": "/recordings/16-10_NA1-5563301586_01.mp4",
       "poster": "/recordings/posters/16-10-na1-5563301586-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "score": 47,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "confidenceScore": 60,
+        "queueClass": "unknown",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "middle",
-        "reason": "Silver read from macro habits: farm pace is a real strength, team grouping or sync appears in the review; held down by lethal-health stays, reset discipline after wins."
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review"
+        ],
+        "confidenceBlockers": [
+          "queue type is unknown",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Silver read from macro habits: farm pace is a real strength, team grouping or sync appears in the review; held down by lethal-health stays, reset discipline after wins. Ranked-transfer confidence is low from unknown evidence."
       }
     },
     {
@@ -3108,14 +3560,34 @@
       "src": "/recordings/16-10_NA1-5563247854_13.mp4",
       "poster": "/recordings/posters/16-10-na1-5563247854-13.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-macro-rank-v2",
+        "version": "2026-05-22-research-calibrated-rank-v3",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "score": 36,
         "confidence": "low",
-        "basis": "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "confidenceScore": 36,
+        "queueClass": "unknown",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
-        "reason": "Bronze read from macro habits: farm pace is a real strength, team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, shutdown or unspent-gold protection."
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro",
+          "queue type is unknown",
+          "needs 3 ranked full games or 5 PvP full games for high confidence"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze read from macro habits: farm pace is a real strength, team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, shutdown or unspent-gold protection. Ranked-transfer confidence is low from unknown evidence."
       }
     },
     {

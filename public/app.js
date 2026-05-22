@@ -1865,8 +1865,9 @@ function recordingRankSentence(item) {
   const label = String(estimate.label || "").trim();
   if (!label) return "";
   const range = String(estimate.range || "").trim();
-  const confidence = String(estimate.confidence || "").trim();
-  const detail = [range, confidence ? `${confidence} confidence` : ""].filter(Boolean).join(", ");
+  const transferConfidence = String(estimate.rankedTransferConfidence || estimate.confidence || "").trim();
+  const confidenceLabel = transferConfidence ? `ranked-transfer ${transferConfidence}` : "";
+  const detail = [range, confidenceLabel].filter(Boolean).join("; ");
   return detail ? `Approx rank read: ${label} (${detail}).` : `Approx rank read: ${label}.`;
 }
 

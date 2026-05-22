@@ -26,7 +26,7 @@ const compatibleAnalysisVersions = new Set([
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
-const rankEstimateVersion = "2026-05-22-macro-rank-v2";
+const rankEstimateVersion = "2026-05-22-research-calibrated-rank-v3";
 const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v3";
 const coachEvidenceVersion = "2026-05-21-specific-evidence-useful-v5";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
@@ -1540,6 +1540,121 @@ function scoreRankBand(score) {
   return bands.find((band) => score >= band.min) || bands.at(-1);
 }
 
+const rankCalibrationResearch = [
+  {
+    id: "riot-ranked-tiers-2026",
+    title: "Riot ranked tiers, divisions, and queue restrictions",
+    url: "https://support-leagueoflegends.riotgames.com/hc/en-us/articles/4406004330643-Ranked-Tiers-Divisions-and-Queues",
+    use: "official current tier ladder, solo/duo queue meaning, and rank-neighbor restrictions"
+  },
+  {
+    id: "riot-apex-tiers-2026",
+    title: "Riot Master, Grandmaster, and Challenger apex tier rules",
+    url: "https://support-leagueoflegends.riotgames.com/hc/en-us/articles/4405776545427-Master-Grandmaster-and-Challenger-The-Apex-Tiers",
+    use: "apex tiers are below one percent, single-division, decay-sensitive, and require daily ranked pressure"
+  },
+  {
+    id: "bennett-poulus-novak-2025",
+    title: "The Practice Behaviors of Expert League of Legends Players",
+    url: "https://opus.lib.uts.edu.au/handle/10453/189269",
+    use: "high-skill players show more frequent and consistent ranked practice across recent match windows"
+  },
+  {
+    id: "srl-league-2021",
+    title: "Because I'm Bad at the Game: self-regulated learning in League of Legends",
+    url: "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2021.780234/full",
+    use: "CS, gold, kill counts, and post-game statistics support self-monitoring and review"
+  },
+  {
+    id: "kpi-objective-vision-2025",
+    title: "League of Legends KPI, map navigation, and vision-control study",
+    url: "https://doaj.org/article/dc43dcec52764f6fbd06ce940fd9ae72",
+    use: "higher-skill play is associated with objective proximity, map movement, and vision-control behavior"
+  }
+];
+
+function isFullReviewRecording(recording = {}) {
+  return recording.kind === "full review" || Number(recording.durationSeconds || 0) > 90;
+}
+
+function rankQueueClass(recording = {}) {
+  const queueId = Number(recording.queueId);
+  const queueText = clean(`${recording.gameType || ""} ${recording.kind || ""}`).toLowerCase();
+  if (queueId === 420 || /ranked solo/.test(queueText)) return "ranked_solo";
+  if (queueId === 440 || /ranked flex/.test(queueText)) return "ranked_flex";
+  if ([400, 430, 480, 490].includes(queueId) || /\b(draft|blind|quickplay|swiftplay|normal)\b/i.test(queueText)) return "pvp";
+  if ([830, 840, 850, 870, 880, 890].includes(queueId) || /\b(co-?op|ai|beginner|intro|intermediate|bot)\b/i.test(queueText)) return "bot";
+  return "unknown";
+}
+
+function rankCalibrationContext(recordings = []) {
+  const full = recordings.filter(isFullReviewRecording);
+  const queueCounts = {};
+  const labels = {};
+  for (const recording of full) {
+    const queueClass = rankQueueClass(recording);
+    queueCounts[queueClass] = (queueCounts[queueClass] || 0) + 1;
+    const label = clean(recording.rankEstimate?.label);
+    if (label) labels[label] = (labels[label] || 0) + 1;
+  }
+  const rankedFullGames = full.filter((recording) => /^ranked/.test(rankQueueClass(recording))).length;
+  const pvpFullGames = full.filter((recording) => ["ranked_solo", "ranked_flex", "pvp"].includes(rankQueueClass(recording))).length;
+  const anchoredFullGames = full.filter((recording) => Array.isArray(recording.clockAnchors) && recording.clockAnchors.length > 0).length;
+  const statFullGames = full.filter((recording) => (
+    Number.isFinite(Number(recording.kills)) &&
+    Number.isFinite(Number(recording.deaths)) &&
+    Number.isFinite(Number(recording.assists)) &&
+    Number.isFinite(Number(recording.cs)) &&
+    Number.isFinite(Number(recording.gameLengthSeconds))
+  )).length;
+  return {
+    version: rankEstimateVersion,
+    fullReviewGames: full.length,
+    queueCounts,
+    rankedFullGames,
+    pvpFullGames,
+    botFullGames: queueCounts.bot || 0,
+    anchoredFullGames,
+    statFullGames,
+    rankLabelCounts: labels,
+    highConfidenceRequirements: {
+      rankedFullGames: 3,
+      pvpFullGames: 5,
+      perGame: [
+        "full game or near-full macro recording",
+        "K/D/A, CS, and game length from the League client",
+        "visible timestamped main mistake window",
+        "PvP or ranked opponent pressure, not only Co-op vs AI"
+      ]
+    },
+    currentLimitation: full.length > 0 && pvpFullGames === 0
+      ? "No current full review has PvP or ranked opponent pressure, so the system can be confident about repeated review evidence but cannot honestly make a high-confidence ranked-MMR claim yet."
+      : ""
+  };
+}
+
+function rankCalibrationSummary(recordings = []) {
+  const context = rankCalibrationContext(recordings);
+  const highConfidenceReady = context.rankedFullGames >= context.highConfidenceRequirements.rankedFullGames ||
+    context.pvpFullGames >= context.highConfidenceRequirements.pvpFullGames;
+  return {
+    version: rankEstimateVersion,
+    method: "research-calibrated macro rank estimate with confidence gates",
+    highConfidenceReady,
+    currentLimitation: context.currentLimitation,
+    fullReviewGames: context.fullReviewGames,
+    queueCounts: context.queueCounts,
+    rankedFullGames: context.rankedFullGames,
+    pvpFullGames: context.pvpFullGames,
+    botFullGames: context.botFullGames,
+    anchoredFullGames: context.anchoredFullGames,
+    statFullGames: context.statFullGames,
+    rankLabelCounts: context.rankLabelCounts,
+    highConfidenceRequirements: context.highConfidenceRequirements,
+    researchBasis: rankCalibrationResearch
+  };
+}
+
 function rankTextFlags(recording) {
   const text = [
     recording.feedbackTitle,
@@ -1562,15 +1677,13 @@ function rankTextFlags(recording) {
   };
 }
 
-function rankedEquivalentForRecording(recording = {}) {
+function rankedEquivalentForRecording(recording = {}, calibrationContext = null) {
   const duration = Number(recording.durationSeconds || 0);
-  const isFullReview = recording.kind === "full review" || duration > 90;
-  if (!isFullReview) return null;
-  if (recording.rankEstimate?.version === rankEstimateVersion) return recording.rankEstimate;
+  if (!isFullReviewRecording(recording)) return null;
 
   const flags = rankTextFlags(recording);
-  const queueText = clean(recording.gameType || recording.kind || "").toLowerCase();
-  const beginnerBot = /co-?op|ai|beginner|bot/.test(queueText);
+  const queueClass = rankQueueClass(recording);
+  const beginnerBot = queueClass === "bot";
   const deaths = Number(recording.deaths);
   const kills = Number(recording.kills);
   const assists = Number(recording.assists);
@@ -1582,10 +1695,61 @@ function rankedEquivalentForRecording(recording = {}) {
   const kda = Number.isFinite(kills) || Number.isFinite(assists) || Number.isFinite(deaths)
     ? (Math.max(0, kills || 0) + Math.max(0, assists || 0)) / Math.max(1, deaths || 0)
     : null;
+  const context = calibrationContext || rankCalibrationContext([recording]);
+  const hasClientStats = [kills, deaths, assists, cs, gameLengthSeconds].every(Number.isFinite);
+  const hasClockAnchor = Array.isArray(recording.clockAnchors) && recording.clockAnchors.length > 0;
+  const currentReviewStandard = recording.analysisVersion === analysisVersion || recording.analysisSource === "manual";
+  const nearFullGame = duration >= 540 || (Number.isFinite(gameLengthSeconds) && gameLengthSeconds > 0 && duration / gameLengthSeconds >= 0.55);
 
   let score = 50;
+  let confidenceScore = 0;
   const strengths = [];
   const leaks = [];
+  const confidenceSignals = [];
+  const confidenceBlockers = [];
+
+  if (nearFullGame) {
+    confidenceScore += 14;
+    confidenceSignals.push("near-full macro recording");
+  } else {
+    confidenceBlockers.push("recording is not long enough to prove full-game macro");
+  }
+  if (hasClientStats) {
+    confidenceScore += 20;
+    confidenceSignals.push("K/D/A, CS, and game length are available");
+  } else {
+    confidenceBlockers.push("missing one or more client stats: K/D/A, CS, game length");
+  }
+  if (hasClockAnchor) {
+    confidenceScore += 16;
+    confidenceSignals.push("visible timestamp anchors exist");
+  } else {
+    confidenceBlockers.push("no verified visible timestamp anchor");
+  }
+  if (currentReviewStandard) {
+    confidenceScore += 10;
+    confidenceSignals.push("review passed the current evidence standard or manual frame review");
+  }
+  if (queueClass === "ranked_solo" || queueClass === "ranked_flex") {
+    confidenceScore += 26;
+    confidenceSignals.push("ranked opponent pressure");
+  } else if (queueClass === "pvp") {
+    confidenceScore += 18;
+    confidenceSignals.push("PvP opponent pressure");
+  } else if (queueClass === "bot") {
+    confidenceBlockers.push("Co-op vs AI inflates fight success and cannot prove ranked opponent pressure");
+  } else {
+    confidenceBlockers.push("queue type is unknown");
+  }
+  if (context.rankedFullGames >= context.highConfidenceRequirements.rankedFullGames) {
+    confidenceScore += 12;
+    confidenceSignals.push("enough ranked full-game samples for calibration");
+  } else if (context.pvpFullGames >= context.highConfidenceRequirements.pvpFullGames) {
+    confidenceScore += 8;
+    confidenceSignals.push("enough PvP full-game samples for calibration");
+  } else {
+    confidenceBlockers.push(`needs ${context.highConfidenceRequirements.rankedFullGames} ranked full games or ${context.highConfidenceRequirements.pvpFullGames} PvP full games for high confidence`);
+  }
 
   if (Number.isFinite(deaths)) {
     if (deaths >= 10) {
@@ -1655,23 +1819,34 @@ function rankedEquivalentForRecording(recording = {}) {
     strengths.push("you are already finding fights, waves, towers, or base pressure");
   }
 
-  const cap = beginnerBot ? 68 : 100;
+  const cap = beginnerBot ? 68 : (queueClass === "unknown" ? 85 : 100);
   const cappedScore = Math.max(0, Math.min(cap, Math.round(score)));
   const band = scoreRankBand(cappedScore);
-  const confidence = beginnerBot ? "low" : (duration >= 540 ? "medium" : "low");
+  const rankedComparableQueue = ["ranked_solo", "ranked_flex", "pvp"].includes(queueClass);
+  const rankedTransferConfidence = confidenceScore >= 78 && rankedComparableQueue && (context.rankedFullGames >= 3 || context.pvpFullGames >= 5)
+    ? "high"
+    : (confidenceScore >= 55 && rankedComparableQueue ? "medium" : "low");
+  const evidenceConfidence = confidenceScore >= 52 && context.fullReviewGames >= 10 ? "high" : (confidenceScore >= 34 ? "medium" : "low");
   const leakText = [...new Set(leaks)].slice(0, 3).join(", ") || "the review does not show enough ranked-punishable leaks";
   const strengthText = [...new Set(strengths)].slice(0, 2).join(", ") || "the recording still shows playable fighting instincts";
   const reason = beginnerBot
-    ? `${band.label} read from macro habits: ${strengthText}; held down by ${leakText}. Confidence is low because Beginner Bot games inflate fight success and cannot prove Diamond+ pressure handling.`
-    : `${band.label} read from macro habits: ${strengthText}; held down by ${leakText}.`;
+    ? `${band.label} read from macro habits: ${strengthText}; held down by ${leakText}. Evidence across the bot-game review set is ${evidenceConfidence}, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment.`
+    : `${band.label} read from macro habits: ${strengthText}; held down by ${leakText}. Ranked-transfer confidence is ${rankedTransferConfidence} from ${queueClass.replace("_", " ")} evidence.`;
   return {
     version: rankEstimateVersion,
     label: band.label,
     range: band.range,
     score: cappedScore,
-    confidence,
-    basis: "rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, and queue context; not Riot MMR",
+    confidence: rankedTransferConfidence,
+    rankedTransferConfidence,
+    evidenceConfidence,
+    confidenceScore: Math.max(0, Math.min(100, Math.round(confidenceScore))),
+    queueClass,
+    basis: "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
     percentile: band.percentile,
+    confidenceSignals,
+    confidenceBlockers: [...new Set(confidenceBlockers)],
+    researchBasis: rankCalibrationResearch.map((item) => item.id),
     reason
   };
 }
@@ -3110,6 +3285,13 @@ async function main() {
     console.log(`${name}: ${recordings.at(-1).reviewPhase} - ${recordings.at(-1).champion} - ${recordings.at(-1).feedbackTitle}`);
   }
 
+  const calibrationContext = rankCalibrationContext(recordings);
+  for (const recording of recordings) {
+    const rankEstimate = rankedEquivalentForRecording(recording, calibrationContext);
+    if (rankEstimate) recording.rankEstimate = rankEstimate;
+    else delete recording.rankEstimate;
+  }
+
   const detectedChampions = aggregateChampions(recordings);
   const mainFeedback = await summarizeRecordings(recordings, detectedChampions);
   const matches = [...new Set(recordings.map((item) => item.file.match(/NA1-\d+/)?.[0]).filter(Boolean))];
@@ -3129,6 +3311,7 @@ async function main() {
     totalRecordings: recordings.length,
     reviewBasis: "Newest match first; recordings inside a match are sorted by length.",
     mainFeedback,
+    rankCalibration: rankCalibrationSummary(recordings),
     detectedChampions,
     recordings: displayRecordings
   };
