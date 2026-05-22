@@ -14,7 +14,7 @@ const captureRoot = process.env.LEAGUE_AUTO_CAPTURE_DIR || path.join(path.dirnam
 const leagueLockfile = process.env.LEAGUE_LOCKFILE || "C:\\Riot Games\\League of Legends\\lockfile";
 const lockPath = path.join(analysisRoot, "league-live-recorder.lock");
 const logPath = path.join(analysisRoot, "league-live-recorder.log");
-const pollMs = Number(process.env.LEAGUE_LIVE_POLL_MS || 1000);
+const pollMs = Number(process.env.LEAGUE_LIVE_POLL_MS || 2500);
 const endGraceMs = Number(process.env.LEAGUE_LIVE_END_GRACE_MS || 35000);
 const segmentSeconds = Number(process.env.LEAGUE_LIVE_SEGMENT_SECONDS || 15);
 const fastForwardSpeed = Number(process.env.LEAGUE_LIVE_FAST_FORWARD || 8);
@@ -25,7 +25,7 @@ const maxCaptureRestarts = Number(process.env.LEAGUE_LIVE_MAX_CAPTURE_RESTARTS |
 const captureStallMs = Number(process.env.LEAGUE_LIVE_CAPTURE_STALL_MS || 45000);
 const minCaptureGrowthBytes = Number(process.env.LEAGUE_LIVE_MIN_GROWTH_BYTES || 8 * 1024);
 // Defaults favor in-game FPS over review smoothness. The site review only needs readable decisions.
-const fps = String(process.env.LEAGUE_LIVE_FPS || 2);
+const fps = String(process.env.LEAGUE_LIVE_FPS || 1);
 const encoderPreference = String(process.env.LEAGUE_LIVE_ENCODER || "auto").toLowerCase();
 const liveCq = String(process.env.LEAGUE_LIVE_CQ || 20);
 const liveCaptureCq = String(process.env.LEAGUE_LIVE_CAPTURE_CQ || 30);
@@ -37,6 +37,7 @@ const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "4500k"
 const captureGop = String(Math.max(1, Math.round((Number(fps) || 4) * (Number(segmentSeconds) || 10))));
 const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "960:-2").trim();
 const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
+const captureApiPreference = String(process.env.LEAGUE_LIVE_CAPTURE_API || "dda").trim().toLowerCase();
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
 const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "region").trim().toLowerCase();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
@@ -873,8 +874,10 @@ async function segmentFootprint(sessionRoot) {
 
 async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop") {
   const outputPattern = path.join(sessionRoot, "segment-%04d.mkv");
-  const encoder = await encoderProfile();
+  let encoder = await encoderProfile();
   const filters = [];
+  const useDda = /^(dda|ddagrab|desktop-duplication|desktop_duplication)$/i.test(captureApiPreference) && mode !== "title";
+  let inputPrefixArgs = ["-f", "gdigrab", "-framerate", fps, "-rtbufsize", "64M", "-draw_mouse", "1"];
   let inputTarget = "desktop";
   let inputArgs = ["-i", inputTarget];
   let captureMode = mode;
@@ -899,6 +902,27 @@ async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop")
       throw new Error(`${reason}; waiting instead of capturing desktop content.`);
     }
   }
+  if (useDda) {
+    const ddaOptions = [
+      `framerate=${fps}`,
+      "draw_mouse=1",
+      "output_fmt=8bit"
+    ];
+    if (captureRect) {
+      ddaOptions.push(`video_size=${captureRect.width}x${captureRect.height}`);
+      ddaOptions.push(`offset_x=${captureRect.left}`);
+      ddaOptions.push(`offset_y=${captureRect.top}`);
+    }
+    inputPrefixArgs = ["-f", "lavfi"];
+    inputArgs = ["-i", `ddagrab=${ddaOptions.join(":")}`];
+    inputTarget = captureRect
+      ? `desktop duplication region ${captureRect.left},${captureRect.top} ${captureRect.width}x${captureRect.height}`
+      : "desktop duplication";
+    filters.push("hwdownload", "format=bgra");
+    if (encoder.name === "h264_nvenc") {
+      encoder = { name: "libx264", label: `CPU H.264 capture, CRF ${x264CaptureCrf}` };
+    }
+  }
   if (captureScale && !/^(0|none|off)$/i.test(captureScale)) {
     filters.push(`scale=${captureScale}:flags=fast_bilinear`);
   }
@@ -907,10 +931,7 @@ async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop")
     "-y",
     "-hide_banner",
     "-loglevel", "error",
-    "-f", "gdigrab",
-    "-framerate", fps,
-    "-rtbufsize", "64M",
-    "-draw_mouse", "1",
+    ...inputPrefixArgs,
     ...inputArgs,
     "-an",
     ...(filters.length ? ["-vf", filters.join(",")] : []),

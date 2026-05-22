@@ -371,7 +371,7 @@ async function lowerProcessPriority(pid) {
     "-NoProfile",
     "-WindowStyle", "Hidden",
     "-Command",
-    `$p = Get-Process -Id ${Number(pid)} -ErrorAction SilentlyContinue; if ($p) { $p.PriorityClass = 'Idle' }`
+    `$p = Get-Process -Id ${Number(pid)} -ErrorAction SilentlyContinue; if ($p) { $p.PriorityClass = 'Idle'; try { $p.PriorityBoostEnabled = $false } catch {} }`
   ], { windowsHide: true }).catch(() => {});
 }
 
@@ -388,6 +388,28 @@ async function run(command, args) {
         return;
       }
       resolve(stdout || "");
+    });
+    if (/^ffmpeg(?:\.exe)?$/i.test(path.basename(command))) {
+      lowerProcessPriority(child.pid);
+    }
+  });
+}
+
+async function runBuffer(command, args, options = {}) {
+  return await new Promise((resolve, reject) => {
+    const child = execFile(command, args, {
+      windowsHide: true,
+      encoding: "buffer",
+      maxBuffer: 1024 * 1024,
+      ...options
+    }, (error, stdout, stderr) => {
+      if (error) {
+        error.stdout = stdout;
+        error.stderr = stderr;
+        reject(error);
+        return;
+      }
+      resolve(stdout || Buffer.alloc(0));
     });
     if (/^ffmpeg(?:\.exe)?$/i.test(path.basename(command))) {
       lowerProcessPriority(child.pid);
@@ -436,7 +458,7 @@ async function probeVideoHealth(filePath) {
 
 async function frameVisibility(filePath, second) {
   try {
-    const { stdout } = await execFileAsync("ffmpeg", [
+    const stdout = await runBuffer("ffmpeg", [
       "-v", "error",
       "-ss", String(Math.max(0, second)),
       "-i", filePath,
@@ -444,11 +466,7 @@ async function frameVisibility(filePath, second) {
       "-vf", "scale=32:18,format=gray",
       "-f", "rawvideo",
       "-"
-    ], {
-      windowsHide: true,
-      encoding: "buffer",
-      maxBuffer: 1024 * 1024
-    });
+    ]);
     const pixels = Buffer.from(stdout || []);
     if (!pixels.length) return null;
     let sum = 0;
@@ -2640,25 +2658,26 @@ async function main() {
   await fs.mkdir(posterRoot, { recursive: true });
   await fs.mkdir(analysisRoot, { recursive: true });
   const existing = await readExistingManifest();
-  const discoveredEntries = await Promise.all((await fs.readdir(sourceDir, { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && sourceVideoPattern.test(entry.name) && !ignoredSourceVideoPattern.test(entry.name))
-    .map(async (entry) => {
-      const sourcePath = path.join(sourceDir, entry.name);
-      const stat = await fs.stat(sourcePath);
-      const health = await probeVideoHealth(sourcePath).catch(() => null);
-      const sidecar = await readJsonSafe(`${sourcePath}.json`);
-      const visual = /^auto_/i.test(entry.name) && health?.duration > 60
-        ? await videoVisibility(sourcePath, health.duration)
-        : null;
-      return {
-        name: entry.name,
-        sourcePath,
-        stat,
-        health,
-        sidecar,
-        visual
-      };
-    }));
+  const sourceFiles = (await fs.readdir(sourceDir, { withFileTypes: true }))
+    .filter((entry) => entry.isFile() && sourceVideoPattern.test(entry.name) && !ignoredSourceVideoPattern.test(entry.name));
+  const discoveredEntries = [];
+  for (const entry of sourceFiles) {
+    const sourcePath = path.join(sourceDir, entry.name);
+    const stat = await fs.stat(sourcePath);
+    const health = await probeVideoHealth(sourcePath).catch(() => null);
+    const sidecar = await readJsonSafe(`${sourcePath}.json`);
+    const visual = /^auto_/i.test(entry.name) && health?.duration > 60
+      ? await videoVisibility(sourcePath, health.duration)
+      : null;
+    discoveredEntries.push({
+      name: entry.name,
+      sourcePath,
+      stat,
+      health,
+      sidecar,
+      visual
+    });
+  }
   const sourceEntries = discoveredEntries
     .filter((entry) => {
       const rejectReason = autoCaptureRejectReason(entry.name, entry.health, entry.sidecar, entry.visual);

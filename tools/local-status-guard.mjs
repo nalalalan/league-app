@@ -8,7 +8,7 @@ const analysisRoot = path.join(appRoot, "_recording-analysis");
 const statusPath = path.join(analysisRoot, "recording-status.json");
 const queuePath = path.join(analysisRoot, "post-game-queue.json");
 const lockPath = path.join(analysisRoot, "league-live-recorder.lock");
-const intervalMs = Number(process.env.LEAGUE_STATUS_GUARD_INTERVAL_MS || 300);
+const intervalMs = Number(process.env.LEAGUE_STATUS_GUARD_INTERVAL_MS || 5000);
 const untilMs = Date.now() + Number(process.env.LEAGUE_STATUS_GUARD_MS || 2 * 60 * 60 * 1000);
 
 function delay(ms) {
