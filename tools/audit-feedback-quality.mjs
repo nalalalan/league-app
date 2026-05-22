@@ -41,7 +41,11 @@ function feedbackIssues(recording = {}) {
   const secondaryFocus = clean(recording.secondaryFocus || recording.secondaryImprovement);
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
-  const needsSecondaryFocus = recording.analysisVersion === "2026-05-22-two-focus-coaching-v11";
+  const strictTwoFocusVersions = new Set([
+    "2026-05-22-two-focus-coaching-v11",
+    "2026-05-22-challenger-direct-coaching-v12"
+  ]);
+  const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
 
   if (/\bAlan\b/.test(allVisible)) {
     issues.push("visible feedback refers to Alan in third person");

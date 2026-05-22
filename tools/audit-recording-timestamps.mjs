@@ -11,7 +11,10 @@ const publicRoot = path.join(appRoot, "public");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
-const currentPrimaryMistakeAnalysisVersion = "2026-05-22-two-focus-coaching-v11";
+const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-22-two-focus-coaching-v11",
+  "2026-05-22-challenger-direct-coaching-v12"
+]);
 
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -162,7 +165,7 @@ function visibleParagraphStandardIssues(recording, anchors) {
 function requiresVisibleParagraphStandard(recording) {
   return /^auto_/i.test(recording.file || "") &&
     Number(recording.durationSeconds || 0) >= 90 &&
-    recording.analysisVersion === currentPrimaryMistakeAnalysisVersion;
+    currentPrimaryMistakeAnalysisVersions.has(recording.analysisVersion);
 }
 
 function unanchoredNarrativeTimestamps(recording, anchors) {
