@@ -11,7 +11,7 @@ const publicRoot = path.join(appRoot, "public");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
-const currentPrimaryMistakeAnalysisVersion = "2026-05-22-primary-mistake-timestamp-v8";
+const currentPrimaryMistakeAnalysisVersion = "2026-05-22-full-game-sampling-v9";
 
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -53,7 +53,7 @@ function sentenceParts(text) {
 }
 
 function primaryMistakeTextPattern() {
-  return /\b(biggest|primary|main|clearest|real|actual|big)?\s*(mistake|leak|overstay|overstaying|stayed|stay|chase|chasing|chased|re-?engage|re-?enter|fight|fighting|accepted|accepting|drift|drifted|low[-\s]?hp|lethal|unspent|shutdown|reset|tempo|collapse|overextend|overextended|missed|delayed|risky|risk|danger|gave|died|death|stall|throw|window|blocked|alone|side lane|side fight)\b/i;
+  return /\b(biggest|primary|main|clearest|real|actual|big)?\s*(mistake|leak|overstay|overstaying|stayed|stay|chase|chasing|chased|duel|dueling|side[-\s]?lane|sideline|re-?engage|re-?enter|fight|fighting|accepted|accepting|drift|drifted|low[-\s]?hp|lethal|unspent|shutdown|reset|tempo|collapse|overextend|overextended|missed|delayed|risky|risk|danger|gave|died|death|stall|throw|window|blocked|alone|side fight)\b/i;
 }
 
 function primaryMistakeTimestampSeconds(...texts) {

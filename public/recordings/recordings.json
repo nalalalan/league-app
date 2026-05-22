@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-22T18:32:14.092Z",
+  "generatedAt": "2026-05-22T18:47:42.980Z",
   "source": "League of Legends Highlights folder",
   "match": "24 matches",
   "matches": [
@@ -34,7 +34,7 @@
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira overall state",
-    "focus": "Current read: Iron III on the newest full game; Bronze I across the last 5 full-game reads; Bronze III median across 23 full games. The latest game is below your recent baseline.",
+    "focus": "Current read: Iron II on the newest full game; Bronze I across the last 5 full-game reads; Bronze III median across 23 full games. The latest game is below your recent baseline.",
     "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is grouping with allies when the play is clear and enough damage to win bot-game fights.",
     "nextRep": "Next game: after the first won fight or open structure, choose only free structure, body blocking that structure, or reset.",
     "whyTrust": "This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.",
@@ -177,7 +177,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Split Pushing Too Long When Mid Is Open And Group Needed",
+      "title": "No Grouping or Mid Conversion After Inhibitor Broken",
       "duration": "25:32",
       "durationSeconds": 1532,
       "gameLength": "31:28",
@@ -192,62 +192,107 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Split Pushing Too Long When Mid Is Open And Group Needed",
-      "feedback": "Mistake: Stayed in side lane pushing bot after 19:36 when teammates were grouped and fighting mid, leaking numbers advantage and mid tower defense. Fix: Rotate mid after fixing side wave when mid is where the fight and objective threaten your nexus, not keep solo-pushing bot at 20+ minutes.",
-      "gameDetail": "Around 6:42, Samira dodges enemy spell in bot lane during minion wave; this is the start or nearest visible start of the main mistake window. Mistake: Stayed in side lane pushing bot after 19:36 when teammates were grouped and fighting mid, leaking numbers advantage and mid tower defense. Fix: Rotate mid after fixing side wave when mid is where the fight and objective threaten your nexus, not keep solo-pushing bot at 20+ minutes. Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between Samira and the collapse, and enemies have to defend structure instead of chasing through fog. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
-      "eventEvidence": "6:42 shows Samira dodges enemy spell in bot lane during minion wave.",
-      "goodThing": "You shovewed the bot wave out to pressure map, avoiding AFK farming base.",
-      "whyTrust": "The frames show your side push never converts to actual objective pressure, while your base and teammates are under threat mid; these are the windows where mid rotation wins or loses games regardless of lane phase.",
-      "focusTag": "side-to-mid transition",
-      "evidence": "6:42 Player dodges enemy spell in bot lane during minion wave.",
-      "pattern": "Alan consistently stays bot post-20m instead of pivoting mid when his team is collapsing and enemy is defending, missing the only window to defend or contest mid objectives.",
-      "diamondRule": "After 20 minutes, only push side if mid is not contested—if your team groups or fight is visible mid, rotate immediately even if side wave is not fully shoved.",
-      "drill": "In next game, after shoving a bot wave past river post-20m, immediately path mid whenever your team is visible or fighting mid—do not take a second wave or jungle camp before rotating.",
+      "feedbackTitle": "No Grouping or Mid Conversion After Inhibitor Broken",
+      "feedback": "Mistake: You kept splitting bot and chasing side pressure after your team broke top inhibitor, instead of grouping with your team for mid pressure or defending against enemy push. Fix: After your team opens an inhibitor, immediately group mid or with your team to force numbers fights or defend, not continue isolated side lane pushes.",
+      "gameDetail": "Around 23:20, Samira approaches enemy bot inhibitor turret as dragon spawns; this is the start or nearest visible start of the main mistake window; earlier at 4:45, Samira and support push minion wave in bot lane versus enemy duo; earlier at 11:48, Samira and support attack enemy under allied bot turret. Mistake: You kept splitting bot and chasing side pressure after your team broke top inhibitor, instead of grouping with your team for mid pressure or defending against enemy push. Fix: After your team opens an inhibitor, immediately group mid or with your team to force numbers fights or defend, not continue isolated side lane pushes. Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between Samira and the collapse, and enemies have to defend structure instead of chasing through fog. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
+      "eventEvidence": "4:45 shows Samira and support push minion wave in bot lane versus enemy duo. 11:48 shows Samira and support attack enemy under allied bot turret. 23:20 shows Samira approaches enemy bot inhibitor turret as dragon spawns.",
+      "goodThing": "You applied pressure to side lanes when map was open, attempting to create threats.",
+      "whyTrust": "Grouping mid enables Samira's teamfight power, but splitting post-inhib gives up number advantage and gives free deaths for enemy Baron/Elder plays; the frames directly show your split leading to solo deaths and tempo loss.",
+      "focusTag": "post-inhib group",
+      "evidence": "4:45 Samira and support push minion wave in bot lane versus enemy duo; 11:48 Samira and support attack enemy under allied bot turret; 23:20 Samira approaches enemy bot inhibitor turret as dragon spawns",
+      "pattern": "After team objectives or inhibitor breaks, you consistently return to split pushing bot or top instead of syncing location with team or defending mid. This pattern exposes you to collapses and forfeits your Samira's value in grouped fights.",
+      "diamondRule": "After an inhibitor is taken, always be with your team for the next mid wave or defensive fight—never stay to split alone in a side lane when fog is deep or base is exposed.",
+      "drill": "Next game, as soon as your team breaks inhib or you have super minions, path immediately to mid or join your group for numbers before touching a side lane again.",
       "timeline": [],
       "clockAnchors": [
         {
           "clock": "0:14",
           "videoSeconds": 4,
-          "description": "Shop is open with Stealth Ward tooltip visible at fountain."
+          "description": "Item shop is open, player has just loaded into the game at fountain"
         },
         {
           "clock": "2:11",
           "videoSeconds": 121.231,
-          "description": "Player last-hits a minion in bot lane skirmish with three enemy champions visible."
+          "description": "Player last-hits a cannon minion in bot lane during 2v2 laning phase"
         },
         {
           "clock": "4:45",
           "videoSeconds": 238.462,
-          "description": "Player and ally stand in lane with enemy Zyra nearby in bot lane."
+          "description": "Player and support push minion wave in bot lane versus enemy duo"
         },
         {
           "clock": "6:42",
           "videoSeconds": 355.692,
-          "description": "Player dodges enemy spell in bot lane during minion wave."
+          "description": "Player dodges a projectile in bot lane, fighting continues"
         },
         {
           "clock": "9:20",
           "videoSeconds": 472.923,
-          "description": "Player is dead, death recap and two enemy champions visible near corpse."
+          "description": "Player is dead and viewing respawn timer after being killed in bot lane"
+        },
+        {
+          "clock": "11:48",
+          "videoSeconds": 590.154,
+          "description": "Player and support attack enemy under allied bot turret"
+        },
+        {
+          "clock": "14:07",
+          "videoSeconds": 707.385,
+          "description": "Player participates in a fight near the river, 'Objective Bounties are available soon' message visible"
+        },
+        {
+          "clock": "16:35",
+          "videoSeconds": 824.615,
+          "description": "Player is recalling under tower in top quadrant after surviving on low HP"
+        },
+        {
+          "clock": "18:52",
+          "videoSeconds": 941.846,
+          "description": "Player collects gold from killing minions alone in bot lane"
+        },
+        {
+          "clock": "21:23",
+          "videoSeconds": 1059.077,
+          "description": "Player uses ability on enemy champion in bot lane during 1v1 fight"
+        },
+        {
+          "clock": "23:20",
+          "videoSeconds": 1176.308,
+          "description": "Player approaches enemy bot inhibitor turret as dragon spawns"
+        },
+        {
+          "clock": "26:04",
+          "videoSeconds": 1293.538,
+          "description": "Player moves up bot lane with a wave of blue minions"
         }
       ],
       "clockMoments": [
         {
-          "clock": "6:42",
-          "videoSeconds": 355.692,
-          "description": "Player dodges enemy spell in bot lane during minion wave."
+          "clock": "4:45",
+          "videoSeconds": 238.462,
+          "description": "Samira and support push minion wave in bot lane versus enemy duo"
+        },
+        {
+          "clock": "11:48",
+          "videoSeconds": 590.154,
+          "description": "Samira and support attack enemy under allied bot turret"
+        },
+        {
+          "clock": "23:20",
+          "videoSeconds": 1176.308,
+          "description": "Samira approaches enemy bot inhibitor turret as dragon spawns"
         }
       ],
       "nuance": [
-        "Good: You do shove out side wave so base does not auto-die to superminions.",
-        "Leaked: Never transition to mid with team, so all objective/defense situations are numbers-down.",
-        "Consequence: Team is wiped and loses inhibitor/mid control while you gain nothing bot.",
-        "Master-level punishment: Opponents force Baron/end if you are seen bot here.",
-        "Repeatable next check: After 20 minutes, watch minimap for grouped allies/fights; auto-rotate mid after one bot push."
+        "You did use waves to try to create map pressure, making defenders react.",
+        "After top inhib broke, you keep farming side lanes while teammates are dead or defending alone.",
+        "Enemy responds by collapsing with numbers and punishes your isolated position, giving up critical deaths for baron/elder tempo.",
+        "Staying sidelane with exposed base and no vision lets enemy reset, group, and pick you off with no recourse.",
+        "Master-tier teams instantly force 5v4 or take your Nexus if you keep this pattern."
       ],
-      "reviewLimit": "These frames do not prove detailed Baron/Dragon setup timing, nor micro errors, but clearly show map presence and decision.",
+      "reviewLimit": "Sampled frames do not cover every second of transitions, so some wave states or recall options between 18-23 minutes may be missed, but grouping habit is visibly absent post-inhib.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-primary-mistake-timestamp-v8",
+      "analysisVersion": "2026-05-22-full-game-sampling-v9",
       "sampledFrames": 14,
       "publicVideoBytes": 36235180,
       "src": "/recordings/auto_NA1-5565779781_01.mp4",
@@ -256,9 +301,9 @@
         "version": "2026-05-22-exact-rank-trend-v4",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron III",
-        "exactRankValue": 1,
-        "score": 8,
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "score": 14,
         "confidence": "medium",
         "rankedTransferConfidence": "medium",
         "evidenceConfidence": "high",
@@ -283,7 +328,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron III read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, kill pressure is not yet consistent, reset discipline after wins. Ranked-transfer confidence is medium from ranked solo evidence."
+        "reason": "Iron II read from macro habits: team grouping or sync appears in the review; held down by very high death count for a bot game, kill pressure is not yet consistent, side chase or fog drift. Ranked-transfer confidence is medium from ranked solo evidence."
       }
     },
     {
@@ -423,16 +468,15 @@
         "score": 31,
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "high",
-        "confidenceScore": 60,
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
-          "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review"
+          "visible timestamp anchors exist"
         ],
         "confidenceBlockers": [
           "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
@@ -445,7 +489,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze III read from macro habits: death count stayed controlled; held down by farm pace is too low for reliable ranked climbing, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "Bronze III read from macro habits: death count stayed controlled; held down by farm pace is too low for reliable ranked climbing, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -543,16 +587,15 @@
         "score": 54,
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "high",
-        "confidenceScore": 60,
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "middle",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
-          "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review"
+          "visible timestamp anchors exist"
         ],
         "confidenceBlockers": [
           "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
@@ -565,7 +608,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Silver I read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "Silver I read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, shutdown or unspent-gold protection. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {
@@ -663,16 +706,15 @@
         "score": 56,
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "high",
-        "confidenceScore": 60,
+        "evidenceConfidence": "medium",
+        "confidenceScore": 50,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "upper middle",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
-          "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review"
+          "visible timestamp anchors exist"
         ],
         "confidenceBlockers": [
           "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure",
@@ -685,7 +727,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Gold IV read from macro habits: death count stayed controlled, fight conversion and damage output are clearly above beginner mechanics; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "Gold IV read from macro habits: death count stayed controlled, fight conversion and damage output are clearly above beginner mechanics; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
       }
     },
     {

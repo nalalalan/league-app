@@ -18,17 +18,19 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-22-primary-mistake-timestamp-v8";
+const analysisVersion = "2026-05-22-full-game-sampling-v9";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-22-primary-mistake-timestamp-v8",
   "2026-05-21-visible-paragraph-teaching-standard-v7",
   "2026-05-21-visible-paragraph-standard-v6",
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
 const rankEstimateVersion = "2026-05-22-exact-rank-trend-v4";
-const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v3";
-const coachEvidenceVersion = "2026-05-21-specific-evidence-useful-v5";
+const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
+const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
+const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -751,6 +753,19 @@ function dedupeClockAnchors(...groups) {
     .slice(0, maxClockReadFrames);
 }
 
+function dedupeClockAnchorsPreserveOrder(anchors, maxItems = maxClockReadFrames) {
+  const kept = [];
+  const seen = new Set();
+  for (const anchor of cleanClockAnchors(anchors)) {
+    const key = `${anchor.clock}@${anchor.videoSeconds}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    kept.push(anchor);
+    if (kept.length >= maxItems) break;
+  }
+  return kept;
+}
+
 function importantSegmentGroups(sidecar) {
   const segments = Array.isArray(sidecar?.segments) ? sidecar.segments : [];
   if (!segments.length) return [];
@@ -821,10 +836,10 @@ function analysisSampleTimes(duration, sidecar) {
   const prioritized = dedupeTimes([...groupMidpoints, ...base, ...groupEdges])
     .filter((time) => time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
   if (prioritized.length <= maxAnalysisFrames) return prioritized;
-  const kept = dedupeTimes([...groupMidpoints, ...base])
+  const kept = dedupeTimes(base)
     .filter((time) => time >= 0.2 && time <= Math.max(0.2, duration - 0.2))
     .slice(0, maxAnalysisFrames);
-  for (const time of prioritized) {
+  for (const time of [...groupMidpoints, ...groupEdges, ...prioritized]) {
     if (kept.length >= maxAnalysisFrames) break;
     if (kept.some((existing) => Math.abs(existing - time) < 2.5)) continue;
     kept.push(time);
@@ -852,8 +867,8 @@ function clockReadTimes(duration, sidecar, candidateTimes = []) {
   ].filter((time) => Number.isFinite(time) && time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
   const deduped = dedupeTimes(candidates);
   if (deduped.length <= maxClockReadFrames) return deduped;
-  const kept = dedupeTimes([...prioritizedTimes, ...groupMidpoints]).slice(0, maxClockReadFrames);
-  for (const time of [...sampleTimesFor(duration), ...groupEdges, ...deduped]) {
+  const kept = dedupeTimes([...prioritizedTimes, ...sampleTimesFor(duration)]).slice(0, maxClockReadFrames);
+  for (const time of [...groupMidpoints, ...groupEdges, ...deduped]) {
     if (kept.length >= maxClockReadFrames) break;
     if (kept.some((existing) => Math.abs(existing - time) < 2.5)) continue;
     kept.push(time);
@@ -895,7 +910,7 @@ function clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds) 
   if (gameLength > 0 && visibleClock > gameLength + 120) return false;
   const expected = expectedGameClockSeconds(sidecar, matchTimeMs, Number(anchor.videoSeconds));
   if (!Number.isFinite(expected)) return true;
-  return Math.abs(visibleClock - expected) <= 90;
+  return Math.abs(visibleClock - expected) <= 360;
 }
 
 function nearestClockReadTime(videoSeconds, readTimes) {
@@ -967,6 +982,19 @@ function stripUnverifiedClockReferences(value, clockAnchors) {
     .trim();
 }
 
+function stripUnmatchedClockTokens(value, clockAnchors) {
+  const verified = cleanClockAnchors(clockAnchors);
+  return coachClean(String(value || "").replace(/\b(?:at|around|by|after|before|from|until|to)?\s*\d{1,2}:[0-5]\d\b/gi, (match) => {
+    const clock = match.match(/\d{1,2}:[0-5]\d/)?.[0];
+    if (clock && anchorMatchesClock(clock, verified, 5)) return match;
+    return "";
+  }))
+    .replace(/\s+([,.;:])/g, "$1")
+    .replace(/\b(after|before|by|around|at)\s+([,.;:]|when|while|and|but)\b/gi, "$2")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function stripUnverifiedTimelineItems(value, clockAnchors) {
   return cleanList(value, 6)
     .map((item) => stripUnverifiedClockReferences(item, clockAnchors))
@@ -1015,7 +1043,7 @@ function tagOverlapScore(first, second) {
 
 function anchorDescriptionLooksWeak(anchorText) {
   return /\b(player|champion)\s+(uses ability|casts abilities|begins walking out|moving in river|farming minions|last-hits minions|is moving alone|walks toward|running down)\b/i.test(anchorText) ||
-    /\b(scuttle crab|scoreboard open|shop open|shop interface|stealth ward selected|game start|standing at (the )?fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
+    /\b(scuttle crab|scoreboard open|shop open|item shop|shop interface|stealth ward selected|loaded into the game at fountain|game start|standing at (the )?fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
 }
 
 function coachWantsEnemyStructureEvidence(analysisText) {
@@ -1108,7 +1136,7 @@ function usefulEvidenceMoment(anchor, analysis, threshold = 8) {
 }
 
 function primaryMistakeTextPattern() {
-  return /\b(biggest|primary|main|clearest|real|actual|big)?\s*(mistake|leak|overstay|overstaying|stayed|stay|chase|chasing|chased|re-?engage|re-?enter|fight|fighting|accepted|accepting|drift|drifted|low[-\s]?hp|lethal|unspent|shutdown|reset|tempo|collapse|overextend|overextended|missed|delayed|risky|risk|danger|gave|died|death|stall|throw|window|blocked|alone|side lane|side fight)\b/i;
+  return /\b(biggest|primary|main|clearest|real|actual|big)?\s*(mistake|leak|overstay|overstaying|stayed|stay|chase|chasing|chased|duel|dueling|side[-\s]?lane|sideline|re-?engage|re-?enter|fight|fighting|accepted|accepting|drift|drifted|low[-\s]?hp|lethal|unspent|shutdown|reset|tempo|collapse|overextend|overextended|missed|delayed|risky|risk|danger|gave|died|death|stall|throw|window|blocked|alone|side fight)\b/i;
 }
 
 function primaryMistakeTimestampSeconds(...texts) {
@@ -1164,7 +1192,7 @@ function selectUsefulEvidenceMoments(analysis, anchors, proposed = [], maxItems 
     .filter((item) => !selectedKeys.has(`${item.anchor.clock}@${item.anchor.videoSeconds}`))
     .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)
     .map((item) => item.anchor);
-  return dedupeClockAnchors([...selected, ...fill])
+  return dedupeClockAnchorsPreserveOrder([...selected, ...fill], maxItems)
     .slice(0, maxItems)
     .sort((a, b) => a.videoSeconds - b.videoSeconds);
 }
@@ -1426,15 +1454,21 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
     .filter((moment) => moment.description)
     .slice(0, 4);
   if (!moments.length) return "";
-  const primary = moments.find((moment) => primaryMistakeTextPattern().test(moment.description || "")) || moments[0];
+  const primary = moments
+    .map((moment, index) => ({
+      moment,
+      score: anchorEvidenceScore(moment, analysis, index) + (primaryMistakeTextPattern().test(moment.description || "") ? 6 : 0)
+    }))
+    .sort((a, b) => b.score - a.score || a.moment.videoSeconds - b.moment.videoSeconds)[0]?.moment || moments[0];
   const rest = moments.filter((moment) => moment !== primary);
   const clauses = [
     `Around ${primary.clock}, ${clauseDescription(primary.description, champion)}; this is the start or nearest visible start of the main mistake window`
   ];
   for (const moment of rest.slice(0, 3)) {
-    clauses.push(`by ${moment.clock}, ${clauseDescription(moment.description, champion)}`);
+    const lead = Number(moment.videoSeconds) < Number(primary.videoSeconds) ? `earlier at ${moment.clock}` : `by ${moment.clock}`;
+    clauses.push(`${lead}, ${clauseDescription(moment.description, champion)}`);
   }
-  const advice = adviceTextForTeaching(analysis, champion);
+  const advice = stripUnmatchedClockTokens(adviceTextForTeaching(analysis, champion), moments);
   const shorthand = shorthandTeachingSentence(analysis);
   const why = "This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.";
   return coachClean([
@@ -1517,6 +1551,22 @@ function hasMatchingPrimaryMistakeAnchor(recording) {
   return primarySeconds.some((seconds) => anchorSeconds.some((anchorSecond) => Math.abs(anchorSecond - seconds) <= 5));
 }
 
+function hasUsablePrimaryMistakeAnchor(recording, champion = "Samira") {
+  const primarySeconds = [...new Set(primaryMistakeTimestampSeconds(recording.gameDetail, recording.eventEvidence || recording.evidence || recording.pattern).map((seconds) => Math.round(seconds)))];
+  if (!primarySeconds.length) return false;
+  return cleanClockAnchors(recording.clockAnchors)
+    .map((anchor) => ({
+      seconds: clockSeconds(anchor.clock),
+      description: normalizeEvidenceDescription(anchor.description || "", champion)
+    }))
+    .some((anchor) => (
+      Number.isFinite(anchor.seconds) &&
+      primarySeconds.some((seconds) => Math.abs(anchor.seconds - seconds) <= 5) &&
+      anchor.description &&
+      !anchorDescriptionLooksWeak(anchor.description)
+    ));
+}
+
 function requiresVisibleParagraphStandard(fileName, recording = {}) {
   const isAuto = /^auto_/i.test(fileName || recording?.file || "");
   const duration = Number(recording?.durationSeconds || 0);
@@ -1527,6 +1577,7 @@ function requiresVisibleParagraphStandard(fileName, recording = {}) {
 function visibleParagraphStandardIssues(recording = {}) {
   const detail = coachClean(recording.gameDetail, "");
   const eventEvidence = coachClean(recording.eventEvidence || recording.evidence, "");
+  const allVisibleText = [recording.feedback, detail, eventEvidence, recording.pattern].filter(Boolean).join(" ");
   const issues = [];
   const needsTeachingReason = recording.analysisSource !== "manual" || recording.file === "auto_NA1-5565387627_01.mp4";
   if (detail.length < 240) {
@@ -1553,11 +1604,19 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (eventEvidence.length < 60) {
     issues.push("eventEvidence must name visible proof");
   }
-  if (!hasMatchingPrimaryMistakeAnchor(recording)) {
+  const unverifiedClockCount = (allVisibleText.match(/\b\d{1,2}:[0-5]\d\b/g) || [])
+    .filter((clock) => !anchorMatchesClock(clock, recording.clockAnchors, 5)).length;
+  if (unverifiedClockCount) {
+    issues.push("visible paragraph must not use unverified game-clock timestamps");
+  }
+  if (!hasUsablePrimaryMistakeAnchor(recording, recording.champion || "Samira")) {
     issues.push("primary mistake timestamp must have a matching verified clock anchor");
   }
   if (/\b(this leads|the consequence|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(detail.slice(0, 80))) {
     issues.push("visible paragraph starts with a conclusion instead of evidence");
+  }
+  if (!/^(?:At|Around|By|Then|In|During|After|When|Samira|You|\d{1,2}:[0-5]\d)\b/i.test(detail)) {
+    issues.push("visible paragraph starts with a broken fragment instead of evidence");
   }
   return issues;
 }
@@ -1967,7 +2026,7 @@ function cachedRecording(existing, fileName, cacheKey) {
   if (requiresVisibleParagraphStandard(fileName, cached) && visibleParagraphStandardIssues(cached).length) return null;
   if (manualFeedback(fileName)) return null;
   if (cached.analysisSource === "fallback" && process.env.LEAGUE_RETRY_FALLBACK === "1" && process.env.OPENAI_API_KEY) return null;
-  if (process.env.LEAGUE_FORCE_ANALYSIS === "1") return null;
+  if (process.env.LEAGUE_FORCE_ANALYSIS === "1" || (forceAnalysisFile && fileName === forceAnalysisFile)) return null;
   return cached;
 }
 
@@ -2627,6 +2686,9 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (/\b(shop interface|shop open|stealth ward selected|standing at (the )?fountain|fountain at game start|game start)\b/i.test([gameDetail, eventEvidence].join(" "))) {
     issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
   }
+  if (!/^(?:At|Around|By|Then|In|During|After|When|Samira|You|\d{1,2}:[0-5]\d)\b/i.test(gameDetail)) {
+    issues.push("visible paragraph starts with a broken fragment instead of evidence");
+  }
   if (isAutoFullReview && !primaryMistakeTimestampSeconds(gameDetail, eventEvidence, pattern).length) {
     issues.push("the beginning of the main mistake window must have a visible game-clock timestamp");
   }
@@ -2860,9 +2922,12 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
     const verifiedAnchors = fastMacroReview
       ? anchors
       : await verifyVisibleClockAnchors({ file, sourcePath, anchors, frameDir });
-    const timelineAnchors = fastMacroReview || verifiedAnchors.length >= 3
-      ? []
-      : await describeTimelineClockAnchors({
+    const latestVerifiedClock = Math.max(0, ...cleanClockAnchors(verifiedAnchors).map((anchor) => clockSeconds(anchor.clock)).filter((seconds) => Number.isFinite(seconds)));
+    const expectedCoverageClock = Number(gameLengthSeconds || 0) > 0 ? Number(gameLengthSeconds) * 0.55 : duration * 0.55;
+    const needsTimelineCoverage = duration >= 600 && latestVerifiedClock < expectedCoverageClock;
+    const shouldDescribeTimeline = (!fastMacroReview && verifiedAnchors.length < 3) || (fastMacroReview && needsTimelineCoverage);
+    const timelineAnchors = shouldDescribeTimeline
+      ? await describeTimelineClockAnchors({
         file,
         sourcePath,
         duration,
@@ -2871,8 +2936,14 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
         matchTimeMs,
         gameLengthSeconds,
         readTimes
-      });
-    const finalAnchors = dedupeClockAnchors([...verifiedAnchors, ...timelineAnchors])
+      })
+      : [];
+    const compatibleTimelineAnchors = cleanClockAnchors(timelineAnchors)
+      .filter((anchor) => !cleanClockAnchors(verifiedAnchors).some((verified) => (
+        Math.abs(Number(verified.videoSeconds) - Number(anchor.videoSeconds)) <= 0.5 &&
+        !clockWithinSeconds(verified.clock, anchor.clock, 2.5)
+      )));
+    const finalAnchors = dedupeClockAnchors([...verifiedAnchors, ...compatibleTimelineAnchors])
       .filter((anchor) => clockFitsCurrentMatch(anchor, sidecar, matchTimeMs, gameLengthSeconds));
     await fs.writeFile(cachePath, `${JSON.stringify({
       cacheKey,
@@ -3175,7 +3246,9 @@ async function main() {
     const cachedTrusted = Boolean(existingEntry) &&
       compatibleAnalysisVersions.has(existingEntry.analysisVersion) &&
       !needsCachedTextRepair(existingEntry) &&
+      (!requiresVisibleParagraphStandard(entry.name, existingEntry) || visibleParagraphStandardIssues(existingEntry).length === 0) &&
       process.env.LEAGUE_FORCE_ANALYSIS !== "1" &&
+      (!forceAnalysisFile || entry.name !== forceAnalysisFile) &&
       process.env.LEAGUE_RETRY_FALLBACK !== "1";
     const health = cachedTrusted
       ? {
@@ -3271,7 +3344,7 @@ async function main() {
       const framePaths = [];
       for (let sampleIndex = 0; sampleIndex < sampleTimes.length; sampleIndex += 1) {
         const framePath = path.join(frameDir, `frame-${sampleIndex + 1}.jpg`);
-        if (!(await exists(framePath))) {
+        if (process.env.LEAGUE_FORCE_ANALYSIS === "1" || (forceAnalysisFile && name === forceAnalysisFile) || !(await exists(framePath))) {
           await extractFrame(sourcePath, framePath, sampleTimes[sampleIndex], duration > 90 ? 960 : 1024);
         }
         framePaths.push(framePath);
@@ -3282,11 +3355,12 @@ async function main() {
     const isManualAnalysis = analysis.analysisSource === "manual";
     const candidateClockAnchors = cleanClockAnchors(analysis.clockAnchors)
       .filter((anchor) => isManualAnalysis || clockFitsCurrentMatch(anchor, entry.sidecar, matchTimeMs, matchStats.gameLengthSeconds || null));
-    const candidateHasPrimaryMistake = hasMatchingPrimaryMistakeAnchor({
+    const candidateHasPrimaryMistake = hasUsablePrimaryMistakeAnchor({
       gameDetail: analysis.gameDetail,
       eventEvidence: analysis.eventEvidence || analysis.evidence,
+      pattern: analysis.pattern,
       clockAnchors: candidateClockAnchors
-    });
+    }, clean(analysis.champion, "Samira"));
     const shouldReadVisibleClock = duration >= 3;
     const visibleClockAnchors = shouldReadVisibleClock && !(fastMacroReview && candidateHasPrimaryMistake)
       ? await detectVisibleClockAnchors({
@@ -3402,14 +3476,14 @@ async function main() {
       champion: clean(analysis.champion, "Unknown"),
       confidence: clean(analysis.confidence, "low"),
       feedbackTitle: normalizeVisibleCoachText(analysis.feedbackTitle || "Focus", championName),
-      feedback: normalizeVisibleCoachText(analysis.feedback || "Review the clip and choose one safer next action.", championName),
+      feedback: normalizeVisibleCoachText(stripUnmatchedClockTokens(analysis.feedback || "Review the clip and choose one safer next action.", annotatedClockAnchors), championName),
       gameDetail: integratedGameDetail,
       eventEvidence: finalEventEvidence,
       goodThing: normalizeVisibleCoachText(analysis.goodThing || "", championName),
       whyTrust: normalizeVisibleCoachText(analysis.whyTrust || "This feedback is tied to the visible replay pattern and one controllable in-game decision.", championName),
       focusTag: normalizeVisibleCoachText(analysis.focusTag || "review", championName),
       evidence: normalizeCoachPunctuation(clockMomentEvidence || (isGenericEvidenceText(cleanedEvidence) ? "" : cleanedEvidence)),
-      pattern: normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."), narrativeClockAnchors), championName),
+      pattern: normalizeVisibleCoachText(stripUnmatchedClockTokens(stripUnverifiedClockReferences(coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."), narrativeClockAnchors), annotatedClockAnchors), championName),
       diamondRule: normalizeVisibleCoachText(analysis.diamondRule || "Convert the first winning moment before taking the next fight.", championName),
       drill: normalizeVisibleCoachText(analysis.drill || "Name the payout before committing.", championName),
       timeline: stripUnverifiedTimelineItems(analysis.timeline, narrativeClockAnchors),
