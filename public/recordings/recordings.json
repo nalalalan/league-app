@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T01:41:45.346Z",
+  "generatedAt": "2026-05-22T03:14:23.218Z",
   "source": "League of Legends Highlights folder",
-  "match": "17 matches",
+  "match": "18 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -19,11 +19,12 @@
     "NA1-5565226188",
     "NA1-5565242641",
     "NA1-5565308644",
-    "NA1-5565356454"
+    "NA1-5565356454",
+    "NA1-5565387627"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 9:38 PM ET",
-  "totalDuration": "130:07",
-  "totalRecordings": 29,
+  "captured": "May 18, 2026, 5:46 PM to May 21, 2026, 10:52 PM ET",
+  "totalDuration": "136:08",
+  "totalRecordings": 30,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira: stop giving wins back",
@@ -44,13 +45,142 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 29,
+      "recordings": 30,
       "evidence": "3:37 Enemy Teleport channels onto a minion while Samira stands in melee range, gets stunned—shows the mistake of not backing off as TP appears.; 3:40 Samira is killed for a shutdown—shows the consequence of not respecting the incoming Teleport and staying too far forward.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5565387627_01.mp4",
+      "publicFile": "auto_NA1-5565387627_01.mp4",
+      "cacheKey": "25268675:1779418337948",
+      "fingerprint": "63c36dd3f1ff",
+      "matchId": "NA1-5565387627",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779415146635,
+      "gameHappenedAt": "2026-05-22T01:59:06.635Z",
+      "gameHappenedAtLabel": "May 21, 2026, 9:59 PM",
+      "recordedAt": "2026-05-22T02:52:18.025Z",
+      "recordedAtLabel": "May 21, 2026, 10:52 PM",
+      "recordedAtTimeLabel": "10:52 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Shutdown lead needs synced conversion",
+      "duration": "6:01",
+      "durationSeconds": 361,
+      "gameLength": "19:52",
+      "gameLengthSeconds": 1192,
+      "kda": "24/5/3",
+      "kills": 24,
+      "deaths": 5,
+      "assists": 3,
+      "cs": 109,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Shutdown lead needs synced conversion",
+      "feedback": "Mistake: after building a huge shutdown lead, you let the next windows become side-lane re-fights and delayed mid pressure instead of one synced conversion call. Fix: after a big spend or 6/0-style lead, make the next play grouped mid, free structure, or reset; do not let the lead sit inside loose side fights.",
+      "gameDetail": "At 09:11 you are in base/shop after a strong 4/0/2 start, and that part is good because you actually spend instead of dragging raw gold around the map. At 10:25 you are 6/0/2 with 1285 gold in a bot-side lane fight while a shutdown has just happened, so the leak is not that you refuse objectives; it is that the huge lead is still being exposed to another side fight before the next grouped objective state is clear. At 11:12 the better version appears: you are grouped mid behind allies with multiple enemies in front, which is safer Samira pressure because your team is between you and the collapse. At 12:42 you are 8/0/2 mid with 77 CS while several allies are dead or on timers, so the next Master-climb decision is not just clear the wave; it is wait, reset, or sync the next push so the shutdown lead cannot be isolated. By 13:10 and 13:24 you do convert with the team in the enemy base, which proves the ending instinct is there, but stronger games punish the earlier 10:25 and 12:42 windows by turning one loose side fight or late solo wave into shutdown gold before the base ever opens.",
+      "eventEvidence": "09:11 shows Samira in shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold. 10:25 shows Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present. 11:12 shows Samira grouped mid behind allies while enemies are in front. 12:42 shows Samira 8/0/2 mid while multiple allies are dead or on timers. 13:10 to 13:24 shows the team converting inside the enemy base.",
+      "goodThing": "You did spend, you did group mid, and you did end through the base. The improvement is protecting the shutdown lead between those good moments.",
+      "whyTrust": "The frames show both the good habit and the leak: you bought at 09:11 and ended with the team at 13:24, but the risky windows were the side-fight exposure at 10:25 and the unsynced mid-wave state at 12:42.",
+      "focusTag": "shutdown lead conversion",
+      "evidence": "Manual frame review of the May 21 queued auto capture: shop/spend at 09:11, side-fight shutdown state at 10:25, grouped mid pressure at 11:12, unsynced mid wave with ally death timers at 12:42, and base conversion at 13:10-13:24.",
+      "pattern": "The repeated climb leak is not only chasing after inhibitor. It is letting a won personal lead pass through extra side fights before the next team objective is organized.",
+      "diamondRule": "After a big Samira spend, the next click should create grouped pressure, free structure, or reset timing; anything else is shutdown exposure.",
+      "drill": "When you are 4/0 or better, say spend, group, structure before accepting the next side fight.",
+      "timeline": [
+        "09:11 - Samira is in shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold.",
+        "10:25 - Samira is 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present.",
+        "11:12 - Samira is grouped mid behind allies while enemies are in front, which is the safer pressure shape.",
+        "12:42 - Samira is 8/0/2 mid while multiple allies are dead or on timers, making sync/reset more important than another solo wave.",
+        "13:10 - The team is entering the enemy base area together.",
+        "13:24 - Samira and allies hit the enemy base as the conversion finally becomes clean."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "9:11",
+          "videoSeconds": 234.217,
+          "description": "Samira is in base shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold."
+        },
+        {
+          "clock": "10:25",
+          "videoSeconds": 249.565,
+          "description": "Samira is 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present."
+        },
+        {
+          "clock": "11:12",
+          "videoSeconds": 278.375,
+          "description": "Samira is grouped mid behind allies while multiple enemies are in front."
+        },
+        {
+          "clock": "12:42",
+          "videoSeconds": 318.75,
+          "description": "Samira is 8/0/2 mid while multiple allies are dead or on timers."
+        },
+        {
+          "clock": "12:54",
+          "videoSeconds": 326.304,
+          "description": "Samira is still moving through the next mid/side pressure window with the shutdown lead."
+        },
+        {
+          "clock": "13:10",
+          "videoSeconds": 341.652,
+          "description": "Samira and allies reach the enemy base area together."
+        },
+        {
+          "clock": "13:24",
+          "videoSeconds": 355.25,
+          "description": "Samira and allies convert inside the enemy base."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "9:11",
+          "videoSeconds": 234.217,
+          "description": "shows Samira in shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold."
+        },
+        {
+          "clock": "10:25",
+          "videoSeconds": 249.565,
+          "description": "shows Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present."
+        },
+        {
+          "clock": "11:12",
+          "videoSeconds": 278.375,
+          "description": "shows Samira grouped mid behind allies while enemies are in front."
+        },
+        {
+          "clock": "12:42",
+          "videoSeconds": 318.75,
+          "description": "shows Samira 8/0/2 mid while multiple allies are dead or on timers."
+        }
+      ],
+      "nuance": [
+        "Good: the 09:11 shop frame shows you did spend your lead instead of ignoring items.",
+        "Good: the 11:12 and 13:24 frames show you can play behind allies and convert the base with the team.",
+        "Leak: the 10:25 side fight keeps the shutdown lead exposed before the next objective state is clean.",
+        "Leak: the 12:42 mid wave happens while allies are dead or on timers, so the wave only matters if it syncs the next push.",
+        "Master-climb punishment: better enemies do not need many openings; one side re-fight or one late solo wave is enough to take your shutdown."
+      ],
+      "reviewLimit": "This review uses sampled visible frames and game-clock anchors. It does not infer hidden clicks, voice calls, or cooldowns that are not visible in the recording.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-21-visible-paragraph-standard-v6",
+      "sampledFrames": 34,
+      "publicVideoBytes": 25162620,
+      "src": "/recordings/auto_NA1-5565387627_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565387627-01.jpg"
+    },
     {
       "file": "auto_NA1-5565356454_01.mp4",
       "publicFile": "auto_NA1-5565356454_01.mp4",
@@ -417,7 +547,7 @@
       "cs": 221,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Base win becomes side chase",
@@ -1134,7 +1264,7 @@
       "confidence": "high",
       "feedbackTitle": "Missed tower conversion after bot push",
       "feedback": "Mistake: After winning lane fights and getting lane priority, you often leave bot lane before taking or finishing the turret when it is open and your wave is in position. Fix: When the enemy bot lane is dead or zoned off and your wave is at their turret, immediately convert that window into plate or turret damage instead of leaving the lane or walking to fog.",
-      "gameDetail": "This leaks early local gold and denies crucial tempo for opening the map. The correct next click was to stay and convert the wave crash into plates/tower, then take a fast safe reset or rotate only after the structure damage window closes. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. Around 1:25, the wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here; By 5:50, bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification. If you win lane and crash the wave, always check for free structure before considering a rotate or recall.",
+      "gameDetail": "This leaks early local gold and denies crucial tempo for opening the map. The correct next click was to stay and convert the wave crash into plates/tower, then take a fast safe reset or rotate only after the structure damage window closes. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. Around 1:25, the wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here; By 5:50, bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification. If you win lane and crash the wave, always check for free structure before considering a rotate or recall.",
       "eventEvidence": "1:25 Wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here.; 5:50 Bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; 10:16 Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification",
       "goodThing": "You consistently win bot lane trades and push waves into tower, showing lane control and good fight selection.",
       "whyTrust": "Samira snowballs hardest when bot lane turret falls early, unlocking the map for dives and roams—if you want reliable climb, punish every free turret window.",
@@ -1683,7 +1813,7 @@
       "cs": 62,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "implementation",
+      "reviewPhase": "baseline",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "You re-fight after winning",
