@@ -728,6 +728,7 @@ const recordingFocus = document.querySelector("#recording-focus");
 const recordingGrid = document.querySelector("#recording-grid");
 const recordingPreview = document.querySelector("#recording-preview");
 const recordingLiveStatus = document.querySelector("#recording-live-status");
+const recordingQueue = document.querySelector("#recording-queue");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -1886,6 +1887,43 @@ function recordingStoryParagraph(item) {
   return paragraph;
 }
 
+function recordingEvidencePanel(item) {
+  const timeline = Array.isArray(item?.timeline) ? item.timeline.filter(hasText).slice(0, 6) : [];
+  const rows = [
+    item?.eventEvidence ? ["evidence", item.eventEvidence] : null,
+    item?.diamondRule ? ["rule", item.diamondRule] : null,
+    item?.drill ? ["rep", item.drill] : null,
+    item?.reviewLimit ? ["limit", item.reviewLimit] : null
+  ].filter(Boolean);
+  if (!timeline.length && !rows.length) return null;
+
+  const panel = document.createElement("div");
+  panel.className = "recording-evidence-panel";
+
+  if (timeline.length) {
+    const list = document.createElement("ol");
+    list.className = "recording-evidence-list";
+    for (const event of timeline) {
+      const itemNode = document.createElement("li");
+      appendTextWithTimestampLinks(itemNode, event, item);
+      list.append(itemNode);
+    }
+    panel.append(list);
+  }
+
+  rows.forEach(([label, value]) => {
+    const row = document.createElement("p");
+    row.className = "recording-evidence-row";
+    const key = document.createElement("b");
+    key.textContent = label;
+    row.append(key, document.createTextNode(" "));
+    appendTextWithTimestampLinks(row, value, item);
+    panel.append(row);
+  });
+
+  return panel;
+}
+
 function seekRecordingVideo(button) {
   const seconds = Number(button?.dataset?.seekSeconds);
   const card = button?.closest(".recording-list-card");
@@ -1966,7 +2004,9 @@ function recordingListCard(item) {
   const title = document.createElement("h3");
   title.textContent = item.feedbackTitle || "Focus";
 
+  const evidencePanel = recordingEvidencePanel(item);
   copy.append(title, recordingStoryParagraph(item));
+  if (evidencePanel) copy.append(evidencePanel);
 
   const videoWrap = document.createElement("div");
   videoWrap.className = "recording-list-video";
@@ -2133,6 +2173,132 @@ function recordingEtaLabel(data = {}, status = "") {
   return "ETA ~1h";
 }
 
+function recordingQueueLabel(data = {}) {
+  const count = Number(data.queueCount);
+  if (!Number.isFinite(count) || count <= 0) return "";
+  const items = Array.isArray(data.queueItems) ? data.queueItems : [];
+  const first = items[0] || {};
+  const endedAt = Date.parse(first.endedAt || "");
+  const firstEnded = Number.isFinite(endedAt)
+    ? new Date(endedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+    : "";
+  const label = count === 1 ? "queue 1 review" : `queue ${count} reviews`;
+  return firstEnded ? `${label}, first ended ${firstEnded}` : label;
+}
+
+function etaLabel(seconds) {
+  const value = Number(seconds);
+  if (!Number.isFinite(value) || value <= 0) return "";
+  if (value < 45) return "under 1m";
+  if (value < 90) return "~1m";
+  if (value < 60 * 60) return `~${Math.ceil(value / 60)}m`;
+  return `~${Math.ceil(value / 3600)}h`;
+}
+
+function timeLabel(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function queueStatusText(item = {}, index = 0) {
+  const status = String(item.status || "").toLowerCase();
+  if (status === "recording") return "recording now";
+  if (status === "processing") return "processing now";
+  if (status === "publishing") return "publishing now";
+  return index === 0 ? "next" : `queued ${index + 1}`;
+}
+
+function appendQueueMetric(container, label, value) {
+  if (!value) return;
+  const metric = document.createElement("span");
+  const name = document.createElement("b");
+  name.textContent = label;
+  metric.append(name, document.createTextNode(value));
+  container.append(metric);
+}
+
+function renderRecordingQueue(data = {}) {
+  if (!recordingQueue) return;
+  const items = Array.isArray(data.queueItems) ? data.queueItems : [];
+  const count = Number(data.queueCount);
+  const hasItems = items.length > 0 || count > 0;
+
+  const header = document.createElement("div");
+  header.className = "recording-queue-head";
+  const title = document.createElement("h3");
+  title.textContent = "post-game queue";
+  const summary = document.createElement("p");
+  summary.textContent = hasItems
+    ? "one review processes at a time; active and finished games stay listed"
+    : "queue clear; next finished game appears here";
+  header.append(title, summary);
+
+  const rows = document.createElement("div");
+  rows.className = "recording-queue-list";
+
+  if (!hasItems) {
+    const empty = document.createElement("article");
+    empty.className = "recording-queue-empty";
+    empty.textContent = "No post-game review is waiting right now.";
+    rows.append(empty);
+  } else {
+    items.forEach((item, index) => {
+      const row = document.createElement("article");
+      const status = String(item.status || "queued").toLowerCase();
+      row.className = `recording-queue-item is-${status}`;
+
+      const state = document.createElement("span");
+      state.className = "recording-queue-state";
+      state.textContent = queueStatusText(item, index);
+
+      const body = document.createElement("div");
+      body.className = "recording-queue-body";
+      const rowTitle = document.createElement("strong");
+      rowTitle.textContent = item.stageLabel || item.label || `review ${index + 1}`;
+      const meta = document.createElement("p");
+      const gameStarted = timeLabel(item.startedAt);
+      const ended = timeLabel(item.endedAt);
+      const gameEnd = timeLabel(item.estimatedGameEndAt);
+      const started = timeLabel(item.estimatedStartAt);
+      const ready = timeLabel(item.estimatedReadyAt);
+      meta.textContent = [
+        status === "recording" && gameStarted ? `game started ${gameStarted}` : "",
+        status !== "recording" && ended ? `game ended ${ended}` : "",
+        status === "recording" && gameEnd ? `game ends around ${gameEnd}` : "",
+        started ? `review starts ${started}` : "",
+        ready ? `live around ${ready}` : ""
+      ].filter(Boolean).join(" | ");
+      body.append(rowTitle, meta);
+
+      const metrics = document.createElement("div");
+      metrics.className = "recording-queue-metrics";
+      if (status === "recording") {
+        appendQueueMetric(metrics, "game left ", etaLabel(item.gameEtaSeconds || item.stageEtaSeconds));
+        appendQueueMetric(metrics, "review starts ", etaLabel(item.startEtaSeconds));
+        appendQueueMetric(metrics, "post ETA ", etaLabel(item.etaSeconds));
+      } else {
+        appendQueueMetric(metrics, "stage ", etaLabel(item.stageEtaSeconds));
+        appendQueueMetric(metrics, "live ETA ", etaLabel(item.etaSeconds));
+      }
+      appendQueueMetric(metrics, "basis ", item.etaBasis || "");
+
+      const progress = document.createElement("span");
+      progress.className = "recording-queue-progress";
+      progress.setAttribute("aria-hidden", "true");
+      const bar = document.createElement("i");
+      const width = Number.isFinite(Number(item.progress)) ? Math.max(4, Math.min(100, Number(item.progress))) : (status === "processing" ? 40 : 8);
+      bar.style.width = `${width}%`;
+      progress.append(bar);
+
+      row.append(state, body, metrics, progress);
+      rows.append(row);
+    });
+  }
+
+  recordingQueue.replaceChildren(header, rows);
+}
+
 function renderRecordingLiveStatus(data = {}) {
   if (!recordingLiveStatus) return;
   const status = String(data.status || "unknown").toLowerCase();
@@ -2146,6 +2312,7 @@ function renderRecordingLiveStatus(data = {}) {
   const progress = Number.isFinite(Number(data.progress)) ? Math.max(0, Math.min(100, Number(data.progress))) : 0;
   const showProgress = ["waiting", "recording", "paused", "processing", "publishing", "published"].includes(visibleStatus);
   const eta = stale ? "" : recordingEtaLabel(data, visibleStatus);
+  const queue = stale ? "" : recordingQueueLabel(data);
   const detail = stale
     ? [data.detail, age ? `last update ${age}` : "heartbeat delayed"].filter(Boolean).join(" | ")
     : ([data.detail || (age ? `updated ${age}` : ""), eta].filter(Boolean).join(" | "));
@@ -2156,14 +2323,19 @@ function renderRecordingLiveStatus(data = {}) {
     <span class="recording-live-dot" aria-hidden="true"></span>
     <span class="recording-live-copy">
       <strong></strong>
-      <span></span>
+      <span class="recording-live-detail"></span>
+      <span class="recording-live-queue"></span>
       <span class="recording-live-progress" aria-hidden="true"><i></i></span>
     </span>
   `;
   recordingLiveStatus.querySelector("strong").textContent = label;
-  recordingLiveStatus.querySelector(".recording-live-copy span").textContent = detail;
+  recordingLiveStatus.querySelector(".recording-live-detail").textContent = detail;
+  const queueElement = recordingLiveStatus.querySelector(".recording-live-queue");
+  queueElement.textContent = queue;
+  queueElement.hidden = !queue;
   recordingLiveStatus.querySelector(".recording-live-progress").hidden = !showProgress;
-  recordingLiveStatus.title = [label, detail, data.etaBasis, data.mode ? `mode ${data.mode}` : ""].filter(Boolean).join(" | ");
+  recordingLiveStatus.title = [label, detail, queue, data.etaBasis, data.mode ? `mode ${data.mode}` : ""].filter(Boolean).join(" | ");
+  renderRecordingQueue(data);
 }
 
 async function hydrateRecordingLiveStatus() {
@@ -2190,6 +2362,7 @@ async function hydrateRecordingLiveStatus() {
       detail: "site could not read the recorder heartbeat",
       stale: true
     });
+    renderRecordingQueue({});
   }
 }
 

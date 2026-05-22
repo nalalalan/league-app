@@ -18,7 +18,11 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-21-specific-decision-chain-v4";
+const analysisVersion = "2026-05-21-specific-decision-chain-v5";
+const compatibleAnalysisVersions = new Set([
+  analysisVersion,
+  "2026-05-21-specific-decision-chain-v4"
+]);
 const clockAnchorVersion = "2026-05-21-visible-clock-balanced-v2";
 const coachEvidenceVersion = "2026-05-21-specific-evidence-useful-v4";
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
@@ -1313,7 +1317,7 @@ function existingRecording(existing, fileName, cacheKey) {
 function cachedRecording(existing, fileName, cacheKey) {
   const cached = existingRecording(existing, fileName, cacheKey);
   if (!cached) return null;
-  if (cached.analysisVersion !== analysisVersion) return null;
+  if (!compatibleAnalysisVersions.has(cached.analysisVersion)) return null;
   if (manualFeedback(fileName)) return null;
   if (cached.analysisSource === "fallback" && process.env.LEAGUE_RETRY_FALLBACK === "1" && process.env.OPENAI_API_KEY) return null;
   if (process.env.LEAGUE_FORCE_ANALYSIS === "1") return null;
@@ -1321,6 +1325,49 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5565242641_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Base win becomes side chase",
+      feedback: "Mistake: after the base was cracked, you kept accepting second and third fights away from the cleanest payout. Fix: after inhibitor/base pressure, call the state out loud: free structure, body blocking structure, or reset; only fight if it directly protects one of those.",
+      gameDetail: "At 20:58 you are already in the enemy base with an open lane and enough damage to keep the push moving; that part is good objective pressure, not the mistake. At 21:14 the fight has paid you, two allies are dead, and you are holding about 2700 unspent gold, so the next Master-climb decision is to reset or regroup instead of staying available for the next collapse. At 22:27 you run down bot side alone with the base still cracked, which leaks the map win into travel time and gives enemies another respawn window. The clearest mistake is the 27:08 to 27:12 chase into the side jungle after the base is already open; by 27:56 you are back in the base brawl at low HP with multiple defenders alive, which is exactly how a won beginner-bot base sequence becomes a shutdown or stall in harder games. The lesson is not stop fighting forever; it is stop fighting unless the fight removes the body between you and the structure.",
+      whyTrust: "The evidence separates the good habit from the leak: you did get to the enemy base, but the later side chase and low-HP re-entry are the parts that stop the same lead from converting cleanly against stronger players.",
+      eventEvidence: "20:58 Samira is in the enemy base hitting through minions and defenders. 21:14 shows the won fight plus about 2700 unspent gold. 22:27 shows a solo bot-side drift after base pressure. 27:08 to 27:12 shows the chase away from structures. 27:56 shows the low-HP re-entry into multiple defenders.",
+      goodThing: "You repeatedly found the base and created real ending pressure; the mistake is what happened after the first payout, not the fact that you went to objectives.",
+      focusTag: "base conversion discipline",
+      evidence: "Manual frame review of the queued May 21 full-game clip: visible base pressure at 20:58 and 21:14, solo bot-side drift at 22:27, side-jungle chase at 27:08-27:12, and low-HP base re-entry at 27:56.",
+      pattern: "The recurring leak is post-win state switching. You win enough of the first fight, then spend the next seconds on a side chase, extra body, or low-HP re-entry instead of choosing reset, regroup, or structure.",
+      diamondRule: "After a base win, every click must be one of three things: hit free structure, kill the body blocking structure, or reset with the gold.",
+      drill: "Next game, after inhibitor/base pressure, say 'free, blocked, or reset' before every forward click for the next 20 seconds.",
+      timeline: [
+        "20:58 - Samira is in the enemy base with allied pressure and an open lane; this is the objective habit to keep.",
+        "21:14 - The fight has paid out, two allies are dead, and Samira has about 2700 gold; the clean next decision is reset or regroup.",
+        "22:27 - Samira runs bot side alone after the base has already been cracked, leaking pressure into travel time.",
+        "27:08 - Samira and an ally chase into the side jungle while the enemy base remains the actual payout.",
+        "27:12 - The chase continues away from structures instead of removing only the body blocking the push.",
+        "27:56 - Samira re-enters a base fight at low HP into multiple defenders, the exact shutdown/stall pattern to cut."
+      ],
+      clockAnchors: [
+        { clock: "20:58", videoSeconds: 750, description: "Samira is inside the enemy base with allied pressure and defenders nearby." },
+        { clock: "21:14", videoSeconds: 765.043, description: "Samira is clearing in the enemy base after a won sequence with about 2700 unspent gold." },
+        { clock: "22:27", videoSeconds: 812.609, description: "Samira is running alone down bot side after the base pressure." },
+        { clock: "24:35", videoSeconds: 901.875, description: "Samira is low near the enemy base while several defenders are still present." },
+        { clock: "27:08", videoSeconds: 1002.87, description: "Samira and an ally chase an enemy into the side jungle away from structures." },
+        { clock: "27:12", videoSeconds: 1006.875, description: "The chase continues around the jungle wall instead of directly converting base pressure." },
+        { clock: "27:56", videoSeconds: 1050.435, description: "Samira is back in the base fight at low HP with multiple defenders alive." }
+      ],
+      nuance: [
+        "Good: you did route the game to the enemy base and created real end pressure.",
+        "Leak: after the first payout, you stayed in fight mode instead of switching to reset/regroup/structure mode.",
+        "What happened: the lead turned into extra travel, side jungle chasing, and low-HP re-entry instead of a clean close.",
+        "Master-climb punishment: stronger players turn that low-HP second fight into shutdown gold, wave clear, and a stalled end.",
+        "Next check: if the enemy is not directly blocking the structure, stop chasing and either hit the structure or reset."
+      ],
+      reviewLimit: "The recording has some non-League desktop frames from full-desktop capture, so this review uses only visible League frames as evidence and does not infer clicks during desktop portions.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "16-10_NA1-5564259818_01.webm") {
     return {
       champion: "Samira",
@@ -1984,7 +2031,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
   const frameList = frameTimes.map((time, index) => `${index + 1}:${mmss(time)}`).join(", ");
 
   const prompt = [
-    "Analyze these League of Legends replay frames extremely carefully for Alan, currently around Silver 4 and trying to build stronger decision quality.",
+    "Analyze these League of Legends replay frames extremely carefully for Alan, currently around Silver 4 and trying to remove the exact habits that block a serious Master-climb path.",
     "Images are chronological sampled frames from the recording. Read them in order and use every visible clue: followed champion, team list/nameplate, health bars, minimap shape when visible, wave state, structure/objective context, fight numbers, target selection, spacing, fog, recalls, base state, and obvious crowd-control or cooldown evidence.",
     "The player champion is usually the champion the replay camera follows most. Use the side list/nameplate when visible. If uncertain, say low confidence and state the limit.",
     "Use capture order internally to distinguish earlier leak evidence from later implementation attempts, but do not mention recency weighting in visible output.",
@@ -1993,22 +2040,22 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Coach like a blunt but serious League coach: name the actual mistake, do not soften it, and do not insult Alan. Be direct enough that he knows exactly where he messed up.",
     "Give exactly one highest-value improvement for this recording, plus the specific visible mistake moments that make the advice trustworthy. The top advice must stay direct, narrow, and playable in the next queue.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
-    "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was.",
+    "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
     "Also include eventEvidence: one compact sentence naming the actual visible things that prove the coaching claim. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, missed reset window, or tempo leak; if the advice is structure conversion, the evidence must show structure access, a free structure, a blocked structure, or the chase away from it. This is proof, not advice.",
     "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
-    "Write gameDetail like a short decision-chain recap, not a stat audit: one compact paragraph, two or three notable visible moments where the decision changed state, at most three light timestamps, no K/D/A, no CS count, no numbered timeline, and one final simple lesson sentence. It must include setup -> Alan's action -> leak/consequence -> better next check when the frames support those parts.",
-    "Do not use 'high elo', 'master-facing', or rank-label coaching language; name the exact visible habit and exact in-game payoff.",
+    "Write gameDetail like a useful replay-review paragraph, not a stat audit: include three to six notable visible moments if the frames support them, enough timestamped evidence to show the mistake chain, no K/D/A, no CS count, and one final simple lesson sentence. It must include setup -> Alan's action -> leak/consequence -> better next check when the frames support those parts.",
+    "Alan explicitly wants Master-level critique. You may mention Master-climb punishment when it names a concrete consequence, but do not use rank labels as vague authority. Name the exact visible habit and exact in-game payoff.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty. A limited review is better than a vague confident one.",
     "For specific game events, include the visible game-clock timestamp from the top right when it is visible, but use timestamps only as reference points. Do not turn the recap into a numbered timeline, and do not invent timestamps for unseen moments.",
     "If any visible game-clock timestamp appears in gameDetail, eventEvidence, timeline, evidence, or pattern, include a matching clockAnchors item: {\"clock\":\"MM:SS\",\"videoSeconds\":number}. Use the review-video time from the labeled frame where that clock is visible. Timestamps should be evidence anchors for the lesson, not decorative time labels. If you are not sure the clock is visible or useful for the lesson, do not include the timestamp in visible copy.",
-    "When timestamps are available, include at least one timestamp for the mistake/leak and one timestamp for either consequence or the correct contrasting habit. If only one useful timestamp is visible, say why in reviewLimit.",
+    "When timestamps are available, include at least three useful timestamps: one for the setup/good habit, one for the mistake/leak, and one for the consequence or corrected next check. If only one or two useful timestamps are visible, say why in reviewLimit.",
     "Do not use shop, fountain, scoreboard, game-start, or item-selection frames as proof unless the actual coaching point is buying, recalling, or spending. They are not valid setup anchors for objective, chase, wave, or fight feedback.",
     "The first sentence of gameDetail must start with the visible game state or Alan's action, not a conclusion like 'This leaks...' or 'The better play...'.",
     "Prioritize repeatable habits that stop the gameplay from transferring to harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
-    "The nuance bullets must be specific coaching facts, not paraphrases: include what was good, what leaked, what the harder-game punishment would be, and the next repeatable check when the frames support them.",
+    "The nuance bullets must be specific coaching facts, not paraphrases: include what was good, what leaked, what happened, what the harder-game or Master-climb punishment would be, and the next repeatable check when the frames support them.",
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
     "Return only JSON with this shape:",
     '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, better next check, and one simple lesson sentence","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
@@ -2306,12 +2353,15 @@ async function main() {
       cacheKey
     });
     const annotatedClockAnchors = annotateClockAnchorsWithMoments(clockAnchors, clockMoments);
-    const narrativeClockAnchors = clockMoments;
+    const isManualAnalysis = analysis.analysisSource === "manual";
+    const narrativeClockAnchors = isManualAnalysis ? clockAnchors : clockMoments;
     const championName = clean(analysis.champion, "Samira");
-    const clockMomentEvidence = evidenceTextFromMoments(clockMoments);
+    const clockMomentEvidence = isManualAnalysis ? "" : evidenceTextFromMoments(clockMoments);
     const rawGameDetail = coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`);
     const cleanedGameDetail = stripUnverifiedClockReferences(rawGameDetail, narrativeClockAnchors);
-    const integratedGameDetail = integrateMomentEvidence(cleanedGameDetail, clockMoments, championName);
+    const integratedGameDetail = isManualAnalysis
+      ? cleanedGameDetail
+      : integrateMomentEvidence(cleanedGameDetail, clockMoments, championName);
     const cleanedEventEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), narrativeClockAnchors), championName);
     const cleanedEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), narrativeClockAnchors), championName);
 

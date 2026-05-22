@@ -1754,6 +1754,16 @@ h1 {
   white-space: normal;
 }
 
+.recording-live-copy .recording-live-queue {
+  color: #6b5b4f;
+  font-size: 10.5px;
+  line-height: 1.15;
+}
+
+.recording-live-queue[hidden] {
+  display: none;
+}
+
 .recording-live-progress {
   display: block;
   width: 100%;
@@ -1811,6 +1821,154 @@ h1 {
 
 .recording-live-status.is-published .recording-live-progress i {
   background: #4c6f9f;
+}
+
+.recording-queue {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(104, 87, 68, .16);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 253, 248, .78);
+  box-shadow: 0 8px 22px rgba(87, 69, 45, .06);
+}
+
+.recording-queue-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.recording-queue h3 {
+  margin: 0;
+  color: #2f2925;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.recording-queue p {
+  margin: 0;
+}
+
+.recording-queue-head p {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 760;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.recording-queue-list {
+  display: grid;
+  gap: 7px;
+}
+
+.recording-queue-item,
+.recording-queue-empty {
+  border: 1px solid rgba(104, 87, 68, .14);
+  border-radius: 7px;
+  background: rgba(248, 241, 231, .72);
+}
+
+.recording-queue-item {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) minmax(220px, .8fr);
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  min-width: 0;
+}
+
+.recording-queue-empty {
+  padding: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.recording-queue-state {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  border-radius: 999px;
+  background: rgba(104, 87, 68, .12);
+  color: #4a4039;
+  font-size: 10.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.recording-queue-item.is-processing .recording-queue-state,
+.recording-queue-item.is-publishing .recording-queue-state {
+  background: rgba(176, 106, 29, .15);
+  color: #7b4d22;
+}
+
+.recording-queue-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.recording-queue-body strong {
+  color: #2f2925;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.16;
+}
+
+.recording-queue-body p {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.recording-queue-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.recording-queue-metrics span {
+  display: inline-flex;
+  gap: 3px;
+  max-width: 100%;
+  border: 1px solid rgba(104, 87, 68, .12);
+  border-radius: 999px;
+  padding: 4px 7px;
+  background: rgba(255, 253, 248, .7);
+  color: #4a4039;
+  font-size: 10.5px;
+  font-weight: 760;
+  line-height: 1.15;
+}
+
+.recording-queue-metrics b {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.recording-queue-progress {
+  grid-column: 1 / -1;
+  display: block;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(104, 87, 68, .14);
+}
+
+.recording-queue-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #b06a1d;
 }
 
 .situation-list {
@@ -2020,9 +2178,9 @@ h1 {
 
 .recording-list-card {
   display: grid;
-  grid-template-columns: minmax(250px, .42fr) minmax(520px, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .44fr);
   gap: 12px;
-  align-items: stretch;
+  align-items: start;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px;
@@ -2098,6 +2256,42 @@ h1 {
 
 .recording-story-praise {
   color: #2d7a43;
+}
+
+.recording-evidence-panel {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid rgba(104, 87, 68, .12);
+  padding-top: 9px;
+}
+
+.recording-evidence-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  color: #3f3731;
+  font-size: 12.5px;
+  font-weight: 690;
+  line-height: 1.36;
+}
+
+.recording-evidence-list li::marker {
+  color: #9a7043;
+  font-weight: 900;
+}
+
+.recording-evidence-row {
+  margin: 0;
+  color: #4a4039;
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.38;
+}
+
+.recording-evidence-row b {
+  color: #7b4d22;
+  font-weight: 900;
 }
 
 .recording-time-link {
@@ -3597,6 +3791,7 @@ h1 {
 .recording-head,
 .recording-preview,
 .recording-preview-card,
+.recording-queue,
 .recording-table-wrap {
   min-width: 0;
 }
@@ -3844,13 +4039,19 @@ h1 {
     margin-top: 6px;
   }
 
-  .recording-grid {
+  .recording-queue {
     grid-column: 1 / -1;
     grid-row: 4;
   }
 
+  .recording-grid {
+    grid-column: 1 / -1;
+    grid-row: 5;
+  }
+
   .recording-focus,
   .recording-head,
+  .recording-queue,
   .recording-grid {
     width: min(100%, calc(100% - clamp(24px, 3vw, 52px)));
     justify-self: center;
@@ -3877,7 +4078,8 @@ h1 {
 
   .recording-main,
   .recording-list-card,
-  .recording-preview-card {
+  .recording-preview-card,
+  .recording-queue-item {
     grid-template-columns: 1fr;
   }
 
@@ -3888,6 +4090,19 @@ h1 {
 
   .recording-preview-metas {
     grid-template-columns: 1fr;
+  }
+
+  .recording-queue-head {
+    display: grid;
+    gap: 3px;
+  }
+
+  .recording-queue-head p {
+    text-align: left;
+  }
+
+  .recording-queue-metrics {
+    justify-content: start;
   }
 
   .recording-main,

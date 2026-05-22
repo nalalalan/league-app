@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T23:39:43.169Z",
+  "generatedAt": "2026-05-22T00:07:46.622Z",
   "source": "League of Legends Highlights folder",
   "match": "15 matches",
   "matches": [
@@ -70,7 +70,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Failing to Convert Winning Fights to Structures",
+      "title": "Base win becomes side chase",
       "duration": "18:22",
       "durationSeconds": 1102,
       "gameLength": "28:40",
@@ -85,18 +85,25 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Failing to Convert Winning Fights to Structures",
-      "feedback": "Mistake: You kept fighting and chasing after teamfights in the enemy base when structures (inhibitors or possibly nexus towers) were already open, instead of finishing the objective. Fix: Once you win a fight in the enemy base and have numbers, stop chasing kills and immediately hit the open structure to end the game or secure inhib/nexus.",
-      "gameDetail": "This greed for extra kills delays game-ending objectives and loses the snowball window, letting enemies respawn or recontest. The lesson is to always use man-advantage moments in the enemy base to directly hit structures when they are available, not to keep fighting or chasing.",
-      "eventEvidence": "",
-      "goodThing": "Strong teamfight mechanics and repeated successful engages, especially winning base fights.",
-      "whyTrust": "Samira is a reset snowball Samira built for clean objective conversion off mid-late teamfight wins—this leaks your biggest payoff.",
-      "focusTag": "structure conversion",
-      "evidence": "",
-      "pattern": "Alan repeatedly focuses on extra fighting near enemy fountain when the inhibitor or nexus are open, losing the chance to end or snowball the game. Each base entry after a won fight was not immediately converted to a structure hit, showing loss of the snowball threat Samira creates.",
-      "diamondRule": "If the enemy base is open and your team has numbers after a won fight, always hit the objective—never chase fresh fights or kills.",
-      "drill": "In next queue, after the enemy base is cracked and you have teammates, auto-path directly onto the inhib/nexus every time you win a fight, regardless of low enemies running away.",
-      "timeline": [],
+      "feedbackTitle": "Base win becomes side chase",
+      "feedback": "Mistake: after the base was cracked, you kept accepting second and third fights away from the cleanest payout. Fix: after inhibitor/base pressure, call the state out loud: free structure, body blocking structure, or reset; only fight if it directly protects one of those.",
+      "gameDetail": "At 20:58 you are already in the enemy base with an open lane and enough damage to keep the push moving; that part is good objective pressure, not the mistake. At 21:14 the fight has paid you, two allies are dead, and you are holding about 2700 unspent gold, so the next Master-climb decision is to reset or regroup instead of staying available for the next collapse. At 22:27 you run down bot side alone with the base still cracked, which leaks the map win into travel time and gives enemies another respawn window. The clearest mistake is the 27:08 to 27:12 chase into the side jungle after the base is already open; by 27:56 you are back in the base brawl at low HP with multiple defenders alive, which is exactly how a won beginner-bot base sequence becomes a shutdown or stall in harder games. The lesson is not stop fighting forever; it is stop fighting unless the fight removes the body between you and the structure.",
+      "eventEvidence": "20:58 Samira is in the enemy base hitting through minions and defenders. 21:14 shows the won fight plus about 2700 unspent gold. 22:27 shows a solo bot-side drift after base pressure. 27:08 to 27:12 shows the chase away from structures. 27:56 shows the low-HP re-entry into multiple defenders.",
+      "goodThing": "You repeatedly found the base and created real ending pressure; the mistake is what happened after the first payout, not the fact that you went to objectives.",
+      "whyTrust": "The evidence separates the good habit from the leak: you did get to the enemy base, but the later side chase and low-HP re-entry are the parts that stop the same lead from converting cleanly against stronger players.",
+      "focusTag": "base conversion discipline",
+      "evidence": "Manual frame review of the queued May 21 full-game clip: visible base pressure at 20:58 and 21:14, solo bot-side drift at 22:27, side-jungle chase at 27:08-27:12, and low-HP base re-entry at 27:56.",
+      "pattern": "The recurring leak is post-win state switching. You win enough of the first fight, then spend the next seconds on a side chase, extra body, or low-HP re-entry instead of choosing reset, regroup, or structure.",
+      "diamondRule": "After a base win, every click must be one of three things: hit free structure, kill the body blocking structure, or reset with the gold.",
+      "drill": "Next game, after inhibitor/base pressure, say 'free, blocked, or reset' before every forward click for the next 20 seconds.",
+      "timeline": [
+        "20:58 - Samira is in the enemy base with allied pressure and an open lane; this is the objective habit to keep.",
+        "21:14 - The fight has paid out, two allies are dead, and Samira has about 2700 gold; the clean next decision is reset or regroup.",
+        "22:27 - Samira runs bot side alone after the base has already been cracked, leaking pressure into travel time.",
+        "27:08 - Samira and an ally chase into the side jungle while the enemy base remains the actual payout.",
+        "27:12 - The chase continues away from structures instead of removing only the body blocking the push.",
+        "27:56 - Samira re-enters a base fight at low HP into multiple defenders, the exact shutdown/stall pattern to cut."
+      ],
       "clockAnchors": [
         {
           "clock": "0:27",
@@ -107,18 +114,75 @@
           "clock": "13:35",
           "videoSeconds": 527.217,
           "description": "Samira is farming caster and cannon minions mid lane; no visible enemies close."
+        },
+        {
+          "clock": "20:58",
+          "videoSeconds": 750,
+          "description": "Samira is inside the enemy base with allied pressure and defenders nearby."
+        },
+        {
+          "clock": "21:14",
+          "videoSeconds": 765.043,
+          "description": "Samira is clearing in the enemy base after a won sequence with about 2700 unspent gold."
+        },
+        {
+          "clock": "22:27",
+          "videoSeconds": 812.609,
+          "description": "Samira is running alone down bot side after the base pressure."
+        },
+        {
+          "clock": "24:35",
+          "videoSeconds": 901.875,
+          "description": "Samira is low near the enemy base while several defenders are still present."
+        },
+        {
+          "clock": "27:08",
+          "videoSeconds": 1002.87,
+          "description": "Samira and an ally chase an enemy into the side jungle away from structures."
+        },
+        {
+          "clock": "27:12",
+          "videoSeconds": 1006.875,
+          "description": "The chase continues around the jungle wall instead of directly converting base pressure."
+        },
+        {
+          "clock": "27:56",
+          "videoSeconds": 1050.435,
+          "description": "Samira is back in the base fight at low HP with multiple defenders alive."
         }
       ],
-      "clockMoments": [],
-      "nuance": [
-        "Strong teamfighting got the enemy low or off the map when base was open.",
-        "Did not move to hit inhib/nexus after the first win, kept clearing or fighting.",
-        "Higher ranked games will punish by letting enemies respawn and counter, wasting man-advantage and risking throws.",
-        "The next check: immediately right-click inhib/nexus after you win base fights."
+      "clockMoments": [
+        {
+          "clock": "20:58",
+          "videoSeconds": 750,
+          "description": "Samira is in the enemy base hitting through minions and defenders."
+        },
+        {
+          "clock": "21:14",
+          "videoSeconds": 765.043,
+          "description": "shows the won fight plus about 2700 unspent gold."
+        },
+        {
+          "clock": "22:27",
+          "videoSeconds": 812.609,
+          "description": "shows a solo bot-side drift after base pressure."
+        },
+        {
+          "clock": "27:08",
+          "videoSeconds": 1002.87,
+          "description": "to shows the chase away from structures."
+        }
       ],
-      "reviewLimit": "Frames before 12:30 do not show open structures or endgame base states, but both 12:45 and 14:20 make the structure conversion leak clear.",
-      "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "nuance": [
+        "Good: you did route the game to the enemy base and created real end pressure.",
+        "Leak: after the first payout, you stayed in fight mode instead of switching to reset/regroup/structure mode.",
+        "What happened: the lead turned into extra travel, side jungle chasing, and low-HP re-entry instead of a clean close.",
+        "Master-climb punishment: stronger players turn that low-HP second fight into shutdown gold, wave clear, and a stalled end.",
+        "Next check: if the enemy is not directly blocking the structure, stop chasing and either hit the structure or reset."
+      ],
+      "reviewLimit": "The recording has some non-League desktop frames from full-desktop capture, so this review uses only visible League frames as evidence and does not infer clicks during desktop portions.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-21-specific-decision-chain-v5",
       "sampledFrames": 36,
       "publicVideoBytes": 73122270,
       "src": "/recordings/auto_NA1-5565242641_01.mp4",
@@ -735,7 +799,7 @@
       "confidence": "high",
       "feedbackTitle": "Missed tower conversion after bot push",
       "feedback": "Mistake: After winning lane fights and getting lane priority, you often leave bot lane before taking or finishing the turret when it is open and your wave is in position. Fix: When the enemy bot lane is dead or zoned off and your wave is at their turret, immediately convert that window into plate or turret damage instead of leaving the lane or walking to fog.",
-      "gameDetail": "This leaks early local gold and denies crucial tempo for opening the map. The correct next click was to stay and convert the wave crash into plates/tower, then take a fast safe reset or rotate only after the structure damage window closes. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. Around 1:25, the wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here; By 5:50, bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification. If you win lane and crash the wave, always check for free structure before considering a rotate or recall.",
+      "gameDetail": "This leaks early local gold and denies crucial tempo for opening the map. The correct next click was to stay and convert the wave crash into plates/tower, then take a fast safe reset or rotate only after the structure damage window closes. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. '; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed! ' notification. Around 1:25, the wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here; By 5:50, bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; Then around 10:16, Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification. If you win lane and crash the wave, always check for free structure before considering a rotate or recall.",
       "eventEvidence": "1:25 Wave is under enemy bot turret with allied presence—ideal setup for taking plates, showing the missed conversion window if Alan leaves here.; 5:50 Bot lane pushing wave under tower, objective notification says 'The Mountains rise!'; 10:16 Samira and blue minions moving mid lane, 'Enemy turret destroyed!' notification",
       "goodThing": "You consistently win bot lane trades and push waves into tower, showing lane control and good fight selection.",
       "whyTrust": "Samira snowballs hardest when bot lane turret falls early, unlocking the map for dives and roams—if you want reliable climb, punish every free turret window.",
@@ -1041,17 +1105,20 @@
       "confidence": "high",
       "feedbackTitle": "Finish-window all-in",
       "feedback": "Mistake: over-learning this clip would make you throw; the same dash is bad if it starts without wave, teammate body, or nexus pressure. Fix: full send only when every reset moves toward the payout.",
-      "gameDetail": "At 14:21 the fight is already in their base, not in river or a side lane: allies and minions are in front, enemy defenders are packed near nexus, and Samira is close enough to chain resets without walking into fog. Around 14:21, fight starts inside the enemy base with multiple enemy defenders still alive;; By 14:41, penta as the base remains open.;. Learn this exactly: the all-in is good when the map is already ending; outside that condition, cash out first.",
-      "eventEvidence": "14:21 fight starts inside the enemy base with multiple enemy defenders still alive;; 14:41 penta as the base remains open.;",
+      "gameDetail": "At 14:21 the fight is already in their base, not in river or a side lane: allies and minions are in front, enemy defenders are packed near nexus, and Samira is close enough to chain resets without walking into fog. At 14:27 the first two kills land and the play becomes a real cleanup instead of a random chase. At 14:33 the chain reaches triple, at 14:38 the quadra happens beside the nexus area, and at 14:41 the penta lands because the fight never leaves the ending window. Learn this exactly: the all-in is good when the map is already ending; outside that condition, cash out first.",
+      "eventEvidence": "14:21 fight starts inside the enemy base with multiple enemy defenders still alive; 14:27 double kill; 14:33 triple; 14:38 quadra near nexus; 14:41 penta as the base remains open.",
       "goodThing": "The strong part is the finish discipline: once the enemy line collapses, Samira stays with the ally/minion push and cleans through the defenders instead of drifting sideways.",
       "whyTrust": "The penta is not random: the clip shows the conditions that made it valid, with allies and minions already in base and every reset moving toward nexus.",
       "focusTag": "finish-only all-in",
-      "evidence": "14:21 fight starts inside the enemy base with multiple enemy defenders still alive;; 14:41 penta as the base remains open.;",
+      "evidence": "Manual storyboard review of the May 20 highlight: visible base fight from 14:21 to 14:41, double/triple/quadra/penta sequence, and enemy base already open.",
       "pattern": "Samira's best-looking fight here works because the map already gives the exit and the payout. The dangerous habit would be copying the same depth when the fight is not already a base finish.",
       "diamondRule": "All-in only when the reset path and the payout are the same direction.",
       "drill": "Before E/R, ask: does every reset move me toward nexus, tower, dragon, Baron, or safety?",
       "timeline": [
         "14:21 - Samira is already inside the enemy base with several defenders alive and allied pressure in front.",
+        "14:27 - The first two kills land, turning the base fight into a cleanup instead of a loose chase.",
+        "14:33 - The reset chain reaches triple while the wave and allies still hold the base area.",
+        "14:38 - The quadra happens near nexus instead of in a side lane or fog pocket.",
         "14:41 - The penta lands with the enemy base open, which is the correct payoff condition."
       ],
       "clockAnchors": [
@@ -1102,7 +1169,7 @@
       ],
       "reviewLimit": "The Riot highlight is only about 22 seconds, so the review claims the visible base fight and does not invent the earlier setup.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-21-specific-decision-chain-v5",
       "sampledFrames": 8,
       "publicVideoBytes": 10628274,
       "src": "/recordings/16-10_NA1-5564259818_01.webm",
@@ -1146,17 +1213,19 @@
       "confidence": "high",
       "feedbackTitle": "You drift after base opens",
       "feedback": "Mistake: you chase sideways after the base is already open. Fix: stand behind the first body in and hit the structure as soon as space is made.",
-      "gameDetail": "Around 11:51, Samira with low health walking away from top lane after a shutdown; By 12:10, Samira is low and drifting sideways below the open enemy base entrance, showing the mistake of not choosing the immediate structure push with the team after the base is cracked; Then around 14:23, the team is hitting the nexus with minions, Samira stands behind front bodies, clearly showing correct structure focus and contrasting the earlier sideways chase. Honest read: the useful footage starts after a desktop-capture section, and the lesson is still clear. Around 12:10 Samira is low below the enemy base entrance while allies are already fighting inside the cracked base; the next valuable movement is backward-to-safe or forward-to-structure with the team, not a solo side angle.",
-      "eventEvidence": "11:51 Samira with low health walking away from top lane after a shutdown.; 12:10 Samira is low and drifting sideways below the open enemy base entrance, showing the mistake of not choosing the immediate structure push with the team after the base is cracked.; 14:23 Team is hitting the nexus with minions, Samira stands behind front bodies, clearly showing correct structure focus and contrasting the earlier sideways chase.",
+      "gameDetail": "Honest read: the useful footage starts after a desktop-capture section, and the lesson is still clear. Around 12:10 Samira is low below the enemy base entrance while allies are already fighting inside the cracked base; the next valuable movement is backward-to-safe or forward-to-structure with the team, not a solo side angle. Around 13:05 the map slows down: Mordekaiser walks away mid, an ally is channeling recall, and Samira is full HP with the lane already open, which is exactly the moment to choose wave/base route before another target appears. Around 13:15 the camera follows Mordekaiser again and Samira casts Q/Flair into him from close range; the spell connects, but the important part is that the fight is sideways while the open base is still the real payout. Around 14:19 the clean version finally shows up: multiple enemies are dead, minions are in the base, Samira is behind the front body, and the team is hitting the ending area instead of wandering after another duel.",
+      "eventEvidence": "12:10 low Samira below the open enemy base entrance; 13:15 Q/Flair into Mordekaiser during a sideways mid fight; 14:19 team and minions are back inside the base to end.",
       "goodThing": "You did group back toward the base and finish the game instead of letting the push fully dissolve.",
       "whyTrust": "The win came from returning to the open base, not from a cleaner combo. Your damage was not the limiting factor; target discipline was.",
       "focusTag": "end the push",
-      "evidence": "11:51 Samira with low health walking away from top lane after a shutdown.; 12:10 Samira is low and drifting sideways below the open enemy base entrance, showing the mistake of not choosing the immediate structure push with the team after the base is cracked.; 14:23 Team is hitting the nexus with minions, Samira stands behind front bodies, clearly showing correct structure focus and contrasting the earlier sideways chase.",
+      "evidence": "Review clip frames with visible game clock: base pressure near 12:10, Mordekaiser Q/Flair around 13:15, final base push around 14:19.",
       "pattern": "The winning pressure was already available. The mistake is treating a nearby Samira like the win condition after the actual win condition is already open.",
       "diamondRule": "If a base structure is available, a chase is wrong unless it directly removes the body blocking the structure.",
       "drill": "Next game: when inhibitor or nexus is open, say front line, structure, no chase.",
       "timeline": [
-        "12:10 - Samira is low below the enemy base entrance while allies are already inside the cracked base."
+        "12:10 - Samira is low below the enemy base entrance while allies are already inside the cracked base.",
+        "13:15 - Samira Q/Flair follows Mordekaiser mid instead of immediately routing the open lane back to base.",
+        "14:19 - The team has minions inside the base and Samira is behind the first body, which is the clean ending shape."
       ],
       "clockAnchors": [
         {
@@ -1230,7 +1299,7 @@
       ],
       "reviewLimit": "The clip has desktop-capture segments mixed with game footage, so the narrative only claims the visible game moments.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-21-specific-decision-chain-v5",
       "sampledFrames": 18,
       "publicVideoBytes": 25780055,
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
@@ -1275,11 +1344,11 @@
       "feedbackTitle": "You re-fight after winning",
       "feedback": "Mistake: you keep playing for another fight after the first win. Fix: cash out wave, tower, reset, or end before touching another Samira.",
       "gameDetail": "Honest read: this is improved, but the same leak keeps coming back after the good moment. Around 1:24 Samira is fighting under the friendly bot tower with Jinx and Braum still on screen; the movement is forward into a contested lane pocket while the safer value is to thin the wave, hold the tower line, and make them walk into you. Around 7:58 the good version happens: the bot push is already under enemy tower, the wave is with you, and the won pressure turns into turret damage instead of another random chase. Around 10:32 Samira is low in bot lane while Braum and Jinx can still answer, so every extra step forward is a shutdown invitation unless the next click is reset or structure. Around 12:44 the punishment is visible: the fight is still extended near the enemy side, crowd control lands, and the screen shows a shutdown instead of a clean cashout. The lesson is not to fight less; it is to make the first won fight buy the wave, turret, reset, or end before accepting the second one.",
-      "eventEvidence": "1:24 contested fight under friendly bot tower;; 7:58 won bot push becomes turret damage;; 10:32 low-health lane stay;",
+      "eventEvidence": "1:24 contested fight under friendly bot tower; 7:58 won bot push becomes turret damage; 10:32 low-health lane stay; 12:44 crowd control and shutdown punish the extended fight.",
       "goodThing": "The good part was real: you turned one bot-side win into turret pressure instead of only chasing kills.",
       "whyTrust": "The same game shows both sides: turret conversion is the right version, and the later low-health re-fight is how stronger opponents get shutdown gold back.",
       "focusTag": "payout before dash",
-      "evidence": "1:24 contested fight under friendly bot tower;; 7:58 won bot push becomes turret damage;; 10:32 low-health lane stay;",
+      "evidence": "",
       "pattern": "The damage is already there. The leak is the second decision: after the first win, you often accept another fight before the map payout is locked.",
       "diamondRule": "First win buys wave, tower, reset, or end before the next fight is allowed.",
       "drill": "After the first kill or forced recall, say cash out before moving forward.",
@@ -1473,7 +1542,7 @@
       ],
       "reviewLimit": "Manual review used sampled replay frames and log timing, not raw inputs or full cooldown telemetry.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-21-specific-decision-chain-v5",
       "sampledFrames": 24,
       "publicVideoBytes": 79026136,
       "src": "/recordings/16-10_NA1-5563352800_01.mp4",
@@ -1517,16 +1586,19 @@
       "confidence": "high",
       "feedbackTitle": "You stay when one hit kills you",
       "feedback": "Mistake: you keep playing the wave when one auto or spell kills you. Fix: give the wave and recall before the lane turns into a death timer.",
-      "gameDetail": "Honest read: this is not a mechanics issue; it is a health-gate issue. By 14:28 the team is ending with Samira alive around the base fight, which proves the Samira damage is not the blocker. Around 2:05, setup: Samira under bot turret with low HP and enemy minions approaching, showing the risky state where the recall should be considered; By 14:28, blue team pushing into red base, Master Yi has destroyed a red inhibitor. The blocker is staying in lane after the health bar says the next decision should be recall.",
-      "eventEvidence": "2:05 Setup: Samira under bot turret with low HP and enemy minions approaching, showing the risky state where the recall should be considered.; 14:28 Blue team pushing into red base, Master Yi has destroyed a red inhibitor",
+      "gameDetail": "Honest read: this is not a mechanics issue; it is a health-gate issue. At 2:43 Samira is under bot tower with the enemy wave arriving, Ashe still visible to the right, and enough missing HP that the lane should already be treated as dangerous instead of playable. At 3:27 the real mistake is clearer: Samira is still beside the bot wave at lethal health, the camera and movement are staying with minions, and the recall path has not been taken even though one clean enemy touch can turn the wave into a death timer. At 4:57 the good version is visible after the reset: Samira is back on the map with enough HP to walk forward, Q/auto from range, and choose the next trade instead of begging not to be hit. By 14:28 the team is ending with Samira alive around the base fight, which proves the champion damage is not the blocker. The blocker is staying in lane after the health bar says the next decision should be recall.",
+      "eventEvidence": "2:43 Samira is under bot tower with Ashe still visible and the wave arriving; 3:27 Samira is still in lane at lethal health; 4:57 reset gives enough HP to re-enter; 14:28 the later team ending works.",
       "goodThing": "After the bad early health decision, you still got back into the game and converted later pressure into the ending push.",
       "whyTrust": "This is not vague advice: the reviewed frames show the exact one-hit-health lane stay, and removing that habit protects the aggression that already works later.",
       "focusTag": "lethal hp reset",
-      "evidence": "2:05 Setup: Samira under bot turret with low HP and enemy minions approaching, showing the risky state where the recall should be considered.; 14:28 Blue team pushing into red base, Master Yi has destroyed a red inhibitor",
+      "evidence": "Manual storyboard review of the May 18 full recording: early lane death at lethal HP, later kills and turret/base conversion after grouping.",
       "pattern": "The new game is better at converting once Samira has items, but the early lane still has a lethal-HP greed point: staying for the wave while one hit from death turns a manageable recall into a death timer.",
       "diamondRule": "Below one enemy auto or spell, the wave is no longer the objective; reset first, then play the next item spike.",
       "drill": "At low HP, say one hit kills me and recall unless the enemy bot lane is dead or fully gone.",
       "timeline": [
+        "2:43 - Samira is under bot tower with Ashe still visible and the wave arriving.",
+        "3:27 - Samira is still in lane at lethal health instead of already reset.",
+        "4:57 - Samira is back with enough HP to re-enter and choose the next trade.",
         "14:28 - The later ending works, which makes the early health-gate mistake the cleaner thing to remove."
       ],
       "clockAnchors": [
@@ -1673,7 +1745,7 @@
       ],
       "reviewLimit": "Manual review used sampled replay frames and close-up storyboard sheets, not raw inputs or complete cooldown telemetry.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-21-specific-decision-chain-v5",
       "sampledFrames": 24,
       "publicVideoBytes": 91217492,
       "src": "/recordings/16-10_NA1-5563301586_01.mp4",

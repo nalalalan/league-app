@@ -37,7 +37,7 @@ const captureGop = String(Math.max(1, Math.round((Number(fps) || 4) * (Number(se
 const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "960:-2").trim();
 const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
 const captureWindowTitle = String(process.env.LEAGUE_LIVE_WINDOW_TITLE || "League of Legends (TM) Client").trim();
-const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "desktop").trim().toLowerCase();
+const captureModePreference = String(process.env.LEAGUE_LIVE_CAPTURE_MODE || "region").trim().toLowerCase();
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || "https://league.aolabs.io/api/recording-status").trim();
 const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
@@ -52,6 +52,14 @@ let lastStatusErrorMs = 0;
 let idleHoldStatus = null;
 let postGameQueue = [];
 let postGameQueueRunning = false;
+let activeQueueSessionRoot = "";
+let activeQueueStage = "";
+let activeQueueStageLabel = "";
+let activeQueueStartedAt = "";
+let activeQueueEta = {};
+let activeQueueProgress = null;
+let activeRecordingSession = null;
+let gameLengthEstimateCache = null;
 
 function clean(value, fallback = "") {
   return String(value || fallback).replace(/\s+/g, " ").trim();
@@ -110,6 +118,119 @@ async function savePostGameQueue() {
   await fs.writeFile(postGameQueuePath, `${JSON.stringify(postGameQueue, null, 2)}\n`, "utf8");
 }
 
+function sourceDurationSecondsForQueueItem(item) {
+  const startedMs = Number(item?.startedMs || Date.parse(item?.startedAt || ""));
+  const endedMs = Number(item?.endedMs || Date.parse(item?.endedAt || ""));
+  if (!Number.isFinite(startedMs) || !Number.isFinite(endedMs) || endedMs <= startedMs) return null;
+  return Math.max(0, Math.round((endedMs - startedMs) / 1000));
+}
+
+async function estimateQueuedReviewSeconds(item) {
+  const sourceDurationSeconds = sourceDurationSecondsForQueueItem(item);
+  const fields = await etaFor("post_game_total", 14 * 60, new Date().toISOString(), { sourceDurationSeconds });
+  return {
+    seconds: Math.max(20, Number(fields.etaSeconds) || 14 * 60),
+    basis: fields.etaBasis || "trained from recent post-game history"
+  };
+}
+
+async function estimatedGameLengthSeconds() {
+  const now = Date.now();
+  if (gameLengthEstimateCache && now - gameLengthEstimateCache.readAt < 60 * 1000) return gameLengthEstimateCache;
+  const values = [];
+  const history = JSON.parse(await fs.readFile(path.join(analysisRoot, "post-game-eta-history.json"), "utf8").catch(() => "{}"));
+  for (const sample of Array.isArray(history.samples) ? history.samples : []) {
+    const seconds = Number(sample?.sourceDurationSeconds);
+    if (Number.isFinite(seconds) && seconds >= 8 * 60 && seconds <= 70 * 60) values.push(seconds);
+  }
+  const sidecars = await fs.readdir(sourceDir).catch(() => []);
+  for (const name of sidecars.filter((entry) => /\.mp4\.json$/i.test(entry)).slice(-30)) {
+    const sidecar = JSON.parse(await fs.readFile(path.join(sourceDir, name), "utf8").catch(() => "{}"));
+    const seconds = Number(sidecar?.sourceDurationSeconds || sidecar?.gameLengthSeconds);
+    if (Number.isFinite(seconds) && seconds >= 8 * 60 && seconds <= 70 * 60) values.push(seconds);
+  }
+  values.sort((a, b) => a - b);
+  const index = values.length ? Math.min(values.length - 1, Math.max(0, Math.floor((values.length - 1) * 0.65))) : -1;
+  gameLengthEstimateCache = {
+    readAt: now,
+    seconds: index >= 0 ? Math.round(values[index]) : 30 * 60,
+    basis: index >= 0 ? `trained on ${values.length} recent game lengths` : "using 30m game fallback until more games finish"
+  };
+  return gameLengthEstimateCache;
+}
+
+async function queueStatusFields() {
+  const now = Date.now();
+  let cumulativeSeconds = 0;
+  const items = [];
+  for (let index = 0; index < postGameQueue.length; index += 1) {
+    const item = postGameQueue[index];
+    const isActive = item.sessionRoot === activeQueueSessionRoot;
+    const estimate = isActive
+      ? {
+          seconds: Math.max(20, Number(activeQueueEta.etaSeconds) || 60),
+          basis: activeQueueEta.etaBasis || "live stage estimate"
+        }
+      : await estimateQueuedReviewSeconds(item);
+    const startEtaSeconds = cumulativeSeconds;
+    const stageEtaSeconds = estimate.seconds;
+    const etaSeconds = startEtaSeconds + stageEtaSeconds;
+    const estimatedStartAt = new Date(now + startEtaSeconds * 1000).toISOString();
+    const estimatedReadyAt = new Date(now + etaSeconds * 1000).toISOString();
+    items.push({
+      label: `review ${index + 1}`,
+      status: isActive ? "processing" : "queued",
+      stage: isActive ? activeQueueStage || "processing" : "queued",
+      stageLabel: isActive ? activeQueueStageLabel || "processing review" : (index === 0 ? "next to process" : "waiting behind earlier review"),
+      startedAt: clean(item.startedAt, ""),
+      endedAt: clean(item.endedAt, ""),
+      queuedAt: clean(item.queuedAt, ""),
+      estimatedStartAt,
+      estimatedReadyAt,
+      startEtaSeconds,
+      etaSeconds,
+      stageEtaSeconds,
+      etaBasis: estimate.basis,
+      progress: isActive && Number.isFinite(Number(activeQueueProgress)) ? Math.round(Number(activeQueueProgress)) : null
+    });
+    cumulativeSeconds = etaSeconds;
+  }
+  if (activeRecordingSession?.startedMs) {
+    const gameEstimate = await estimatedGameLengthSeconds();
+    const elapsedSeconds = Math.max(0, Math.round((now - Number(activeRecordingSession.startedMs || now)) / 1000));
+    const targetGameSeconds = Math.max(gameEstimate.seconds, elapsedSeconds + 5 * 60);
+    const gameEtaSeconds = Math.max(60, targetGameSeconds - elapsedSeconds);
+    const reviewEstimate = await estimateQueuedReviewSeconds({
+      startedMs: activeRecordingSession.startedMs,
+      endedMs: Number(activeRecordingSession.startedMs) + targetGameSeconds * 1000
+    });
+    const startEtaSeconds = Math.max(cumulativeSeconds, gameEtaSeconds);
+    const etaSeconds = startEtaSeconds + reviewEstimate.seconds;
+    items.push({
+      label: "current game",
+      status: "recording",
+      stage: "recording",
+      stageLabel: "recording current game; review waits for game end",
+      startedAt: clean(activeRecordingSession.startedAt?.toISOString?.() || activeRecordingSession.startedAt, ""),
+      endedAt: "",
+      queuedAt: "",
+      estimatedGameEndAt: new Date(now + gameEtaSeconds * 1000).toISOString(),
+      estimatedStartAt: new Date(now + startEtaSeconds * 1000).toISOString(),
+      estimatedReadyAt: new Date(now + etaSeconds * 1000).toISOString(),
+      gameEtaSeconds,
+      startEtaSeconds,
+      etaSeconds,
+      stageEtaSeconds: gameEtaSeconds,
+      etaBasis: `${gameEstimate.basis}; ${reviewEstimate.basis}`,
+      progress: Math.max(6, Math.min(88, Math.round((elapsedSeconds / targetGameSeconds) * 100)))
+    });
+  }
+  return {
+    queueCount: items.length,
+    queueItems: items.slice(0, 5)
+  };
+}
+
 async function enqueuePostGameSession(session) {
   const item = serializeSession(session);
   if (!postGameQueue.some((queued) => queued.sessionRoot === item.sessionRoot)) {
@@ -149,11 +270,13 @@ async function log(message) {
 }
 
 async function publishRecorderStatus(status, fields = {}, options = {}) {
+  const queue = await queueStatusFields();
   const payload = {
     status,
     updatedAt: new Date().toISOString(),
     mode: captureModePreference,
-    ...fields
+    ...fields,
+    ...queue
   };
   await fs.mkdir(analysisRoot, { recursive: true });
   await fs.writeFile(statusPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8").catch(() => {});
@@ -165,7 +288,9 @@ async function publishRecorderStatus(status, fields = {}, options = {}) {
     progress: payload.progress,
     mode: payload.mode,
     matchId: payload.matchId,
-    startedAt: payload.startedAt
+    startedAt: payload.startedAt,
+    queueCount: payload.queueCount,
+    queueFirstEndedAt: payload.queueItems?.[0]?.endedAt || ""
   });
   const throttleMs = Number(options.throttleMs ?? 15000);
   if (!options.force && key === lastStatusKey && Date.now() - lastStatusPostMs < throttleMs) return;
@@ -825,6 +950,7 @@ async function startSession() {
     taintedSegmentIndexes: new Set(),
     captureRestarts: 0
   };
+  activeRecordingSession = session;
   await publishRecorderStatus("recording", sessionStatusFields(session, session.captureMode === "desktop" ? "Full desktop capture active for this League game." : "League window capture active."), { force: true });
   return session;
 }
@@ -931,17 +1057,6 @@ async function restartCaptureIfNeeded(session) {
   session.lastSegmentBytes = footprint.bytes;
   session.lastSegmentGrowthMs = Date.now();
   await publishRecorderStatus("recording", sessionStatusFields(session, session.captureMode === "desktop" ? "Full desktop capture active for this League game." : "League window capture active."), { force: true });
-}
-
-async function waitForNoGame(reason) {
-  let logged = false;
-  while (await gameIsRunning()) {
-    if (!logged) {
-      await log(`${reason}; waiting because a League game is running.`);
-      logged = true;
-    }
-    await delay(10000);
-  }
 }
 
 async function stopSession(session) {
@@ -1083,7 +1198,6 @@ async function finalizeSession(session) {
   for (let index = 0; index < cleanSegments.length; index += 1) {
     const segment = cleanSegments[index];
     const previousSegment = cleanSegments[index - 1] || null;
-    await waitForNoGame("Post-game video processing paused");
     processed.push(await processSegment(segment, importantIndexes, session.sessionRoot, previousSegment));
   }
   const listPath = path.join(session.sessionRoot, "processed.txt");
@@ -1091,7 +1205,6 @@ async function finalizeSession(session) {
   await writeConcatList(listPath, processed.map((item) => item.outputPath));
   await fs.mkdir(sourceDir, { recursive: true });
   const encoder = await encoderProfile();
-  await waitForNoGame("Post-game final encode paused");
   await run("ffmpeg", [
     "-y",
     "-hide_banner",
@@ -1177,7 +1290,6 @@ async function finalizeSession(session) {
   await log(`Created review clip ${outputPath}`);
 
   if (publishAfterGame) {
-    await waitForNoGame("Publishing paused");
     await log("Publishing updated League recordings.");
     const publishingFields = {
       ...sessionStatusFields(session, "Uploading review."),
@@ -1186,6 +1298,17 @@ async function finalizeSession(session) {
       matchId: replay?.matchId || "",
       ...(await etaFor("clip_to_live", 10 * 60, clipCreatedAt.toISOString(), publishEtaContext))
     };
+    if (session.sessionRoot === activeQueueSessionRoot) {
+      activeQueueStage = "publishing";
+      activeQueueStageLabel = "uploading review to site";
+      activeQueueStartedAt = clipCreatedAt.toISOString();
+      activeQueueEta = {
+        etaSeconds: publishingFields.etaSeconds,
+        estimatedReadyAt: publishingFields.estimatedReadyAt,
+        etaBasis: publishingFields.etaBasis
+      };
+      activeQueueProgress = publishingFields.progress;
+    }
     await publishRecorderStatus("publishing", publishingFields, { force: true });
     try {
       await run(npmBin, ["run", "publish:recordings"], {
@@ -1237,12 +1360,31 @@ async function processPostGameQueue() {
     while (postGameQueue.length) {
       const item = postGameQueue[0];
       const session = deserializeSession(item);
-      await waitForNoGame("Queued post-game processing paused");
       await log(`Processing queued review ${session.sessionRoot}.`);
+      activeQueueSessionRoot = session.sessionRoot;
+      activeQueueStage = "processing";
+      activeQueueStageLabel = "building review clip";
+      activeQueueStartedAt = new Date().toISOString();
+      activeQueueEta = await etaFor("post_game_total", 14 * 60, session.endedAt.toISOString(), {
+        sourceDurationSeconds: Math.max(0, Math.round((session.endedMs - session.startedMs) / 1000))
+      });
+      activeQueueProgress = 65;
+      await publishRecorderStatus("processing", {
+        ...sessionStatusFields(session, "Building queued review while the next game can continue."),
+        label: "processing queued review",
+        progress: 65,
+        ...activeQueueEta
+      }, { force: true });
       await finalizeSession(session);
       postGameQueue.shift();
       await savePostGameQueue();
       await log(`Queued review finished ${session.sessionRoot}.`);
+      activeQueueSessionRoot = "";
+      activeQueueStage = "";
+      activeQueueStageLabel = "";
+      activeQueueStartedAt = "";
+      activeQueueEta = {};
+      activeQueueProgress = null;
     }
   } finally {
     postGameQueueRunning = false;
@@ -1264,15 +1406,36 @@ async function main() {
     log(`Post-game queue worker failed: ${error.stack || error.message}`).catch(() => {});
   });
   await log("League live recorder is watching for game process.");
-  await publishRecorderStatus("watching", {
-    label: "recorder ready",
-    detail: "waiting for League",
+  let skipCurrentGame = await gameIsRunning();
+  await publishRecorderStatus(skipCurrentGame ? "waiting" : "watching", {
+    label: skipCurrentGame ? "waiting for next game" : "recorder ready",
+    detail: skipCurrentGame ? "restarted mid-game; current game ignored" : "waiting for League",
     mode: captureModePreference,
-    progress: 0
+    progress: skipCurrentGame ? 10 : 0
   }, { force: true });
   let session = null;
   while (true) {
     const running = await gameIsRunning();
+    if (skipCurrentGame) {
+      if (!running) {
+        skipCurrentGame = false;
+        await publishRecorderStatus("watching", {
+          label: "recorder ready",
+          detail: "waiting for League",
+          mode: captureModePreference,
+          progress: 0
+        }, { force: true });
+      } else if (!postGameQueueRunning) {
+        await publishRecorderStatus("waiting", {
+          label: "waiting for next game",
+          detail: "restarted mid-game; current game ignored",
+          mode: captureModePreference,
+          progress: 10
+        }, { throttleMs: 60000 });
+      }
+      await delay(pollMs);
+      continue;
+    }
     if (running && !session) {
       idleHoldStatus = null;
       try {
@@ -1294,6 +1457,7 @@ async function main() {
     if (!running && session && Date.now() - session.lastSeenMs > endGraceMs) {
       const current = session;
       session = null;
+      activeRecordingSession = null;
       try {
         await stopSession(current);
         await enqueuePostGameSession(current);
@@ -1303,6 +1467,10 @@ async function main() {
         await publishRecorderStatus("error", errorFields, { force: true });
         holdIdleStatus("error", errorFields);
       }
+    }
+    if (!running && !session && postGameQueueRunning) {
+      await delay(pollMs);
+      continue;
     }
     if (!running && !session) {
       if (idleHoldStatus && Date.now() < idleHoldStatus.untilMs) {

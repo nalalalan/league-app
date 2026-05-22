@@ -14,6 +14,9 @@ const recordingWebmMediaBase = (process.env.LEAGUE_RECORDING_WEBM_MEDIA_BASE || 
 const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "https://raw.githubusercontent.com/nalalalan/league-app/main/public/recordings").replace(/\/+$/, "");
 const statusToken = (process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const recordingStatusPath = path.join(dataRoot, "recording-status.json");
+const localAnalysisRoot = path.join(__dirname, "_recording-analysis");
+const localRecordingStatusPath = path.join(localAnalysisRoot, "recording-status.json");
+const localPostGameQueuePath = path.join(localAnalysisRoot, "post-game-queue.json");
 
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -106,17 +109,44 @@ async function saveNotes(notes) {
   await fsp.writeFile(notesPath, JSON.stringify(notes, null, 2) + "\n", "utf8");
 }
 
-async function loadRecordingStatus() {
+async function readJsonFile(filePath, fallback = null) {
   try {
-    return JSON.parse(await fsp.readFile(recordingStatusPath, "utf8"));
+    return JSON.parse(await fsp.readFile(filePath, "utf8"));
   } catch {
-    return {
-      status: "unknown",
-      label: "recorder status unavailable",
-      detail: "No live recorder heartbeat has reached the site yet.",
-      updatedAt: ""
-    };
+    return fallback;
   }
+}
+
+function statusUpdatedMs(raw) {
+  const value = Date.parse(raw?.updatedAt || raw?.serverReceivedAt || "");
+  return Number.isFinite(value) ? value : 0;
+}
+
+async function loadRecordingStatus() {
+  const fallback = {
+    status: "unknown",
+    label: "recorder status unavailable",
+    detail: "No live recorder heartbeat has reached the site yet.",
+    updatedAt: ""
+  };
+  const primary = await readJsonFile(recordingStatusPath, null);
+  const local = isRailway ? null : await readJsonFile(localRecordingStatusPath, null);
+  let status = [primary, local]
+    .filter(Boolean)
+    .sort((a, b) => statusUpdatedMs(b) - statusUpdatedMs(a))[0] || fallback;
+
+  if (!isRailway) {
+    const queue = await readJsonFile(localPostGameQueuePath, []);
+    const hasCurrentQueueSnapshot = Array.isArray(status.queueItems) && Date.now() - statusUpdatedMs(status) < 2 * 60 * 1000;
+    if (Array.isArray(queue) && !hasCurrentQueueSnapshot) {
+      status = {
+        ...status,
+        queueCount: queue.length,
+        queueItems: queue
+      };
+    }
+  }
+  return status;
 }
 
 async function saveRecordingStatus(status) {
@@ -148,6 +178,39 @@ function cleanEtaSeconds(value) {
   return Math.max(0, Math.min(60 * 60, Math.round(seconds)));
 }
 
+function cleanQueueItem(item, index) {
+  return {
+    label: cleanText(item?.label, 80) || `review ${index + 1}`,
+    status: cleanText(item?.status, 32),
+    stage: cleanText(item?.stage, 40),
+    stageLabel: cleanText(item?.stageLabel, 100),
+    startedAt: cleanText(item?.startedAt, 40),
+    endedAt: cleanText(item?.endedAt, 40),
+    queuedAt: cleanText(item?.queuedAt, 40),
+    estimatedGameEndAt: cleanText(item?.estimatedGameEndAt, 40),
+    estimatedStartAt: cleanText(item?.estimatedStartAt, 40),
+    estimatedReadyAt: cleanText(item?.estimatedReadyAt, 40),
+    gameEtaSeconds: cleanEtaSeconds(item?.gameEtaSeconds),
+    startEtaSeconds: cleanEtaSeconds(item?.startEtaSeconds),
+    etaSeconds: cleanEtaSeconds(item?.etaSeconds),
+    stageEtaSeconds: cleanEtaSeconds(item?.stageEtaSeconds),
+    etaBasis: cleanText(item?.etaBasis, 180),
+    progress: cleanProgress(item?.progress)
+  };
+}
+
+function publicQueueFields(raw = {}) {
+  const rawItems = Array.isArray(raw.queueItems) ? raw.queueItems : [];
+  const rawCount = Number(raw.queueCount);
+  const queueCount = Number.isFinite(rawCount)
+    ? Math.max(0, Math.min(99, Math.round(rawCount)))
+    : rawItems.length;
+  const visibleItems = rawItems
+    .slice(0, Math.max(0, Math.min(5, queueCount || rawItems.length)))
+    .map(cleanQueueItem);
+  return { queueCount, queueItems: visibleItems };
+}
+
 function publicRecordingStatus(raw) {
   const updatedMs = Date.parse(raw.updatedAt || raw.serverReceivedAt || "");
   const estimatedReadyMs = Date.parse(raw.estimatedReadyAt || "");
@@ -155,6 +218,7 @@ function publicRecordingStatus(raw) {
   const etaSeconds = Number.isFinite(estimatedReadyMs)
     ? Math.max(0, Math.round((estimatedReadyMs - Date.now()) / 1000))
     : cleanEtaSeconds(raw.etaSeconds);
+  const queue = publicQueueFields(raw);
   return {
     status: cleanStatus(raw.status),
     label: cleanText(raw.label, 80) || "recorder status",
@@ -167,6 +231,8 @@ function publicRecordingStatus(raw) {
     etaSeconds,
     estimatedReadyAt: cleanText(raw.estimatedReadyAt, 40),
     etaBasis: cleanText(raw.etaBasis, 100),
+    queueCount: queue.queueCount,
+    queueItems: queue.queueItems,
     ageSeconds,
     stale: ageSeconds === null || ageSeconds > 180
   };
@@ -301,6 +367,7 @@ async function handleApi(req, res, url) {
       return true;
     }
     const payload = await readJsonBody(req);
+    const queue = publicQueueFields(payload);
     const status = {
       status: cleanStatus(payload.status),
       label: cleanText(payload.label, 80),
@@ -312,6 +379,8 @@ async function handleApi(req, res, url) {
       etaSeconds: cleanEtaSeconds(payload.etaSeconds),
       estimatedReadyAt: cleanText(payload.estimatedReadyAt, 40),
       etaBasis: cleanText(payload.etaBasis, 100),
+      queueCount: queue.queueCount,
+      queueItems: queue.queueItems,
       updatedAt: cleanText(payload.updatedAt, 40) || new Date().toISOString(),
       serverReceivedAt: new Date().toISOString()
     };
