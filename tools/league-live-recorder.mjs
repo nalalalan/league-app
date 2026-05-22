@@ -44,6 +44,7 @@ const reviewBuildMode = String(process.env.LEAGUE_REVIEW_BUILD_MODE || "copy").t
 const publishAfterGame = process.env.LEAGUE_LIVE_PUBLISH !== "0";
 const skipCurrentGameOnRestart = process.env.LEAGUE_LIVE_SKIP_CURRENT_GAME !== "0";
 const statusEndpoint = String(process.env.LEAGUE_STATUS_ENDPOINT || "https://league.aolabs.io/api/recording-status").trim();
+const liveBase = String(process.env.LEAGUE_SITE_URL || "https://league.aolabs.io").replace(/\/+$/, "");
 const statusToken = String(process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const statusPath = path.join(analysisRoot, "recording-status.json");
 const postGameQueuePath = path.join(analysisRoot, "post-game-queue.json");
@@ -268,6 +269,44 @@ async function etaFor(stage, fallbackSeconds, startedAt, context = {}) {
     startedAt,
     context
   });
+}
+
+async function liveManifestContains(fileName) {
+  if (!fileName) return false;
+  const response = await fetch(`${liveBase}/recordings/recordings.json?verify=${Date.now()}`, {
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(7000)
+  });
+  if (!response.ok) return false;
+  const manifest = await response.json();
+  const recordings = Array.isArray(manifest.recordings) ? manifest.recordings : [];
+  return recordings.some((item) => {
+    const src = String(item.src || "");
+    return item.file === fileName || item.publicFile === fileName || src.endsWith(`/${fileName}`);
+  });
+}
+
+async function reconcileBlockedHoldIfLive() {
+  if (!idleHoldStatus || idleHoldStatus.status !== "blocked") return false;
+  const fileName = idleHoldStatus.fields?.outputFile || "";
+  const matchId = idleHoldStatus.fields?.matchId || "";
+  const inferredFile = fileName || (matchId ? `auto_${matchId}_01.mp4` : "");
+  if (!inferredFile || !(await liveManifestContains(inferredFile).catch(() => false))) return false;
+  const fields = {
+    ...idleHoldStatus.fields,
+    label: "review live",
+    detail: "The new recording is on league.aolabs.io.",
+    progress: 100,
+    ...clearEtaFields()
+  };
+  idleHoldStatus = {
+    status: "published",
+    fields,
+    untilMs: Date.now() + postGameStatusHoldMs
+  };
+  await publishRecorderStatus("published", fields, { force: true });
+  return true;
 }
 
 async function log(message) {
@@ -1431,6 +1470,20 @@ async function finalizeSession(session) {
       await publishRecorderStatus("published", publishedFields, { force: true });
       holdIdleStatus("published", publishedFields);
     } catch (error) {
+      const outputFile = path.basename(outputPath);
+      if (await liveManifestContains(outputFile).catch(() => false)) {
+        const publishedFields = {
+          ...sessionStatusFields(session, "Review sent to site."),
+          label: "review live",
+          progress: 100,
+          matchId: replay?.matchId || "",
+          outputFile,
+          ...clearEtaFields()
+        };
+        await publishRecorderStatus("published", publishedFields, { force: true });
+        holdIdleStatus("published", publishedFields);
+        return;
+      }
       const combinedOutput = `${error.stdout || ""}\n${error.stderr || ""}`;
       const blockedLine = combinedOutput.match(/Publish blocked[^\r\n]*/i)?.[0];
       const detail = blockedLine || "Review clip created, but the site publish failed. Check publisher log.";
@@ -1440,6 +1493,7 @@ async function finalizeSession(session) {
         label: "publish blocked",
         progress: 100,
         matchId: replay?.matchId || "",
+        outputFile,
         ...clearEtaFields()
       };
       await publishRecorderStatus("blocked", blockedFields, { force: true });
@@ -1596,6 +1650,7 @@ async function main() {
     }
     if (!running && !session) {
       if (idleHoldStatus && Date.now() < idleHoldStatus.untilMs) {
+        await reconcileBlockedHoldIfLive();
         await publishRecorderStatus(idleHoldStatus.status, idleHoldStatus.fields, { throttleMs: 60000 });
       } else {
         idleHoldStatus = null;

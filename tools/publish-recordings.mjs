@@ -337,6 +337,26 @@ async function waitForLiveRecording(currentState, options = {}) {
   return false;
 }
 
+async function reconcileBlockedStatusIfLive(currentState) {
+  const latest = newestSourceFile(currentState);
+  if (!latest?.name) return false;
+  const status = await readJson(statusPath, {});
+  if (status?.status !== "blocked") return false;
+  if (status?.outputFile && status.outputFile !== latest.name) return false;
+  if (status?.matchId && !latest.name.includes(status.matchId)) return false;
+  if (!(await liveManifestContains(latest.name).catch(() => false))) return false;
+  await publishStatus("published", {
+    label: "review live",
+    detail: "The new recording is on league.aolabs.io.",
+    progress: 100,
+    matchId: status.matchId || "",
+    startedAt: status.startedAt || "",
+    ...clearEtaFields()
+  });
+  console.log(`Cleared stale blocked status for live recording ${latest.name}.`);
+  return true;
+}
+
 async function main() {
   if (!(await acquireLock())) return;
   await fs.mkdir(analysisRoot, { recursive: true });
@@ -351,6 +371,7 @@ async function main() {
       ? !(await liveManifestContains(expectedSourceFile).catch(() => false))
       : false;
     if (sameState(currentState, previousState) && process.env.LEAGUE_FORCE_ANALYSIS !== "1" && !retryAnalysis && !expectedMissingLive) {
+      await reconcileBlockedStatusIfLive(currentState);
       console.log("No new League recordings.");
       return;
     }
@@ -393,6 +414,7 @@ async function main() {
       ...(await etaFor("publisher_to_live", publisherToLiveEtaFallbackSeconds, publishStartedAt, latestContext))
     });
     if (!(await hasPublishPathChanges())) {
+      await reconcileBlockedStatusIfLive(currentState);
       await fs.writeFile(statePath, `${JSON.stringify(currentState, null, 2)}\n`, "utf8");
       console.log("League recordings synced; no public recording changes.");
       return;

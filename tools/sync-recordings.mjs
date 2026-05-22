@@ -1059,6 +1059,7 @@ function anchorEvidenceScore(anchor, analysis, index = 0) {
 function normalizeEvidenceDescription(description, champion = "Samira") {
   const name = clean(champion, "Samira");
   return coachClean(description)
+    .replace(/\bat\s*,\s*/gi, "")
     .replace(/\benemy champion\b/gi, "enemy")
     .replace(/\bchampion damage\b/gi, `${name} damage`)
     .replace(/\bPlayer\b/g, name)
@@ -1067,12 +1068,39 @@ function normalizeEvidenceDescription(description, champion = "Samira") {
     .replace(/\bchampion\b/g, name)
     .replace(/\bChamp\b/g, name)
     .replace(/\bchamp\b/g, name)
+    .replace(/\s*;+\s*([.!?])/g, "$1")
+    .replace(/\s*;+\s*$/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 function normalizeVisibleCoachText(text, champion = "Samira") {
   return normalizeEvidenceDescription(text, champion);
+}
+
+function hasRepeatedConversionGlossary(recording = {}) {
+  return /\bConversion means turning a fight win or gold lead into something that remains after the fight ends\b/i.test(recording.gameDetail || "");
+}
+
+function normalizeCoachPunctuation(text) {
+  return coachClean(text)
+    .replace(/([.!?])\s*;/g, "$1")
+    .replace(/\s*;\s*([.!?])/g, "$1")
+    .replace(/([.!?])\1+/g, "$1")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function stripRepeatedConversionGlossary(text) {
+  return normalizeCoachPunctuation(String(text || "").replace(
+    /\s*Conversion means turning a fight win or gold lead into something that remains after the fight ends: tower damage, base damage, dragon\/Baron setup, or a safe reset with spent gold\.\s*/gi,
+    " "
+  ));
+}
+
+function needsCachedTextRepair(recording = {}) {
+  const text = [recording.gameDetail, recording.eventEvidence, recording.evidence].filter(Boolean).join(" ");
+  return hasRepeatedConversionGlossary(recording) || /[.!?]\s*;|;\s*[.!?]|[.!?]{2,}/.test(text);
 }
 
 function usefulEvidenceMoment(anchor, analysis, threshold = 8) {
@@ -1327,7 +1355,7 @@ function usefulMomentCountInText(text, clockMoments) {
 
 function clauseDescription(description, champion) {
   const cleaned = normalizeEvidenceDescription(description, champion)
-    .replace(/[.!?]+$/g, "")
+    .replace(/[.;!?]+$/g, "")
     .replace(/^at\s+\d{1,2}:[0-5]\d,?\s*/i, "")
     .replace(/^shows\b/i, "shows")
     .replace(/^team\b/i, "the team")
@@ -1387,9 +1415,6 @@ function adviceTextForTeaching(analysis, champion = "Samira") {
 function shorthandTeachingSentence(analysis) {
   const text = analysisCoachText(analysis);
   const parts = [];
-  if (/\b(sync(?:ed|ing)?|conversion|convert|payout|tempo)\b/i.test(text)) {
-    parts.push("Conversion means turning a fight win or gold lead into something that remains after the fight ends: tower damage, base damage, dragon/Baron setup, or a safe reset with spent gold.");
-  }
   if (/\b(grouped mid|group mid|mid pressure)\b/i.test(text)) {
     parts.push("Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between Samira and the collapse, and enemies have to defend structure instead of chasing through fog.");
   }
@@ -1425,9 +1450,30 @@ function eventEvidenceFromMoments(clockMoments, champion = "Samira") {
     .filter((moment) => moment.description)
     .slice(0, 4);
   if (!moments.length) return "";
-  return coachClean(moments
+  const evidence = coachClean(moments
     .map((moment) => `${moment.clock} shows ${clauseDescription(moment.description, champion)}`)
     .join(". ") + ".");
+  if (evidence.length >= 60) return evidence;
+  return coachClean(`${evidence.replace(/[.!?]+$/g, "")}; this anchors the visible start of the mistake window.`);
+}
+
+function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = "Samira") {
+  const existing = cleanClockAnchors(clockMoments)
+    .filter((moment) => moment.description)
+    .map((moment) => ({ ...moment, description: normalizeEvidenceDescription(moment.description, champion) }))
+    .filter((moment) => !anchorDescriptionLooksWeak(moment.description));
+  if (existing.length) return existing.slice(0, 4);
+  return cleanClockAnchors(clockAnchors)
+    .filter((anchor) => anchor.description)
+    .map((anchor, index) => ({
+      anchor: { ...anchor, description: normalizeEvidenceDescription(anchor.description, champion) },
+      score: anchorEvidenceScore(anchor, analysis, index)
+    }))
+    .filter((item) => !anchorDescriptionLooksWeak(item.anchor.description))
+    .filter((item) => item.score >= -4)
+    .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)
+    .map((item) => item.anchor)
+    .slice(0, 4);
 }
 
 async function readExistingManifest() {
@@ -1917,6 +1963,7 @@ function cachedRecording(existing, fileName, cacheKey) {
   const cached = existingRecording(existing, fileName, cacheKey);
   if (!cached) return null;
   if (!compatibleAnalysisVersions.has(cached.analysisVersion)) return null;
+  if (needsCachedTextRepair(cached)) return cached;
   if (requiresVisibleParagraphStandard(fileName, cached) && visibleParagraphStandardIssues(cached).length) return null;
   if (manualFeedback(fileName)) return null;
   if (cached.analysisSource === "fallback" && process.env.LEAGUE_RETRY_FALLBACK === "1" && process.env.OPENAI_API_KEY) return null;
@@ -2878,7 +2925,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like a useful replay-review paragraph, not a stat audit: include the main visible mistake window, what leaked, what happened next or almost happened, and one final simple lesson sentence. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp. Extra timestamps are optional and should appear only when they make the critique clearer.",
-    "Do not use coaching shorthand without teaching it. If you use words like conversion, convert, sync, grouped mid, mid pressure, tempo, or payout, define the word in plain League terms inside the same paragraph.",
+    "Do not over-explain common coaching terms Alan already knows. Only define grouped mid, sync, tempo, payout, or conversion when the advice would otherwise be unclear; prioritize why the decision is better in this visible state.",
     "If you recommend grouping mid or pressuring mid, explain why mid is better in that visible state: for example, allies are already there, mid is the shortest lane to towers/base, it reduces fog-collapse risk, it lets teammates peel, or it forces enemies to defend structure instead of chasing Samira in a side lane. Tie the reason to the frames; do not say group mid as generic advice.",
     "Every full-game review must include the reason Alan should do the fix, not just the instruction. A good sentence sounds like: 'This matters because ...' or 'That route is better because ...'.",
     "Alan explicitly wants Master-level critique. You may mention Master-climb punishment when it names a concrete consequence, but do not use rank labels as vague authority. Name the exact visible habit and exact in-game payoff.",
@@ -3127,6 +3174,7 @@ async function main() {
     const existingEntry = existingRecording(existing, entry.name, cacheKey);
     const cachedTrusted = Boolean(existingEntry) &&
       compatibleAnalysisVersions.has(existingEntry.analysisVersion) &&
+      !needsCachedTextRepair(existingEntry) &&
       process.env.LEAGUE_FORCE_ANALYSIS !== "1" &&
       process.env.LEAGUE_RETRY_FALLBACK !== "1";
     const health = cachedTrusted
@@ -3274,11 +3322,13 @@ async function main() {
     let integratedGameDetail = isManualAnalysis
       ? cleanedGameDetail
       : integrateMomentEvidence(cleanedGameDetail, clockMoments, championName);
+    integratedGameDetail = stripRepeatedConversionGlossary(integratedGameDetail);
     const cleanedEventEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), narrativeClockAnchors), championName);
     const cleanedEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), narrativeClockAnchors), championName);
-    let finalEventEvidence = clockMomentEvidence || (isGenericEvidenceText(cleanedEventEvidence) ? "" : cleanedEventEvidence);
-    if (!isManualAnalysis && isFullReview && clockMoments.length >= 1) {
-      const projectedIssues = visibleParagraphStandardIssues({
+    let finalEventEvidence = normalizeCoachPunctuation(clockMomentEvidence || (isGenericEvidenceText(cleanedEventEvidence) ? "" : cleanedEventEvidence));
+    if (!isManualAnalysis && isFullReview) {
+      const repairMoments = standardRepairMoments(analysis, annotatedClockAnchors, clockMoments, championName);
+      let projectedIssues = visibleParagraphStandardIssues({
         file: name,
         durationSeconds: duration,
         analysisSource: analysis.analysisSource || "openai",
@@ -3287,11 +3337,20 @@ async function main() {
         eventEvidence: finalEventEvidence,
         clockAnchors: annotatedClockAnchors
       });
-      if (projectedIssues.length) {
-        const repairedDetail = teachingDetailFromMoments(analysis, clockMoments, championName);
-        const repairedEvidence = eventEvidenceFromMoments(clockMoments, championName);
+      if (projectedIssues.length && repairMoments.length) {
+        const repairedDetail = teachingDetailFromMoments(analysis, repairMoments, championName);
+        const repairedEvidence = eventEvidenceFromMoments(repairMoments, championName);
         if (repairedDetail) integratedGameDetail = repairedDetail;
         if (repairedEvidence) finalEventEvidence = repairedEvidence;
+        projectedIssues = visibleParagraphStandardIssues({
+          file: name,
+          durationSeconds: duration,
+          analysisSource: analysis.analysisSource || "openai",
+          analysisVersion,
+          gameDetail: integratedGameDetail,
+          eventEvidence: finalEventEvidence,
+          clockAnchors: annotatedClockAnchors
+        });
       }
     }
 
@@ -3349,7 +3408,7 @@ async function main() {
       goodThing: normalizeVisibleCoachText(analysis.goodThing || "", championName),
       whyTrust: normalizeVisibleCoachText(analysis.whyTrust || "This feedback is tied to the visible replay pattern and one controllable in-game decision.", championName),
       focusTag: normalizeVisibleCoachText(analysis.focusTag || "review", championName),
-      evidence: clockMomentEvidence || (isGenericEvidenceText(cleanedEvidence) ? "" : cleanedEvidence),
+      evidence: normalizeCoachPunctuation(clockMomentEvidence || (isGenericEvidenceText(cleanedEvidence) ? "" : cleanedEvidence)),
       pattern: normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.pattern, "The recording points to one repeatable decision pattern."), narrativeClockAnchors), championName),
       diamondRule: normalizeVisibleCoachText(analysis.diamondRule || "Convert the first winning moment before taking the next fight.", championName),
       drill: normalizeVisibleCoachText(analysis.drill || "Name the payout before committing.", championName),
