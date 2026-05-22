@@ -2465,6 +2465,49 @@ function appendQueueMetric(container, label, value) {
   container.append(metric);
 }
 
+function queueHeaderSummary(items, count, hasItems) {
+  if (!hasItems) return "clear";
+  const activeCount = items.length || count || 1;
+  return activeCount === 1 ? "1 active" : `${activeCount} active`;
+}
+
+function queueRowTitle(item = {}, status = "", index = 0) {
+  if (status === "recording") return "Current game recording";
+  if (status === "processing") return "Review processing";
+  if (status === "publishing") return "Posting review";
+  return item.stageLabel || item.label || `Queued review ${index + 1}`;
+}
+
+function queueRowMeta(item = {}, status = "") {
+  const ended = timeLabel(item.endedAt);
+  const gameEnd = timeLabel(item.estimatedGameEndAt);
+  const started = timeLabel(item.estimatedStartAt);
+  const ready = timeLabel(item.estimatedReadyAt);
+  if (status === "recording") {
+    if (ready) return `Post around ${ready}.`;
+    if (gameEnd) return `Review starts after game, around ${gameEnd}.`;
+    return "Review starts after this game.";
+  }
+  if (status === "processing") return ready ? `Post around ${ready}.` : "Posting when the review finishes.";
+  if (status === "publishing") return ready ? `Live around ${ready}.` : "Posting now.";
+  if (started) return `Starts around ${started}.`;
+  return ended ? `Waiting since ${ended}.` : "Waiting.";
+}
+
+function appendQueueEtas(container, item = {}, status = "") {
+  if (status === "recording") {
+    appendQueueMetric(container, "post ", etaLabel(item.etaSeconds));
+    appendQueueMetric(container, "game ", etaLabel(item.gameEtaSeconds || item.stageEtaSeconds));
+    return;
+  }
+  if (status === "queued") {
+    appendQueueMetric(container, "starts ", etaLabel(item.startEtaSeconds || item.stageEtaSeconds));
+    appendQueueMetric(container, "post ", etaLabel(item.etaSeconds));
+    return;
+  }
+  appendQueueMetric(container, "post ", etaLabel(item.etaSeconds || item.stageEtaSeconds));
+}
+
 function renderRecordingQueue(data = {}) {
   if (!recordingQueue) return;
   const items = Array.isArray(data.queueItems) ? data.queueItems : [];
@@ -2476,9 +2519,7 @@ function renderRecordingQueue(data = {}) {
   const title = document.createElement("h3");
   title.textContent = "post-game queue";
   const summary = document.createElement("p");
-  summary.textContent = hasItems
-    ? "one review processes at a time; active and finished games stay listed"
-    : "queue clear; next finished game appears here";
+  summary.textContent = queueHeaderSummary(items, count, hasItems);
   header.append(title, summary);
 
   const rows = document.createElement("div");
@@ -2502,33 +2543,15 @@ function renderRecordingQueue(data = {}) {
       const body = document.createElement("div");
       body.className = "recording-queue-body";
       const rowTitle = document.createElement("strong");
-      rowTitle.textContent = item.stageLabel || item.label || `review ${index + 1}`;
+      rowTitle.textContent = queueRowTitle(item, status, index);
       const meta = document.createElement("p");
-      const gameStarted = timeLabel(item.startedAt);
-      const ended = timeLabel(item.endedAt);
-      const gameEnd = timeLabel(item.estimatedGameEndAt);
-      const started = timeLabel(item.estimatedStartAt);
-      const ready = timeLabel(item.estimatedReadyAt);
-      meta.textContent = [
-        status === "recording" && gameStarted ? `game started ${gameStarted}` : "",
-        status !== "recording" && ended ? `game ended ${ended}` : "",
-        status === "recording" && gameEnd ? `game ends around ${gameEnd}` : "",
-        started ? `review starts ${started}` : "",
-        ready ? `live around ${ready}` : ""
-      ].filter(Boolean).join(" | ");
+      meta.textContent = queueRowMeta(item, status);
       body.append(rowTitle, meta);
 
       const metrics = document.createElement("div");
       metrics.className = "recording-queue-metrics";
-      if (status === "recording") {
-        appendQueueMetric(metrics, "game left ", etaLabel(item.gameEtaSeconds || item.stageEtaSeconds));
-        appendQueueMetric(metrics, "review starts ", etaLabel(item.startEtaSeconds));
-        appendQueueMetric(metrics, "post ETA ", etaLabel(item.etaSeconds));
-      } else {
-        appendQueueMetric(metrics, "stage ", etaLabel(item.stageEtaSeconds));
-        appendQueueMetric(metrics, "live ETA ", etaLabel(item.etaSeconds));
-      }
-      appendQueueMetric(metrics, "basis ", item.etaBasis || "");
+      appendQueueEtas(metrics, item, status);
+      if (item.etaBasis) row.title = item.etaBasis;
 
       const progress = document.createElement("span");
       progress.className = "recording-queue-progress";
