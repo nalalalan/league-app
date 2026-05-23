@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T20:53:20.986Z",
+  "generatedAt": "2026-05-23T21:30:00.848Z",
   "source": "League of Legends Highlights folder",
   "match": "32 matches",
   "matches": [
@@ -71,9 +71,9 @@
     "anchoredFullGames": 30,
     "statFullGames": 30,
     "rankLabelCounts": {
-      "Bronze": 13,
+      "Bronze": 12,
       "Silver": 5,
-      "Iron": 11,
+      "Iron": 12,
       "Gold": 1
     },
     "exactRankScale": [
@@ -1134,7 +1134,7 @@
       "confidence": "medium",
       "feedbackTitle": "Won fight needed low-HP reset",
       "feedback": "Mistake: after a fight win, you let the next state become another low-health stay instead of cashing the win out safely. Fix: if the fight is won and your HP is low, recall unless a free structure is already directly in front of your team.",
-      "gameDetail": "At 16:27 the cost is already visible: Samira is dead in mid river after the fight sequence, so your next-game script is reset immediately after a won fight when HP is low unless a free structure is already in front of the team. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure. At 10:42 the earlier warning sign is visible in bot lane because both sides are still trading while you and your ally are low, so the smaller version of the same habit is one extra forward step after health already says stop. At 14:47 you are near a grouped objective fight, which is the kind of useful team shape to keep if the exit happens cleanly afterward.",
+      "gameDetail": "Around 14:47, a grouped objective fight near dragon pit; this is the start or nearest visible start of the main mistake window; earlier at 10:42, a bot-lane skirmish with both sides still trading and Samira plus ally low; by 16:27, Samira dead with the death timer open while allies push mid. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
       "secondaryFocus": "Next game, in lane and river fights, stop taking the next forward step once health is below one enemy spell; hold behind ally or wave until the threat is used.",
       "mistakeTypes": [
         "reset/overstay discipline",
@@ -1207,18 +1207,18 @@
       "poster": "/recordings/posters/auto-na1-5565818690-01.jpg",
       "rankEstimate": {
         "version": "2026-05-22-exact-rank-trend-v4",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 25,
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 21,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
+        "percentile": "new ranked fundamentals",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -1235,7 +1235,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "Iron I read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
       }
     },
     {
@@ -2161,13 +2161,22 @@
       "cs": 59,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Spend the base win before the next fight",
       "feedback": "Mistake: after turning the lead into enemy-base pressure, you kept the next fight window alive while carrying a large unspent shutdown. Fix: after the base kill or tower damage, reset unless nexus is immediately finishable.",
-      "gameDetail": "At 1:31 you are already farming bot safely with the wave in front, and by 3:23 you take the first bot-side fight instead of only bleeding CS; that early pressure is good. At 4:36 you correctly turn the lane win into bot tower damage with allies and minions, and at 6:56 you are still converting through bot-side structure pressure. The leak starts after the map is already cracked: at 9:47 you are walking near the enemy base with multiple enemies alive, and at 10:36 you get another kill inside the base while holding about 2497 gold. That fight works in beginner bots, but the Master-climb reason to reset is simple: unspent gold is not real power yet, and giving a shutdown before buying would erase the tempo you already earned. At 12:21 you are back on the map after spending, which is the cleaner version; the repeatable rule is base damage or a base kill first, then spend the gold unless the nexus is free right now.",
+      "gameDetail": "Around 3:23, at you are already farming bot safely with the wave in front, and by you take the first bot-side fight instead of only bleeding CS; this is the start or nearest visible start of the main mistake window; earlier at 1:31, Samira safely farming bot with wave control; by 4:36, Samira hitting bot tower with allies and minions; by 6:56, at you correctly turn the lane win into bot tower damage with allies and minions, and at you are still converting through bot-side structure pressure. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window. At 3:23, your next job is to stop the camp or side-wave click, check death timers and the nearest threatened turret, then walk to the defensive wave, group, or reset instead of trading base defense for small farm.",
+      "secondaryFocus": "Also work on camera and map-state checks: before taking a camp, side wave, or forward fight after 15 minutes, check ally deaths, the closest threatened turret, and whether your team can stand between you and the collapse.",
+      "mistakeTypes": [
+        "reset/overstay discipline",
+        "side farm over map defense",
+        "spacing/entry discipline",
+        "wave/objective conversion",
+        "camera/map-state check"
+      ],
       "eventEvidence": "1:31 shows Samira safely farming bot with wave control. 4:36 shows Samira hitting bot tower with allies and minions. 9:47 shows Samira near the enemy base while enemies are still alive. 10:36 shows a base kill while Samira is holding about 2497 gold. 12:21 shows Samira back on the map after spending.",
+      "failureEvidence": "At 3:23, at you are already farming bot safely with the wave in front, and by you take the first bot-side fight instead of only bleeding CS; the failure is letting the next click stay on the wrong task after the map state changes, which leaks time, safety, or defense and gives the enemy another fight or push window.",
       "goodThing": "You did convert the lane lead into tower/base pressure instead of only chasing kills.",
       "whyTrust": "The evidence is tied to visible state: wave-first lane pressure, tower conversion, then a large unspent-gold base fight before the reset.",
       "focusTag": "spend after base payout",
@@ -2207,7 +2216,7 @@
         {
           "clock": "3:28",
           "videoSeconds": 135.087,
-          "description": "Samira is moving through mid lane as her team’s mid turret is being attacked by Anivia’s ultimate, with no immediate fight occurring."
+          "description": "Samira is moving through mid lane as her team’s mid turret is being attacked by champion’s ultimate, with no immediate fight occurring."
         },
         {
           "clock": "4:36",
@@ -2222,7 +2231,7 @@
         {
           "clock": "5:18",
           "videoSeconds": 193.348,
-          "description": "Samira and Nautilus are attacking the low-health mid outer turret, with Samira picking up gold from the turret plates."
+          "description": "Samira and support are attacking the low-health mid outer turret, with Samira picking up gold from the turret plates."
         },
         {
           "clock": "9:47",
@@ -2249,7 +2258,7 @@
         {
           "clock": "3:23",
           "videoSeconds": 76.826,
-          "description": "At you are already farming bot safely with the wave in front, and by you take the first bot-side fight instead of only bleeding CS;"
+          "description": "At you are already farming bot safely with the wave in front, and by you take the first bot-side fight instead of only bleeding CS"
         },
         {
           "clock": "4:36",
@@ -2273,6 +2282,7 @@
       "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
       "sampledFrames": 34,
       "publicVideoBytes": 24317981,
+      "captureFps": 2,
       "src": "/recordings/auto_NA1-5565445744_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565445744-01.jpg",
       "rankEstimate": {
@@ -2307,8 +2317,7 @@
           "kpi-objective-vision-2025"
         ],
         "reason": "Silver III read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
-      },
-      "captureFps": 2
+      }
     },
     {
       "file": "auto_NA1-5565387627_01.mp4",
