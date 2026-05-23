@@ -2463,15 +2463,15 @@ h1 {
 }
 
 .recording-story-evidence {
-  color: #5b5148;
+  color: #443b35;
 }
 
 .recording-story-types {
-  color: #3c5f66;
+  color: #443b35;
 }
 
 .recording-story-secondary {
-  color: #6c4d26;
+  color: #443b35;
 }
 
 .recording-time-link {
@@ -2507,7 +2507,7 @@ h1 {
 
 .recording-story-secondary .recording-time-link:hover,
 .recording-story-secondary .recording-time-link:focus-visible {
-  color: #5f3714;
+  color: #7b4d22;
 }
 
 .recording-list-description,
