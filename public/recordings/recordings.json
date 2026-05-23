@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T03:28:12.331Z",
+  "generatedAt": "2026-05-23T04:20:40.212Z",
   "source": "League of Legends Highlights folder",
   "match": "31 matches",
   "matches": [
@@ -41,7 +41,7 @@
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira overall state",
-    "focus": "Current read: Bronze I on the newest full game; Bronze IV across the last 5 full-game reads; Bronze III median across 29 full games. The latest game is above your recent baseline.",
+    "focus": "Current read: Bronze IV on the newest full game; Iron I across the last 5 full-game reads; Bronze III median across 29 full games. The latest game is near your recent baseline.",
     "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is grouping with allies when the play is clear and enough damage to win bot-game fights.",
     "nextRep": "Next game: call even or losing before each fight; if losing, choose only back, tower wave, or wait.",
     "whyTrust": "This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.",
@@ -184,7 +184,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Side camp while base is breaking",
+      "title": "Six deaths from bad-state clicks",
       "duration": "25:30",
       "durationSeconds": 1530,
       "gameLength": "25:46",
@@ -199,29 +199,29 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Side camp while base is breaking",
-      "feedback": "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and deaths. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
-      "gameDetail": "At 23:33 you are hitting red buff alone while enemies are already pressuring through your side of the map; your job is to stop the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on jungle gold. The leak is time: every extra second on the camp leaves Samira away from the only place that can stop the push, and the consequence shows by 25:30 when you are dead, an allied turret has fallen, and the enemy is inside the base area. Earlier, at 17:42, the correct shape briefly appears because you and Hecarim are mid with a wave; the better next click there is to keep hovering mid/river with him after the wave dies, not drift into low-impact side collection while the enemy controls the next fight. At 19:39 you are again near river with an ally, which is the useful map area; if no fight is possible, hold vision and catch the next mid wave, not a deep side camp. The simple rule for the next game is: when your team is behind and structures are threatened, one safe defensive wave is worth more than one jungle camp.",
+      "feedbackTitle": "Six deaths from bad-state clicks",
+      "feedback": "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and another death. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
+      "gameDetail": "At 23:33, in a 1/6/1, 152 CS, 25-minute ranked game, you are taking a side jungle camp while enemies are pressuring through your side of the map; your job is to leave the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on camp gold. At 23:33 the feeding pattern is not that you never farm; it is that normal farm stays on the menu after the map state already says defend. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
       "secondaryFocus": "Second focus: camera and map checks - next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
-      "eventEvidence": "17:42 shows Samira and Hecarim mid with a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on red buff while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
-      "goodThing": "At 17:42 you did find the correct map lane with Hecarim and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
-      "whyTrust": "The review is tied to the visible collapse frames: 23:33 shows the side-camp choice, and 25:30 shows the death plus base-structure consequence.",
+      "eventEvidence": "17:42 shows Samira mid with an ally and a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on a side jungle camp while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
+      "goodThing": "At 17:42 you did find the correct map lane with an ally and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
+      "whyTrust": "The review is tied to the visible collapse frames and the scoreboard line: 1/6/1 with 152 CS, side-camp choice at 23:33, and death/base consequence at 25:30.",
       "focusTag": "base defense over side farm",
-      "evidence": "Manual frame review of auto_NA1-5566120017_01. mp4: mid-wave setup at 17:42, river hover at 19:39, isolated red-buff camp at 23:33, and death/base collapse at 25:30.",
-      "pattern": "The repeated mistake is not mechanics; it is treating a losing map as if normal farming still has equal value. In harder games, the team that is losing has to defend the shortest lane and base line first, then take camps only after the wave is stopped.",
+      "evidence": "Manual frame review of the latest ranked recording plus scoreboard context: 1/6/1, 152 CS, mid-wave setup at 17:42, river hover at 19:39, isolated side camp at 23:33, and death/base collapse at 25:30.",
+      "pattern": "The repeated mistake is not mechanics; it is treating a losing map as if normal farming still has equal value. The six deaths matter more than the extra camp, so the first climb target is leaving low-value farm before it becomes another death window.",
       "diamondRule": "When the enemy can hit your base, defensive wave first, jungle camp second.",
       "drill": "Next game, whenever an outer or inhibitor-side turret is threatened, say wave before camp and path to the structure line first.",
       "timeline": [
-        "17:42 - Samira and Hecarim are mid with a wave, which is the correct pressure lane.",
+        "17:42 - Samira is mid with an ally and a wave, which is the correct pressure or defense lane.",
         "19:39 - Samira is near river with an ally, close enough to help a mid or dragon-side fight.",
-        "23:33 - Samira is alone on red buff while the enemy map state is threatening base pressure.",
+        "23:33 - Samira is alone on a side jungle camp while the enemy map state is threatening base pressure.",
         "25:30 - Samira is dead, an allied turret has fallen, and enemies are in the base area."
       ],
       "clockAnchors": [
         {
           "clock": "17:42",
           "videoSeconds": 1057.692,
-          "description": "Samira and Hecarim are mid clearing a wave together."
+          "description": "Samira is mid with an ally clearing a wave."
         },
         {
           "clock": "19:39",
@@ -231,7 +231,7 @@
         {
           "clock": "23:33",
           "videoSeconds": 1408.923,
-          "description": "Samira is hitting red buff alone while the enemy side of the map is pressuring in."
+          "description": "Samira is taking a side jungle camp alone while the enemy side of the map is pressuring in."
         },
         {
           "clock": "25:30",
@@ -243,7 +243,7 @@
         {
           "clock": "17:42",
           "videoSeconds": 1057.692,
-          "description": "shows Samira and Hecarim mid with a wave"
+          "description": "shows Samira mid with an ally and a wave"
         },
         {
           "clock": "19:39",
@@ -253,7 +253,7 @@
         {
           "clock": "23:33",
           "videoSeconds": 1408.923,
-          "description": "shows Samira alone on red buff while the enemy map state is pushing in"
+          "description": "shows Samira alone on a side jungle camp while the enemy map state is pushing in"
         },
         {
           "clock": "25:30",
@@ -262,11 +262,11 @@
         }
       ],
       "nuance": [
-        "Good: the 17:42 mid wave with Hecarim is the map shape to keep.",
+        "Good: the 17:42 mid wave with an ally is the map shape to keep.",
+        "Stat read: 1/6/1 with 152 CS means the easiest improvement is cutting two preventable deaths, not farming less forever.",
         "Leak: at 23:33 the camp takes your Samira away from the base-defense line.",
         "Consequence: by 25:30 you are dead and the enemy has converted pressure into your base.",
-        "Next check: if a structure can fall before you finish the camp, leave the camp.",
-        "Second focus is camera/map checking, not combo speed, because the 2 FPS capture is better for decisions than frame-perfect mechanics."
+        "Next check: if a structure can fall before you finish the camp, leave the camp."
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed or every cooldown. It can judge map state, side-camp timing, ally location, death state, and whether the next click protects base.",
       "analysisSource": "manual",
@@ -280,9 +280,9 @@
         "version": "2026-05-22-exact-rank-trend-v4",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze I",
-        "exactRankValue": 7,
-        "score": 37,
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "score": 24,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -306,7 +306,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze I read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "Bronze IV read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
       }
     },
     {

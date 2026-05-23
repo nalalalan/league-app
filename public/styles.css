@@ -2386,12 +2386,17 @@ h1 {
 .recording-story-critique,
 .recording-story-praise,
 .recording-story-secondary,
-.recording-story-rank {
+.recording-story-rank,
+.recording-story-stats {
   font-weight: 900;
 }
 
 .recording-story-rank {
   color: #4c5f86;
+}
+
+.recording-story-stats {
+  color: #5f564d;
 }
 
 .recording-story-critique {

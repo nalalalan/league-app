@@ -1915,6 +1915,19 @@ function recordingRankSentence(item) {
   return label ? `Approx rank read: ${label}.` : "";
 }
 
+function recordingStatsSentence(item) {
+  const kills = Number(item?.kills);
+  const deaths = Number(item?.deaths);
+  const assists = Number(item?.assists);
+  const hasSplitKda = [kills, deaths, assists].every(Number.isFinite);
+  const kda = hasText(item?.kda) ? String(item.kda).trim() : (hasSplitKda ? `${kills}/${deaths}/${assists}` : "");
+  const cs = Number(item?.cs);
+  const parts = [];
+  if (kda) parts.push(`${kda} K/D/A`);
+  if (Number.isFinite(cs) && cs > 0) parts.push(`${Math.round(cs)} CS`);
+  return parts.length ? `Stats: ${parts.join(", ")}.` : "";
+}
+
 function recordingStoryParagraph(item) {
   const paragraph = document.createElement("p");
   paragraph.className = "recording-list-story";
@@ -1925,6 +1938,7 @@ function recordingStoryParagraph(item) {
     compactGameLength(item)
   ].join(" | ") + ".");
   appendStorySpan(paragraph, recordingRankSentence(item), "recording-story-rank");
+  appendStorySpan(paragraph, recordingStatsSentence(item), "recording-story-stats");
   const critique = displayCritique(item);
   const sentences = storySentences(recordingParagraph(item))
     .filter((sentence) => !isRedundantStorySentence(sentence, item, critique));

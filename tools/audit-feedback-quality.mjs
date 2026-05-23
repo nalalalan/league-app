@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { hasExactJungleBuffName, unverifiedChampionNames } from "./review-text-guards.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, "..");
@@ -96,6 +97,15 @@ function feedbackIssues(recording = {}) {
   }
   if (needsActionScript && !hasTimestampedActionScript(detail)) {
     issues.push("full review missing a timestamped do-this-instead action script");
+  }
+  if (needsActionScript) {
+    const unverifiedNames = unverifiedChampionNames(allVisible, [recording.champion || "Samira"]);
+    if (unverifiedNames.length) {
+      issues.push(`visible review names unverified champion(s): ${unverifiedNames.join(", ")}; use ally/enemy/team unless roster evidence is verified`);
+    }
+    if (hasExactJungleBuffName(allVisible)) {
+      issues.push("visible review names an exact jungle buff without verified camp evidence; use jungle camp unless the camp label is verified");
+    }
   }
   if (!evidence || evidence.length < 55 || /generated from sampled|limited to sampled|conservative read|match-level/i.test(evidence)) {
     issues.push("full review evidence is too weak");

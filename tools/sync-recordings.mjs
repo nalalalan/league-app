@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
+import { hasExactJungleBuffName, unverifiedChampionNames } from "./review-text-guards.mjs";
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1627,6 +1628,13 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (needsActionScript && !hasTimestampedActionScript(detail)) {
     issues.push("visible paragraph must include a timestamped replacement action script");
   }
+  const unverifiedNames = unverifiedChampionNames(allVisibleText, [recording.champion || "Samira"]);
+  if (needsActionScript && unverifiedNames.length) {
+    issues.push(`visible review names unverified champion(s): ${unverifiedNames.join(", ")}; use ally/enemy/team unless roster evidence is verified`);
+  }
+  if (needsActionScript && hasExactJungleBuffName(allVisibleText)) {
+    issues.push("visible review names an exact jungle buff without verified camp evidence; use jungle camp unless the camp label is verified");
+  }
   if (needsTeachingReason && /\b(grouped mid|group mid|mid pressure)\b/i.test(detail) && !/\b(mid[^.]*because|because[^.]*mid|mid[^.]*shortest|mid[^.]*team|mid[^.]*allies|mid[^.]*base|mid[^.]*tower|mid[^.]*fog|mid[^.]*collapse)\b/i.test(detail)) {
     issues.push("visible paragraph must explain why mid/grouping is better in this state");
   }
@@ -2113,31 +2121,32 @@ function manualFeedback(file) {
     return {
       champion: "Samira",
       confidence: "high",
-      feedbackTitle: "Side camp while base is breaking",
-      feedback: "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and deaths. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
-      gameDetail: "At 23:33 you are hitting red buff alone while enemies are already pressuring through your side of the map; your job is to stop the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on jungle gold. The leak is time: every extra second on the camp leaves Samira away from the only place that can stop the push, and the consequence shows by 25:30 when you are dead, an allied turret has fallen, and the enemy is inside the base area. Earlier, at 17:42, the correct shape briefly appears because you and Hecarim are mid with a wave; the better next click there is to keep hovering mid/river with him after the wave dies, not drift into low-impact side collection while the enemy controls the next fight. At 19:39 you are again near river with an ally, which is the useful map area; if no fight is possible, hold vision and catch the next mid wave, not a deep side camp. The simple rule for the next game is: when your team is behind and structures are threatened, one safe defensive wave is worth more than one jungle camp.",
-      whyTrust: "The review is tied to the visible collapse frames: 23:33 shows the side-camp choice, and 25:30 shows the death plus base-structure consequence.",
-      eventEvidence: "17:42 shows Samira and Hecarim mid with a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on red buff while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
-      goodThing: "At 17:42 you did find the correct map lane with Hecarim and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
+      feedbackTitle: "Six deaths from bad-state clicks",
+      feedback: "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and another death. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
+      gameDetail: "At 23:33, in a 1/6/1, 152 CS, 25-minute ranked game, you are taking a side jungle camp while enemies are pressuring through your side of the map; your job is to leave the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on camp gold. At 23:33 the feeding pattern is not that you never farm; it is that normal farm stays on the menu after the map state already says defend. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
+      whyTrust: "The review is tied to the visible collapse frames and the scoreboard line: 1/6/1 with 152 CS, side-camp choice at 23:33, and death/base consequence at 25:30.",
+      eventEvidence: "17:42 shows Samira mid with an ally and a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on a side jungle camp while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
+      goodThing: "At 17:42 you did find the correct map lane with an ally and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
       focusTag: "base defense over side farm",
-      evidence: "Manual frame review of auto_NA1-5566120017_01.mp4: mid-wave setup at 17:42, river hover at 19:39, isolated red-buff camp at 23:33, and death/base collapse at 25:30.",
-      pattern: "The repeated mistake is not mechanics; it is treating a losing map as if normal farming still has equal value. In harder games, the team that is losing has to defend the shortest lane and base line first, then take camps only after the wave is stopped.",
+      evidence: "Manual frame review of the latest ranked recording plus scoreboard context: 1/6/1, 152 CS, mid-wave setup at 17:42, river hover at 19:39, isolated side camp at 23:33, and death/base collapse at 25:30.",
+      pattern: "The repeated mistake is not mechanics; it is treating a losing map as if normal farming still has equal value. The six deaths matter more than the extra camp, so the first climb target is leaving low-value farm before it becomes another death window.",
       diamondRule: "When the enemy can hit your base, defensive wave first, jungle camp second.",
       drill: "Next game, whenever an outer or inhibitor-side turret is threatened, say wave before camp and path to the structure line first.",
       timeline: [
-        "17:42 - Samira and Hecarim are mid with a wave, which is the correct pressure lane.",
+        "17:42 - Samira is mid with an ally and a wave, which is the correct pressure or defense lane.",
         "19:39 - Samira is near river with an ally, close enough to help a mid or dragon-side fight.",
-        "23:33 - Samira is alone on red buff while the enemy map state is threatening base pressure.",
+        "23:33 - Samira is alone on a side jungle camp while the enemy map state is threatening base pressure.",
         "25:30 - Samira is dead, an allied turret has fallen, and enemies are in the base area."
       ],
       clockAnchors: [
-        { clock: "17:42", videoSeconds: 1057.692, description: "Samira and Hecarim are mid clearing a wave together." },
+        { clock: "17:42", videoSeconds: 1057.692, description: "Samira is mid with an ally clearing a wave." },
         { clock: "19:39", videoSeconds: 1174.769, description: "Samira is near river with an ally before the next map collapse." },
-        { clock: "23:33", videoSeconds: 1408.923, description: "Samira is hitting red buff alone while the enemy side of the map is pressuring in." },
+        { clock: "23:33", videoSeconds: 1408.923, description: "Samira is taking a side jungle camp alone while the enemy side of the map is pressuring in." },
         { clock: "25:30", videoSeconds: 1526, description: "Samira is dead while an allied turret has fallen and enemies are inside the base area." }
       ],
       nuance: [
-        "Good: the 17:42 mid wave with Hecarim is the map shape to keep.",
+        "Good: the 17:42 mid wave with an ally is the map shape to keep.",
+        "Stat read: 1/6/1 with 152 CS means the easiest improvement is cutting two preventable deaths, not farming less forever.",
         "Leak: at 23:33 the camp takes your champion away from the base-defense line.",
         "Consequence: by 25:30 you are dead and the enemy has converted pressure into your base.",
         "Next check: if a structure can fall before you finish the camp, leave the camp.",
@@ -2844,6 +2853,13 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (isAutoFullReview && !hasTimestampedActionScript(gameDetail)) {
     issues.push("gameDetail must include a timestamped replacement action script");
   }
+  const unverifiedNames = unverifiedChampionNames(combined, [parsed?.champion || "Samira"]);
+  if (isAutoFullReview && unverifiedNames.length) {
+    issues.push(`visible feedback names unverified champion(s): ${unverifiedNames.join(", ")}; use ally/enemy/team unless roster evidence is verified`);
+  }
+  if (isAutoFullReview && hasExactJungleBuffName(combined)) {
+    issues.push("visible feedback names an exact jungle buff without verified camp evidence; use jungle camp unless the camp label is verified");
+  }
   if (/\b(?:by|at|around)\s+and\s*,/i.test(combined)) {
     issues.push("visible evidence contains a malformed timestamp phrase");
   }
@@ -3167,6 +3183,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
     "The recorder is intentionally low-FPS for low-lag review. At 2 FPS, scan every visible aspect that can honestly be judged: macro, reset timing, objective conversion, side-lane drift, base pressure, shutdown protection, map tempo, camera stability, spacing, entry timing, target choice, cooldown/CC accounting, wave state, fog/vision pathing, and repeated cursor/pathing patterns. Do not over-index on single-frame mechanics.",
+    "Do not name allied or enemy champions unless the name is verified from visible roster/nameplate evidence. If uncertain, say ally, enemy, support, jungler, defender, or teammate. Do not name red buff or blue buff unless the camp label is visually verified; say jungle camp instead.",
     "Coach like a blunt but serious Challenger-path League coach: name the actual mistake, do not soften it, and do not insult Alan. If a play is greedy, late, unsafe, low-value, disconnected, or not transferable to stronger ranked games, say that plainly and tie it to visible evidence.",
     "Give exactly two improvement areas for this recording after scanning the whole visible game. The first is the highest-value main mistake and stays in feedback/gameDetail. The second goes in secondaryFocus as one separate easy thing Alan can work on right away.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
@@ -3209,7 +3226,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and exactly what to do differently at the timestamp. Be direct enough for a Challenger-path review without insulting him. Timestamp the start or nearest visible start of the main mistake window, make that timestamped sentence a replacement action script, include one separate secondaryFocus that does not repeat the main mistake, keep Mistake/Fix labels out of gameDetail, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and exactly what to do differently at the timestamp. Be direct enough for a Challenger-path review without insulting him. Timestamp the start or nearest visible start of the main mistake window, make that timestamped sentence a replacement action script, include one separate secondaryFocus that does not repeat the main mistake, keep Mistake/Fix labels out of gameDetail, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
