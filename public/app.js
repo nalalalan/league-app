@@ -1344,14 +1344,15 @@ function recordingMainCard(review) {
   article.className = "recording-main";
 
   const title = document.createElement("h3");
-  title.textContent = item.title || (review.detectedChampions || []).map((champion) => champion.name).filter(Boolean)[0] || "Samira";
+  const fallbackChampion = (review.detectedChampions || []).map((champion) => champion.name).filter(Boolean)[0] || "Samira";
+  title.textContent = displayMainFeedbackTitle(item.title, fallbackChampion);
 
   const focus = document.createElement("p");
   focus.className = "recording-main-focus";
   focus.textContent = [
     item.focus || item.title || "Name the payout before the dash.",
     item.rule || item.nextRep || "Before E/R: wave, tower, dragon, recall, or nexus. If none is real, hold the dash.",
-    item.whyTrust || ""
+    item.nextRep || ""
   ]
     .map((text) => String(text || "").replace(/^\s*Honest read:\s*/i, "").trim())
     .filter(Boolean)
@@ -1359,6 +1360,16 @@ function recordingMainCard(review) {
     .replace(/^([a-z])/, (match) => match.toUpperCase());
   article.append(title, focus);
   return article;
+}
+
+function displayMainFeedbackTitle(title, championName = "Samira") {
+  const champion = String(championName || "").trim();
+  const escaped = champion.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const cleaned = String(title || "")
+    .replace(new RegExp(`^\\s*${escaped}\\s+`, "i"), "")
+    .trim();
+  if (!cleaned || /^overall state$/i.test(cleaned)) return "current state";
+  return cleaned.replace(/^([a-z])/, (match) => match.toUpperCase());
 }
 
 function recordingDeepDetails(item) {
@@ -2102,16 +2113,26 @@ function rankTrendPoints(review, selectedChampionId) {
 
 function rankTrendTickValues(points, minValue, maxValue) {
   const present = new Set(points.map((point) => point.value));
+  const latestValue = points.at(-1)?.value;
   const domainRanks = rankTrendScale
     .map((rank, value) => ({ rank, value }))
     .filter((point) => point.value >= minValue && point.value <= maxValue);
-  if (domainRanks.length <= 16) return domainRanks;
-  return domainRanks.filter((point) => (
-    present.has(point.value) ||
-    /\bIV$/.test(point.rank) ||
+  const importantValues = new Set([
+    minValue,
+    maxValue,
+    latestValue,
+    ...points.slice(-5).map((point) => point.value)
+  ].filter(Number.isFinite));
+  const filtered = domainRanks.filter((point, index) => (
+    importantValues.has(point.value) ||
+    present.has(point.value) && domainRanks.length <= 9 ||
+    index % 2 === 0 ||
     point.rank === "Master" ||
     point.rank === "Challenger"
   ));
+  return filtered.length > 10
+    ? filtered.filter((point, index) => importantValues.has(point.value) || index % 2 === 0)
+    : filtered;
 }
 
 function svgNode(name, attributes = {}) {
@@ -2128,9 +2149,9 @@ function rankTrendDateLabel(time) {
 }
 
 function rankTrendSvg(points) {
-  const width = 560;
-  const height = 260;
-  const margin = { top: 16, right: 54, bottom: 34, left: 76 };
+  const width = 640;
+  const height = 274;
+  const margin = { top: 18, right: 22, bottom: 34, left: 74 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
   const values = points.map((point) => point.value);
@@ -2155,6 +2176,7 @@ function rankTrendSvg(points) {
   const svg = svgNode("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
+    preserveAspectRatio: "xMidYMid meet",
     "aria-label": "Exact estimated rank over time"
   });
 
@@ -2227,16 +2249,6 @@ function rankTrendSvg(points) {
     svg.append(circle);
   }
 
-  const latest = points.at(-1);
-  const latestText = svgNode("text", {
-    x: xScale(latest.time) - 6,
-    y: Math.max(12, yScale(latest.value) - 9),
-    class: "rank-trend-point-label",
-    "text-anchor": "end"
-  });
-  latestText.textContent = latest.rank;
-  svg.append(latestText);
-
   return svg;
 }
 
@@ -2247,7 +2259,7 @@ function renderRankTrend(review = recordingReview, selectedChampionId = currentC
   const heading = document.createElement("div");
   heading.className = "rank-trend-head";
   const title = document.createElement("h2");
-  title.textContent = `${champion.name} rank trend`;
+  title.textContent = "rank trend";
   const meta = document.createElement("p");
   meta.textContent = points.length ? `${points.length} full-game reads` : "no full-game rank reads";
   heading.append(title, meta);
@@ -2263,7 +2275,7 @@ function renderRankTrend(review = recordingReview, selectedChampionId = currentC
   const latest = points.at(-1);
   const latestLine = document.createElement("p");
   latestLine.className = "rank-trend-latest";
-  latestLine.textContent = `Latest: ${latest.rank} on ${latest.dateLabel}.`;
+  latestLine.textContent = `latest ${latest.rank} | ${latest.dateLabel}`;
   const chart = document.createElement("div");
   chart.className = "rank-trend-chart";
   chart.append(rankTrendSvg(points));

@@ -48,12 +48,14 @@
     </header>
 
     <main class="page">
-      <section class="champion-overview" aria-label="champion and rank trend">
+      <section class="champion-overview" aria-label="champion and rank state">
         <section class="champion-picker" aria-label="champion">
           <div class="portrait-row" id="champion-picker"></div>
         </section>
-        <aside class="rank-trend" id="rank-trend" aria-live="polite"></aside>
-        <aside class="recording-focus overall-state" id="recording-focus"></aside>
+        <section class="rank-state-card" aria-label="rank trend and current state">
+          <aside class="rank-trend" id="rank-trend" aria-live="polite"></aside>
+          <aside class="recording-focus overall-state" id="recording-focus"></aside>
+        </section>
       </section>
 
       <section class="selected-champion" id="champion-panel" aria-live="polite">

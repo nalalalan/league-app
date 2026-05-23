@@ -213,6 +213,34 @@ summary {
   box-sizing: border-box;
 }
 
+.rank-state-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.16fr) minmax(300px, .84fr);
+  gap: clamp(18px, 1.9vw, 28px);
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: clamp(16px, 1.8vw, 22px);
+  border: 1px solid rgba(72, 65, 57, .22);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, .86);
+  color: #302a25;
+  box-shadow: 0 10px 28px rgba(42, 33, 22, .08);
+}
+
+.rank-state-card .recording-focus {
+  grid-column: auto;
+  grid-row: auto;
+  width: 100%;
+  margin: 0;
+  align-self: stretch;
+  justify-self: stretch;
+  justify-items: stretch;
+}
+
 .champion-picker {
   position: relative;
   min-width: 0;
@@ -287,14 +315,14 @@ summary {
   z-index: 1;
   width: 100%;
   max-width: 100%;
-  min-height: 348px;
+  min-height: 0;
   box-sizing: border-box;
-  padding: 14px 14px 12px;
-  border: 1px solid rgba(72, 65, 57, .24);
-  border-radius: 6px;
-  background: rgba(255, 253, 248, .82);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: #302a25;
-  box-shadow: 0 10px 28px rgba(42, 33, 22, .08);
+  box-shadow: none;
 }
 
 .rank-trend-head {
@@ -302,13 +330,13 @@ summary {
   gap: 10px;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 }
 
 .rank-trend h2 {
   margin: 0;
   color: #2d2723;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.1;
 }
 
@@ -325,6 +353,7 @@ summary {
 .rank-trend-chart {
   width: 100%;
   overflow: hidden;
+  padding: 1px 0 0;
 }
 
 .rank-trend svg {
@@ -335,13 +364,13 @@ summary {
 }
 
 .rank-trend-grid {
-  stroke: rgba(78, 70, 62, .14);
+  stroke: rgba(78, 70, 62, .12);
   stroke-width: 1;
 }
 
 .rank-trend-axis {
-  stroke: rgba(42, 37, 32, .58);
-  stroke-width: 1.1;
+  stroke: rgba(42, 37, 32, .46);
+  stroke-width: .95;
 }
 
 .rank-trend-line {
@@ -349,13 +378,13 @@ summary {
   stroke: #24211e;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 2.2;
+  stroke-width: 1.9;
 }
 
 .rank-trend-point {
   fill: #fffdf8;
   stroke: #24211e;
-  stroke-width: 1.6;
+  stroke-width: 1.45;
 }
 
 .rank-trend-y-label,
@@ -373,7 +402,13 @@ summary {
 }
 
 .rank-trend-latest {
-  padding-top: 5px;
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 5px;
+  padding: 3px 8px 4px;
+  border: 1px solid rgba(93, 78, 62, .16);
+  border-radius: 999px;
+  background: rgba(245, 238, 226, .72);
   color: #3e3731;
 }
 
@@ -392,7 +427,25 @@ summary {
   width: 100%;
   max-width: 100%;
   min-height: 100%;
-  box-shadow: 0 10px 28px rgba(42, 33, 22, .08);
+  gap: 10px;
+  padding: 0 0 0 clamp(16px, 1.8vw, 24px);
+  border: 0;
+  border-left: 1px solid rgba(72, 65, 57, .16);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.overall-state .recording-main h3 {
+  font-size: 17px;
+}
+
+.overall-state .recording-main-focus {
+  max-width: 46ch;
+  color: #3a332e;
+  font-size: 14.4px;
+  font-weight: 520;
+  line-height: 1.45;
 }
 
 .page.is-bursting .situation-card {
@@ -3755,6 +3808,16 @@ h1 {
     min-height: 0;
   }
 
+  .rank-state-card {
+    grid-template-columns: 1fr;
+  }
+
+  .overall-state .recording-main {
+    padding: 13px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgba(72, 65, 57, .16);
+  }
+
   .selected-copy {
     width: min(72%, 520px);
   }
@@ -3773,6 +3836,7 @@ h1 {
 @media (max-width: 560px) {
   .champion-overview,
   .champion-picker,
+  .rank-state-card,
   .rank-trend,
   .overall-state,
   .overall-state .recording-main {
@@ -3814,8 +3878,8 @@ h1 {
     padding-top: 16px;
   }
 
-  .rank-trend {
-    padding: 11px 10px 10px;
+  .rank-state-card {
+    padding: 12px 10px;
   }
 
   .rank-trend-head {
@@ -4193,7 +4257,7 @@ h1 {
   .champion-overview {
     grid-column: 1 / -1;
     grid-row: 1;
-    grid-template-columns: minmax(0, 584px) minmax(390px, 1fr) minmax(300px, 360px);
+    grid-template-columns: minmax(0, 584px) minmax(620px, 1fr);
     gap: clamp(14px, 1.45vw, 22px);
     align-items: stretch;
     justify-self: center;
@@ -4217,10 +4281,11 @@ h1 {
     align-self: auto;
   }
 
-  .overall-state.recording-focus {
+  .rank-state-card .recording-focus {
     grid-column: auto;
     grid-row: auto;
     width: 100%;
+    align-self: stretch;
     justify-self: stretch;
   }
 
