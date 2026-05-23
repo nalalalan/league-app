@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T20:43:46.477Z",
+  "generatedAt": "2026-05-23T20:53:20.986Z",
   "source": "League of Legends Highlights folder",
   "match": "32 matches",
   "matches": [
@@ -202,7 +202,7 @@
       "confidence": "high",
       "feedbackTitle": "Repeated death-side isolation and loss of map-pacing after side farm",
       "feedback": "Mistake: Samira repeatedly overextended for side lane farm and isolated fights post-lane against the map tempo, resulting in picks, shutdowns, and loss of objective pressure. Fix: After each won fight, or whenever teams are resetting and objective timers are looming, immediately path back to grouped mid or nearest allied position instead of extending in bot lane, especially when respawn timers are long and map fog is deep.",
-      "gameDetail": "Around 29:39, Samira dead, ally turret destroyed, respawn timer active, dark jungle area visible; this is the start or nearest visible start of the main mistake window; earlier at 3:17, Samira and support near bottom tower, enemy support and Samira in lane, trading with minions present; earlier at 25:49, Samira and support clearing minion wave by destroyed bottom inhibitor turret. Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between Samira and the collapse, and enemies have to defend structure instead of chasing through fog. At 3:17, your next job is to leave the lane or fight, recall on the first safe screen, and spend before touching another wave instead of farming while one engage can kill you. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
+      "gameDetail": "Around 25:49, Samira and support clearing minion wave by destroyed bottom inhibitor turret; this is the start or nearest visible start of the main mistake window; earlier at 3:17, Samira and support near bottom tower, enemy support and Samira in lane, trading with minions present; by 29:39, Samira dead, ally turret destroyed, respawn timer active, dark jungle area visible. Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between Samira and the collapse, and enemies have to defend structure instead of chasing through fog. At 25:49, your next job is to stop the camp or side-wave click, check death timers and the nearest threatened turret, then walk to the defensive wave, group, or reset instead of trading base defense for small farm. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
       "secondaryFocus": "Your spacing and safety discipline while farming in deep lanes needs work—never hit far-side bot waves without deep allied vision or full team reset; next game, check minimap for missing enemies before pushing past river after 15 min.",
       "mistakeTypes": [
         "side farm over base defense",
@@ -216,7 +216,7 @@
       "goodThing": "Hitting waves and farming gold yielded some item breakpoints and kept XP progressing.",
       "whyTrust": "The repeated solo-death pattern in side lane after midgame is the most common Challenger-level exploit; the evidence here shows the conversion cost in live objectives and gold, and correcting it is the single highest-leverage macro fix for AD carries.",
       "focusTag": "side overstay isolation",
-      "evidence": "3:17 Samira and support near bottom tower, enemy support and Samira in lane, trading with minions present; 25:49 Samira and support clearing minion wave by destroyed bottom inhibitor turret; 29:39 Samira dead, ally turret destroyed, respawn timer active, dark jungle area visible",
+      "evidence": "3:17 shows Samira and support near bottom tower, enemy support and Samira in lane, trading with minions present. 25:49 shows Samira and support clearing minion wave by destroyed bottom inhibitor turret. 29:39 shows Samira dead, ally turret destroyed, respawn timer active, dark jungle area visible.",
       "pattern": "You play aggressively for farm and fights, but drift into isolated side lanes after every won fight or reset, missing the chance to convert kills into objectives or grouped pressure. These missteps inevitably lead to shutdowns and tempo swings.",
       "diamondRule": "Never push past river for side farm or hunt alone after 20 minutes unless you see all enemies on the map or your team is synced for a siege.",
       "drill": "On every fight win or after 15 min, hit Tab + minimap and choose only: group mid, take tower, or reset; never default to side wave without info.",
@@ -277,17 +277,17 @@
         {
           "clock": "3:17",
           "videoSeconds": 174.192,
-          "description": "Samira and support near bottom tower, enemy support and Samira in lane, trading with minions present"
+          "description": "shows Samira and support near bottom tower, enemy support and Samira in lane, trading with minions present."
         },
         {
           "clock": "25:49",
           "videoSeconds": 1365.538,
-          "description": "Samira and support clearing minion wave by destroyed bottom inhibitor turret"
+          "description": "shows Samira and support clearing minion wave by destroyed bottom inhibitor turret."
         },
         {
           "clock": "29:39",
           "videoSeconds": 1535.731,
-          "description": "Samira dead, ally turret destroyed, respawn timer active, dark jungle area visible"
+          "description": "shows Samira dead, ally turret destroyed, respawn timer active, dark jungle area visible."
         }
       ],
       "nuance": [

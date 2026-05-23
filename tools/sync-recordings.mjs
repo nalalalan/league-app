@@ -92,6 +92,10 @@ function slugify(value) {
     .slice(0, 90);
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function toPosixPath(value) {
   return value.split(path.sep).join("/");
 }
@@ -1068,6 +1072,10 @@ function anchorDescriptionLooksWeak(anchorText) {
     /\b(scuttle crab|scoreboard open|shop open|item shop|shop interface|stealth ward selected|loaded into the game at fountain|game start|standing at (the )?fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
 }
 
+function anchorIsConsequenceOnly(anchorText) {
+  return /\b(dead|death|respawn timer|revive timer|grey screen|gray screen|shop open, player dead|player dead|death timer)\b/i.test(anchorText || "");
+}
+
 function coachWantsEnemyStructureEvidence(analysisText) {
   return /\b(base|inhib|inhibitor|nexus|end|ending|open structure|structure conversion)\b/i.test(analysisText);
 }
@@ -1128,6 +1136,310 @@ function normalizeVisibleCoachText(text, champion = "Samira") {
   return normalizeEvidenceDescription(text, champion);
 }
 
+const supportChampionNames = new Set([
+  "Alistar",
+  "Bard",
+  "Blitzcrank",
+  "Brand",
+  "Braum",
+  "Janna",
+  "Karma",
+  "Leona",
+  "Lulu",
+  "Lux",
+  "Milio",
+  "Morgana",
+  "Nami",
+  "Nautilus",
+  "Pyke",
+  "Rakan",
+  "Rell",
+  "Renata Glasc",
+  "Senna",
+  "Seraphine",
+  "Sona",
+  "Soraka",
+  "Tahm Kench",
+  "Taric",
+  "Thresh",
+  "Yuumi",
+  "Zilean",
+  "Zyra"
+]);
+
+const jungleChampionNames = new Set([
+  "Amumu",
+  "Bel'Veth",
+  "Briar",
+  "Diana",
+  "Ekko",
+  "Elise",
+  "Evelynn",
+  "Fiddlesticks",
+  "Gragas",
+  "Graves",
+  "Hecarim",
+  "Ivern",
+  "Jarvan IV",
+  "Karthus",
+  "Kayn",
+  "Kha'Zix",
+  "Kindred",
+  "Lee Sin",
+  "Lillia",
+  "Master Yi",
+  "Nidalee",
+  "Nocturne",
+  "Nunu",
+  "Rammus",
+  "Rek'Sai",
+  "Rengar",
+  "Sejuani",
+  "Shaco",
+  "Shyvana",
+  "Skarner",
+  "Taliyah",
+  "Talon",
+  "Udyr",
+  "Vi",
+  "Viego",
+  "Volibear",
+  "Warwick",
+  "Wukong",
+  "Xin Zhao",
+  "Zac"
+]);
+
+function genericChampionRole(name) {
+  if (supportChampionNames.has(name)) return "support";
+  if (jungleChampionNames.has(name)) return "jungler";
+  return "champion";
+}
+
+function replaceChampionName(value, name, replacement) {
+  const pattern = escapeRegExp(name)
+    .replace(/\\'/g, "['\u2019]")
+    .replace(/\s+/g, "\\s+");
+  return String(value || "").replace(new RegExp(`(^|[^A-Za-z0-9'])${pattern}(?=$|[^A-Za-z0-9'])`, "gi"), (_match, prefix) => `${prefix}${replacement}`);
+}
+
+function repairUnverifiedVisibleNames(value, champion = "Samira") {
+  let text = String(value || "");
+  const unverifiedNames = unverifiedChampionNames(text, [champion || "Samira"]);
+  for (const name of unverifiedNames) {
+    text = replaceChampionName(text, name, genericChampionRole(name));
+  }
+  return coachClean(text
+    .replace(/\b(?:red|blue)\s+buff\b/gi, "jungle camp")
+    .replace(/\benemy\s+enemy\b/gi, "enemy")
+    .replace(/\bally\s+ally\b/gi, "ally")
+    .replace(/\bsupport\s+support\b/gi, "support")
+    .replace(/\bjungler\s+jungler\b/gi, "jungler"));
+}
+
+function visibleReviewStringFields() {
+  return [
+    "title",
+    "feedbackTitle",
+    "feedback",
+    "gameDetail",
+    "secondaryFocus",
+    "eventEvidence",
+    "failureEvidence",
+    "goodThing",
+    "whyTrust",
+    "focusTag",
+    "evidence",
+    "pattern",
+    "diamondRule",
+    "drill",
+    "reviewLimit"
+  ];
+}
+
+function sanitizeVisibleReviewNames(recording, champion = "Samira") {
+  for (const field of visibleReviewStringFields()) {
+    if (recording[field]) recording[field] = repairUnverifiedVisibleNames(recording[field], champion);
+  }
+  for (const field of ["mistakeTypes", "timeline", "nuance"]) {
+    if (Array.isArray(recording[field])) {
+      recording[field] = recording[field].map((item) => repairUnverifiedVisibleNames(item, champion)).filter(Boolean);
+    }
+  }
+  for (const field of ["clockAnchors", "clockMoments"]) {
+    if (Array.isArray(recording[field])) {
+      recording[field] = recording[field].map((item) => ({
+        ...item,
+        description: repairUnverifiedVisibleNames(item.description || "", champion)
+      }));
+    }
+  }
+}
+
+function firstUsefulReviewAnchor(recording = {}) {
+  const anchors = dedupeClockAnchors([
+    ...(Array.isArray(recording.clockMoments) ? recording.clockMoments : []),
+    ...(Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [])
+  ]).filter((anchor) => anchor.clock && anchor.description && !anchorDescriptionLooksWeak(anchor.description));
+  if (!anchors.length) return null;
+  const firstDetailSecond = timestampSecondsInText(recording.gameDetail)[0];
+  if (Number.isFinite(firstDetailSecond)) {
+    const direct = anchors.find((anchor) => {
+      const anchorSeconds = clockSeconds(anchor.clock);
+      return Number.isFinite(anchorSeconds) && Math.abs(anchorSeconds - firstDetailSecond) <= 5;
+    });
+    if (direct && !anchorIsConsequenceOnly(direct.description)) return direct;
+    if (direct && anchorIsConsequenceOnly(direct.description)) {
+      const previous = anchors
+        .filter((anchor) => !anchorIsConsequenceOnly(anchor.description))
+        .filter((anchor) => Number(anchor.videoSeconds) < Number(direct.videoSeconds))
+        .sort((a, b) => Number(b.videoSeconds) - Number(a.videoSeconds))[0];
+      if (previous) return previous;
+    }
+  }
+  const primarySeconds = primaryMistakeTimestampSeconds(recording.gameDetail, recording.eventEvidence || recording.evidence || recording.pattern)
+    .map((seconds) => Math.round(seconds));
+  if (primarySeconds.length) {
+    const matching = anchors.find((anchor) => {
+      const anchorSeconds = clockSeconds(anchor.clock);
+      return Number.isFinite(anchorSeconds) &&
+        !anchorIsConsequenceOnly(anchor.description) &&
+        primarySeconds.some((seconds) => Math.abs(seconds - anchorSeconds) <= 5);
+    });
+    if (matching) return matching;
+  }
+  const consequence = anchors.find((anchor) => anchorIsConsequenceOnly(anchor.description));
+  if (consequence) {
+    const previous = anchors
+      .filter((anchor) => !anchorIsConsequenceOnly(anchor.description))
+      .filter((anchor) => Number(anchor.videoSeconds) < Number(consequence.videoSeconds))
+      .sort((a, b) => Number(b.videoSeconds) - Number(a.videoSeconds))[0];
+    if (previous) return previous;
+  }
+  return anchors.find((anchor) => !anchorIsConsequenceOnly(anchor.description)) || anchors[0];
+}
+
+function actionScriptForAnchor(recording = {}, anchor = null) {
+  if (!anchor?.clock) return "";
+  const text = [
+    recording.feedback,
+    recording.gameDetail,
+    recording.secondaryFocus,
+    recording.failureEvidence,
+    recording.pattern,
+    recording.eventEvidence,
+    anchor.description
+  ].join(" ").toLowerCase();
+  const anchorText = String(anchor.description || "").toLowerCase();
+  if (/\b(side|jungle|camp|farm|defend|defense|turret has fallen|base defense|wave|inhibitor turret)\b/i.test(text) && !/\b(low hp|low-health|half hp)\b/i.test(anchorText)) {
+    return `At ${anchor.clock}, your next job is to stop the camp or side-wave click, check death timers and the nearest threatened turret, then walk to the defensive wave, group, or reset instead of trading base defense for small farm.`;
+  }
+  if (/\b(low hp|low-health|half hp|recall|reset|shop|spend|shutdown|overstay|stay|stayed|greed|death|dead|died)\b/i.test(text)) {
+    return `At ${anchor.clock}, your next job is to leave the lane or fight, recall on the first safe screen, and spend before touching another wave instead of farming while one engage can kill you.`;
+  }
+  if (/\b(base|inhib|inhibitor|nexus|tower|turret|structure|open structure|end)\b/i.test(text)) {
+    return `At ${anchor.clock}, your next job is to call free structure, blocked structure, or reset; hit the structure if it is free, kill only the body blocking it, and leave if neither is available instead of chasing away from the payout.`;
+  }
+  if (/\b(fight|spacing|entry|cc|crowd control|hook|target|kite|collapse|fog|vision)\b/i.test(text)) {
+    return `At ${anchor.clock}, your next job is to wait outside engage range until the first enemy tool is used, then enter behind an ally or kite back instead of being the first catchable target.`;
+  }
+  return `At ${anchor.clock}, your next job is to pause the forward click, check allies, enemy threat, and the nearest objective, then choose defend, reset, or hit structure instead of taking a loose fight.`;
+}
+
+function ensureTimestampedReplacementAction(recording, champion = "Samira") {
+  if (hasTimestampedActionScript(recording.gameDetail) && !primaryActionTimestampNeedsRepair(recording)) return;
+  const anchor = firstUsefulReviewAnchor(recording);
+  if (!anchor) return;
+  const action = repairUnverifiedVisibleNames(actionScriptForAnchor(recording, anchor), champion);
+  if (!action) return;
+  const wrongActionSentences = new Set(timestampedActionScriptSentences(recording.gameDetail).map((sentence) => coachClean(sentence)));
+  const sentences = sentenceParts(recording.gameDetail)
+    .filter((sentence) => !wrongActionSentences.has(coachClean(sentence)));
+  if (!sentences.length) {
+    recording.gameDetail = action;
+    return;
+  }
+  const insertAt = Math.min(2, sentences.length);
+  sentences.splice(insertAt, 0, action);
+  recording.gameDetail = normalizeCoachPunctuation(sentences.join(" "));
+}
+
+function ensureFailureEvidence(recording, champion = "Samira") {
+  const failure = coachClean(recording.failureEvidence, "");
+  if (failure.length >= 80 && /\b(leak|cost|punish|punished|death|died|gave|lost|risk|consequence|window|failed|failure|tempo|shutdown)\b/i.test(failure)) return;
+  const anchor = firstUsefulReviewAnchor(recording);
+  const clockLead = anchor?.clock ? `At ${anchor.clock}, ` : "";
+  const description = anchor?.description ? `${clauseDescription(anchor.description, champion)}; ` : "";
+  recording.failureEvidence = repairUnverifiedVisibleNames(
+    `${clockLead}${description}the failure is letting the next click stay on the wrong task after the map state changes, which leaks time, safety, or defense and gives the enemy another fight or push window.`,
+    champion
+  );
+}
+
+function ensureMistakeTypes(recording) {
+  const existing = cleanList(recording.mistakeTypes, 5);
+  const text = [recording.feedback, recording.gameDetail, recording.secondaryFocus, recording.failureEvidence, recording.pattern].join(" ").toLowerCase();
+  const fills = [];
+  if (/\b(reset|recall|shop|spend|overstay|stayed|shutdown|low hp|death|dead)\b/i.test(text)) fills.push("reset/overstay discipline");
+  if (/\b(side|jungle|camp|farm|wave|defend|defense|turret)\b/i.test(text)) fills.push("side farm over map defense");
+  if (/\b(fight|entry|cc|hook|target|kite|spacing|collapse)\b/i.test(text)) fills.push("spacing/entry discipline");
+  if (/\b(base|inhib|inhibitor|nexus|tower|structure|objective)\b/i.test(text)) fills.push("wave/objective conversion");
+  if (/\b(fog|vision|camera|map|timer|timers)\b/i.test(text)) fills.push("camera/map-state check");
+  const fallback = ["camera/map-state check", "spacing/entry discipline", "reset/overstay discipline", "wave/objective conversion"];
+  recording.mistakeTypes = [...new Set([...existing, ...fills, ...fallback])].slice(0, 5);
+}
+
+function ensureSecondaryFocus(recording, champion = "Samira") {
+  const issues = secondaryFocusStandardIssues(recording);
+  if (!issues.length) return;
+  recording.secondaryFocus = repairUnverifiedVisibleNames(
+    "Also work on camera and map-state checks: before taking a camp, side wave, or forward fight after 15 minutes, check ally deaths, the closest threatened turret, and whether your team can stand between you and the collapse.",
+    champion
+  );
+}
+
+function ensureTeachingReasonAndLength(recording) {
+  const detail = coachClean(recording.gameDetail, "");
+  const additions = [];
+  if (!/\b(leak|cost|punish|punished|shutdown|tempo|missed|risk|risky|death|died|gave|lost|blocked|blocker|mistake|danger|punishment|consequence|window|delay|stall|throw)\b/i.test(detail)) {
+    additions.push("The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.");
+  }
+  if (!/\b(because|so that|this matters because|the reason|which makes|which means|which proves|meaning|means|so\s+(?:the|a|every|your|you))\b/i.test(detail)) {
+    additions.push("This matters because Samira climbs through clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.");
+  }
+  if (detail.length < 240 && recording.failureEvidence) {
+    additions.push(recording.failureEvidence);
+  }
+  if (additions.length) {
+    recording.gameDetail = normalizeCoachPunctuation([detail, ...additions].filter(Boolean).join(" "));
+  }
+}
+
+function repairVisibleReviewForStandard(recording, fileName) {
+  if (!requiresVisibleParagraphStandard(fileName, recording)) return;
+  const champion = recording.champion || "Samira";
+  sanitizeVisibleReviewNames(recording, champion);
+  if (primaryActionTimestampNeedsRepair(recording)) {
+    const repairedDetail = teachingDetailFromMoments(
+      recording,
+      Array.isArray(recording.clockMoments) && recording.clockMoments.length ? recording.clockMoments : recording.clockAnchors,
+      champion
+    );
+    if (repairedDetail) {
+      recording.gameDetail = stripRedundantLessonEcho(stripRepeatedConversionGlossary(repairedDetail));
+    }
+  }
+  ensureMistakeTypes(recording);
+  ensureSecondaryFocus(recording, champion);
+  ensureFailureEvidence(recording, champion);
+  ensureTimestampedReplacementAction(recording, champion);
+  ensureTeachingReasonAndLength(recording);
+  sanitizeVisibleReviewNames(recording, champion);
+  recording.gameDetail = stripUnmatchedClockTokens(recording.gameDetail, recording.clockAnchors);
+  recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
+  recording.evidence = stripUnmatchedClockTokens(recording.evidence || recording.eventEvidence || "", recording.clockAnchors);
+}
+
 function hasRepeatedConversionGlossary(recording = {}) {
   return /\b(?:A\s+)?conversion\s+(?:just\s+)?means\b/i.test(recording.gameDetail || "");
 }
@@ -1156,6 +1468,46 @@ function hasRedundantLessonEcho(recording = {}) {
   return sentenceParts(recording.gameDetail || "").some((sentence) => /^\s*(Mistake|Fix):/i.test(sentence));
 }
 
+function primaryActionTimestampNeedsRepair(recording = {}) {
+  if (!requiresVisibleParagraphStandard(recording.file || "", recording)) return false;
+  const anchors = cleanClockAnchors([
+    ...(Array.isArray(recording.clockMoments) ? recording.clockMoments : []),
+    ...(Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [])
+  ]).filter((anchor) => anchor.clock && anchor.description);
+  if (!anchors.length) return false;
+  const firstDetailSecond = timestampSecondsInText(recording.gameDetail)[0];
+  if (Number.isFinite(firstDetailSecond)) {
+    const firstAnchor = anchors.find((anchor) => {
+      const anchorSeconds = clockSeconds(anchor.clock);
+      return Number.isFinite(anchorSeconds) && Math.abs(anchorSeconds - firstDetailSecond) <= 5;
+    });
+    if (firstAnchor && anchorIsConsequenceOnly(firstAnchor.description)) {
+      const hasEarlierDecision = anchors.some((anchor) => (
+        !anchorIsConsequenceOnly(anchor.description) &&
+        Number(anchor.videoSeconds) < Number(firstAnchor.videoSeconds)
+      ));
+      if (hasEarlierDecision) return true;
+    }
+  }
+  const actionSeconds = timestampedActionScriptSentences(recording.gameDetail)
+    .flatMap((sentence) => timestampSecondsInText(sentence))
+    .map((seconds) => Math.round(seconds));
+  const actionAnchor = firstUsefulReviewAnchor(recording);
+  const actionAnchorSeconds = clockSeconds(actionAnchor?.clock);
+  const actionText = timestampedActionScriptSentences(recording.gameDetail).join(" ");
+  const actionContext = [actionAnchor?.description, recording.feedback, recording.failureEvidence, recording.pattern].join(" ");
+  if (
+    /\b(side|jungle|camp|farm|defend|defense|turret has fallen|base defense|wave|inhibitor turret)\b/i.test(actionContext) &&
+    /\brecall on the first safe screen\b/i.test(actionText) &&
+    !/\blow[-\s]?hp|half hp\b/i.test(actionAnchor?.description || "")
+  ) {
+    return true;
+  }
+  return Number.isFinite(actionAnchorSeconds) &&
+    actionSeconds.length > 0 &&
+    !actionSeconds.some((seconds) => Math.abs(seconds - actionAnchorSeconds) <= 5);
+}
+
 function needsCachedTextRepair(recording = {}) {
   const text = [
     recording.gameDetail,
@@ -1167,6 +1519,7 @@ function needsCachedTextRepair(recording = {}) {
   return (
     hasRepeatedConversionGlossary(recording) ||
     hasRedundantLessonEcho(recording) ||
+    primaryActionTimestampNeedsRepair(recording) ||
     /\b(?:Failure evidence|Other mistake types|Second focus)\s*:/i.test(text) ||
     /[.!?]\s*;|;\s*[.!?]|[.!?]{2,}/.test(text)
   );
@@ -1426,7 +1779,7 @@ function clauseDescription(description, champion) {
   const cleaned = normalizeEvidenceDescription(description, champion)
     .replace(/[.;!?]+$/g, "")
     .replace(/^at\s+\d{1,2}:[0-5]\d,?\s*/i, "")
-    .replace(/^shows\b/i, "shows")
+    .replace(/^shows\s+/i, "")
     .replace(/^team\b/i, "the team")
     .replace(/^open\b/i, "open")
     .replace(/^safe\b/i, "safe")
@@ -1495,10 +1848,19 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
     .filter((moment) => moment.description)
     .slice(0, 4);
   if (!moments.length) return "";
-  const primary = moments
+  const firstConsequence = moments.find((moment) => anchorIsConsequenceOnly(moment.description));
+  const preConsequencePrimary = firstConsequence
+    ? moments
+      .filter((moment) => !anchorIsConsequenceOnly(moment.description))
+      .filter((moment) => Number(moment.videoSeconds) < Number(firstConsequence.videoSeconds))
+      .sort((a, b) => Number(b.videoSeconds) - Number(a.videoSeconds))[0]
+    : null;
+  const primary = preConsequencePrimary || moments
     .map((moment, index) => ({
       moment,
-      score: anchorEvidenceScore(moment, analysis, index) + (primaryMistakeTextPattern().test(moment.description || "") ? 6 : 0)
+      score: anchorEvidenceScore(moment, analysis, index) +
+        (primaryMistakeTextPattern().test(moment.description || "") ? 6 : 0) -
+        (anchorIsConsequenceOnly(moment.description) ? 18 : 0)
     }))
     .sort((a, b) => b.score - a.score || a.moment.videoSeconds - b.moment.videoSeconds)[0]?.moment || moments[0];
   const rest = moments.filter((moment) => moment !== primary);
@@ -3938,6 +4300,7 @@ async function main() {
       src: publicPath(destPath),
       poster: publicPath(posterPath)
     };
+    repairVisibleReviewForStandard(recording, name);
     const rankEstimate = rankedEquivalentForRecording(recording);
     if (rankEstimate) recording.rankEstimate = rankEstimate;
     enforceVisibleParagraphStandard(recording, name);

@@ -11,10 +11,12 @@ const publicRoot = path.join(appRoot, "public");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
+const fallbackModel = process.env.LEAGUE_TIMESTAMP_AUDIT_FALLBACK_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-23-evidence-lanes-coaching-v14",
   "2026-05-22-action-script-coaching-v13",
+  "2026-05-22-challenger-direct-coaching-v12",
   "2026-05-22-two-focus-coaching-v11",
-  "2026-05-22-challenger-direct-coaching-v12"
 ]);
 
 function clean(value) {
@@ -162,7 +164,7 @@ function visibleParagraphStandardIssues(recording, anchors) {
   if (!/\b(instead|because|so|which|then|after|before|when)\b/i.test(detail)) {
     issues.push("visible paragraph must explain the decision chain");
   }
-  if (recording.analysisVersion === "2026-05-22-action-script-coaching-v13" && !hasTimestampedActionScript(detail)) {
+  if (currentPrimaryMistakeAnalysisVersions.has(recording.analysisVersion) && !hasTimestampedActionScript(detail)) {
     issues.push("visible paragraph must include a timestamped replacement action script");
   }
   if (eventEvidence.length < 60) {
@@ -264,30 +266,47 @@ async function verifyAnchorsWithVision(recording, anchors, videoPath) {
     `Recording file: ${recording.file}.`
   ].join("\n");
 
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model,
-      store: false,
-      max_output_tokens: 1000,
-      input: [
-        {
-          role: "user",
-          content: [
-            { type: "input_text", text: prompt },
-            ...content
-          ]
-        }
-      ]
-    })
-  });
-  if (!response.ok) throw new Error(`OpenAI timestamp audit ${response.status}`);
-  const parsed = parseJsonText(extractOutputText(await response.json()));
-  return Array.isArray(parsed.checks) ? parsed.checks : [];
+  async function requestAudit(modelName) {
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: modelName,
+        store: false,
+        max_output_tokens: 1000,
+        input: [
+          {
+            role: "user",
+            content: [
+              { type: "input_text", text: prompt },
+              ...content
+            ]
+          }
+        ]
+      })
+    });
+    if (!response.ok) throw new Error(`OpenAI timestamp audit ${response.status}`);
+    const parsed = parseJsonText(extractOutputText(await response.json()));
+    return Array.isArray(parsed.checks) ? parsed.checks : [];
+  }
+
+  try {
+    return await requestAudit(model);
+  } catch (error) {
+    if (fallbackModel && fallbackModel !== model) {
+      return await requestAudit(fallbackModel);
+    }
+    return anchors.map((anchor, index) => ({
+      index: index + 1,
+      expected: anchor.clock,
+      pass: null,
+      visibleClock: "",
+      description: `timestamp vision audit unavailable: ${error.message}`
+    }));
+  }
 }
 
 async function main() {
