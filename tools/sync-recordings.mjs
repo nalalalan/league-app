@@ -19,9 +19,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-22-action-script-coaching-v13";
+const analysisVersion = "2026-05-23-evidence-lanes-coaching-v14";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-22-action-script-coaching-v13",
   "2026-05-22-challenger-direct-coaching-v12",
   "2026-05-22-two-focus-coaching-v11",
   "2026-05-22-nonredundant-macro-review-v10",
@@ -1607,6 +1608,9 @@ function visibleParagraphStandardIssues(recording = {}) {
   const needsTeachingReason = recording.analysisSource !== "manual" || recording.file === "auto_NA1-5565387627_01.mp4";
   const needsSecondaryFocus = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
   const needsActionScript = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
+  const needsEvidenceLanes = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
+  const failureEvidence = coachClean(recording.failureEvidence, "");
+  const mistakeTypes = Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.filter(Boolean) : [];
   if (detail.length < 240) {
     issues.push("visible paragraph is too short");
   }
@@ -1643,6 +1647,14 @@ function visibleParagraphStandardIssues(recording = {}) {
   }
   if (eventEvidence.length < 60) {
     issues.push("eventEvidence must name visible proof");
+  }
+  if (needsEvidenceLanes) {
+    if (failureEvidence.length < 80) {
+      issues.push("failureEvidence must explain what visibly failed and what it cost");
+    }
+    if (mistakeTypes.length < 3) {
+      issues.push("mistakeTypes must name at least three distinct mistake lanes");
+    }
   }
   const unverifiedClockCount = (allVisibleText.match(/\b\d{1,2}:[0-5]\d\b/g) || [])
     .filter((clock) => !anchorMatchesClock(clock, recording.clockAnchors, 5)).length;
@@ -2126,6 +2138,13 @@ function manualFeedback(file) {
       gameDetail: "At 23:33, in a 1/6/1, 152 CS, 25-minute ranked game, you are taking a side jungle camp while enemies are pressuring through your side of the map; your job is to leave the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on camp gold. At 23:33 the feeding pattern is not that you never farm; it is that normal farm stays on the menu after the map state already says defend. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
       whyTrust: "The review is tied to the visible collapse frames and the scoreboard line: 1/6/1 with 152 CS, side-camp choice at 23:33, and death/base consequence at 25:30.",
       eventEvidence: "17:42 shows Samira mid with an ally and a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on a side jungle camp while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
+      failureEvidence: "Failure evidence: at 23:33 Samira chooses a side jungle camp while the visible map state is already about base defense, so the failure is not farming in general; it is farming after the defend signal. By 25:30 the cost is visible because Samira is dead, an allied turret has fallen, and enemies are inside the base area.",
+      mistakeTypes: [
+        "side farm over base defense",
+        "camera/map-state check",
+        "shutdown or death-state exposure",
+        "wave/objective defense timing"
+      ],
       goodThing: "At 17:42 you did find the correct map lane with an ally and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
       focusTag: "base defense over side farm",
       evidence: "Manual frame review of the latest ranked recording plus scoreboard context: 1/6/1, 152 CS, mid-wave setup at 17:42, river hover at 19:39, isolated side camp at 23:33, and death/base collapse at 25:30.",
@@ -2166,6 +2185,13 @@ function manualFeedback(file) {
       gameDetail: "At 23:33 the mid push has turned into a crowded fight with three enemy bodies still in front of you and an enemy turret/base line behind them; your job is to stand behind the first ally, hit the nearest safe target or wave, and leave as soon as your health drops instead of staying available for the full re-engage. By 23:43 you are dead with multiple allies also down, so the leak is not that you lacked damage; the leak is that the fight continued after the safe damage window ended and gave the enemy a clean push back. At 24:20, when you respawn with several teammates still dead, do not run out looking for a fight or a side route; hold base, clear the closest wave under turret, and wait for at least two teammates to spawn. At 26:54 the same rule appears again with four allies dead: stop at the base/inhibitor line, do not walk up bottom jungle or lane, and only clear minions that enter tower range. The simple next-game script is fight from behind a body while the state is even, and when the state is losing, defend one safe wave until teammates are alive.",
       whyTrust: "The review is tied to the death-state frames: the game was already hard, so the fastest improvement is removing the extra deaths after the safe fight window is gone.",
       eventEvidence: "23:33 shows Samira behind a Baron-powered mid push with multiple enemy defenders still alive; 23:43 shows Samira dead after the fight continues; 24:20 shows Samira respawning while several teammates are still dead; 26:54 shows Samira moving out while four allies are dead.",
+      failureEvidence: "Failure evidence: at 23:33 the fight is already crowded with enemy defenders alive, so the safe damage window is ending. By 23:43 Samira is dead with allies also down; at 24:20 and 26:54 the visible failure repeats as forward movement starts while teammates are still dead instead of holding the base line.",
+      mistakeTypes: [
+        "spacing/entry discipline",
+        "shutdown or death-state exposure",
+        "base-defense wave timing",
+        "forward pathing after allies die"
+      ],
       goodThing: "At 19:52 you are in the better shape: allies are in front of Samira near mid, so you can damage from behind them instead of being the first body enemies reach.",
       focusTag: "losing-state discipline",
       evidence: "Manual frame review of the May 22 6:11 PM ranked game: mid fight setup at 23:33, death-state consequence at 23:43, respawn/base state at 24:20, and four-allies-dead defense state at 26:54.",
@@ -2821,9 +2847,11 @@ function analysisSpecificityIssues(parsed, context = {}) {
   const gameDetail = coachClean(parsed?.gameDetail, "");
   const eventEvidence = coachClean(parsed?.eventEvidence, "");
   const secondaryFocus = coachClean(parsed?.secondaryFocus || parsed?.secondaryImprovement, "");
+  const mistakeTypes = cleanList(parsed?.mistakeTypes, 5);
+  const failureEvidence = coachClean(parsed?.failureEvidence, "");
   const pattern = coachClean(parsed?.pattern, "");
   const nuance = cleanList(parsed?.nuance, 5);
-  const combined = [feedback, gameDetail, eventEvidence, secondaryFocus, pattern, nuance.join(" ")].join(" ");
+  const combined = [feedback, gameDetail, eventEvidence, failureEvidence, secondaryFocus, pattern, mistakeTypes.join(" "), nuance.join(" ")].join(" ");
   const issues = [];
   const isAutoFullReview = /^auto_/i.test(context.file || "") && Number(context.duration || 0) >= 90;
   if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback)) {
@@ -2834,6 +2862,12 @@ function analysisSpecificityIssues(parsed, context = {}) {
   }
   if (!eventEvidence || eventEvidence.length < 60) {
     issues.push("eventEvidence must name visible proof");
+  }
+  if (isAutoFullReview && (!failureEvidence || failureEvidence.length < 80)) {
+    issues.push("failureEvidence must spell out the visible proof of failure, not only the recommendation");
+  }
+  if (isAutoFullReview && mistakeTypes.length < 3) {
+    issues.push("mistakeTypes must list at least three distinct mistake lanes visible or honestly limited by the recording");
   }
   if (!/\b(leak|cost|punish|punished|shutdown|tempo|missed|risk|risky|death|died|gave|lost|blocked|consequence|happened)\b/i.test(combined)) {
     issues.push("missing leak or consequence");
@@ -3185,16 +3219,17 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "The recorder is intentionally low-FPS for low-lag review. At 2 FPS, scan every visible aspect that can honestly be judged: macro, reset timing, objective conversion, side-lane drift, base pressure, shutdown protection, map tempo, camera stability, spacing, entry timing, target choice, cooldown/CC accounting, wave state, fog/vision pathing, and repeated cursor/pathing patterns. Do not over-index on single-frame mechanics.",
     "Do not name allied or enemy champions unless the name is verified from visible roster/nameplate evidence. If uncertain, say ally, enemy, support, jungler, defender, or teammate. Do not name red buff or blue buff unless the camp label is visually verified; say jungle camp instead.",
     "Coach like a blunt but serious Challenger-path League coach: name the actual mistake, do not soften it, and do not insult Alan. If a play is greedy, late, unsafe, low-value, disconnected, or not transferable to stronger ranked games, say that plainly and tie it to visible evidence.",
-    "Give exactly two improvement areas for this recording after scanning the whole visible game. The first is the highest-value main mistake and stays in feedback/gameDetail. The second goes in secondaryFocus as one separate easy thing Alan can work on right away.",
+    "Give one highest-value main mistake plus at least two supporting mistake lanes after scanning the whole visible game. The main mistake stays in feedback/gameDetail. The next easiest lane goes in secondaryFocus. The broader lane list goes in mistakeTypes so the page can show more kinds of mistakes without becoming a giant checklist.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
     "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
     "Alan's latest correction: do not stop at category advice like group, reset, pressure mid, spacing, or target selection. For the main mistake, gameDetail must include a replayable action script tied to the timestamp: 'At MM:SS, do X instead of Y; if Z is true, do A; if not, do B.' This should tell him what to click or wait for in that exact state.",
-    "Also include eventEvidence: one compact sentence naming the actual visible things that prove the coaching claim. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, missed reset window, or tempo leak; if the advice is structure conversion, the evidence must show structure access, a free structure, a blocked structure, or the chase away from it. This is proof, not advice.",
+    "Also include eventEvidence and failureEvidence. eventEvidence is one compact sentence naming the actual visible things that prove the coaching claim. failureEvidence is the same proof written as the failure chain: what Alan did, what visible state made it wrong, what leaked, and what happened next or almost happened. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, missed reset window, or tempo leak; if the advice is structure conversion, the evidence must show structure access, a free structure, a blocked structure, or the chase away from it. This is proof, not advice.",
     "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like a useful replay-review paragraph, not a stat audit: include the main visible mistake window, what leaked, what happened next or almost happened, and one final simple lesson sentence. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must say what to do differently in that state. Extra timestamps are optional and should appear only when they make the critique clearer.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
     "secondaryFocus must be one concise sentence and must not repeat the main mistake. Choose the strongest second lane from visible mechanics-adjacent habits, camera stability, spacing, target choice, cursor/click pattern when visible, entry timing, cooldown/CC accounting, lane trade discipline, wave handling, pathing, fog/vision, or reset pattern. Include an easy next-game action.",
+    "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
     "Do not over-explain common coaching terms Alan already knows. Only define grouped mid, sync, tempo, payout, or conversion when the advice would otherwise be unclear; prioritize the timestamped replacement action and why that action is better in this visible state.",
@@ -3210,11 +3245,11 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Prioritize repeatable habits that stop the gameplay from transferring to much harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
     "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
-    "The nuance bullets must be specific coaching facts, not paraphrases: include what was good, what leaked, what happened, what the harder-game or Challenger-level punishment would be, and the next repeatable check when the frames support them.",
+    "The nuance bullets must be specific coaching facts, not paraphrases: include what was good, what leaked, what happened, at least one additional mistake lane beyond the main leak, what the harder-game or Challenger-level punishment would be, and the next repeatable check when the frames support them.",
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
     "Visible output must address the player as 'you' or 'Samira', never 'Alan' in third person.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, timestamped do-this-instead action script, and one simple lesson sentence","secondaryFocus":"Second focus: one distinct mechanics/camera/spacing/pathing/wave/vision/target-choice improvement plus one easy next-game action; mention FPS limits if micro-mechanics cannot be judged","eventEvidence":"compact proof of what visibly happened in the game","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, timestamped do-this-instead action script, and one simple lesson sentence","secondaryFocus":"Second focus: one distinct mechanics/camera/spacing/pathing/wave/vision/target-choice improvement plus one easy next-game action; mention FPS limits if micro-mechanics cannot be judged","mistakeTypes":["3-5 short distinct mistake lanes visible or honestly limited by the recording"],"eventEvidence":"compact proof of what visibly happened in the game","failureEvidence":"one sentence proving failure: what Alan did, what state made it wrong, what leaked, and what happened next or almost happened","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, second/third mistake lane, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -3226,7 +3261,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and exactly what to do differently at the timestamp. Be direct enough for a Challenger-path review without insulting him. Timestamp the start or nearest visible start of the main mistake window, make that timestamped sentence a replacement action script, include one separate secondaryFocus that does not repeat the main mistake, keep Mistake/Fix labels out of gameDetail, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and exactly what to do differently at the timestamp. Be direct enough for a Challenger-path review without insulting him. Timestamp the start or nearest visible start of the main mistake window, make that timestamped sentence a replacement action script, include failureEvidence as visible proof of failure, include mistakeTypes with at least three distinct mistake lanes, include one separate secondaryFocus that does not repeat the main mistake, keep Mistake/Fix labels out of gameDetail, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
@@ -3244,7 +3279,9 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
       feedback: coachClean(parsed.feedback, "Review the clip and choose one safer next action."),
       gameDetail: coachClean(parsed.gameDetail, `${coachClean(parsed.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(parsed.feedback, "Choose one safer next action.")}`),
       secondaryFocus: coachClean(parsed.secondaryFocus || parsed.secondaryImprovement, ""),
+      mistakeTypes: cleanList(parsed.mistakeTypes, 5).map((item) => coachClean(item)),
       eventEvidence: coachClean(parsed.eventEvidence, coachClean(parsed.evidence, "Generated from sampled replay frames.")),
+      failureEvidence: coachClean(parsed.failureEvidence, ""),
       goodThing: coachClean(parsed.goodThing, ""),
       whyTrust: coachClean(parsed.whyTrust, "This feedback is tied to the visible replay pattern and one controllable in-game decision."),
       focusTag: coachClean(parsed.focusTag, "review"),
@@ -3628,6 +3665,8 @@ async function main() {
         analysisVersion,
         gameDetail: integratedGameDetail,
         secondaryFocus: analysis.secondaryFocus || analysis.secondaryImprovement || "",
+        failureEvidence: analysis.failureEvidence || "",
+        mistakeTypes: analysis.mistakeTypes || [],
         eventEvidence: finalEventEvidence,
         clockAnchors: annotatedClockAnchors
       });
@@ -3643,6 +3682,8 @@ async function main() {
           analysisVersion,
           gameDetail: integratedGameDetail,
           secondaryFocus: analysis.secondaryFocus || analysis.secondaryImprovement || "",
+          failureEvidence: analysis.failureEvidence || "",
+          mistakeTypes: analysis.mistakeTypes || [],
           eventEvidence: finalEventEvidence,
           clockAnchors: annotatedClockAnchors
         });
@@ -3701,7 +3742,9 @@ async function main() {
       feedback: normalizeVisibleCoachText(stripUnmatchedClockTokens(analysis.feedback || "Review the clip and choose one safer next action.", annotatedClockAnchors), championName),
       gameDetail: integratedGameDetail,
       secondaryFocus: normalizeVisibleCoachText(stripUnmatchedClockTokens(stripUnverifiedClockReferences(analysis.secondaryFocus || analysis.secondaryImprovement || "", narrativeClockAnchors), annotatedClockAnchors), championName),
+      mistakeTypes: cleanList(analysis.mistakeTypes, 5).map((item) => normalizeVisibleCoachText(item, championName)),
       eventEvidence: finalEventEvidence,
+      failureEvidence: normalizeVisibleCoachText(stripUnmatchedClockTokens(stripUnverifiedClockReferences(analysis.failureEvidence || "", narrativeClockAnchors), annotatedClockAnchors), championName),
       goodThing: normalizeVisibleCoachText(analysis.goodThing || "", championName),
       whyTrust: normalizeVisibleCoachText(analysis.whyTrust || "This feedback is tied to the visible replay pattern and one controllable in-game decision.", championName),
       focusTag: normalizeVisibleCoachText(analysis.focusTag || "review", championName),

@@ -2439,6 +2439,8 @@ h1 {
 .recording-story-critique,
 .recording-story-praise,
 .recording-story-secondary,
+.recording-story-evidence,
+.recording-story-types,
 .recording-story-rank,
 .recording-story-stats {
   font-weight: 900;
@@ -2458,6 +2460,14 @@ h1 {
 
 .recording-story-praise {
   color: #2d7a43;
+}
+
+.recording-story-evidence {
+  color: #5b5148;
+}
+
+.recording-story-types {
+  color: #3c5f66;
 }
 
 .recording-story-secondary {

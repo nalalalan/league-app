@@ -40,6 +40,8 @@ function visibleFields(recording = {}) {
     ["feedback", recording.feedback],
     ["gameDetail", recording.gameDetail],
     ["secondaryFocus", recording.secondaryFocus || recording.secondaryImprovement],
+    ["failureEvidence", recording.failureEvidence],
+    ["mistakeTypes", Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.join("; ") : ""],
     ["eventEvidence", recording.eventEvidence || recording.evidence],
     ["goodThing", recording.goodThing],
     ["whyTrust", recording.whyTrust]
@@ -58,12 +60,14 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-23-evidence-lanes-coaching-v14",
     "2026-05-22-action-script-coaching-v13",
     "2026-05-22-two-focus-coaching-v11",
     "2026-05-22-challenger-direct-coaching-v12"
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
-  const needsActionScript = recording.analysisVersion === "2026-05-22-action-script-coaching-v13";
+  const needsActionScript = recording.analysisVersion === "2026-05-23-evidence-lanes-coaching-v14" || recording.analysisVersion === "2026-05-22-action-script-coaching-v13";
+  const needsEvidenceLanes = recording.analysisVersion === "2026-05-23-evidence-lanes-coaching-v14";
 
   if (/\bAlan\b/.test(allVisible)) {
     issues.push("visible feedback refers to Alan in third person");
@@ -109,6 +113,12 @@ function feedbackIssues(recording = {}) {
   }
   if (!evidence || evidence.length < 55 || /generated from sampled|limited to sampled|conservative read|match-level/i.test(evidence)) {
     issues.push("full review evidence is too weak");
+  }
+  if (needsEvidenceLanes) {
+    const failureEvidence = clean(recording.failureEvidence);
+    const mistakeTypes = Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.filter(Boolean) : [];
+    if (failureEvidence.length < 80) issues.push("failureEvidence does not prove the visible failure chain");
+    if (mistakeTypes.length < 3) issues.push("mistakeTypes needs at least three distinct mistake lanes");
   }
   if (!recording.rankEstimate?.exactRank) {
     issues.push("full review missing exact rank read");

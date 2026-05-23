@@ -1701,6 +1701,53 @@ function displaySecondaryFocus(item) {
   return `Second focus: ${text.replace(/^Also\s+/i, "").trim()}`;
 }
 
+function displayFailureEvidence(item) {
+  const evidence = stripCoachPrefix(item.failureEvidence || recordingEvidence(item));
+  if (!hasText(evidence) || isGenericEvidence(evidence)) return "";
+  if (/^Failure evidence:/i.test(evidence)) return evidence;
+  return `Failure evidence: ${evidence}`;
+}
+
+function displayMistakeTypes(item) {
+  const explicit = Array.isArray(item.mistakeTypes)
+    ? item.mistakeTypes.map((value) => String(value || "").replace(/\s+/g, " ").trim()).filter(Boolean)
+    : [];
+  const inferred = inferMistakeTypes(item);
+  const unique = [...explicit, ...inferred]
+    .map((value) => value.replace(/[.!?]+$/g, "").trim())
+    .filter(Boolean)
+    .filter((value, index, array) => array.findIndex((other) => other.toLowerCase() === value.toLowerCase()) === index)
+    .slice(0, 4);
+  if (!unique.length) return "";
+  return `Other mistake types: ${unique.join("; ")}.`;
+}
+
+function inferMistakeTypes(item) {
+  const source = [
+    item.feedbackTitle,
+    item.feedback,
+    item.gameDetail,
+    item.secondaryFocus,
+    item.pattern,
+    item.eventEvidence,
+    ...(Array.isArray(item.nuance) ? item.nuance : [])
+  ].filter(Boolean).join(" ").toLowerCase();
+  const candidates = [
+    ["side farm over base defense", /\b(camp|jungle camp|side wave|side value|side farm|normal farm)\b[\s\S]{0,120}\b(base|defend|turret|inhibitor|collapse)\b|\b(base|defend|turret|inhibitor|collapse)\b[\s\S]{0,120}\b(camp|jungle camp|side wave|side value|side farm|normal farm)\b/],
+    ["reset/overstay discipline", /\b(reset|recall|overstay|stay(?:ed|ing)?|unspent|gold|death timer)\b/],
+    ["shutdown or death-state exposure", /\b(shutdown|dead|death|died|feeding|low hp|lethal|one spell from death|allies? dead|teammates? dead)\b/],
+    ["camera/map-state check", /\b(camera|map check|death timers?|minimap|nearest threatened turret|glance|look at mid|map state)\b/],
+    ["spacing/entry discipline", /\b(spacing|entry|frontline|support|cross past|stand behind|first ally|enemy engage|body)\b/],
+    ["target choice or chase drift", /\b(target choice|chase|chasing|side jungle|fog|collapse|dash|re-enter|re-entry)\b/],
+    ["wave/objective conversion", /\b(wave|structure|tower|turret|inhibitor|nexus|objective|conversion|payout|hit structure)\b/],
+    ["vision/fog pathing", /\b(vision|fog|unseen|pathing|river|jungle|collapse risk)\b/]
+  ];
+  return candidates
+    .filter(([, pattern]) => pattern.test(source))
+    .map(([label]) => label)
+    .slice(0, 4);
+}
+
 function storySentences(text) {
   return String(text || "")
     .replace(/\s+/g, " ")
@@ -1955,6 +2002,8 @@ function recordingStoryParagraph(item) {
     .filter((sentence) => !isRedundantStorySentence(sentence, item, critique));
   const praise = displayPraise(item);
   const secondaryFocus = displaySecondaryFocus(item);
+  const failureEvidence = displayFailureEvidence(item);
+  const mistakeTypes = displayMistakeTypes(item);
   const critiqueIndex = critiqueInsertIndex(sentences);
   const praiseIndex = praise ? praiseInsertIndex(sentences) : -1;
   const timestampOptions = { linkTimestamps: true, item };
@@ -1967,6 +2016,8 @@ function recordingStoryParagraph(item) {
     appendStorySpan(paragraph, critique, "recording-story-critique", timestampOptions);
     appendStorySpan(paragraph, praise, "recording-story-praise", timestampOptions);
   }
+  appendStorySpan(paragraph, failureEvidence, "recording-story-evidence", timestampOptions);
+  appendStorySpan(paragraph, mistakeTypes, "recording-story-types", timestampOptions);
   appendStorySpan(paragraph, secondaryFocus, "recording-story-secondary", timestampOptions);
   return paragraph;
 }
