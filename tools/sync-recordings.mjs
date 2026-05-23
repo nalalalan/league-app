@@ -35,7 +35,10 @@ const rankEstimateVersion = "2026-05-22-exact-rank-trend-v4";
 const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
-const refreshedManualFeedbackFiles = new Set(["auto_NA1-5565911037_01.mp4"]);
+const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5565911037_01.mp4",
+  "auto_NA1-5566120017_01.mp4"
+]);
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
 const targetPublicVideoBytes = Number(process.env.LEAGUE_TARGET_PUBLIC_VIDEO_BYTES || 92 * 1024 * 1024);
 const minPublicVideoRatio = Number(process.env.LEAGUE_MIN_PUBLIC_VIDEO_RATIO || 0.5);
@@ -2106,6 +2109,45 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5566120017_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Side camp while base is breaking",
+      feedback: "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and deaths. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
+      gameDetail: "At 23:33 you are hitting red buff alone while enemies are already pressuring through your side of the map; your job is to stop the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on jungle gold. The leak is time: every extra second on the camp leaves Samira away from the only place that can stop the push, and the consequence shows by 25:30 when you are dead, an allied turret has fallen, and the enemy is inside the base area. Earlier, at 17:42, the correct shape briefly appears because you and Hecarim are mid with a wave; the better next click there is to keep hovering mid/river with him after the wave dies, not drift into low-impact side collection while the enemy controls the next fight. At 19:39 you are again near river with an ally, which is the useful map area; if no fight is possible, hold vision and catch the next mid wave, not a deep side camp. The simple rule for the next game is: when your team is behind and structures are threatened, one safe defensive wave is worth more than one jungle camp.",
+      whyTrust: "The review is tied to the visible collapse frames: 23:33 shows the side-camp choice, and 25:30 shows the death plus base-structure consequence.",
+      eventEvidence: "17:42 shows Samira and Hecarim mid with a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on red buff while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
+      goodThing: "At 17:42 you did find the correct map lane with Hecarim and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
+      focusTag: "base defense over side farm",
+      evidence: "Manual frame review of auto_NA1-5566120017_01.mp4: mid-wave setup at 17:42, river hover at 19:39, isolated red-buff camp at 23:33, and death/base collapse at 25:30.",
+      pattern: "The repeated mistake is not mechanics; it is treating a losing map as if normal farming still has equal value. In harder games, the team that is losing has to defend the shortest lane and base line first, then take camps only after the wave is stopped.",
+      diamondRule: "When the enemy can hit your base, defensive wave first, jungle camp second.",
+      drill: "Next game, whenever an outer or inhibitor-side turret is threatened, say wave before camp and path to the structure line first.",
+      timeline: [
+        "17:42 - Samira and Hecarim are mid with a wave, which is the correct pressure lane.",
+        "19:39 - Samira is near river with an ally, close enough to help a mid or dragon-side fight.",
+        "23:33 - Samira is alone on red buff while the enemy map state is threatening base pressure.",
+        "25:30 - Samira is dead, an allied turret has fallen, and enemies are in the base area."
+      ],
+      clockAnchors: [
+        { clock: "17:42", videoSeconds: 1057.692, description: "Samira and Hecarim are mid clearing a wave together." },
+        { clock: "19:39", videoSeconds: 1174.769, description: "Samira is near river with an ally before the next map collapse." },
+        { clock: "23:33", videoSeconds: 1408.923, description: "Samira is hitting red buff alone while the enemy side of the map is pressuring in." },
+        { clock: "25:30", videoSeconds: 1526, description: "Samira is dead while an allied turret has fallen and enemies are inside the base area." }
+      ],
+      nuance: [
+        "Good: the 17:42 mid wave with Hecarim is the map shape to keep.",
+        "Leak: at 23:33 the camp takes your champion away from the base-defense line.",
+        "Consequence: by 25:30 you are dead and the enemy has converted pressure into your base.",
+        "Next check: if a structure can fall before you finish the camp, leave the camp.",
+        "Second focus is camera/map checking, not combo speed, because the 2 FPS capture is better for decisions than frame-perfect mechanics."
+      ],
+      reviewLimit: "This uses sampled 2 FPS frames, so it cannot judge exact combo speed or every cooldown. It can judge map state, side-camp timing, ally location, death state, and whether the next click protects base.",
+      secondaryFocus: "Second focus: camera and map checks - next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5565911037_01.mp4") {
     return {
       champion: "Samira",
@@ -2801,6 +2843,9 @@ function analysisSpecificityIssues(parsed, context = {}) {
   }
   if (isAutoFullReview && !hasTimestampedActionScript(gameDetail)) {
     issues.push("gameDetail must include a timestamped replacement action script");
+  }
+  if (/\b(?:by|at|around)\s+and\s*,/i.test(combined)) {
+    issues.push("visible evidence contains a malformed timestamp phrase");
   }
   if (/^(this|each time|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(gameDetail)) {
     issues.push("gameDetail starts with conclusion instead of visible action");

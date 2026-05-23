@@ -88,8 +88,11 @@ function feedbackIssues(recording = {}) {
   if (!/\b(because|this matters|reason|so that|which means|which makes|which proves|so\s+(?:the|a|every|your|you))\b/i.test(detail)) {
     issues.push("full review does not explain why the advice is correct");
   }
-  if (!/\b(leak|cost|punish|punished|shutdown|tempo|risk|risky|death|died|missed|delay|stall|throw|collapse|window|lost|gave|overstay|alone)\b/i.test(allVisible)) {
+  if (!/\b(leak|leaks|leaked|cost|punish|punished|shutdown|tempo|risk|risky|death|died|missed|delay|stall|throw|collapse|consequence|window|lost|gave|overstay|alone)\b/i.test(allVisible)) {
     issues.push("full review does not name the leak or consequence");
+  }
+  if (/\b(?:by|at|around)\s+and\s*,/i.test(allVisible)) {
+    issues.push("visible review contains a malformed timestamp phrase");
   }
   if (needsActionScript && !hasTimestampedActionScript(detail)) {
     issues.push("full review missing a timestamped do-this-instead action script");
