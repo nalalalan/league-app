@@ -10,7 +10,7 @@ const appRoot = path.resolve(__dirname, "..");
 const publicRoot = path.join(appRoot, "public");
 const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
-const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
+const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
 const currentPrimaryMistakeAnalysisVersions = new Set([
   "2026-05-22-action-script-coaching-v13",
   "2026-05-22-two-focus-coaching-v11",
