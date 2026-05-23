@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-23T00:09:06.115Z",
+  "generatedAt": "2026-05-23T03:28:12.331Z",
   "source": "League of Legends Highlights folder",
-  "match": "30 matches",
+  "match": "31 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -32,19 +32,20 @@
     "NA1-5565856492",
     "NA1-5565905533",
     "NA1-5565911037",
-    "NA1-5565964482"
+    "NA1-5565964482",
+    "NA1-5566120017"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 8:08 PM ET",
-  "totalDuration": "327:24",
-  "totalRecordings": 42,
+  "captured": "May 18, 2026, 5:46 PM to May 22, 2026, 11:20 PM ET",
+  "totalDuration": "352:54",
+  "totalRecordings": 43,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira overall state",
-    "focus": "Current read: Iron I on the newest full game; Iron I across the last 5 full-game reads; Bronze III median across 28 full games. The latest game is near your recent baseline.",
+    "focus": "Current read: Bronze I on the newest full game; Bronze IV across the last 5 full-game reads; Bronze III median across 29 full games. The latest game is above your recent baseline.",
     "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is grouping with allies when the play is clear and enough damage to win bot-game fights.",
     "nextRep": "Next game: call even or losing before each fight; if losing, choose only back, tower wave, or wait.",
     "whyTrust": "This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.",
-    "pattern": "Latest file auto_NA1-5565964482_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
+    "pattern": "Latest file auto_NA1-5566120017_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
     "checklist": [
       "Read the latest rank point.",
       "Check the repeated leak.",
@@ -57,19 +58,19 @@
     "method": "research-calibrated macro rank estimate with confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 28,
+    "fullReviewGames": 29,
     "queueCounts": {
       "unknown": 4,
       "bot": 18,
-      "ranked_solo": 6
+      "ranked_solo": 7
     },
-    "rankedFullGames": 6,
-    "pvpFullGames": 6,
+    "rankedFullGames": 7,
+    "pvpFullGames": 7,
     "botFullGames": 18,
-    "anchoredFullGames": 28,
-    "statFullGames": 28,
+    "anchoredFullGames": 29,
+    "statFullGames": 29,
     "rankLabelCounts": {
-      "Bronze": 12,
+      "Bronze": 13,
       "Silver": 5,
       "Iron": 10,
       "Gold": 1
@@ -155,13 +156,159 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 42,
+      "recordings": 43,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5566120017_01.mp4",
+      "publicFile": "auto_NA1-5566120017_01.mp4",
+      "cacheKey": "49207218:1779506457692",
+      "fingerprint": "1c896cfd49b0",
+      "matchId": "NA1-5566120017",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779504841362,
+      "gameHappenedAt": "2026-05-23T02:54:01.362Z",
+      "gameHappenedAtLabel": "May 22, 2026, 10:54 PM",
+      "recordedAt": "2026-05-23T03:20:57.821Z",
+      "recordedAtLabel": "May 22, 2026, 11:20 PM",
+      "recordedAtTimeLabel": "11:20 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Side camp while base is breaking",
+      "duration": "25:30",
+      "durationSeconds": 1530,
+      "gameLength": "25:46",
+      "gameLengthSeconds": 1546,
+      "kda": "1/6/1",
+      "kills": 1,
+      "deaths": 6,
+      "assists": 1,
+      "cs": 152,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Side camp while base is breaking",
+      "feedback": "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and deaths. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
+      "gameDetail": "At 23:33 you are hitting red buff alone while enemies are already pressuring through your side of the map; your job is to stop the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on jungle gold. The leak is time: every extra second on the camp leaves Samira away from the only place that can stop the push, and the consequence shows by 25:30 when you are dead, an allied turret has fallen, and the enemy is inside the base area. Earlier, at 17:42, the correct shape briefly appears because you and Hecarim are mid with a wave; the better next click there is to keep hovering mid/river with him after the wave dies, not drift into low-impact side collection while the enemy controls the next fight. At 19:39 you are again near river with an ally, which is the useful map area; if no fight is possible, hold vision and catch the next mid wave, not a deep side camp. The simple rule for the next game is: when your team is behind and structures are threatened, one safe defensive wave is worth more than one jungle camp.",
+      "secondaryFocus": "Second focus: camera and map checks - next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
+      "eventEvidence": "17:42 shows Samira and Hecarim mid with a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on red buff while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
+      "goodThing": "At 17:42 you did find the correct map lane with Hecarim and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
+      "whyTrust": "The review is tied to the visible collapse frames: 23:33 shows the side-camp choice, and 25:30 shows the death plus base-structure consequence.",
+      "focusTag": "base defense over side farm",
+      "evidence": "Manual frame review of auto_NA1-5566120017_01. mp4: mid-wave setup at 17:42, river hover at 19:39, isolated red-buff camp at 23:33, and death/base collapse at 25:30.",
+      "pattern": "The repeated mistake is not mechanics; it is treating a losing map as if normal farming still has equal value. In harder games, the team that is losing has to defend the shortest lane and base line first, then take camps only after the wave is stopped.",
+      "diamondRule": "When the enemy can hit your base, defensive wave first, jungle camp second.",
+      "drill": "Next game, whenever an outer or inhibitor-side turret is threatened, say wave before camp and path to the structure line first.",
+      "timeline": [
+        "17:42 - Samira and Hecarim are mid with a wave, which is the correct pressure lane.",
+        "19:39 - Samira is near river with an ally, close enough to help a mid or dragon-side fight.",
+        "23:33 - Samira is alone on red buff while the enemy map state is threatening base pressure.",
+        "25:30 - Samira is dead, an allied turret has fallen, and enemies are in the base area."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "17:42",
+          "videoSeconds": 1057.692,
+          "description": "Samira and Hecarim are mid clearing a wave together."
+        },
+        {
+          "clock": "19:39",
+          "videoSeconds": 1174.769,
+          "description": "Samira is near river with an ally before the next map collapse."
+        },
+        {
+          "clock": "23:33",
+          "videoSeconds": 1408.923,
+          "description": "Samira is hitting red buff alone while the enemy side of the map is pressuring in."
+        },
+        {
+          "clock": "25:30",
+          "videoSeconds": 1526,
+          "description": "Samira is dead while an allied turret has fallen and enemies are inside the base area."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "17:42",
+          "videoSeconds": 1057.692,
+          "description": "shows Samira and Hecarim mid with a wave"
+        },
+        {
+          "clock": "19:39",
+          "videoSeconds": 1174.769,
+          "description": "shows Samira near river with an ally"
+        },
+        {
+          "clock": "23:33",
+          "videoSeconds": 1408.923,
+          "description": "shows Samira alone on red buff while the enemy map state is pushing in"
+        },
+        {
+          "clock": "25:30",
+          "videoSeconds": 1526,
+          "description": "shows Samira dead as an allied turret falls and enemies are in the base area."
+        }
+      ],
+      "nuance": [
+        "Good: the 17:42 mid wave with Hecarim is the map shape to keep.",
+        "Leak: at 23:33 the camp takes your Samira away from the base-defense line.",
+        "Consequence: by 25:30 you are dead and the enemy has converted pressure into your base.",
+        "Next check: if a structure can fall before you finish the camp, leave the camp.",
+        "Second focus is camera/map checking, not combo speed, because the 2 FPS capture is better for decisions than frame-perfect mechanics."
+      ],
+      "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed or every cooldown. It can judge map state, side-camp timing, ally location, death state, and whether the next click protects base.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-22-action-script-coaching-v13",
+      "sampledFrames": 14,
+      "publicVideoBytes": 49207218,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5566120017_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5566120017-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-exact-rank-trend-v4",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "score": 37,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 98,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "developing",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze I read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
+      }
+    },
     {
       "file": "auto_NA1-5565964482_01.mp4",
       "publicFile": "auto_NA1-5565964482_01.mp4",
