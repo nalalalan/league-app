@@ -19,7 +19,7 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-5-mini";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-23-evidence-lanes-coaching-v14";
+const analysisVersion = "2026-05-23-champion-source-coaching-v15";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
   "2026-05-22-action-script-coaching-v13",
@@ -38,6 +38,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5566620104_01.mp4",
   "auto_NA1-5565911037_01.mp4",
   "auto_NA1-5565964482_01.mp4",
   "auto_NA1-5565818690_01.mp4",
@@ -225,6 +226,15 @@ function queueLabel(queueId) {
   return labels[Number(queueId)] || "Type unknown";
 }
 
+function knownChampionName(id) {
+  const championIds = {
+    51: "Cait",
+    105: "Fizz",
+    360: "Samira"
+  };
+  return championIds[Number(id)] || "";
+}
+
 function shortClock(seconds) {
   if (!Number.isFinite(seconds)) return "";
   return mmss(seconds);
@@ -340,6 +350,8 @@ async function loadMatchStats(matchIds) {
       assists: Number(itemStats.assists || 0),
       kda: `${Number(itemStats.kills || 0)}/${Number(itemStats.deaths || 0)}/${Number(itemStats.assists || 0)}`,
       cs,
+      championName: clean(participant.championName || knownChampionName(participant.championId)),
+      championId: Number(participant.championId) || null,
       statsSource: "League Client match history"
     });
   }
@@ -1405,7 +1417,7 @@ function ensureTeachingReasonAndLength(recording) {
     additions.push("The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.");
   }
   if (!/\b(because|so that|this matters because|the reason|which makes|which means|which proves|meaning|means|so\s+(?:the|a|every|your|you))\b/i.test(detail)) {
-    additions.push("This matters because Samira climbs through clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.");
+    additions.push("This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.");
   }
   if (detail.length < 240 && recording.failureEvidence) {
     additions.push(recording.failureEvidence);
@@ -1647,7 +1659,7 @@ async function selectEvidenceClockMoments({ file, analysis, clockAnchors, frameD
     "One strong mistake-start timestamp is enough. Do not include weak extra timestamps just to pad the review.",
     "If an allowed anchor is only normal gameplay, walking, farming, shop, respawn, or a random fight unrelated to the coaching claim, reject it.",
     "Reject shop, fountain, scoreboard, game-start, or item-selection anchors unless the coaching claim is literally about buying, recalling, or spending.",
-    "Descriptions should be short evidence labels tied to the lesson, not generic frame captions. Say Samira, not Player or Champion. A good structure/objective moment should be labeled as good evidence, not treated as a chase.",
+    "Descriptions should be short evidence labels tied to the lesson, not generic frame captions. Say the detected player champion, not Player or Champion. A good structure/objective moment should be labeled as good evidence, not treated as a chase.",
     "Return only JSON with this shape:",
     '{"clockMoments":[{"clock":"MM:SS","videoSeconds":0,"description":"why this frame is evidence for the lesson"}]}',
     `Recording file: ${file}.`,
@@ -2506,6 +2518,48 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5566620104_01.mp4") {
+    return {
+      champion: "Cait",
+      confidence: "high",
+      feedbackTitle: "Cait deaths hide useful damage",
+      feedback: "Mistake: you let playable Cait states become extra forward or side-value clicks before checking who could reach you, so deaths erased the pressure your lane damage was creating. Fix: after a wave, camp, or fight is handled, click back behind an allied body, check the nearest threatened turret/objective, and only continue if Cait can hit from max range.",
+      gameDetail: "Around 2:16, Cait is bot with an allied duo and a minion wave while enemy pressure is visible elsewhere; the useful next click is to stay behind the wave and allied body, hit only what is in max range, then choose safe wave, tower hit, objective path, or reset instead of walking into another loose trade. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the amount of pressure Cait creates. At 14:21 the frame shows the ability bar with Piltover Peacemaker, which confirms this is Cait footage and makes the rule sharper: Cait climbs by staying unavailable while dealing damage from range, not by playing the map like a short-range cleanup champion. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys.",
+      whyTrust: "The champion identity is source-checked from the visible Cait HUD and Piltover Peacemaker frame, and the stat line is from League Client match history.",
+      eventEvidence: "2:16 shows Cait's bot-side lane state with ally and wave cover; 14:21 shows the Cait ability bar with Piltover Peacemaker; the synced stat line is 0/5/6 K/D/A and 112 CS.",
+      failureEvidence: "Cait had enough lane presence to be involved in fights, but the visible review and 0/5/6 stat line show deaths outvaluing the pressure; the failure is letting Cait become reachable before the next click has a safe target, ally body, or objective payout.",
+      mistakeTypes: [
+        "Cait spacing before forward clicks",
+        "death-state exposure",
+        "camera/map-state check",
+        "wave or objective payout after pressure"
+      ],
+      goodThing: "You are still finding bot-lane presence and damage windows; keep using Cait's range and wave cover instead of abandoning pressure entirely.",
+      focusTag: "Cait spacing and payout",
+      evidence: "Manual champion-identity repair from the latest recording poster and anchors: Cait HUD, Piltover Peacemaker at 14:21, 0/5/6 K/D/A, 112 CS, and bot-lane wave states.",
+      pattern: "The repeatable issue is not mechanics speed; it is letting a ranged champion become reachable before the map state is safe. Cait should make enemies walk through wave, ally bodies, traps, or tower pressure before she is a target.",
+      diamondRule: "On Cait, if no ally or structure is between you and the enemy, the next click is back, not forward.",
+      drill: "Next Cait game, before every camp, side wave, or forward fight after 15 minutes, check ally deaths, nearest threatened turret, and whether an ally can stand between Cait and the collapse.",
+      timeline: [
+        "2:16 - Cait is bot with allied duo and minion wave cover.",
+        "14:21 - Cait ability bar shows Piltover Peacemaker, confirming the recording is Cait footage."
+      ],
+      clockAnchors: [
+        { clock: "2:16", videoSeconds: 172.538, description: "Cait is bot with allied duo and minion wave cover while enemy pressure is visible elsewhere." },
+        { clock: "14:21", videoSeconds: 762.423, description: "Cait is near turret with the ability bar showing Piltover Peacemaker." }
+      ],
+      nuance: [
+        "Good: you are present for bot-side waves and fights instead of being absent from the game.",
+        "Leak: Cait becomes reachable before the next click has ally cover, structure value, or a reset path.",
+        "Consequence: 0/5/6 means deaths are costing more than the pressure is paying.",
+        "Next check: if no ally body, trap line, wave, or turret separates Cait from the enemy, click back first.",
+        "The second lane is camera/map-state checking, because this low-FPS review can judge positioning and pathing better than frame-perfect mechanics."
+      ],
+      reviewLimit: "This is a champion-identity and visible-state repair from sampled 2 FPS footage, not a full frame-perfect Cait mechanics review.",
+      secondaryFocus: "Next Cait game, before every camp, side wave, or forward fight after 15 minutes, check ally deaths, nearest threatened turret, and whether an ally can stand between Cait and the collapse.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5566120017_01.mp4") {
     return {
       champion: "Samira",
@@ -3354,7 +3408,7 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (isAutoFullReview && !hasTimestampedActionScript(gameDetail)) {
     issues.push("gameDetail must include a timestamped replacement action script");
   }
-  const unverifiedNames = unverifiedChampionNames(combined, [parsed?.champion || "Samira"]);
+  const unverifiedNames = unverifiedChampionNames(combined, [parsed?.champion || "Unknown"]);
   if (isAutoFullReview && unverifiedNames.length) {
     issues.push(`visible feedback names unverified champion(s): ${unverifiedNames.join(", ")}; use ally/enemy/team unless roster evidence is verified`);
   }
@@ -3371,12 +3425,12 @@ function analysisSpecificityIssues(parsed, context = {}) {
     issues.push("gameDetail repeats the Mistake/Fix feedback instead of adding new evidence");
   }
   if (/\bAlan\b/.test(combined)) {
-    issues.push("visible feedback must address the player as you or Samira, not Alan in third person");
+    issues.push("visible feedback must address the player as you or the detected champion, not Alan in third person");
   }
   if (/\b(shop interface|shop open|stealth ward selected|standing at (the )?fountain|fountain at game start|game start)\b/i.test([gameDetail, eventEvidence].join(" "))) {
     issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
   }
-  if (!/^(?:At|Around|By|Then|In|During|After|When|Samira|You|\d{1,2}:[0-5]\d)\b/i.test(gameDetail)) {
+  if (!/^(?:At|Around|By|Then|In|During|After|When|Samira|Cait|Caitlyn|Fizz|You|\d{1,2}:[0-5]\d)\b/i.test(gameDetail)) {
     issues.push("visible paragraph starts with a broken fragment instead of evidence");
   }
   if (isAutoFullReview && !primaryMistakeTimestampSeconds(gameDetail, eventEvidence, pattern).length) {
@@ -3488,7 +3542,7 @@ async function describeTimelineClockAnchors({ file, sourcePath, duration, sideca
     "Alan needs timestamped League feedback even when OCR misses the tiny HUD clock.",
     "The clock labels below are computed from Riot match start time plus the capture segment timeline. Use them only as labels for the exact frames provided; do not invent events outside the frame.",
     "Choose 4-8 useful coaching evidence frames. Prefer frames showing setup, Alan's action, a fight, a wave/structure state, a reset/spend, a side-lane risk, a collapse risk, or a consequence. Avoid shop/fountain/scoreboard frames unless the visible coaching point is spending, resetting, or protecting gold.",
-    "Each description must be factual and visible. Say Samira, not Player. Do not write advice in descriptions.",
+    "Each description must be factual and visible. Say the followed player champion, not Player. Do not write advice in descriptions.",
     "Return only JSON with this shape:",
     '{"clockAnchors":[{"clock":"MM:SS","videoSeconds":0,"description":"visible evidence in that exact frame"}]}',
     `Recording file: ${file}. Duration: ${mmss(duration)}.`
@@ -3701,7 +3755,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
     "Do not over-explain common coaching terms Alan already knows. Only define grouped mid, sync, tempo, payout, or conversion when the advice would otherwise be unclear; prioritize the timestamped replacement action and why that action is better in this visible state.",
-    "If you recommend grouping mid or pressuring mid, explain why mid is better in that visible state: for example, allies are already there, mid is the shortest lane to towers/base, it reduces fog-collapse risk, it lets teammates peel, or it forces enemies to defend structure instead of chasing Samira in a side lane. Tie the reason to the frames; do not say group mid as generic advice.",
+    "If you recommend grouping mid or pressuring mid, explain why mid is better in that visible state: for example, allies are already there, mid is the shortest lane to towers/base, it reduces fog-collapse risk, it lets teammates peel, or it forces enemies to defend structure instead of chasing the player champion in a side lane. Tie the reason to the frames; do not say group mid as generic advice.",
     "Every full-game review must include the reason Alan should do the fix, not just the instruction. A good sentence sounds like: 'This matters because ...' or 'That route is better because ...'.",
     "Alan explicitly wants Challenger-level critique. You may mention Challenger-level punishment when it names a concrete consequence, but do not use rank labels as vague authority. Name the exact visible habit and exact in-game payoff.",
     "If the visible frames are too sparse for a claim, say that in reviewLimit instead of inventing certainty. A limited review is better than a vague confident one.",
@@ -3712,10 +3766,10 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "The first sentence of gameDetail must start with the visible game state or Alan's action, not a conclusion like 'This leaks...' or 'The better play...'.",
     "Prioritize repeatable habits that stop the gameplay from transferring to much harder ranked games: lethal-HP lane stays, re-entering after the first win, chasing away from open structures, wave crash, recall timing, objective conversion, shutdown protection, numbers before joining, second entry, cooldown/CC accounting, vision/fog discipline, target choice, structure hitting, and reset discipline.",
     "If this is an implementation or current-form clip, evaluate the next constraint after the attempted improvement instead of only repeating the old diagnosis.",
-    "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in Samira mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
+    "Also include whyTrust: one concrete reason Alan should trust and try the feedback, grounded in the detected champion's mechanics, map conversion, recording evidence, or anxiety-reducing decision rules.",
     "The nuance bullets must be specific coaching facts, not paraphrases: include what was good, what leaked, what happened, at least one additional mistake lane beyond the main leak, what the harder-game or Challenger-level punishment would be, and the next repeatable check when the frames support them.",
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
-    "Visible output must address the player as 'you' or 'Samira', never 'Alan' in third person.",
+    "Visible output must address the player as 'you' or the detected player champion, never 'Alan' in third person.",
     "Return only JSON with this shape:",
     '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, timestamped do-this-instead action script, and one simple lesson sentence","secondaryFocus":"one natural sentence with a distinct mechanics/camera/spacing/pathing/wave/vision/target-choice improvement plus one easy next-game action; mention FPS limits if micro-mechanics cannot be judged; no label prefix","mistakeTypes":["3-5 short distinct mistake lanes visible or honestly limited by the recording"],"eventEvidence":"compact proof of what visibly happened in the game","failureEvidence":"one natural sentence proving failure: what Alan did, what state made it wrong, what leaked, and what happened next or almost happened; no label prefix","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, second/third mistake lane, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
@@ -3988,6 +4042,8 @@ function dynamicOverallFeedback(recordings = [], detectedChampions = []) {
 function championId(name) {
   const normalized = clean(name, "unknown").toLowerCase().replace(/[^a-z]/g, "");
   const aliases = {
+    cait: "caitlyn",
+    caitlyn: "caitlyn",
     kaisa: "kaisa",
     kai: "kaisa",
     missfortune: "missfortune"
@@ -4179,7 +4235,7 @@ async function main() {
     });
     const annotatedClockAnchors = annotateClockAnchorsWithMoments(clockAnchors, clockMoments);
     const narrativeClockAnchors = isManualAnalysis ? clockAnchors : clockMoments;
-    const championName = clean(analysis.champion, "Samira");
+    const championName = clean(matchStats.championName || analysis.champion, "Unknown");
     const clockMomentEvidence = isManualAnalysis ? "" : evidenceTextFromMoments(clockMoments);
     const isFullReview = duration > 90;
     const rawGameDetail = coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`);
@@ -4271,7 +4327,7 @@ async function main() {
       statsSource: matchStats.statsSource || "",
       kind: isFullReview ? "full review" : "highlight",
       reviewPhase: phase,
-      champion: clean(analysis.champion, "Unknown"),
+      champion: championName,
       confidence: clean(analysis.confidence, "low"),
       feedbackTitle: normalizeVisibleCoachText(analysis.feedbackTitle || "Focus", championName),
       feedback: normalizeVisibleCoachText(stripUnmatchedClockTokens(analysis.feedback || "Review the clip and choose one safer next action.", annotatedClockAnchors), championName),

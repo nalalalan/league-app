@@ -479,9 +479,11 @@ const champions = [
   },
   {
     id: "caitlyn",
-    name: "Caitlyn",
-    skin: "Pool Party Caitlyn",
-    image: `${imageBase}/Caitlyn_13.jpg`,
+    name: "Cait",
+    skin: "exact Cait photo",
+    person: "Cait",
+    snippet: "Stay unavailable",
+    image: "/assets/champions/caitlyn-user-exact.png",
     focus: "Stay unavailable. Farm, survive, shoot from outside their reach.",
     note: "Caitlyn is the comfort sniper pick: range, space, sustain, and leaving when noticed.",
     situations: [
@@ -669,7 +671,11 @@ const champions = [
   }
 ];
 
-const pageChampionIds = ["samira", "fizz"];
+const pageChampionIds = ["samira", "caitlyn", "fizz"];
+const pageChampionAliases = new Map([
+  ["cait", "caitlyn"],
+  ["caitlyn", "caitlyn"]
+]);
 const pageChampions = champions.filter((champion) => pageChampionIds.includes(champion.id));
 
 const recordingReview = {
@@ -2145,12 +2151,47 @@ function durationLabel(seconds) {
 
 function championId(value) {
   const normalized = String(value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (pageChampionAliases.has(normalized)) return pageChampionAliases.get(normalized);
   return pageChampionIds.includes(normalized) ? normalized : normalized;
 }
 
 function recordingsForChampion(review, selectedChampionId) {
   return sortedRecordings(review.recordings || [])
     .filter((item) => championId(item.champion) === selectedChampionId);
+}
+
+function championLatestMainFeedback(champion, championRecordings = []) {
+  const latest = sortedRecordings(championRecordings)[0];
+  if (!latest) {
+    return {
+      focus: `No ${champion.name} recordings yet.`,
+      rule: `New ${champion.name} games will appear after the Highlights folder updates.`,
+      whyTrust: "No footage, no feedback.",
+      reviewLimit: ""
+    };
+  }
+  const statLine = [latest.kda ? `${latest.kda} K/D/A` : "", Number.isFinite(Number(latest.cs)) ? `${latest.cs} CS` : ""]
+    .filter(Boolean)
+    .join(", ");
+  const rankLine = latest.rankEstimate?.exactRank ? `Approx rank read: ${latest.rankEstimate.exactRank}` : "";
+  const sourceLine = [
+    rankLine,
+    statLine ? `stats ${statLine}` : "",
+    latest.gameHappenedAtLabel || latest.recordedAtLabel || ""
+  ].filter(Boolean).join(" | ");
+  const shortRule = String(latest.feedback || latest.gameDetail || "")
+    .split(/(?<=[.!?])\s+/)
+    .find(Boolean) || "Use the newest recording as the current practice state.";
+  const nextAction = latest.secondaryFocus || latest.drill || "";
+  return {
+    title: `${champion.name} latest synced state`,
+    focus: `Newest ${champion.name} game: ${sourceLine}. ${latest.feedbackTitle || "Latest review"}.`,
+    rule: shortRule,
+    nextRep: nextAction,
+    whyTrust: latest.whyTrust || "This uses the newest synced recording for this champion.",
+    pattern: latest.pattern || "",
+    reviewLimit: latest.reviewLimit || ""
+  };
 }
 
 const rankTrendBands = [
@@ -2531,6 +2572,7 @@ function renderRecordings(review = recordingReview, selectedChampionId = current
     totalDuration: durationLabel(totalSeconds),
     match: matches.length === 1 ? matches[0] : `${matches.length} matches`,
     detectedChampions: [{ name: champion.name }],
+    mainFeedback: championLatestMainFeedback(champion, championRecordings),
     recordings: championRecordings
   };
   recordingSummary.textContent = "latest clips first";
@@ -6418,7 +6460,8 @@ function animateChampionSwap(champion) {
 function championIdFromLocation() {
   const params = new URLSearchParams(window.location.search);
   const value = String(params.get("champion") || window.location.hash.replace(/^#/, "") || "samira").trim().toLowerCase();
-  return pageChampionIds.includes(value) ? value : "samira";
+  const normalized = pageChampionAliases.get(value) || value;
+  return pageChampionIds.includes(normalized) ? normalized : "samira";
 }
 
 function setChampionRoute(championId, replace = false) {

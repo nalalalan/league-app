@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T21:49:29.628Z",
+  "generatedAt": "2026-05-23T22:12:01.656Z",
   "source": "League of Legends Highlights folder",
   "match": "33 matches",
   "matches": [
@@ -43,11 +43,11 @@
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 23, 2026, 5:24 PM: newest full-game read Iron I; current 3-game read Iron II; archive median Bronze IV across 31 full games, used only as baseline context. The newest game is around the current three-game read.",
-    "rule": "The newest-game blocker is reset/overstay discipline and side farm over map defense; the current repeat across the latest games is reset/overstay discipline, side farm over base defense, and side farm over map defense. The keep-habit is You are finding fights and creating damage pressure; the fix is cashing those wins out cleaner.",
-    "nextRep": "Also work on camera and map-state checks: before taking a camp, side wave, or forward fight after 15 minutes, check ally deaths, the closest threatened turret, and whether your team can stand between you and the collapse.",
+    "focus": "Synced through May 23, 2026, 3:51 PM: newest full-game read Iron IV; current 3-game read Iron II; archive median Bronze IV across 30 full games, used only as baseline context. The newest game is around the current three-game read.",
+    "rule": "The newest-game blocker is side farm over base defense and reset/overstay discipline; the current repeat across the latest games is side farm over base defense, camera/map-state check, and map/grouping check post-lane. The keep-habit is Hitting waves and farming gold yielded some item breakpoints and kept XP progressing.",
+    "nextRep": "Your spacing and safety discipline while farming in deep lanes needs work—never hit far-side bot waves without deep allied vision or full team reset; next game, check minimap for missing enemies before pushing past river after 15 min.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
-    "pattern": "Latest file auto_NA1-5566620104_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
+    "pattern": "Latest file auto_NA1-5566563083_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
       "Read the newest-game point.",
       "Use the latest-game next action.",
@@ -72,9 +72,9 @@
     "anchoredFullGames": 31,
     "statFullGames": 31,
     "rankLabelCounts": {
-      "Bronze": 12,
+      "Bronze": 13,
       "Silver": 5,
-      "Iron": 13,
+      "Iron": 12,
       "Gold": 1
     },
     "exactRankScale": [
@@ -158,10 +158,19 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 45,
+      "recordings": 44,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
+    },
+    {
+      "id": "caitlyn",
+      "name": "Cait",
+      "confidence": "high",
+      "recordings": 1,
+      "evidence": "Manual Cait-identity repair from the latest recording poster and anchors: Cait HUD, Piltover Peacemaker at 14:21, 0/5/6 K/D/A, 112 CS, and bot-lane wave states.",
+      "improvementTitle": "Cait deaths hide useful damage",
+      "improvement": "Mistake: you let playable Cait states become extra forward or side-value clicks before checking who could reach you, so deaths erased the pressure your lane damage was creating. Fix: after a wave, camp, or fight is handled, click back behind an allied body, check the nearest threatened turret/objective, and only continue if Cait can hit from max range."
     }
   ],
   "recordings": [
@@ -186,7 +195,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "16/10 means conversion gap",
+      "title": "Cait deaths hide useful damage",
       "duration": "18:24",
       "durationSeconds": 1103.5,
       "gameLength": "21:44",
@@ -199,100 +208,66 @@
       "statsSource": "League Client match history",
       "kind": "full review",
       "reviewPhase": "current form",
-      "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "16/10 means conversion gap",
-      "feedback": "The full-game read says damage is enough; the next useful rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
-      "gameDetail": "Around 2:16, allied duo in bot lane with minion wave; enemy activity top-right; this is the start or nearest visible start of the main mistake window. The full-game read says damage is enough; the next useful rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall. At 2:16, your next job is to stop the camp or side-wave click, check death timers and the nearest threatened turret, then walk to the defensive wave, group, or reset instead of trading base defense for small farm. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
-      "secondaryFocus": "Also work on camera and map-state checks: before taking a camp, side wave, or forward fight after 15 minutes, check ally deaths, the closest threatened turret, and whether your team can stand between you and the collapse.",
+      "champion": "Cait",
+      "confidence": "high",
+      "feedbackTitle": "Cait deaths hide useful damage",
+      "feedback": "Mistake: you let playable Cait states become extra forward or side-value clicks before checking who could reach you, so deaths erased the pressure your lane damage was creating. Fix: after a wave, camp, or fight is handled, click back behind an allied body, check the nearest threatened turret/objective, and only continue if Cait can hit from max range.",
+      "gameDetail": "Around 2:16, Cait is bot with an allied duo and a minion wave while enemy pressure is visible elsewhere; the useful next click is to stay behind the wave and allied body, hit only what is in max range, then choose safe wave, tower hit, objective path, or reset instead of walking into another loose trade. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the amount of pressure Cait creates. At 14:21 the frame shows the ability bar with Piltover Peacemaker, which confirms this is Cait footage and makes the rule sharper: Cait climbs by staying unavailable while dealing damage from range, not by playing the map like a short-range cleanup champion. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
+      "secondaryFocus": "Next Cait game, before every camp, side wave, or forward fight after 15 minutes, check ally deaths, nearest threatened turret, and whether an ally can stand between Cait and the collapse.",
       "mistakeTypes": [
-        "reset/overstay discipline",
-        "side farm over map defense",
-        "spacing/entry discipline",
-        "wave/objective conversion",
-        "camera/map-state check"
+        "Cait spacing before forward clicks",
+        "death-state exposure",
+        "camera/map-state check",
+        "wave or objective payout after pressure",
+        "reset/overstay discipline"
       ],
-      "eventEvidence": "2:16 shows allied duo in bot lane with minion wave; enemy activity top-right.",
-      "failureEvidence": "At 2:16, allied duo in bot lane with minion wave; enemy activity top-right; the failure is letting the next click stay on the wrong task after the map state changes, which leaks time, safety, or defense and gives the enemy another fight or push window.",
-      "goodThing": "You are finding fights and creating damage pressure; the fix is cashing those wins out cleaner.",
-      "whyTrust": "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
-      "focusTag": "overstay control",
-      "evidence": "2:16 Allied duo in bot lane with minion wave; enemy activity top-right.",
-      "pattern": "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
-      "diamondRule": "After a won fight, take the guaranteed payout before looking for the next fight.",
-      "drill": "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
-      "timeline": [],
+      "eventEvidence": "2:16 shows Cait's bot-side lane state with ally and wave cover; 14:21 shows the Cait ability bar with Piltover Peacemaker; the synced stat line is 0/5/6 K/D/A and 112 CS.",
+      "failureEvidence": "Cait had enough lane presence to be involved in fights, but the visible review and 0/5/6 stat line show deaths outvaluing the pressure; the failure is letting Cait become reachable before the next click has a safe target, ally body, or objective payout.",
+      "goodThing": "You are still finding bot-lane presence and damage windows; keep using Cait's range and wave cover instead of abandoning pressure entirely.",
+      "whyTrust": "The Cait identity is source-checked from the visible Cait HUD and Piltover Peacemaker frame, and the stat line is from League Client match history.",
+      "focusTag": "Cait spacing and payout",
+      "evidence": "Manual Cait-identity repair from the latest recording poster and anchors: Cait HUD, Piltover Peacemaker at 14:21, 0/5/6 K/D/A, 112 CS, and bot-lane wave states.",
+      "pattern": "The repeatable issue is not mechanics speed; it is letting a ranged Cait become reachable before the map state is safe. Cait should make enemies walk through wave, ally bodies, traps, or tower pressure before she is a target.",
+      "diamondRule": "On Cait, if no ally or structure is between you and the enemy, the next click is back, not forward.",
+      "drill": "Next Cait game, before every camp, side wave, or forward fight after 15 minutes, check ally deaths, nearest threatened turret, and whether an ally can stand between Cait and the collapse.",
+      "timeline": [
+        "2:16 - Cait is bot with allied duo and minion wave cover.",
+        "14:21 - Cait ability bar shows Piltover Peacemaker, confirming the recording is Cait footage."
+      ],
       "clockAnchors": [
-        {
-          "clock": "0:51",
-          "videoSeconds": 88.269,
-          "description": "Two allied champions near bot lane; minimap visible bottom-right."
-        },
         {
           "clock": "2:16",
           "videoSeconds": 172.538,
-          "description": "Allied duo in bot lane with minion wave; enemy activity top-right."
-        },
-        {
-          "clock": "3:40",
-          "videoSeconds": 256.808,
-          "description": "Allied champions on spawn platform (base); minimap visible."
-        },
-        {
-          "clock": "5:04",
-          "videoSeconds": 341.077,
-          "description": "Two allies in bot lane with a clustered minion wave; minimap visible."
-        },
-        {
-          "clock": "6:53",
-          "videoSeconds": 425.346,
-          "description": "Ally near bot lane turret farming minions; chat text visible left."
-        },
-        {
-          "clock": "8:56",
-          "videoSeconds": 509.615,
-          "description": "Player laning in bot with minion wave; minimap shows wards."
-        },
-        {
-          "clock": "10:20",
-          "videoSeconds": 593.885,
-          "description": "Champion running along base path near fountain; minimap visible."
-        },
-        {
-          "clock": "11:45",
-          "videoSeconds": 678.154,
-          "description": "Engagement near turret with large damage number visible; minimap visible."
+          "description": "Cait is bot with allied duo and minion wave cover while enemy pressure is visible elsewhere."
         },
         {
           "clock": "14:21",
           "videoSeconds": 762.423,
-          "description": "Champion laning near turret with ability bar showing Piltover Peacemaker."
-        },
-        {
-          "clock": "18:07",
-          "videoSeconds": 846.692,
-          "description": "Ally in river near dragon pit; minimap shows objective timers."
-        },
-        {
-          "clock": "19:31",
-          "videoSeconds": 930.962,
-          "description": "Top-side lane near turret with allied champion and minions; minimap visible."
+          "description": "Cait is near turret with the ability bar showing Piltover Peacemaker."
         }
       ],
       "clockMoments": [
         {
           "clock": "2:16",
           "videoSeconds": 172.538,
-          "description": "Allied duo in bot lane with minion wave; enemy activity top-right."
+          "description": "shows Cait's bot-side lane state with ally and wave cover"
+        },
+        {
+          "clock": "14:21",
+          "videoSeconds": 762.423,
+          "description": "shows the Cait ability bar with Piltover Peacemaker"
         }
       ],
       "nuance": [
-        "High kills only matter when the map state changes.",
-        "Shutdown deaths after a win erase the lead Samira already created."
+        "Good: you are present for bot-side waves and fights instead of being absent from the game.",
+        "Leak: Cait becomes reachable before the next click has ally cover, structure value, or a reset path.",
+        "Consequence: 0/5/6 means deaths are costing more than the pressure is paying.",
+        "Next check: if no ally body, trap line, wave, or turret separates Cait from the enemy, click back first.",
+        "The second lane is camera/map-state checking, because this low-FPS review can judge positioning and pathing better than frame-perfect mechanics."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
+      "reviewLimit": "This is a Cait-identity and visible-state repair from sampled 2 FPS footage, not a full frame-perfect Cait mechanics review.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-23-champion-source-coaching-v15",
       "sampledFrames": 14,
       "publicVideoBytes": 34335204,
       "captureFps": 2,
@@ -300,18 +275,18 @@
       "poster": "/recordings/posters/auto-na1-5566620104-01.jpg",
       "rankEstimate": {
         "version": "2026-05-22-exact-rank-trend-v4",
-        "label": "Iron",
-        "range": "Iron IV-Iron II",
-        "exactRank": "Iron I",
-        "exactRankValue": 3,
-        "score": 20,
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "score": 31,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "new ranked fundamentals",
+        "percentile": "developing",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -328,7 +303,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron I read from macro habits: the recording still shows playable fighting instincts; held down by avoidable deaths still show up, kill pressure is not yet consistent, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "Bronze III read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
       }
     },
     {
@@ -464,7 +439,7 @@
         "Camera stayed focused on Samira but did not check minimap info aggressively enough before advancing past river.",
         "In Challenger, every mid/late isolated death results in immediate Baron, Dragon, or structure loss—fixing this is transferrable at every rank."
       ],
-      "reviewLimit": "Can't judge detailed micro-mechanics (e.g. combo cancels or animation finesse) due to 2 FPS capture; ally comms, detailed vision control, and fog-of-war trap checks are partially readable only through minimap and visible deaths. Early lane setup cannot be fully reviewed from these samples. The exact camp or objective context for each isolated death is limited by lack of extended fight sequence.",
+      "reviewLimit": "Can't judge detailed micro-mechanics (e.g. combo cancels or animation finesse) due to 2 FPS capture; ally comms, detailed vision control, and fog-of-war trap checks are partially readable only through minimap and visible deaths. Early lane setup cannot be fully reviewed from these samples. The exact camp or objective context for each isolated death is limited by lack of extended fight sequence. Detail refresh kept the previous review because model analysis failed: No JSON object returned. Detail refresh kept the previous review because model analysis failed: No JSON object returned.",
       "analysisSource": "openai",
       "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
       "sampledFrames": 14,
@@ -482,7 +457,7 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 98,
+        "confidenceScore": 88,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -490,7 +465,6 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
@@ -620,7 +594,7 @@
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed or every cooldown. It can judge map state, side-camp timing, ally location, death state, and whether the next click protects base.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
+      "analysisVersion": "2026-05-23-champion-source-coaching-v15",
       "sampledFrames": 14,
       "publicVideoBytes": 49207218,
       "captureFps": 2,
@@ -779,7 +753,7 @@
       ],
       "reviewLimit": "The 2 FPS review can judge repeated mid-wave state, map movement, and respawn timing. It cannot judge exact camera hotkey timing or frame-perfect mechanics.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
+      "analysisVersion": "2026-05-23-champion-source-coaching-v15",
       "sampledFrames": 14,
       "publicVideoBytes": 43843823,
       "captureFps": 2,
@@ -949,7 +923,7 @@
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed, reaction time, or every cooldown. It can judge the visible fight state, ally death timers, spacing, and forward pathing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
+      "analysisVersion": "2026-05-23-champion-source-coaching-v15",
       "sampledFrames": 14,
       "publicVideoBytes": 47751708,
       "captureFps": 2,
@@ -1366,7 +1340,7 @@
       ],
       "reviewLimit": "The 2 FPS review can judge HP-state, fight aftermath, death timer, and grouped objective shape. It cannot judge exact spell cooldowns or combo timing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
+      "analysisVersion": "2026-05-23-champion-source-coaching-v15",
       "sampledFrames": 14,
       "publicVideoBytes": 31469760,
       "captureFps": 1,
