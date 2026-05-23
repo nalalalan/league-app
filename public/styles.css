@@ -2439,20 +2439,16 @@ h1 {
 .recording-story-critique,
 .recording-story-praise,
 .recording-story-action,
-.recording-story-secondary,
-.recording-story-evidence,
-.recording-story-types,
-.recording-story-rank,
-.recording-story-stats {
+.recording-story-secondary {
   font-weight: 900;
 }
 
 .recording-story-rank {
-  color: #4c5f86;
+  color: #443b35;
 }
 
 .recording-story-stats {
-  color: #5f564d;
+  color: #443b35;
 }
 
 .recording-story-critique {

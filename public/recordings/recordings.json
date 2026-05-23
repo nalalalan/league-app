@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T06:08:08.872Z",
+  "generatedAt": "2026-05-23T17:53:53.728Z",
   "source": "League of Legends Highlights folder",
   "match": "31 matches",
   "matches": [
@@ -42,7 +42,7 @@
   "mainFeedback": {
     "title": "Samira overall state",
     "focus": "Current read: Bronze IV on the newest full game; Iron I across the last 5 full-game reads; Bronze III median across 29 full games. The latest game is near your recent baseline.",
-    "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is grouping with allies when the play is clear and enough damage to win bot-game fights.",
+    "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is grouping with allies when the play is clear and finding fights and base pressure.",
     "nextRep": "Next game: call even or losing before each fight; if losing, choose only back, tower wave, or wait.",
     "whyTrust": "This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.",
     "pattern": "Latest file auto_NA1-5566120017_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
@@ -202,7 +202,7 @@
       "feedbackTitle": "Six deaths from bad-state clicks",
       "feedback": "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and another death. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
       "gameDetail": "At 23:33, in a 1/6/1, 152 CS, 25-minute ranked game, you are taking a side jungle camp while enemies are pressuring through your side of the map; your job is to leave the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on camp gold. At 23:33 the feeding pattern is not that you never farm; it is that normal farm stays on the menu after the map state already says defend. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
-      "secondaryFocus": "Second focus: camera and map checks - next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
+      "secondaryFocus": "Next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
       "mistakeTypes": [
         "side farm over base defense",
         "camera/map-state check",
@@ -210,7 +210,7 @@
         "wave/objective defense timing"
       ],
       "eventEvidence": "17:42 shows Samira mid with an ally and a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on a side jungle camp while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
-      "failureEvidence": "Failure evidence: at 23:33 Samira chooses a side jungle camp while the visible map state is already about base defense, so the failure is not farming in general; it is farming after the defend signal. By 25:30 the cost is visible because Samira is dead, an allied turret has fallen, and enemies are inside the base area.",
+      "failureEvidence": "At 23:33 Samira chooses a side jungle camp while the visible map state is already about base defense, so the failure is not farming in general; it is farming after the defend signal. By 25:30 the cost is visible because Samira is dead, an allied turret has fallen, and enemies are inside the base area.",
       "goodThing": "At 17:42 you did find the correct map lane with an ally and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
       "whyTrust": "The review is tied to the visible collapse frames and the scoreboard line: 1/6/1 with 152 CS, side-camp choice at 23:33, and death/base consequence at 25:30.",
       "focusTag": "base defense over side farm",
@@ -337,7 +337,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "No conversion from mid lane priority — tempo and conversion discipline leak",
+      "title": "Mid wave needed a side check",
       "duration": "24:56",
       "durationSeconds": 1495.5,
       "gameLength": "24:58",
@@ -351,111 +351,91 @@
       "kind": "full review",
       "reviewPhase": "current form",
       "champion": "Samira",
-      "confidence": "high",
-      "feedbackTitle": "No conversion from mid lane priority — tempo and conversion discipline leak",
-      "feedback": "Mistake: You repeatedly stayed mid to clear waves without converting lane priority into side/objective threat, collapsing sidelane play, or applying pressure elsewhere while your team was respawning and the map was open. Fix: At 16:05, after clearing the mid wave, rotate to help pressure bot or contest vision/objectives instead of autopiloting another mid wave; if an enemy is clearly showing alone bot, pressure with your team there, if not, use your wave to invade or establish vision for the next Dragon/Baron.",
-      "gameDetail": "At 16:05, after clearning the mid wave, Samira remains in midlane with zero enemy pressure and the map in a neutral or losing state, clearly visible from the minimap; rather than resetting, grouping with a sidelane push, or contesting a key objective as her teammates respawn, she idles in mid and takes another wave, gaining minimal value while losing potential payout from side pressure, vision contest, or tempo setup. This sequence gives the enemy time to reset/map control and denies the chance to help teammates with numbers or catch future plays out of fog. The correct action is to immediately evaluate the lowest pressure side, rotate with the next wave, or help start vision contest on the upcoming Dragon, Baron, or collapse a side play, not auto-pilot-farming the next mid wave; every mid wave after you are caught up uncontested is value lost if it doesn't convert to something on the map. This matters because in games with higher drag/baron/side threat, not converting mid priority to side/objective pressure will stall your climb and let the enemy dictate every important map state.",
-      "secondaryFocus": "Second focus: Repeatedly clearing mid waves with no camera or attention on sidelane skirmishes—next game, deploy your camera to side lanes after every mid-push even if you aren't rotating, so you spot plays before they're over (mechanics judgment limited by FPS, focus on camera/control and side plays).",
-      "eventEvidence": "9:46 Samira auto-attacking cannon minion at mid turret; 16:05 Samira is mid alone, no enemy contest or structure available, with allied vision and skirmishes breaking out on side lanes per the minimap, but she stays mid to farm. 21:49 Samira running from fountain into base after respawn",
-      "goodThing": "Solid wave control and no random mid solo deaths, showing discipline in not pushing for turret chip when unsafe.",
-      "whyTrust": "This feedback is grounded in the strategic structure of Samira mid-games, where conversion of wave prio into side/objective threat leads to faster climbs and helps avoid games decided by enemy grouping or side picks.",
-      "focusTag": "conversion/tempo discipline",
-      "evidence": "9:46 Samira auto-attacking cannon minion at mid turret; 16:05 Samira is mid alone, no enemy contest or structure available, with allied vision and skirmishes breaking out on side lanes per the minimap, but she stays mid to farm. 21:49 Samira running from fountain into base after respawn",
-      "pattern": "You consistently held mid wave control safely but defaulted to extra mid wave clear instead of scanning or rotating to punish open map/side opportunities after pushes, especially with Dragon/Baron/side showing on minimap.",
-      "diamondRule": "If you have mid priority and there is no play to make mid, immediately check for a side rotation or contest vision/next objective instead of defaulting to another mid wave.",
-      "drill": "After every uncontested mid wave, instantly move your camera to each side lane and jungle fog—decide if you should rotate or contest for vision/objective, and do not let yourself autopilot back to mid.",
+      "confidence": "medium",
+      "feedbackTitle": "Mid wave needed a side check",
+      "feedback": "Mistake: you kept turning mid priority into another mid wave after the map was asking for a side-lane or objective check. Fix: after the mid wave is handled, move your camera first, then choose ally/objective movement or reset before touching the next wave.",
+      "gameDetail": "At 16:05 Samira is mid alone last-hitting after the wave is already under control; move the camera to both side lanes, then either path toward the closest ally/objective or reset instead of autoing the next neutral mid wave. The leak is not that mid farm is bad; it is that mid stayed as default farm when the wave had already bought you time to look elsewhere. At 9:46 the same neutral pattern appears at mid turret, and by 21:49 the game has already produced a death/reset cycle, so the bigger climb habit is to turn one handled mid wave into a map check before the next minion. This matters because mid priority only helps Samira climb if it becomes information, vision, structure access, or a safer reset before enemies get another collapse window.",
+      "secondaryFocus": "Next game, after every mid wave past 14 minutes, flick camera to both side lanes and death timers before autoing the next wave; if a fight or threatened turret is visible, leave mid.",
+      "mistakeTypes": [
+        "mid wave autopilot",
+        "camera/map-state check",
+        "objective or side-lane conversion",
+        "reset timing after priority"
+      ],
+      "eventEvidence": "9:46 shows Samira auto-attacking a cannon minion at mid turret. 16:05 shows Samira last-hitting mid alone with no immediate structure hit. 18:00 and 19:54 show more mid movement/wave clear. 21:49 shows Samira leaving fountain after a death/reset state.",
+      "failureEvidence": "At 16:05 Samira uses the handled mid wave as permission to keep farming mid instead of checking the next side/objective state, so the wave priority leaks into autopilot time. By 21:49 the recording has reached a respawn cycle, which is the visible cost pattern when mid time does not become a useful map action soon enough.",
+      "goodThing": "The strong part is that you kept finding mid waves and did not randomly abandon the lane; that wave control is useful when it becomes a map check.",
+      "whyTrust": "The visible anchors show repeated mid-wave time at 9:46, 16:05, 18:00, and 19:54, plus the later 21:49 respawn state, so the review is about map-use after mid wave rather than combo execution.",
+      "focusTag": "mid priority check",
+      "evidence": "Manual repair from visible clock anchors: 9:46 mid cannon, 16:05 mid last-hit state, 18:00 and 19:54 repeated mid wave movement, and 21:49 respawn/reset state.",
+      "pattern": "The repeated mistake is not wave clearing itself. It is failing to spend the few seconds earned by wave clear on camera, side pressure, vision, or reset choice.",
+      "diamondRule": "After one safe mid wave, look side before touching the next one.",
+      "drill": "Next game, after every mid wave past 14 minutes, flick camera to both side lanes and death timers before autoing the next wave; if a fight or threatened turret is visible, leave mid.",
       "timeline": [
-        "16:05 - Samira clears uncontested mid wave, no structure or pressure conversion, loses tempo window for side/objective contest"
+        "9:46 - Samira is auto-attacking cannon minion at mid turret.",
+        "16:05 - Samira is last-hitting mid alone after the wave is already under control.",
+        "18:00 - Samira continues moving through mid after using a skillshot.",
+        "19:54 - Samira clears another mid wave.",
+        "21:49 - Samira leaves fountain after the game has reached a death/reset cycle."
       ],
       "clockAnchors": [
         {
-          "clock": "0:15",
-          "videoSeconds": 4,
-          "description": "Allied champions standing at the fountain at game start"
-        },
-        {
-          "clock": "2:08",
-          "videoSeconds": 118.423,
-          "description": "Mid lane champion using ability on minion wave"
-        },
-        {
-          "clock": "4:03",
-          "videoSeconds": 232.846,
-          "description": "Champion standing in base healing at fountain"
-        },
-        {
-          "clock": "5:57",
-          "videoSeconds": 347.269,
-          "description": "Champion and minions pushing mid lane"
-        },
-        {
-          "clock": "7:52",
-          "videoSeconds": 461.692,
-          "description": "Enemy slain announcement as two champions face mid"
-        },
-        {
           "clock": "9:46",
           "videoSeconds": 576.115,
-          "description": "Champion auto-attacking cannon minion at mid turret"
-        },
-        {
-          "clock": "11:41",
-          "videoSeconds": 690.538,
-          "description": "Enemy champion under turret hit by skillshot in mid lane"
-        },
-        {
-          "clock": "14:11",
-          "videoSeconds": 804.962,
-          "description": "Two champions fighting in mid lane among minions"
+          "description": "Samira auto-attacks a cannon minion at mid turret."
         },
         {
           "clock": "16:05",
           "videoSeconds": 919,
-          "description": "Champion last hitting minions in mid lane"
+          "description": "Samira last-hits minions in mid lane while alone."
         },
         {
           "clock": "18:00",
           "videoSeconds": 1033.808,
-          "description": "Champion moving in mid lane after using skillshot"
+          "description": "Samira moves in mid lane after using a skillshot."
         },
         {
           "clock": "19:54",
           "videoSeconds": 1148.231,
-          "description": "Champion clearing minion wave in mid lane with one minion remaining"
+          "description": "Samira clears a mid minion wave with one minion remaining."
         },
         {
           "clock": "21:49",
           "videoSeconds": 1262.654,
-          "description": "Champion running from fountain into base after respawn"
+          "description": "Samira runs from fountain into base after a respawn state."
         }
       ],
       "clockMoments": [
         {
           "clock": "9:46",
           "videoSeconds": 576.115,
-          "description": "Samira auto-attacking cannon minion at mid turret"
+          "description": "shows Samira auto-attacking a cannon minion at mid turret."
         },
         {
           "clock": "16:05",
           "videoSeconds": 919,
-          "description": "Samira is mid alone, no enemy contest or structure available, with allied vision and skirmishes breaking out on side lanes per the minimap, but she stays mid to farm."
+          "description": "shows Samira last-hitting mid alone with no immediate structure hit."
         },
         {
-          "clock": "21:49",
-          "videoSeconds": 1262.654,
-          "description": "Samira running from fountain into base after respawn"
+          "clock": "18:00",
+          "videoSeconds": 1033.808,
+          "description": "and show more mid movement/wave clear."
+        },
+        {
+          "clock": "19:54",
+          "videoSeconds": 1148.231,
+          "description": "and show more mid movement/wave clear."
         }
       ],
       "nuance": [
-        "Good wave control with no random deaths or greedy solo turret chip visible.",
-        "Biggest leak is leaving value on the map by repeatedly staying mid when no mid structure/objective is up.",
-        "Not rotating after mid prio loses real side/objective impact, especially as teams group or contest.",
-        "Higher ranked teams punish 'extra wave' with crossmap vision loss, numbers disadvantage, or shutting down late roams.",
-        "Repeatable check: after clearing mid, move camera/rotate unless your team is contesting/fighting in mid right now."
+        "Good: mid wave control gives you time and lane access.",
+        "Leak: at 16:05 the wave is handled, but the next action is still more mid farming instead of a side/objective check.",
+        "Consequence: the game later reaches a respawn state, so the review target is spending mid priority sooner.",
+        "Next check: after one safe mid wave, look at side lanes and death timers before taking the next one."
       ],
-      "reviewLimit": "Mechanics like animation cancels, micro-spacing, or frame-perfect combos cannot be judged due to low-FPS footage; no fight or all-in sequences are visible, and only macro, wave, vision, and camera discipline can be reliably checked.",
-      "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-action-script-coaching-v13",
+      "reviewLimit": "The 2 FPS review can judge repeated mid-wave state, map movement, and respawn timing. It cannot judge exact camera hotkey timing or frame-perfect mechanics.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
       "sampledFrames": 14,
       "publicVideoBytes": 43843823,
       "captureFps": 2,
@@ -465,13 +445,13 @@
         "version": "2026-05-22-exact-rank-trend-v4",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron I",
-        "exactRankValue": 3,
-        "score": 19,
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "score": 10,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 88,
+        "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -479,6 +459,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
@@ -490,7 +471,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron I read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, kill pressure is not yet consistent, reset discipline after wins. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "Iron III read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, kill pressure is not yet consistent, reset discipline after wins. Ranked-transfer confidence is high from ranked solo evidence."
       }
     },
     {
@@ -532,7 +513,7 @@
       "feedbackTitle": "Losing fights need a next-click script",
       "feedback": "Mistake: you kept playing messy or losing states as if one more fight would fix them, even when enemies were alive, your health was dropping, or teammates were dead. Fix: at the mistake timestamp, back out, clear only the safe wave, or wait behind the first ally before entering again.",
       "gameDetail": "At 23:33 the mid push has turned into a crowded fight with three enemy bodies still in front of you and an enemy turret/base line behind them; your job is to stand behind the first ally, hit the nearest safe target or wave, and leave as soon as your health drops instead of staying available for the full re-engage. By 23:43 you are dead with multiple allies also down, so the leak is not that you lacked damage; the leak is that the fight continued after the safe damage window ended and gave the enemy a clean push back. At 24:20, when you respawn with several teammates still dead, do not run out looking for a fight or a side route; hold base, clear the closest wave under turret, and wait for at least two teammates to spawn. At 26:54 the same rule appears again with four allies dead: stop at the base/inhibitor line, do not walk up bottom jungle or lane, and only clear minions that enter tower range. The simple next-game script is fight from behind a body while the state is even, and when the state is losing, defend one safe wave until teammates are alive.",
-      "secondaryFocus": "Second focus: lane and fight spacing - next game, do not cross past your support/frontline until the enemy engage tool is used; at 4:55 and 7:16 the safer habit is last-hit from Q range and let the wave come to you.",
+      "secondaryFocus": "Next game, do not cross past your support/frontline until the enemy engage tool is used; at 4:55 and 7:16 the safer habit is last-hit from Q range and let the wave come to you.",
       "mistakeTypes": [
         "spacing/entry discipline",
         "shutdown or death-state exposure",
@@ -540,7 +521,7 @@
         "forward pathing after allies die"
       ],
       "eventEvidence": "23:33 shows Samira behind a Baron-powered mid push with multiple enemy defenders still alive; 23:43 shows Samira dead after the fight continues; 24:20 shows Samira respawning while several teammates are still dead; 26:54 shows Samira moving out while four allies are dead.",
-      "failureEvidence": "Failure evidence: at 23:33 the fight is already crowded with enemy defenders alive, so the safe damage window is ending. By 23:43 Samira is dead with allies also down; at 24:20 and 26:54 the visible failure repeats as forward movement starts while teammates are still dead instead of holding the base line.",
+      "failureEvidence": "At 23:33 the fight is already crowded with enemy defenders alive, so the safe damage window is ending. By 23:43 Samira is dead with allies also down; at 24:20 and 26:54 the visible failure repeats as forward movement starts while teammates are still dead instead of holding the base line.",
       "goodThing": "At 19:52 you are in the better shape: allies are in front of Samira near mid, so you can damage from behind them instead of being the first body enemies reach.",
       "whyTrust": "The review is tied to the death-state frames: the game was already hard, so the fastest improvement is removing the extra deaths after the safe fight window is gone.",
       "focusTag": "losing-state discipline",
@@ -619,7 +600,7 @@
         "Leak: the 23:33 fight continues after the safe damage window is gone.",
         "Consequence: by 23:43 Samira is dead with allies down, which gives the enemy room to push back instead of letting your team stabilize.",
         "Next check: if two or more allies are dead, switch to base defense and safe wave clear until bodies are back.",
-        "Second focus is not frame-perfect mechanics; at 2 FPS the visible mechanics habit is entry discipline and spacing over several seconds."
+        "The second visible lane is entry discipline and spacing over several seconds, not frame-perfect mechanics."
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed, reaction time, or every cooldown. It can judge the visible fight state, ally death timers, spacing, and forward pathing.",
       "analysisSource": "manual",
@@ -695,14 +676,16 @@
       "cs": 4,
       "statsSource": "League Client match history",
       "kind": "highlight",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Passive Level 1 Botlane (Remake Situation)",
       "feedback": "Mistake: You did not contest early lane state or pressure for level 2 when the enemy botlane was present and your support was AFK, conceding full wave and lane control. Fix: Auto-pilot AFK waits lose you both pressure and tempo in every game; instead, if your support is absent, focus on maximizing safe XP soak without ceding full control, using tower cover to grab as much gold/XP as possible or threaten with your range, and be alert for remake with minimal risk.",
       "gameDetail": "At 01:05 in botlane, enemy Nautilus and Senna arrive first to lane while your Karma is AFK in fountain/base, as seen on minimap and remake bar. You remain far back, not contesting any last hits or threatening from bush/under-tower, which hands complete wave control to Nautilus/Senna and will snowball lane state against you in any non-remake scenario. Level 1 Samira is weak, but leaving two champions uncontested guarantees they get prio, crash, and zone you—especially critical versus a ranged + engaged support where staying in XP range with minimal risk is mandatory. Challenger-level botlaners maximize whatever XP, single last hits, and bush vision they can grab even in a lost 2v1, because ceding 1-2 minutes of lane XP is unrecoverable. Around 1:04, at and , you hover well behind your minion wave while Nautilus/Senna step up uncontested; By 1:16, at and , you hover well behind your minion wave while Nautilus/Senna step up uncontested. Even in remake games, build the discipline to claim auto-range last hits and punish enemy over-aggression under turret to prevent permanent low-tempo habits from forming.",
-      "secondaryFocus": "Second focus: Lane posturing and A-click/camera discipline—your camera and positioning snap to max distance from Nautilus/Senna with zero check of their spellcast animations or fog threat; in future games, hold camera at spell range and A-click toward melee minions just out of hook range to pressure every possible XP safely, even at low FPS.",
+      "secondaryFocus": "Lane posturing and A-click/camera discipline—your camera and positioning snap to max distance from Nautilus/Senna with zero check of their spellcast animations or fog threat; in future games, hold camera at spell range and A-click toward melee minions just out of hook range to pressure every possible XP safely, even at low FPS.",
+      "mistakeTypes": [],
       "eventEvidence": "1:04 At and , you hover well behind your minion wave while Nautilus/Senna step up uncontested; 1:16 At and , you hover well behind your minion wave while Nautilus/Senna step up uncontested",
+      "failureEvidence": "",
       "goodThing": "You do not greed forward or die to a likely Nautilus hook/trap in a doomed 1v2.",
       "whyTrust": "In Challenger bot lanes, players denied from level 2 lose all ability to control crash, XP, and safe farm for 5+ minutes; claiming wave XP and exerting even minimal threat is the only way to prevent snowball disasters.",
       "focusTag": "lane control discipline",
@@ -794,14 +777,16 @@
       "cs": 192,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Failed to Rotate Off Sidelane to Pressure Mid",
       "feedback": "Mistake: You stayed bot and continued farming long after the bot turret fell and your team grouped for mid/inhib plays. Fix: After first turret and the wave is past river, you must rotate to mid to pressure with your team and threaten objectives instead of leaking time farming bot alone.",
-      "gameDetail": "After 13:16 (frame 6) you and your enchanter crash down the last hits on bot outer with all dragon-side objectives cleared and enemy pressure breaking, but you stay bot side for multiple minutes in the following frames, chasing bot wave and jungle instead of rotating mid where your teammates group for a heavy push (frame 10, 24:28 clock visible). This indecision means you arrive late to mid plays and miss the highest-value window to threaten inner turrets or help your team snowball with numbers—especially risky because Samira’s mid-game threat is highest when grouped. Sticking to a dead lane after tower is down delays your tempo advantage, risks unnecessary 1vX catches, and stalls snowball; the higher-level payoff is collapsing mid, using pushed bot to force rotates, and fighting around your team or objective. That route is better because mid is shortest for rotations, connects with teammates for both safety and max pressure, and applies the kind of tempo punishment Master players expect.",
-      "secondaryFocus": "Second focus: Fix late recalls and wasted time low in lane—when low HP and after fighting or objective, recall immediately rather than half-heartedly farming dead waves; next game, recall as soon as your productive play is over or you’re at risk.",
-      "eventEvidence": "13:15 From onward, bot turret is gone, wave is pushed, team groups mid, but Samira is caught farming bot and hovering alone with no dragon or tower to take. 21:21 Samira in the middle of a recall at outer bot turret, ally lane minions and enemies nearby. 24:28 After (frame 6) you and your enchanter crash down the last hits on bot outer with all dragon-side objectives cleared and enemy pressure breaking, but you stay bot side for multiple minutes in the following frames, chasing bot wave and jungle instead of rotating mid where your teammates group for a heavy push (frame 10, clock visible).",
+      "gameDetail": "Around 24:28, after (frame 6) you and your enchanter crash down the last hits on bot outer with all dragon-side objectives cleared and enemy pressure breaking, but you stay bot side for multiple minutes in the following frames, chasing bot wave and jungle instead of rotating mid where your teammates group for a heavy push (frame 10, clock visible); this is the start or nearest visible start of the main mistake window; earlier at 13:15, from onward, bot turret is gone, wave is pushed, team groups mid, but Samira is caught farming bot and hovering alone with no dragon or tower to take; earlier at 21:21, Samira in the middle of a recall at outer bot turret, ally lane minions and enemies nearby. Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between Samira and the collapse, and enemies have to defend structure instead of chasing through fog. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
+      "secondaryFocus": "Fix late recalls and wasted time low in lane—when low HP and after fighting or objective, recall immediately rather than half-heartedly farming dead waves; next game, recall as soon as your productive play is over or you’re at risk.",
+      "mistakeTypes": [],
+      "eventEvidence": "13:15 shows from onward, bot turret is gone, wave is pushed, team groups mid, but Samira is caught farming bot and hovering alone with no dragon or tower to take. 21:21 shows Samira in the middle of a recall at outer bot turret, ally lane minions and enemies nearby. 24:28 shows after (frame 6) you and your enchanter crash down the last hits on bot outer with all dragon-side objectives cleared and enemy pressure breaking, but you stay bot side for multiple minutes in the following frames, chasing bot wave and jungle instead of rotating mid where your teammates group for a heavy push (frame 10, clock visible).",
+      "failureEvidence": "",
       "goodThing": "You correctly converted early bot tower pressure with support backup and did not greed-dive post-tower, showing some conversion discipline.",
       "whyTrust": "This feedback tracks with visible team groupings, minimap rotations, and open structures: not rotating to mid means you miss the team snowball timing and risk solo deaths when you are needed to punch through mid or defend; this is a repeatable core ADC habit at all ranks.",
       "focusTag": "mid-group-after-tower",
@@ -898,190 +883,16 @@
       "analysisVersion": "2026-05-22-two-focus-coaching-v11",
       "sampledFrames": 14,
       "publicVideoBytes": 38992220,
+      "captureFps": 1,
       "src": "/recordings/auto_NA1-5565856492_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565856492-01.jpg",
       "rankEstimate": {
         "version": "2026-05-22-exact-rank-trend-v4",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 24,
-        "confidence": "high",
-        "rankedTransferConfidence": "high",
-        "evidenceConfidence": "high",
-        "confidenceScore": 88,
-        "queueClass": "ranked_solo",
-        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
-        "confidenceSignals": [
-          "near-full macro recording",
-          "K/D/A, CS, and game length are available",
-          "visible timestamp anchors exist",
-          "ranked opponent pressure",
-          "enough ranked full-game samples for calibration"
-        ],
-        "confidenceBlockers": [],
-        "researchBasis": [
-          "riot-ranked-tiers-2026",
-          "riot-apex-tiers-2026",
-          "bennett-poulus-novak-2025",
-          "srl-league-2021",
-          "kpi-objective-vision-2025"
-        ],
-        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
-      },
-      "captureFps": 1
-    },
-    {
-      "file": "auto_NA1-5565818690_01.mp4",
-      "publicFile": "auto_NA1-5565818690_01.mp4",
-      "cacheKey": "31469760:1779480016297",
-      "fingerprint": "bfdf4ac2005e",
-      "matchId": "NA1-5565818690",
-      "score": "auto",
-      "clipNumber": 1,
-      "matchTimeMs": 1779477997903,
-      "gameHappenedAt": "2026-05-22T19:26:37.903Z",
-      "gameHappenedAtLabel": "May 22, 2026, 3:26 PM",
-      "recordedAt": "2026-05-22T20:00:16.377Z",
-      "recordedAtLabel": "May 22, 2026, 4:00 PM",
-      "recordedAtTimeLabel": "4:00 PM",
-      "clipTimestampSeconds": null,
-      "clipTimestamp": "",
-      "clipWindow": "",
-      "timestamp": "",
-      "queueId": 420,
-      "gameType": "Ranked Solo",
-      "gameTypeSource": "LeagueClient log",
-      "title": "Overstayed After Teamfight Win",
-      "duration": "22:00",
-      "durationSeconds": 1320,
-      "gameLength": "31:42",
-      "gameLengthSeconds": 1902,
-      "kda": "7/9/8",
-      "kills": 7,
-      "deaths": 9,
-      "assists": 8,
-      "cs": 169,
-      "statsSource": "League Client match history",
-      "kind": "full review",
-      "reviewPhase": "current form",
-      "champion": "Samira",
-      "confidence": "high",
-      "feedbackTitle": "Overstayed After Teamfight Win",
-      "feedback": "Mistake: You overstayed after a successful fight mid at 16:29 with very low health and no pressure advantage, leading to a delayed reset and unnecessary death. Fix: After winning a fight and taking out key threats, immediately reset if low HP and there's no immediate structure or high-priority objective to convert, instead of greedily staying for more mid wave or minor map pressure.",
-      "gameDetail": "After a skirmish near mid at 16:29, Samira is left low HP, but instead of resetting, she stays in the mid lane and continues to pressure while enemies are respawning or collapsing. This greedy stay results in a death that could have been avoided by recalling after the fight win. The immediate consequence is a shutdown payout and loss of map tempo, giving the enemy a free push window. The more disciplined play is to recall the moment the area is won and HP is low, so you can spend gold, refill resources, and return before the enemy can force a numbers advantage. That reset buys you both tempo and safety for the next objective setup, especially when your shutdown is a real risk.",
-      "secondaryFocus": "Second focus: lane spacing and HP-trade discipline; at 10:42 both bot-lane sides are still trading while you and support are low, so the next rep is to stop taking extra forward steps once health bars say one clean spell can end the lane.",
-      "eventEvidence": "0:36 Samira is at bot lane near turret with a support, both moving towards lane. 4:35 Bot lane farming; two allies retreating, enemy duo near their tower, Samira attacking minions. 16:27 Samira is dead in mid river after a fight win, with the death timer open, showing she did not reset after the initial win.",
-      "goodThing": "You won the initial fight and took out a major threat before the overstayed death.",
-      "whyTrust": "This habit directly controls how often you give shutdowns and how many fights you take without resources—one of the main ways Samira games collapse in harder ranks.",
-      "focusTag": "reset-discipline",
-      "evidence": "0:36 Samira is at bot lane near turret with a support, both moving towards lane. 4:35 Bot lane farming; two allies retreating, enemy duo near their tower, Samira attacking minions. 16:27 Samira is dead in mid river after a fight win, with the death timer open, showing she did not reset after the initial win.",
-      "pattern": "You frequently squeeze extra waves or map presence after fight wins instead of instantly resetting when you are low HP and high value, leaking tempo and risking death.",
-      "diamondRule": "If you win a fight and drop to low HP with shutdown gold, reset immediately unless you have a free turret or Baron/Dragon on the map.",
-      "drill": "Next game, after any fight win where you drop below half HP, reset right after unless there is a structure you can hit for free.",
-      "timeline": [],
-      "clockAnchors": [
-        {
-          "clock": "0:36",
-          "videoSeconds": 4,
-          "description": "Player is at bot lane near turret with a support, both moving towards lane."
-        },
-        {
-          "clock": "2:17",
-          "videoSeconds": 104.923,
-          "description": "Both bot lane duos are fighting in lane near the bottom right brush, minions present."
-        },
-        {
-          "clock": "4:35",
-          "videoSeconds": 205.846,
-          "description": "Bot lane farming; two allies retreating, enemy duo near their tower, player attacking minions."
-        },
-        {
-          "clock": "6:56",
-          "videoSeconds": 306.769,
-          "description": "Player is in base viewing item shop and hovering over Gluttonous Greaves."
-        },
-        {
-          "clock": "8:37",
-          "videoSeconds": 407.692,
-          "description": "Player farming minions in bot lane with support, last hit gold showing."
-        },
-        {
-          "clock": "10:42",
-          "videoSeconds": 508.615,
-          "description": "Bot lane skirmish; abilities used, two enemy champions present, player and support low health."
-        },
-        {
-          "clock": "13:06",
-          "videoSeconds": 609.538,
-          "description": "Player attacking enemy under red tower in bot lane, multiple minions and champions present."
-        },
-        {
-          "clock": "14:47",
-          "videoSeconds": 710.462,
-          "description": "Objective fight near dragon pit, multiple allies attacking a tanky enemy within AoE effect."
-        },
-        {
-          "clock": "16:27",
-          "videoSeconds": 811,
-          "description": "Player is dead, death timer counting down, ally team pushing mid lane."
-        },
-        {
-          "clock": "19:12",
-          "videoSeconds": 912.308,
-          "description": "Two enemy champions visible near river, player moving in the jungle area."
-        },
-        {
-          "clock": "22:50",
-          "videoSeconds": 1013.231,
-          "description": "Player walking towards mid inhibitor turret with minions, enemy minions and jungle visible."
-        },
-        {
-          "clock": "24:54",
-          "videoSeconds": 1114.154,
-          "description": "Player in mid lane fighting enemy champion near outer turret, casting spell."
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "0:36",
-          "videoSeconds": 4,
-          "description": "Samira is at bot lane near turret with a support, both moving towards lane."
-        },
-        {
-          "clock": "4:35",
-          "videoSeconds": 205.846,
-          "description": "Bot lane farming; two allies retreating, enemy duo near their tower, Samira attacking minions."
-        },
-        {
-          "clock": "16:27",
-          "videoSeconds": 811,
-          "description": "Samira is dead in mid river after a fight win, with the death timer open, showing she did not reset after the initial win."
-        }
-      ],
-      "nuance": [
-        "You participated in successful fights and took out key threats, which is strong pressure play.",
-        "After winning, you stayed to contest for more waves or presence while low HP, with no fast payout available.",
-        "The enemy respawns and collapses, catching you for a shutdown and flipping mid tempo.",
-        "In a Master game this is instantly punished for Baron control or inhibitor loss.",
-        "The instant check after winning a fight is: do I have the HP, resources, or shutdown to risk staying, or is reset mandatory?"
-      ],
-      "reviewLimit": "Some lane and early macro details (such as deep warding, jungle cover, or roams) are not provable due to the large interval between frames, but the post-fight reset pattern is visible and clear.",
-      "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-two-focus-coaching-v11",
-      "sampledFrames": 14,
-      "publicVideoBytes": 31469760,
-      "src": "/recordings/auto_NA1-5565818690_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565818690-01.jpg",
-      "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron III",
-        "exactRankValue": 1,
-        "score": 8,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 20,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -1104,9 +915,149 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron III read from macro habits: the recording still shows playable fighting instincts; held down by too many punishable deaths, lethal-health stays, reset discipline after wins. Ranked-transfer confidence is high from ranked solo evidence."
-      },
-      "captureFps": 1
+        "reason": "Iron I read from macro habits: team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
+      }
+    },
+    {
+      "file": "auto_NA1-5565818690_01.mp4",
+      "publicFile": "auto_NA1-5565818690_01.mp4",
+      "cacheKey": "31469760:1779480016297",
+      "fingerprint": "bfdf4ac2005e",
+      "matchId": "NA1-5565818690",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779477997903,
+      "gameHappenedAt": "2026-05-22T19:26:37.903Z",
+      "gameHappenedAtLabel": "May 22, 2026, 3:26 PM",
+      "recordedAt": "2026-05-22T20:00:16.377Z",
+      "recordedAtLabel": "May 22, 2026, 4:00 PM",
+      "recordedAtTimeLabel": "4:00 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Won fight needed low-HP reset",
+      "duration": "22:00",
+      "durationSeconds": 1320,
+      "gameLength": "31:42",
+      "gameLengthSeconds": 1902,
+      "kda": "7/9/8",
+      "kills": 7,
+      "deaths": 9,
+      "assists": 8,
+      "cs": 169,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "implementation",
+      "champion": "Samira",
+      "confidence": "medium",
+      "feedbackTitle": "Won fight needed low-HP reset",
+      "feedback": "Mistake: after a fight win, you let the next state become another low-health stay instead of cashing the win out safely. Fix: if the fight is won and your HP is low, recall unless a free structure is already directly in front of your team.",
+      "gameDetail": "At 16:27 the cost is already visible: Samira is dead in mid river after the fight sequence, so your next-game script is reset immediately after a won fight when HP is low unless a free structure is already in front of the team. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure. At 10:42 the earlier warning sign is visible in bot lane because both sides are still trading while you and your ally are low, so the smaller version of the same habit is one extra forward step after health already says stop. At 14:47 you are near a grouped objective fight, which is the kind of useful team shape to keep if the exit happens cleanly afterward.",
+      "secondaryFocus": "Next game, in lane and river fights, stop taking the next forward step once health is below one enemy spell; hold behind ally or wave until the threat is used.",
+      "mistakeTypes": [
+        "reset/overstay discipline",
+        "low-HP spacing",
+        "post-fight exit timing",
+        "shutdown or death-state exposure"
+      ],
+      "eventEvidence": "10:42 shows a bot-lane skirmish with both sides still trading and Samira plus ally low. 14:47 shows a grouped objective fight near dragon pit. 16:27 shows Samira dead with the death timer open while allies push mid.",
+      "failureEvidence": "At 16:27 Samira is dead after the mid-river fight sequence, so the visible failure is not refusing to fight; it is staying past the safe exit after the useful fight value is gone. The earlier 10:42 low-health lane trade shows the same HP-state habit before it becomes the later death timer.",
+      "goodThing": "The strong part is that you did join a grouped objective fight at 14:47 instead of only playing side farm.",
+      "whyTrust": "The visible anchors show a low-health trade pattern at 10:42, a grouped objective fight at 14:47, and the death timer at 16:27, so the review is about post-fight exit timing and HP-state discipline.",
+      "focusTag": "low hp reset",
+      "evidence": "Manual repair from visible clock anchors: 10:42 low-health bot trade, 14:47 grouped objective fight, and 16:27 death timer after the fight sequence.",
+      "pattern": "The repeated mistake is not being afraid to fight. It is failing to switch from fight mode to exit mode once health and payout say the useful part is over.",
+      "diamondRule": "Won fight plus low HP means recall unless the structure is free now.",
+      "drill": "Next game, after any won fight, check HP before clicking forward; if one spell can kill you and no free structure is on-screen, recall.",
+      "timeline": [
+        "10:42 - Samira and ally are low while the bot-lane trade is still continuing.",
+        "14:47 - Samira is near a grouped objective fight around dragon pit.",
+        "16:27 - Samira is dead in mid river with the death timer visible while allies push mid."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "10:42",
+          "videoSeconds": 508.615,
+          "description": "Bot-lane skirmish continues while Samira and ally are low health."
+        },
+        {
+          "clock": "14:47",
+          "videoSeconds": 710.462,
+          "description": "Samira is near a grouped objective fight around dragon pit."
+        },
+        {
+          "clock": "16:27",
+          "videoSeconds": 811,
+          "description": "Samira is dead with the death timer visible while allies push mid."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "10:42",
+          "videoSeconds": 508.615,
+          "description": "shows a bot-lane skirmish with both sides still trading and Samira plus ally low."
+        },
+        {
+          "clock": "14:47",
+          "videoSeconds": 710.462,
+          "description": "shows a grouped objective fight near dragon pit."
+        },
+        {
+          "clock": "16:27",
+          "videoSeconds": 811,
+          "description": "shows Samira dead with the death timer open while allies push mid."
+        }
+      ],
+      "nuance": [
+        "Good: the 14:47 grouped objective fight is a useful team shape.",
+        "Leak: at 16:27 the won-fight value has turned into a death timer instead of a clean reset.",
+        "Consequence: low HP makes the next forward click more expensive than the next wave or camp can repay.",
+        "Next check: after a won fight, HP decides whether the next click is forward or recall."
+      ],
+      "reviewLimit": "The 2 FPS review can judge HP-state, fight aftermath, death timer, and grouped objective shape. It cannot judge exact spell cooldowns or combo timing.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
+      "sampledFrames": 14,
+      "publicVideoBytes": 31469760,
+      "captureFps": 1,
+      "src": "/recordings/auto_NA1-5565818690_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5565818690-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-exact-rank-trend-v4",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "score": 25,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 98,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "developing",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
+      }
     },
     {
       "file": "auto_NA1-5565804951_01.mp4",

@@ -117,6 +117,9 @@ function feedbackIssues(recording = {}) {
   if (needsEvidenceLanes) {
     const failureEvidence = clean(recording.failureEvidence);
     const mistakeTypes = Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.filter(Boolean) : [];
+    if (/\b(?:Failure evidence|Other mistake types|Second focus)\s*:/i.test(allVisible)) {
+      issues.push("visible feedback contains field labels instead of natural coaching prose");
+    }
     if (failureEvidence.length < 80) issues.push("failureEvidence does not prove the visible failure chain");
     if (mistakeTypes.length < 3) issues.push("mistakeTypes needs at least three distinct mistake lanes");
   }

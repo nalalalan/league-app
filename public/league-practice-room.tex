@@ -133,7 +133,7 @@
 \end{center}
 
 \vspace{0.35em}
-\noindent\textbf{Fast multiplayer games can convert practice into threat when social judgment, sensory load, ambiguous damage, and repeated failure are experienced as one continuous demand. This manuscript reports a single-user design study of \href{https://league.aolabs.io}{league.aolabs.io}, a public review room for League of Legends practice. The system does not claim clinical efficacy, population generality, or competitive optimization. It translates a user-provided learning arc into a low-threat review surface: two champion pages, source-bounded recording review, archived situation notes, public logs, and a downloadable record. The strongest contribution is a design pattern rather than a gameplay result: make the next repetition easier to start by keeping the active champions visible, putting recording feedback first, and moving older situation material into an archive. The interface treats bots as a practice room, human games as performance, death-with-intent as a valid rep, and recording review as mental practice. This bounded case suggests how personal learning software can support high-repetition play without becoming another source of evaluation pressure.}
+\noindent\textbf{Fast multiplayer games can convert practice into threat when social judgment, sensory load, ambiguous damage, and repeated failure are experienced as one continuous demand. This manuscript reports a single-user design study of \href{https://league.aolabs.io}{league.aolabs.io}, a public review room for League of Legends practice. The system does not claim clinical efficacy, population generality, or competitive optimization. It translates a user-provided learning arc into a low-threat review surface: two champion pages, source-bounded recording review, archived situation notes, public logs, and a downloadable record. The strongest contribution is a design pattern rather than a gameplay result: make the next repetition easier to start by keeping the active champions visible, putting recording feedback first, encoding coach intent directly in the paragraph color system, and moving older situation material into an archive. The interface treats bots as a practice room, human games as performance, death-with-intent as a valid rep, and recording review as mental practice. This bounded case suggests how personal learning software can support high-repetition play without becoming another source of evaluation pressure.}
 
 \newpage
 \pagestyle{fancy}
@@ -168,6 +168,35 @@ Damage triggers panic & Mindset situation & Damage is information \\
 Samira has many buttons & Button-order situation & Q before E; W saved for real danger \\
 Low targets bait chase & Chase situation & Low plus reachable, not low plus fog \\
 Champion fit affects repetition & Two champion pages & Samira recordings; Fizz empty until footage exists \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{The interface itself became part of the research record}
+
+The public page is not a neutral wrapper around the recordings. It is part of the intervention being studied. For that reason, the paper records the actual interface, not only the backend, manifest, or coaching text. The live page begins with the shared AO Labs header, a quiet paper strip, two champion cards, and then the current Samira review state. The champion cards use the exact user-supplied photographs: the hat photo for Samira and the peace-sign photo for Fizz. This matters because the page is meant to feel like a personal practice room rather than a generic analytics product.
+
+The top review tile combines the rank trend plot and the overall Samira state into one calm surface. The plot uses exact per-game rank equivalents rather than broad ranges, and the state paragraph summarizes the newest full game, recent baseline, all-game median, recurring blocker, reliable strength, and evidence limit. That top tile is intentionally not a broad dashboard. It exists to answer one question before the next game: what level is the current play reading as, and what pattern is most worth fixing next?
+
+Each recording row is also a designed reading object. The title names the main pattern, the first line gives queue, champion, time, length, rank read, and compact K/D/A/CS context, and the paragraph carries the actual coaching. The color semantics are now part of the product contract: green marks what was good and should be kept, red marks what was bad and should stop, pink marks the exact next-game action, and neutral dark text carries the timestamps, evidence, stats, and context that make the highlighted claims understandable. The pink span is reserved for action text that remains useful when read alone, so a timestamped setup can stay neutral while the instruction itself is visually distinct. This avoids making Alan infer a hidden legend from several arbitrary colors.
+
+\begin{table}[H]
+\centering
+\caption{Current interface elements and the paper obligation they create.}
+{\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{p{0.23\linewidth}p{0.33\linewidth}p{0.30\linewidth}}
+\toprule
+Visible surface & Function in the practice room & Paper record required \\
+\midrule
+Shared AO Labs header and paper strip & Places the tool inside the AO Labs suite and keeps the PDF reachable without adding navigation clutter & Name the public route, suite context, and paper access pattern \\
+Samira and Fizz cards & Keep the active champion set small and personal; avoid a broad champion library & State why only these two champions are exposed and how exact photos are used \\
+Rank trend and overall state tile & Shows the current rank-equivalent read and recurring blocker before the recording list & Describe the rank field, aggregation, confidence boundary, and state-generation rule \\
+Post-game queue & Shows whether capture, processing, publishing, and posting are waiting, active, or complete & Describe queue ordering, ETA role, one-at-a-time processing, and lag-reduction constraints \\
+Recording card & Couples video, timestamped review, compact stats, and action script in one row & Describe the card anatomy and how evidence, failure lanes, and timestamps are rendered \\
+Highlighted coach clauses & Turns one paragraph into a readable coach key without adding panels & Record the reading model: green keep, red stop, pink next action, neutral support text \\
+Archive and public log & Preserve older situation rules and public notes without competing with current review & State which material is demoted below the active recordings and why \\
 \bottomrule
 \end{tabular}
 }
@@ -232,7 +261,7 @@ The seed corpus was the user-provided League learning arc pasted into the implem
 
 \subsection*{Interface requirements}
 
-The page was constrained by user instructions gathered during planning: one page only, clean and pretty, same AO Labs vibe, no poster hero, no dense dashboard, no redundant helper labels, no overexplaining, public notes by default, and one quiet paper strip. The page therefore uses the shared AO Labs header, warm off-white palette, dark ink text, 8 px cards, restrained borders and shadows, compact fragments, and one visible PDF action.
+The page was constrained by user instructions gathered during planning and revision: one page only, clean and pretty, same AO Labs vibe, no poster hero, no dense dashboard, no redundant helper labels, no overexplaining, public notes by default, one quiet paper strip, detailed coaching without a giant checklist, a readable queue, and a color system that does not require a legend. The page therefore uses the shared AO Labs header, warm off-white palette, dark ink text, 8 px cards, restrained borders and shadows, compact fragments, one visible PDF action, and a four-part coaching color key: green for the behavior to keep, red for the behavior to stop, pink for the next-game action, and neutral dark text for evidence, stats, timestamps, and context. The paragraph must still read naturally as coach prose; the colors are applied after the coaching is written so that skimming only green, only red, or only pink answers a different practical question. This interface description is treated as part of manuscript accuracy: when the page changes in a way that changes what Alan sees, how evidence is displayed, how queue state is communicated, or how coaching intent is encoded, the paper must be checked or updated in the same work cycle.
 
 \subsection*{Rule extraction}
 

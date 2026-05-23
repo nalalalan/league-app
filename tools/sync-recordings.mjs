@@ -39,6 +39,8 @@ const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
   "auto_NA1-5565911037_01.mp4",
+  "auto_NA1-5565964482_01.mp4",
+  "auto_NA1-5565818690_01.mp4",
   "auto_NA1-5566120017_01.mp4"
 ]);
 const largeRecordingBytes = Number(process.env.LEAGUE_LARGE_RECORDING_BYTES || 45 * 1024 * 1024);
@@ -59,6 +61,8 @@ function clean(value, fallback = "") {
 
 function coachClean(value, fallback = "") {
   return clean(value, fallback)
+    .replace(/^\s*(?:Failure evidence|Other mistake types|Second focus)\s*:\s*/i, "")
+    .replace(/^\s*Second focus\s+is\s+/i, "")
     .replace(/\bhigh[-\s]?elo\s+Samira\b/gi, "strong Samira player")
     .replace(/\bhigh[-\s]?elo\b/gi, "stronger games")
     .replace(/\bmaster[-\s]?facing\b/gi, "")
@@ -1153,8 +1157,19 @@ function hasRedundantLessonEcho(recording = {}) {
 }
 
 function needsCachedTextRepair(recording = {}) {
-  const text = [recording.gameDetail, recording.eventEvidence, recording.evidence].filter(Boolean).join(" ");
-  return hasRepeatedConversionGlossary(recording) || hasRedundantLessonEcho(recording) || /[.!?]\s*;|;\s*[.!?]|[.!?]{2,}/.test(text);
+  const text = [
+    recording.gameDetail,
+    recording.secondaryFocus || recording.secondaryImprovement,
+    recording.failureEvidence,
+    recording.eventEvidence,
+    recording.evidence
+  ].filter(Boolean).join(" ");
+  return (
+    hasRepeatedConversionGlossary(recording) ||
+    hasRedundantLessonEcho(recording) ||
+    /\b(?:Failure evidence|Other mistake types|Second focus)\s*:/i.test(text) ||
+    /[.!?]\s*;|;\s*[.!?]|[.!?]{2,}/.test(text)
+  );
 }
 
 function usefulEvidenceMoment(anchor, analysis, threshold = 8) {
@@ -2138,7 +2153,7 @@ function manualFeedback(file) {
       gameDetail: "At 23:33, in a 1/6/1, 152 CS, 25-minute ranked game, you are taking a side jungle camp while enemies are pressuring through your side of the map; your job is to leave the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on camp gold. At 23:33 the feeding pattern is not that you never farm; it is that normal farm stays on the menu after the map state already says defend. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
       whyTrust: "The review is tied to the visible collapse frames and the scoreboard line: 1/6/1 with 152 CS, side-camp choice at 23:33, and death/base consequence at 25:30.",
       eventEvidence: "17:42 shows Samira mid with an ally and a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on a side jungle camp while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
-      failureEvidence: "Failure evidence: at 23:33 Samira chooses a side jungle camp while the visible map state is already about base defense, so the failure is not farming in general; it is farming after the defend signal. By 25:30 the cost is visible because Samira is dead, an allied turret has fallen, and enemies are inside the base area.",
+      failureEvidence: "At 23:33 Samira chooses a side jungle camp while the visible map state is already about base defense, so the failure is not farming in general; it is farming after the defend signal. By 25:30 the cost is visible because Samira is dead, an allied turret has fallen, and enemies are inside the base area.",
       mistakeTypes: [
         "side farm over base defense",
         "camera/map-state check",
@@ -2169,10 +2184,10 @@ function manualFeedback(file) {
         "Leak: at 23:33 the camp takes your champion away from the base-defense line.",
         "Consequence: by 25:30 you are dead and the enemy has converted pressure into your base.",
         "Next check: if a structure can fall before you finish the camp, leave the camp.",
-        "Second focus is camera/map checking, not combo speed, because the 2 FPS capture is better for decisions than frame-perfect mechanics."
+        "The second visible lane is camera/map checking, not combo speed, because the 2 FPS capture is better for decisions than frame-perfect mechanics."
       ],
       reviewLimit: "This uses sampled 2 FPS frames, so it cannot judge exact combo speed or every cooldown. It can judge map state, side-camp timing, ally location, death state, and whether the next click protects base.",
-      secondaryFocus: "Second focus: camera and map checks - next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
+      secondaryFocus: "Next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
       analysisSource: "manual"
     };
   }
@@ -2185,7 +2200,7 @@ function manualFeedback(file) {
       gameDetail: "At 23:33 the mid push has turned into a crowded fight with three enemy bodies still in front of you and an enemy turret/base line behind them; your job is to stand behind the first ally, hit the nearest safe target or wave, and leave as soon as your health drops instead of staying available for the full re-engage. By 23:43 you are dead with multiple allies also down, so the leak is not that you lacked damage; the leak is that the fight continued after the safe damage window ended and gave the enemy a clean push back. At 24:20, when you respawn with several teammates still dead, do not run out looking for a fight or a side route; hold base, clear the closest wave under turret, and wait for at least two teammates to spawn. At 26:54 the same rule appears again with four allies dead: stop at the base/inhibitor line, do not walk up bottom jungle or lane, and only clear minions that enter tower range. The simple next-game script is fight from behind a body while the state is even, and when the state is losing, defend one safe wave until teammates are alive.",
       whyTrust: "The review is tied to the death-state frames: the game was already hard, so the fastest improvement is removing the extra deaths after the safe fight window is gone.",
       eventEvidence: "23:33 shows Samira behind a Baron-powered mid push with multiple enemy defenders still alive; 23:43 shows Samira dead after the fight continues; 24:20 shows Samira respawning while several teammates are still dead; 26:54 shows Samira moving out while four allies are dead.",
-      failureEvidence: "Failure evidence: at 23:33 the fight is already crowded with enemy defenders alive, so the safe damage window is ending. By 23:43 Samira is dead with allies also down; at 24:20 and 26:54 the visible failure repeats as forward movement starts while teammates are still dead instead of holding the base line.",
+      failureEvidence: "At 23:33 the fight is already crowded with enemy defenders alive, so the safe damage window is ending. By 23:43 Samira is dead with allies also down; at 24:20 and 26:54 the visible failure repeats as forward movement starts while teammates are still dead instead of holding the base line.",
       mistakeTypes: [
         "spacing/entry discipline",
         "shutdown or death-state exposure",
@@ -2219,10 +2234,100 @@ function manualFeedback(file) {
         "Leak: the 23:33 fight continues after the safe damage window is gone.",
         "Consequence: by 23:43 Samira is dead with allies down, which gives the enemy room to push back instead of letting your team stabilize.",
         "Next check: if two or more allies are dead, switch to base defense and safe wave clear until bodies are back.",
-        "Second focus is not frame-perfect mechanics; at 2 FPS the visible mechanics habit is entry discipline and spacing over several seconds."
+        "The second visible lane is entry discipline and spacing over several seconds, not frame-perfect mechanics."
       ],
       reviewLimit: "This uses sampled 2 FPS frames, so it cannot judge exact combo speed, reaction time, or every cooldown. It can judge the visible fight state, ally death timers, spacing, and forward pathing.",
-      secondaryFocus: "Second focus: lane and fight spacing - next game, do not cross past your support/frontline until the enemy engage tool is used; at 4:55 and 7:16 the safer habit is last-hit from Q range and let the wave come to you.",
+      secondaryFocus: "Next game, do not cross past your support/frontline until the enemy engage tool is used; at 4:55 and 7:16 the safer habit is last-hit from Q range and let the wave come to you.",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5565964482_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "medium",
+      feedbackTitle: "Mid wave needed a side check",
+      feedback: "Mistake: you kept turning mid priority into another mid wave after the map was asking for a side-lane or objective check. Fix: after the mid wave is handled, move your camera first, then choose ally/objective movement or reset before touching the next wave.",
+      gameDetail: "At 16:05 Samira is mid alone last-hitting after the wave is already under control; move the camera to both side lanes, then either path toward the closest ally/objective or reset instead of autoing the next neutral mid wave. The leak is not that mid farm is bad; it is that mid stayed as default farm when the wave had already bought you time to look elsewhere. At 9:46 the same neutral pattern appears at mid turret, and by 21:49 the game has already produced a death/reset cycle, so the bigger climb habit is to turn one handled mid wave into a map check before the next minion. This matters because mid priority only helps Samira climb if it becomes information, vision, structure access, or a safer reset before enemies get another collapse window.",
+      whyTrust: "The visible anchors show repeated mid-wave time at 9:46, 16:05, 18:00, and 19:54, plus the later 21:49 respawn state, so the review is about map-use after mid wave rather than combo execution.",
+      eventEvidence: "9:46 shows Samira auto-attacking a cannon minion at mid turret. 16:05 shows Samira last-hitting mid alone with no immediate structure hit. 18:00 and 19:54 show more mid movement/wave clear. 21:49 shows Samira leaving fountain after a death/reset state.",
+      failureEvidence: "At 16:05 Samira uses the handled mid wave as permission to keep farming mid instead of checking the next side/objective state, so the wave priority leaks into autopilot time. By 21:49 the recording has reached a respawn cycle, which is the visible cost pattern when mid time does not become a useful map action soon enough.",
+      mistakeTypes: [
+        "mid wave autopilot",
+        "camera/map-state check",
+        "objective or side-lane conversion",
+        "reset timing after priority"
+      ],
+      goodThing: "The strong part is that you kept finding mid waves and did not randomly abandon the lane; that wave control is useful when it becomes a map check.",
+      focusTag: "mid priority check",
+      evidence: "Manual repair from visible clock anchors: 9:46 mid cannon, 16:05 mid last-hit state, 18:00 and 19:54 repeated mid wave movement, and 21:49 respawn/reset state.",
+      pattern: "The repeated mistake is not wave clearing itself. It is failing to spend the few seconds earned by wave clear on camera, side pressure, vision, or reset choice.",
+      diamondRule: "After one safe mid wave, look side before touching the next one.",
+      drill: "Next game, after every mid wave past 14 minutes, flick camera to both side lanes and death timers before autoing the next wave; if a fight or threatened turret is visible, leave mid.",
+      timeline: [
+        "9:46 - Samira is auto-attacking cannon minion at mid turret.",
+        "16:05 - Samira is last-hitting mid alone after the wave is already under control.",
+        "18:00 - Samira continues moving through mid after using a skillshot.",
+        "19:54 - Samira clears another mid wave.",
+        "21:49 - Samira leaves fountain after the game has reached a death/reset cycle."
+      ],
+      clockAnchors: [
+        { clock: "9:46", videoSeconds: 576.115, description: "Samira auto-attacks a cannon minion at mid turret." },
+        { clock: "16:05", videoSeconds: 919, description: "Samira last-hits minions in mid lane while alone." },
+        { clock: "18:00", videoSeconds: 1033.808, description: "Samira moves in mid lane after using a skillshot." },
+        { clock: "19:54", videoSeconds: 1148.231, description: "Samira clears a mid minion wave with one minion remaining." },
+        { clock: "21:49", videoSeconds: 1262.654, description: "Samira runs from fountain into base after a respawn state." }
+      ],
+      nuance: [
+        "Good: mid wave control gives you time and lane access.",
+        "Leak: at 16:05 the wave is handled, but the next action is still more mid farming instead of a side/objective check.",
+        "Consequence: the game later reaches a respawn state, so the review target is spending mid priority sooner.",
+        "Next check: after one safe mid wave, look at side lanes and death timers before taking the next one."
+      ],
+      reviewLimit: "The 2 FPS review can judge repeated mid-wave state, map movement, and respawn timing. It cannot judge exact camera hotkey timing or frame-perfect mechanics.",
+      secondaryFocus: "Next game, after every mid wave past 14 minutes, flick camera to both side lanes and death timers before autoing the next wave; if a fight or threatened turret is visible, leave mid.",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5565818690_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "medium",
+      feedbackTitle: "Won fight needed low-HP reset",
+      feedback: "Mistake: after a fight win, you let the next state become another low-health stay instead of cashing the win out safely. Fix: if the fight is won and your HP is low, recall unless a free structure is already directly in front of your team.",
+      gameDetail: "At 16:27 the cost is already visible: Samira is dead in mid river after the fight sequence, so your next-game script is reset immediately after a won fight when HP is low unless a free structure is already in front of the team. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure. At 10:42 the earlier warning sign is visible in bot lane because both sides are still trading while you and your ally are low, so the smaller version of the same habit is one extra forward step after health already says stop. At 14:47 you are near a grouped objective fight, which is the kind of useful team shape to keep if the exit happens cleanly afterward.",
+      whyTrust: "The visible anchors show a low-health trade pattern at 10:42, a grouped objective fight at 14:47, and the death timer at 16:27, so the review is about post-fight exit timing and HP-state discipline.",
+      eventEvidence: "10:42 shows a bot-lane skirmish with both sides still trading and Samira plus ally low. 14:47 shows a grouped objective fight near dragon pit. 16:27 shows Samira dead with the death timer open while allies push mid.",
+      failureEvidence: "At 16:27 Samira is dead after the mid-river fight sequence, so the visible failure is not refusing to fight; it is staying past the safe exit after the useful fight value is gone. The earlier 10:42 low-health lane trade shows the same HP-state habit before it becomes the later death timer.",
+      mistakeTypes: [
+        "reset/overstay discipline",
+        "low-HP spacing",
+        "post-fight exit timing",
+        "shutdown or death-state exposure"
+      ],
+      goodThing: "The strong part is that you did join a grouped objective fight at 14:47 instead of only playing side farm.",
+      focusTag: "low hp reset",
+      evidence: "Manual repair from visible clock anchors: 10:42 low-health bot trade, 14:47 grouped objective fight, and 16:27 death timer after the fight sequence.",
+      pattern: "The repeated mistake is not being afraid to fight. It is failing to switch from fight mode to exit mode once health and payout say the useful part is over.",
+      diamondRule: "Won fight plus low HP means recall unless the structure is free now.",
+      drill: "Next game, after any won fight, check HP before clicking forward; if one spell can kill you and no free structure is on-screen, recall.",
+      timeline: [
+        "10:42 - Samira and ally are low while the bot-lane trade is still continuing.",
+        "14:47 - Samira is near a grouped objective fight around dragon pit.",
+        "16:27 - Samira is dead in mid river with the death timer visible while allies push mid."
+      ],
+      clockAnchors: [
+        { clock: "10:42", videoSeconds: 508.615, description: "Bot-lane skirmish continues while Samira and ally are low health." },
+        { clock: "14:47", videoSeconds: 710.462, description: "Samira is near a grouped objective fight around dragon pit." },
+        { clock: "16:27", videoSeconds: 811, description: "Samira is dead with the death timer visible while allies push mid." }
+      ],
+      nuance: [
+        "Good: the 14:47 grouped objective fight is a useful team shape.",
+        "Leak: at 16:27 the won-fight value has turned into a death timer instead of a clean reset.",
+        "Consequence: low HP makes the next forward click more expensive than the next wave or camp can repay.",
+        "Next check: after a won fight, HP decides whether the next click is forward or recall."
+      ],
+      reviewLimit: "The 2 FPS review can judge HP-state, fight aftermath, death timer, and grouped objective shape. It cannot judge exact spell cooldowns or combo timing.",
+      secondaryFocus: "Next game, in lane and river fights, stop taking the next forward step once health is below one enemy spell; hold behind ally or wave until the threat is used.",
       analysisSource: "manual"
     };
   }
@@ -3220,6 +3325,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Do not name allied or enemy champions unless the name is verified from visible roster/nameplate evidence. If uncertain, say ally, enemy, support, jungler, defender, or teammate. Do not name red buff or blue buff unless the camp label is visually verified; say jungle camp instead.",
     "Coach like a blunt but serious Challenger-path League coach: name the actual mistake, do not soften it, and do not insult Alan. If a play is greedy, late, unsafe, low-value, disconnected, or not transferable to stronger ranked games, say that plainly and tie it to visible evidence.",
     "Give one highest-value main mistake plus at least two supporting mistake lanes after scanning the whole visible game. The main mistake stays in feedback/gameDetail. The next easiest lane goes in secondaryFocus. The broader lane list goes in mistakeTypes so the page can show more kinds of mistakes without becoming a giant checklist.",
+    "Write the visible coaching fields like one smooth paragraph from a highly experienced League coach. Do not expose field labels such as 'Failure evidence:', 'Other mistake types:', or 'Second focus:'. Green/red/pink highlighting is handled by the page; all unhighlighted prose should read as context, proof, and supporting detail for the green/red/pink claims. The red-readable mistake text should name only what was bad or leaking, the green-readable goodThing should name only what to keep doing, and the pink-readable action text should tell Alan exactly what to do next game if he reads only pink.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
     "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
     "Alan's latest correction: do not stop at category advice like group, reset, pressure mid, spacing, or target selection. For the main mistake, gameDetail must include a replayable action script tied to the timestamp: 'At MM:SS, do X instead of Y; if Z is true, do A; if not, do B.' This should tell him what to click or wait for in that exact state.",
@@ -3228,7 +3334,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like a useful replay-review paragraph, not a stat audit: include the main visible mistake window, what leaked, what happened next or almost happened, and one final simple lesson sentence. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must say what to do differently in that state. Extra timestamps are optional and should appear only when they make the critique clearer.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
-    "secondaryFocus must be one concise sentence and must not repeat the main mistake. Choose the strongest second lane from visible mechanics-adjacent habits, camera stability, spacing, target choice, cursor/click pattern when visible, entry timing, cooldown/CC accounting, lane trade discipline, wave handling, pathing, fog/vision, or reset pattern. Include an easy next-game action.",
+    "secondaryFocus must be one concise natural sentence and must not repeat the main mistake. Choose the strongest second lane from visible mechanics-adjacent habits, camera stability, spacing, target choice, cursor/click pattern when visible, entry timing, cooldown/CC accounting, lane trade discipline, wave handling, pathing, fog/vision, or reset pattern. Include an easy next-game action, but do not start with 'Second focus:' or a label.",
     "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
@@ -3249,7 +3355,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
     "Visible output must address the player as 'you' or 'Samira', never 'Alan' in third person.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, timestamped do-this-instead action script, and one simple lesson sentence","secondaryFocus":"Second focus: one distinct mechanics/camera/spacing/pathing/wave/vision/target-choice improvement plus one easy next-game action; mention FPS limits if micro-mechanics cannot be judged","mistakeTypes":["3-5 short distinct mistake lanes visible or honestly limited by the recording"],"eventEvidence":"compact proof of what visibly happened in the game","failureEvidence":"one sentence proving failure: what Alan did, what state made it wrong, what leaked, and what happened next or almost happened","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, second/third mistake lane, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short title","feedback":"Mistake: what Alan did wrong. Fix: what to do differently.","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, timestamped do-this-instead action script, and one simple lesson sentence","secondaryFocus":"one natural sentence with a distinct mechanics/camera/spacing/pathing/wave/vision/target-choice improvement plus one easy next-game action; mention FPS limits if micro-mechanics cannot be judged; no label prefix","mistakeTypes":["3-5 short distinct mistake lanes visible or honestly limited by the recording"],"eventEvidence":"compact proof of what visibly happened in the game","failureEvidence":"one natural sentence proving failure: what Alan did, what state made it wrong, what leaked, and what happened next or almost happened; no label prefix","goodThing":"one honest positive thing Alan did well, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, second/third mistake lane, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -3261,7 +3367,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and exactly what to do differently at the timestamp. Be direct enough for a Challenger-path review without insulting him. Timestamp the start or nearest visible start of the main mistake window, make that timestamped sentence a replacement action script, include failureEvidence as visible proof of failure, include mistakeTypes with at least three distinct mistake lanes, include one separate secondaryFocus that does not repeat the main mistake, keep Mistake/Fix labels out of gameDetail, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and exactly what to do differently at the timestamp. Be direct enough for a Challenger-path review without insulting him. Timestamp the start or nearest visible start of the main mistake window, make that timestamped sentence a replacement action script, include failureEvidence as visible proof of failure, include mistakeTypes with at least three distinct mistake lanes, include one separate secondaryFocus that does not repeat the main mistake, keep Mistake/Fix labels out of gameDetail, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }

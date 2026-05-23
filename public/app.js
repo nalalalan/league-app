@@ -1695,17 +1695,20 @@ function displayPraise(item) {
 }
 
 function displaySecondaryFocus(item) {
-  const text = stripCoachPrefix(item.secondaryFocus || item.secondaryImprovement || "");
+  let text = stripVisibleCoachLabel(stripCoachPrefix(item.secondaryFocus || item.secondaryImprovement || ""));
   if (!hasText(text)) return "";
-  if (/^Second focus:/i.test(text)) return text;
-  return `Second focus: ${text.replace(/^Also\s+/i, "").trim()}`;
+  text = text
+    .replace(/^Also\s+/i, "")
+    .replace(/^[a-z][^.!?]{0,70}\s+-\s+next game,\s*/i, "Next game, ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return normalizeActionInstruction(text);
 }
 
 function displayFailureEvidence(item) {
-  const evidence = stripCoachPrefix(item.failureEvidence || recordingEvidence(item));
+  const evidence = stripVisibleCoachLabel(stripCoachPrefix(item.failureEvidence || recordingEvidence(item)));
   if (!hasText(evidence) || isGenericEvidence(evidence)) return "";
-  if (/^Failure evidence:/i.test(evidence)) return evidence;
-  return `Failure evidence: ${evidence}`;
+  return sentenceCase(evidence);
 }
 
 function displayMistakeTypes(item) {
@@ -1719,7 +1722,48 @@ function displayMistakeTypes(item) {
     .filter((value, index, array) => array.findIndex((other) => other.toLowerCase() === value.toLowerCase()) === index)
     .slice(0, 4);
   if (!unique.length) return "";
-  return `Other mistake types: ${unique.join("; ")}.`;
+  return `The same leak also shows up as ${naturalList(unique)}.`;
+}
+
+function stripVisibleCoachLabel(text) {
+  return String(text || "")
+    .replace(/^\s*(?:Failure evidence|Other mistake types|Second focus)\s*:\s*/i, "")
+    .replace(/^\s*Second focus\s+is\s+/i, "")
+    .trim();
+}
+
+function sentenceCase(text) {
+  const cleaned = String(text || "").replace(/\s+/g, " ").trim();
+  return cleaned.replace(/^([a-z])/, (_, letter) => letter.toUpperCase());
+}
+
+function naturalList(items) {
+  const cleanItems = items.map((item) => String(item || "").trim()).filter(Boolean);
+  if (cleanItems.length <= 1) return cleanItems[0] || "";
+  if (cleanItems.length === 2) return `${cleanItems[0]} and ${cleanItems[1]}`;
+  return `${cleanItems.slice(0, -1).join(", ")}, and ${cleanItems[cleanItems.length - 1]}`;
+}
+
+function normalizeActionInstruction(text) {
+  let cleaned = stripVisibleCoachLabel(text)
+    .replace(/\s+/g, " ")
+    .trim();
+  cleaned = cleaned
+    .replace(/^[^.!?]{0,180}\s*[—-]\s*next game,\s*/i, "Next game, ")
+    .replace(/^[^.!?]{0,180}\s*;\s*next game,\s*/i, "Next game, ")
+    .replace(/^[\s\S]{0,220}\bin future games,\s*/i, "In future games, ")
+    .replace(/^[\s\S]{0,220}\bnext rep is to\s+/i, "")
+    .replace(/^[\s\S]{0,220}\bnext game,\s*/i, "Next game, ")
+    .replace(/^your job is to\s+/i, "")
+    .replace(/^the clean next decision is to\s+/i, "")
+    .replace(/^the better next click is to\s+/i, "")
+    .replace(/^the simple next-game script is\s+/i, "")
+    .replace(/^next-game script is\s+/i, "")
+    .replace(/^next-game script:\s*/i, "")
+    .replace(/^next game,\s*/i, "Next game, ")
+    .trim();
+  if (!cleaned) return "";
+  return sentenceCase(cleaned);
 }
 
 function inferMistakeTypes(item) {
@@ -1843,7 +1887,7 @@ function appendActionAwareStorySentence(paragraph, sentence, options = {}) {
   if (actionIndex > 0) {
     appendStoryText(paragraph, sentence.slice(0, actionIndex).trim(), options);
   }
-  appendStorySpan(paragraph, sentence.slice(actionIndex).trim(), "recording-story-action", options);
+  appendStorySpan(paragraph, normalizeActionInstruction(sentence.slice(actionIndex)), "recording-story-action", options);
 }
 
 function secondsFromTimestamp(text) {
