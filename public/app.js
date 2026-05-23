@@ -1812,6 +1812,40 @@ function praiseInsertIndex(sentences) {
   return Math.min(sentences.length, Math.max(1, sentences.length - 1));
 }
 
+function actionInstructionIndex(sentence) {
+  const source = String(sentence || "");
+  const patterns = [
+    /\byour job is to\b/i,
+    /\bdo not\b/i,
+    /\bnext-game script\b/i,
+    /\bthe clean next decision\b/i,
+    /\bthe better next click\b/i,
+    /\bwhen you are behind\b/i,
+    /\bwhen the state is losing\b/i,
+    /\bstand behind\b/i,
+    /\bclear only\b/i,
+    /\bwait for\b/i,
+    /\bleave the\b/i,
+    /\bwalk toward\b/i
+  ];
+  return patterns
+    .map((pattern) => source.search(pattern))
+    .filter((index) => index >= 0)
+    .sort((a, b) => a - b)[0] ?? -1;
+}
+
+function appendActionAwareStorySentence(paragraph, sentence, options = {}) {
+  const actionIndex = actionInstructionIndex(sentence);
+  if (actionIndex < 0) {
+    appendStoryText(paragraph, sentence, options);
+    return;
+  }
+  if (actionIndex > 0) {
+    appendStoryText(paragraph, sentence.slice(0, actionIndex).trim(), options);
+  }
+  appendStorySpan(paragraph, sentence.slice(actionIndex).trim(), "recording-story-action", options);
+}
+
 function secondsFromTimestamp(text) {
   const match = String(text || "").match(/^(\d{1,2}):([0-5]\d)$/);
   if (!match) return null;
@@ -2008,7 +2042,7 @@ function recordingStoryParagraph(item) {
   const praiseIndex = praise ? praiseInsertIndex(sentences) : -1;
   const timestampOptions = { linkTimestamps: true, item };
   sentences.forEach((sentence, index) => {
-    appendStoryText(paragraph, sentence, timestampOptions);
+    appendActionAwareStorySentence(paragraph, sentence, timestampOptions);
     if (index + 1 === critiqueIndex) appendStorySpan(paragraph, critique, "recording-story-critique", timestampOptions);
     if (index + 1 === praiseIndex) appendStorySpan(paragraph, praise, "recording-story-praise", timestampOptions);
   });

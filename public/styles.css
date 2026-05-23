@@ -2438,6 +2438,7 @@ h1 {
 
 .recording-story-critique,
 .recording-story-praise,
+.recording-story-action,
 .recording-story-secondary,
 .recording-story-evidence,
 .recording-story-types,
@@ -2462,15 +2463,16 @@ h1 {
   color: #2d7a43;
 }
 
+.recording-story-action,
+.recording-story-secondary {
+  color: #b24673;
+}
+
 .recording-story-evidence {
   color: #443b35;
 }
 
 .recording-story-types {
-  color: #443b35;
-}
-
-.recording-story-secondary {
   color: #443b35;
 }
 
@@ -2505,9 +2507,11 @@ h1 {
   color: #1f6133;
 }
 
+.recording-story-action .recording-time-link:hover,
+.recording-story-action .recording-time-link:focus-visible,
 .recording-story-secondary .recording-time-link:hover,
 .recording-story-secondary .recording-time-link:focus-visible {
-  color: #7b4d22;
+  color: #8f3159;
 }
 
 .recording-list-description,
