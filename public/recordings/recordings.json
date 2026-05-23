@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T17:53:53.728Z",
+  "generatedAt": "2026-05-23T19:55:20.867Z",
   "source": "League of Legends Highlights folder",
   "match": "31 matches",
   "matches": [
@@ -40,16 +40,16 @@
   "totalRecordings": 43,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
-    "title": "Samira overall state",
-    "focus": "Current read: Bronze IV on the newest full game; Iron I across the last 5 full-game reads; Bronze III median across 29 full games. The latest game is near your recent baseline.",
-    "rule": "The recurring blocker is shutdown or unspent-gold exposure and reset/overstay after a won moment; the reliable strength is grouping with allies when the play is clear and finding fights and base pressure.",
-    "nextRep": "Next game: call even or losing before each fight; if losing, choose only back, tower wave, or wait.",
-    "whyTrust": "This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.",
-    "pattern": "Latest file auto_NA1-5566120017_01.mp4 drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.",
+    "title": "Samira latest synced state",
+    "focus": "Synced through May 22, 2026, 10:54 PM: newest full-game read Bronze IV; current 3-game read Iron I; archive median Bronze III across 29 full games, used only as baseline context. The newest game is around the current three-game read.",
+    "rule": "The newest-game blocker is side farm over base defense and camera/map-state check; the current repeat across the latest games is camera/map-state check, shutdown or death-state exposure, and side farm over base defense. The keep-habit is you found the correct map lane with an ally and a mid wave; that is the shape to repeat before it turns into side-camp drift.",
+    "nextRep": "Next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
+    "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
+    "pattern": "Latest file auto_NA1-5566120017_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
-      "Read the latest rank point.",
-      "Check the repeated leak.",
-      "Play one rep against that leak."
+      "Read the newest-game point.",
+      "Use the latest-game next action.",
+      "Treat the archive as baseline only."
     ],
     "reviewLimit": "Rank read is a macro-equivalent estimate, not Riot MMR."
   },

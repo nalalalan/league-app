@@ -679,8 +679,8 @@ const recordingReview = {
   totalRecordings: 13,
   reviewBasis: "Recording review is ordered as a queue plan with one feedback note per file.",
   mainFeedback: {
-    title: "Samira: kill, crash, reset",
-    focus: "Conversion is the climb gap: after a won fight, cash out wave crash, tower, dragon, Baron, nexus, or recall.",
+    title: "Samira latest synced state",
+    focus: "Latest synced read: conversion is the climb gap; after a won fight, cash out wave crash, tower, dragon, Baron, nexus, or recall.",
     rule: "No second E/R unless the payout is secured or the next target is isolated, low, and the exit is named.",
     nextRep: "Next game: kill -> payout -> reset.",
     whyTrust: "Shutdown deaths erase Samira leads; conversion turns the same mechanics into XP, tempo, and objectives."
@@ -1368,7 +1368,7 @@ function displayMainFeedbackTitle(title, championName = "Samira") {
   const cleaned = String(title || "")
     .replace(new RegExp(`^\\s*${escaped}\\s+`, "i"), "")
     .trim();
-  if (!cleaned || /^overall state$/i.test(cleaned)) return "current state";
+  if (!cleaned || /^overall state$/i.test(cleaned)) return "latest synced state";
   return cleaned.replace(/^([a-z])/, (match) => match.toUpperCase());
 }
 

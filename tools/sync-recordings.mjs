@@ -3482,6 +3482,79 @@ function recordingRankValue(recording = {}) {
   return null;
 }
 
+function stripTerminalPunctuation(value = "") {
+  return clean(value).replace(/[.!?]+$/g, "");
+}
+
+function sentenceCaseFragment(value = "") {
+  const text = stripTerminalPunctuation(value);
+  return text.replace(/^([A-Z])/, (match) => match.toLowerCase());
+}
+
+function firstSentenceFragment(value = "", maxLength = 140) {
+  const text = stripTerminalPunctuation(value);
+  if (!text) return "";
+  const first = text.split(/(?<=[.!?])\s+/)[0] || text;
+  if (first.length <= maxLength) return stripTerminalPunctuation(first);
+  const clipped = first.slice(0, maxLength).replace(/\s+\S*$/, "");
+  return stripTerminalPunctuation(clipped);
+}
+
+function recordingMistakePhrases(recording = {}) {
+  const fromReview = cleanList(recording.mistakeTypes, 5)
+    .map((item) => sentenceCaseFragment(item))
+    .filter(Boolean);
+  if (fromReview.length) return fromReview;
+
+  const flags = rankTextFlags(recording);
+  const phrases = [];
+  if (flags.chaseDrift) phrases.push("side pressure or fog drift");
+  if (flags.overstayReset) phrases.push("reset/overstay discipline");
+  if (flags.shutdownGold) phrases.push("shutdown or unspent-gold exposure");
+  if (flags.conversion) phrases.push("missed structure/objective conversion");
+  if (flags.lethalHp) phrases.push("low-HP or death-state re-entry");
+  return phrases;
+}
+
+function recordingStrengthPhrase(recording = {}) {
+  const good = clean(recording.goodThing);
+  if (good) {
+    return firstSentenceFragment(good, 150)
+      .replace(/^At\s+\d{1,2}:[0-5]\d\s+you\s+/i, "you ")
+      .replace(/^The strong part is that\s+/i, "")
+      .replace(/\byou did find\b/i, "you found")
+      .replace(/\byou did\b/i, "you")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  const flags = rankTextFlags(recording);
+  if (flags.syncedTeamplay) return "grouping with allies when the play is clear";
+  if (flags.positiveConversion) return "finding fights, waves, towers, or base pressure";
+  if (Number(recording.kills) >= 12) return "enough damage to win bot-game fights";
+  return "";
+}
+
+function weightedCurrentPhrases(recordings = [], phraseGetter) {
+  const counts = new Map();
+  recordings.forEach((recording, index) => {
+    const weight = index + 1;
+    for (const phrase of phraseGetter(recording).slice(0, 3)) {
+      counts.set(phrase, (counts.get(phrase) || 0) + weight);
+    }
+  });
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([phrase]) => phrase);
+}
+
+function joinCompactList(items = [], fallback = "") {
+  const values = items.map((item) => clean(item)).filter(Boolean);
+  if (values.length === 0) return fallback;
+  if (values.length === 1) return values[0];
+  if (values.length === 2) return `${values[0]} and ${values[1]}`;
+  return `${values.slice(0, -1).join(", ")}, and ${values.at(-1)}`;
+}
+
 function dynamicOverallFeedback(recordings = [], detectedChampions = []) {
   const full = recordings
     .filter((recording) => isFullReviewRecording(recording) && championId(recording.champion) === "samira")
@@ -3495,42 +3568,35 @@ function dynamicOverallFeedback(recordings = [], detectedChampions = []) {
 
   const latest = full.at(-1) || recordings.at(-1);
   const values = full.map((recording) => recording.rankValue);
-  const recent = full.slice(-5);
-  const recentValues = recent.map((recording) => recording.rankValue);
+  const currentWindow = full.slice(-3);
+  const currentValues = currentWindow.map((recording) => recording.rankValue);
   const medianValue = values.length ? [...values].sort((a, b) => a - b)[Math.floor((values.length - 1) / 2)] : null;
-  const recentAverage = recentValues.length
-    ? recentValues.reduce((sum, value) => sum + value, 0) / recentValues.length
+  const currentAverage = currentValues.length
+    ? currentValues.reduce((sum, value) => sum + value, 0) / currentValues.length
     : medianValue;
   const latestRank = latest?.rankEstimate?.exactRank || (Number.isFinite(latest?.rankValue) ? rankNameFromValue(latest.rankValue) : "unranked");
   const baselineRank = Number.isFinite(medianValue) ? rankNameFromValue(medianValue) : "unranked";
-  const recentRank = Number.isFinite(recentAverage) ? rankNameFromValue(recentAverage) : baselineRank;
+  const currentRank = Number.isFinite(currentAverage) ? rankNameFromValue(currentAverage) : baselineRank;
 
-  const leakCounts = new Map();
-  const strengthCounts = new Map();
-  for (const recording of full) {
-    const flags = rankTextFlags(recording);
-    if (flags.overstayReset) leakCounts.set("reset/overstay after a won moment", (leakCounts.get("reset/overstay after a won moment") || 0) + 1);
-    if (flags.conversion) leakCounts.set("missed structure conversion", (leakCounts.get("missed structure conversion") || 0) + 1);
-    if (flags.chaseDrift) leakCounts.set("side chase or fog drift", (leakCounts.get("side chase or fog drift") || 0) + 1);
-    if (flags.lethalHp) leakCounts.set("lethal-HP stay", (leakCounts.get("lethal-HP stay") || 0) + 1);
-    if (flags.shutdownGold) leakCounts.set("shutdown or unspent-gold exposure", (leakCounts.get("shutdown or unspent-gold exposure") || 0) + 1);
-    if (flags.positiveConversion) strengthCounts.set("finding fights and base pressure", (strengthCounts.get("finding fights and base pressure") || 0) + 1);
-    if (flags.syncedTeamplay) strengthCounts.set("grouping with allies when the play is clear", (strengthCounts.get("grouping with allies when the play is clear") || 0) + 1);
-    if (Number(recording.kills) >= 12) strengthCounts.set("enough damage to win bot-game fights", (strengthCounts.get("enough damage to win bot-game fights") || 0) + 1);
-  }
-  const topLeaks = [...leakCounts.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
-  const topStrengths = [...strengthCounts.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
-  const latestVsRecent = Number.isFinite(latest?.rankValue) && Number.isFinite(recentAverage)
-    ? latest.rankValue - recentAverage
+  const latestVsCurrent = Number.isFinite(latest?.rankValue) && Number.isFinite(currentAverage)
+    ? latest.rankValue - currentAverage
     : 0;
-  const direction = latestVsRecent >= 2
-    ? "The latest game is above your recent baseline"
-    : (latestVsRecent <= -2 ? "The latest game is below your recent baseline" : "The latest game is near your recent baseline");
+  const direction = latestVsCurrent >= 2
+    ? "The newest game is above the current three-game read"
+    : (latestVsCurrent <= -2 ? "The newest game is below the current three-game read" : "The newest game is around the current three-game read");
   const limit = rankCalibrationContext(recordings).currentLimitation ||
     "Rank read is a macro-equivalent estimate, not Riot MMR.";
   const gamesLabel = full.length === 1 ? "1 full game" : `${full.length} full games`;
-  const leakText = topLeaks.slice(0, 2).join(" and ") || "not enough repeated leak evidence yet";
-  const strengthText = topStrengths.slice(0, 2).join(" and ") || "not enough repeated strength evidence yet";
+  const latestGameLabel = latest?.gameHappenedAtLabel || latest?.recordedAtLabel || "the latest synced full game";
+  const latestMistakes = recordingMistakePhrases(latest);
+  const currentMistakes = weightedCurrentPhrases(currentWindow, recordingMistakePhrases);
+  const latestLeakText = joinCompactList(latestMistakes.slice(0, 2), "not enough newest-game mistake evidence yet");
+  const repeatText = joinCompactList(currentMistakes.slice(0, 3), latestLeakText);
+  const latestStrength = recordingStrengthPhrase(latest);
+  const strengthText = latestStrength || joinCompactList(weightedCurrentPhrases(currentWindow, (recording) => {
+    const phrase = recordingStrengthPhrase(recording);
+    return phrase ? [phrase] : [];
+  }).slice(0, 1), "not enough newest-game strength evidence yet");
   const latestText = [
     latest?.feedbackTitle,
     latest?.feedback,
@@ -3540,18 +3606,19 @@ function dynamicOverallFeedback(recordings = [], detectedChampions = []) {
     latest?.diamondRule
   ].filter(Boolean).join(" ");
   const latestNeedsLosingStateScript = /\b(losing state|allies (?:are )?dead|teammates (?:are )?dead|four allies dead|base line|inhibitor line|safe wave|hold base|defend one safe wave)\b/i.test(latestText);
-  const nextRep = latestNeedsLosingStateScript
+  const latestAction = clean(latest?.secondaryFocus || latest?.drill || "");
+  const nextRep = latestAction || (latestNeedsLosingStateScript
     ? "Next game: call even or losing before each fight; if losing, choose only back, tower wave, or wait."
-    : "Next game: after the first won fight or open structure, choose only free structure, body blocking that structure, or reset.";
+    : "Next game: after the first won fight or open structure, choose only free structure, body blocking that structure, or reset.");
 
   return {
-    title: "Samira overall state",
-    focus: `Current read: ${latestRank} on the newest full game; ${recentRank} across the last ${Math.min(5, recent.length)} full-game reads; ${baselineRank} median across ${gamesLabel}. ${direction}.`,
-    rule: `The recurring blocker is ${leakText}; the reliable strength is ${strengthText}.`,
+    title: "Samira latest synced state",
+    focus: `Synced through ${latestGameLabel}: newest full-game read ${latestRank}; current ${Math.min(3, currentWindow.length)}-game read ${currentRank}; archive median ${baselineRank} across ${gamesLabel}, used only as baseline context. ${direction}.`,
+    rule: `The newest-game blocker is ${latestLeakText}; the current repeat across the latest games is ${repeatText}. The keep-habit is ${strengthText}.`,
     nextRep,
-    whyTrust: `This updates from the generated manifest every sync using all full-game Samira reviews, exact rank values, visible mistake windows, K/D/A, CS, queue class, and timestamp evidence.`,
-    pattern: `Latest file ${latest?.file || "unknown"} drives the newest point, while the baseline uses every full-game Samira rank estimate currently on the site.`,
-    checklist: ["Read the latest rank point.", "Check the repeated leak.", "Play one rep against that leak."],
+    whyTrust: `This is latest-weighted: the newest full game carries the coaching state, the last ${Math.min(3, currentWindow.length)} full games set the current pattern, and older games only provide baseline context.`,
+    pattern: `Latest file ${latest?.file || "unknown"} is the state source; the archive median is kept for the plot and baseline only.`,
+    checklist: ["Read the newest-game point.", "Use the latest-game next action.", "Treat the archive as baseline only."],
     reviewLimit: limit
   };
 }
