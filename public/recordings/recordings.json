@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-24T04:49:39.980Z",
+  "generatedAt": "2026-05-24T05:27:52.047Z",
   "source": "League of Legends Highlights folder",
   "match": "38 matches",
   "matches": [
@@ -49,8 +49,8 @@
   "mainFeedback": {
     "title": "Samira latest synced state",
     "focus": "Synced through May 24, 2026, 12:18 AM: newest full-game read Iron IV; current 3-game read Bronze I; archive median Bronze IV across 35 full games, used only as baseline context. The newest game is below the current three-game read.",
-    "rule": "The newest-game blocker is reset/overstay discipline and side farm over map defense; the current repeat across the latest games is ally-frontline check, reset/overstay discipline, and side farm over map defense. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-    "nextRep": "After 15 minutes, before any forward click: closest threatened turret, ally deaths, and who can stand in front of me.",
+    "rule": "The newest-game blocker is catchable fight entry and death-state exposure; the current repeat across the latest games is ally-frontline check, catchable fight entry, and death-state exposure. The keep-habit is you do choose a clean recall under bot turret with gold to spend; keep that reset instinct and apply it again before later river fights.",
+    "nextRep": "Also work on camera/map-state checks before entering fights: if the camera is on enemy bodies but not on a tower, wave, objective, or ally front, take one step back before casting.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5566943774_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
@@ -77,9 +77,9 @@
     "anchoredFullGames": 36,
     "statFullGames": 36,
     "rankLabelCounts": {
-      "Bronze": 17,
+      "Bronze": 16,
       "Silver": 4,
-      "Iron": 13,
+      "Iron": 14,
       "Gold": 2
     },
     "exactRankScale": [
@@ -200,7 +200,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Pressure mode after payout vanished",
+      "title": "Fight entry after value is gone",
       "duration": "27:35",
       "durationSeconds": 1655,
       "gameLength": "27:16",
@@ -214,79 +214,93 @@
       "kind": "full review",
       "reviewPhase": "current form",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Pressure mode after payout vanished",
-      "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      "gameDetail": "At 15:32, the mistake window is Samira in a current-match mid-game rotation and objective review frame. earlier at 9:12, Samira in a current-match lane-to-map transition review frame. At 15:32, branch before any forward click: closest threatened turret, ally deaths, and front body; if tower is free, hit it; if one body blocks it and an ally can front, hit that body safely; if only wave is guaranteed, clear it then recall; if none are true, leave. The 2/10/8, 103 CS in 27 minutes says the biggest cost is death-state exposure: the damage exists, but too many decisions end in timers before the result is locked. The sharper leak is staying in pressure mode after the safe payout is no longer proven; a Samira lead climbs when the next click turns the wave or fight into a stable result before enemies get another collapse window. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
-      "secondaryFocus": "After 15 minutes, before any forward click: closest threatened turret, ally deaths, and who can stand in front of me.",
+      "confidence": "high",
+      "feedbackTitle": "Fight entry after value is gone",
+      "feedback": "Mistake: you kept letting fight entry stay available when no tower, wave, or objective was visible, so deaths erased the pressure you created. Fix: if there is no free structure, safe wave, or ally body in front of you, click back and reset the fight instead of entering for one more hit.",
+      "gameDetail": "At 22:00, you are on the left edge of an upper-river jungle fight with two allies near you, two enemies in front, no tower or wave payout on screen, and the score has tightened to 28-29; mistake category: catchable fight entry after safe value disappeared; correct next click: hold behind the ally line, kite back toward the safe exit, and only re-enter if an ally is still body-blocking the enemy collapse. Earlier at 15:32 you actually make the right kind of click by recalling under your bot turret with over 1100 gold, so the problem is not that you never reset; it is that later no-payout fights still stay on the menu. By 24:00 the cost is visible: you are dead again near the upper river/jungle area, and the final 2/10/8 with 103 CS in 27 minutes says deaths are the main blocker, with income too low to survive repeated dead timers. The repeatable rule is simple: after 15 minutes, if the screen does not show free tower, safe wave, objective, or ally front, the next click is back, not forward.",
+      "secondaryFocus": "Also work on camera/map-state checks before entering fights: if the camera is on enemy bodies but not on a tower, wave, objective, or ally front, take one step back before casting.",
       "mistakeTypes": [
-        "reset/overstay discipline",
-        "side farm over map defense",
-        "spacing/entry discipline",
-        "wave/objective conversion",
-        "camera/map-state check"
+        "catchable fight entry",
+        "death-state exposure",
+        "ally-frontline check",
+        "camera/map-state check",
+        "low CS income stability"
       ],
-      "eventEvidence": "15:32 shows Samira in a current-match mid-game rotation and objective review frame. 9:12 shows Samira in a current-match lane-to-map transition review frame. 11:19 shows Samira in a current-match lane-to-map transition review frame. 13:25 shows Samira in a current-match lane-to-map transition review frame.",
-      "failureEvidence": "At 15:32, Samira in a current-match mid-game rotation and objective review frame; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.",
-      "goodThing": "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-      "whyTrust": "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
-      "focusTag": "overstay control",
-      "evidence": "15:32 shows Samira in a current-match mid-game rotation and objective review frame. 9:12 shows Samira in a current-match lane-to-map transition review frame. 11:19 shows Samira in a current-match lane-to-map transition review frame. 13:25 shows Samira in a current-match lane-to-map transition review frame.",
-      "pattern": "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
-      "diamondRule": "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
-      "drill": "After 15 minutes, before any forward click: closest threatened turret, ally deaths, who can stand in front of me.",
-      "timeline": [],
+      "eventEvidence": "7:59 and 12:44 show death timers after bot-side fights; 15:32 shows the correct recall under bot turret with over 1100 gold; 22:00 shows the upper-river fight with enemies in front and no tower or wave payout on screen; 24:00 shows another death in the same upper-river/jungle area.",
+      "failureEvidence": "At 22:00 the visible state is fight-only value with no structure, wave, or objective payout on screen, so stepping in only works if ally front stays between you and the enemies; by 24:00 that condition has failed and another death timer has replaced the reset or map result.",
+      "goodThing": "At 15:32 you do choose a clean recall under bot turret with gold to spend; keep that reset instinct and apply it again before later river fights.",
+      "whyTrust": "This uses inspected 7:59, 12:44, 15:32, 22:00, and 24:00 frames plus the 2/10/8, 103 CS ranked stat line.",
+      "focusTag": "fight entry reset",
+      "evidence": "Manual frame inspection of the visible death timers, 15:32 recall, 22:00 upper-river fight, and 24:00 death plus League Client stats.",
+      "pattern": "The game shows playable damage and some correct reset decisions, but the repeated failure is treating fight-only screens as if they still contain a permanent payout.",
+      "diamondRule": "If the next screen has no free tower, safe wave, objective, or ally front, Samira clicks back before she clicks in.",
+      "drill": "Before every fight after 15 minutes, say: payout on screen, ally in front, or back.",
+      "timeline": [
+        "7:59 - Samira is on a death timer after a bot-side fight.",
+        "12:44 - Samira is dead again after a bot-side river/jungle fight.",
+        "15:32 - Samira recalls under allied bot turret with over 1100 gold.",
+        "22:00 - Samira is near an upper-river jungle fight with allies nearby and enemies in front.",
+        "24:00 - Samira is dead near the same upper-river/jungle area."
+      ],
       "clockAnchors": [
         {
-          "clock": "9:12",
+          "clock": "7:59",
           "videoSeconds": 510.769,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
+          "description": "Samira is on a death timer after a bot-side fight."
         },
         {
-          "clock": "11:19",
-          "videoSeconds": 637.462,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
-        },
-        {
-          "clock": "13:25",
+          "clock": "12:44",
           "videoSeconds": 764.154,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
+          "description": "Samira is dead again after a bot-side river or jungle fight."
         },
         {
           "clock": "15:32",
-          "videoSeconds": 890.846,
-          "description": "shows Samira in a current-match mid-game rotation and objective review frame"
+          "videoSeconds": 932,
+          "description": "Samira recalls under allied bot turret with over 1100 gold."
+        },
+        {
+          "clock": "22:00",
+          "videoSeconds": 1320,
+          "description": "Samira is on the left edge of an upper-river jungle fight with allies nearby, enemies in front, and no tower or wave payout on screen."
+        },
+        {
+          "clock": "24:00",
+          "videoSeconds": 1440,
+          "description": "Samira is dead near the upper-river jungle area."
         }
       ],
       "clockMoments": [
         {
-          "clock": "15:32",
-          "videoSeconds": 890.846,
-          "description": "shows Samira in a current-match mid-game rotation and objective review frame"
-        },
-        {
-          "clock": "9:12",
+          "clock": "7:59",
           "videoSeconds": 510.769,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
+          "description": "and show death timers after bot-side fights"
         },
         {
-          "clock": "11:19",
-          "videoSeconds": 637.462,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
-        },
-        {
-          "clock": "13:25",
+          "clock": "12:44",
           "videoSeconds": 764.154,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
+          "description": "and show death timers after bot-side fights"
+        },
+        {
+          "clock": "15:32",
+          "videoSeconds": 932,
+          "description": "shows the correct recall under bot turret with over 1100 gold"
+        },
+        {
+          "clock": "22:00",
+          "videoSeconds": 1320,
+          "description": "shows the upper-river fight with enemies in front and no tower or wave payout on screen"
         }
       ],
       "nuance": [
-        "High kills only matter when the next click creates tower, wave, objective, reset, or base value.",
-        "Low CS makes every unclear forward click more expensive because income is already unstable."
+        "The good part is the 15:32 recall; the reset button exists in your game.",
+        "The bad part is entering later fight-only screens when no permanent payout is visible.",
+        "Ten deaths are the main blocker in this ranked game.",
+        "103 CS in 27 minutes is also low, but the CS issue is partly caused by dead time.",
+        "The next-game check is payout, ally front, or back."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry. The detailed AI or clock-reading pass failed, so this review uses computed game-clock labels from match/capture timing and conservative current-match frames.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs or cooldowns, but it can verify the visible death timers, recall, fight-only state, missing tower/wave payout, and final K/D/A/CS context.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 53058250,
       "captureFps": 2,
@@ -322,7 +336,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron IV read from macro habits: the recording still shows playable fighting instincts; held down by very high death count for a bot game, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "Iron IV read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Ranked-transfer confidence is high from ranked solo evidence."
       }
     },
     {
@@ -363,7 +377,7 @@
       "confidence": "high",
       "feedbackTitle": "Grouped base push needs click discipline",
       "feedback": "Mistake: the grouped base push was good, but the next click still needs to be structure, safe blocker, wave, or exit instead of another vague forward move. Fix: when allies are in front in base, hit free structure, hit only the defender blocking it, clear the wave, or leave as soon as those stop being true.",
-      "gameDetail": "At 19:43 the mistake risk is inside the enemy base: you are grouped with multiple allies in front, an enemy is near the base entrance, and the nearest permanent value is the exposed inhibitor/base structure, so the branch is hit free structure, hit only the defender blocking it from behind ally front, clear wave if the structure is not hittable, or leave when defenders and respawns make the structure no longer free. At 16:07 the stronger version already happened because your team is grouped near enemy mid turret as it falls, which is real conversion. At 10:43 you are 3/0/1 with 76 CS and 1031 gold in bot lane, so the lead exists before the base push. The 5/1/7, 123 CS, 23-minute line says deaths are controlled and fight impact is good; the next Challenger-path improvement is making every base click either structure, blocker, wave, or exit.",
+      "gameDetail": "At 19:43, Samira grouped with allies in the enemy base near exposed structures; mistake category: pressure mode after safe payout vanished; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. At 16:07 the stronger version already happened because your team is grouped near enemy mid turret as it falls, which is real conversion. At 10:43 you are 3/0/1 with 76 CS and 1031 gold in bot lane, so the lead exists before the base push. The 5/1/7, 123 CS, 23-minute line says deaths are controlled and fight impact is good; the next Challenger-path improvement is making every base click either structure, blocker, wave, or exit.",
       "secondaryFocus": "Work on base target priority: once allies are in front, keep the camera on structure and defenders so the next click is structure, blocker, wave, or exit.",
       "mistakeTypes": [
         "base structure target priority",
@@ -440,7 +454,7 @@
       ],
       "reviewLimit": "Manual frame review used 2 FPS sampled frames and cannot prove exact clicks or cooldowns; it can judge grouped base state, structure access, stats, and exit-branch discipline.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 48482093,
       "captureFps": 2,
@@ -517,7 +531,7 @@
       "confidence": "high",
       "feedbackTitle": "Pressure mode after payout vanished",
       "feedback": "Mistake: you stayed in pressure mode after the safe mid wave or turret-defense payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      "gameDetail": "At 16:55 the mistake window is Samira mid with one ally beside you, a minion wave nearby, a very low allied mid turret on screen, and the team kill score down 12-16; before any forward click, check closest threatened turret, ally deaths, and who can stand in front: hit enemy tower if it is free, hit only the blocker if safe, clear the wave then recall if wave is the only value, or leave if none of those are true. Earlier at 5:26 the cleaner version is visible bot side because you have ally-and-wave cover before pressure continues, and by 18:50 and 20:44 you are still around mid turret with an ally and waves rather than a guaranteed forward structure. The leak is that you stayed in pressure mode after the safe payout stopped being clear; with a 6/3/6, 81 CS, 25-minute ranked line, the issue is not raw damage or a huge death count, it is low income plus unstable wave/tower conversion before the next forward click.",
+      "gameDetail": "At 16:55, Samira mid beside one ally, a nearby wave, a low allied mid turret, minimap, and a 12-16 team kill score; mistake category: side value over map defense; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. Earlier at 5:26 the cleaner version is visible bot side because you have ally-and-wave cover before pressure continues, and by 18:50 and 20:44 you are still around mid turret with an ally and waves rather than a guaranteed forward structure. The leak is that you stayed in pressure mode after the safe payout stopped being clear; with a 6/3/6, 81 CS, 25-minute ranked line, the issue is not raw damage or a huge death count, it is low income plus unstable wave/tower conversion before the next forward click.",
       "secondaryFocus": "After 15 minutes, before any forward click, use camera/map-state discipline: closest threatened turret, ally deaths, and who can stand in front of me.",
       "mistakeTypes": [
         "mid wave/turret branch discipline",
@@ -594,7 +608,7 @@
       ],
       "reviewLimit": "Manual frame review used 2 FPS sampled frames and cannot prove exact inputs, every enemy position, or every death timer; the branch is therefore conditional on visible tower, wave, ally, and minimap state.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 49011046,
       "captureFps": 2,
@@ -671,7 +685,7 @@
       "confidence": "high",
       "feedbackTitle": "Bot pressure needs exit branch",
       "feedback": "Mistake: you created bot pressure, but the later fight windows stayed open after the safe tower or wave branch should have ended. Fix: hit tower while it is free, hit only a safe blocker, push wave then recall, or leave before the collapse returns.",
-      "gameDetail": "At 15:01 you are bot with an ally, a minion wave, and the enemy bot turret directly in front; the branch is to hit tower while it is free, stop only for a safe blocker, then push the next wave or recall before the enemy collapse returns. At 10:03 you were already low under allied bot turret while the wave was ahead of you, so pressure had to start from turret and wave safety rather than another forward trade. By 11:54 you are near the enemy bot side again with enemies visible around lane and the jungle entrance, which means the next click needs ally front and turret value before it becomes a chase. The 12/6/5, 156 CS, 26-minute line says your damage and lane pressure are real, but six deaths are the bigger blocker; the improvement is ending bot pressure as tower damage, wave crash, or reset before the fight reopens.",
+      "gameDetail": "At 15:01, Samira and an ally hitting enemy bot turret with a wave; mistake category: side value over map defense; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. At 10:03 you were already low under allied bot turret while the wave was ahead of you, so pressure had to start from turret and wave safety rather than another forward trade. By 11:54 you are near the enemy bot side again with enemies visible around lane and the jungle entrance, which means the next click needs ally front and turret value before it becomes a chase. The 12/6/5, 156 CS, 26-minute line says your damage and lane pressure are real, but six deaths are the bigger blocker; the improvement is ending bot pressure as tower damage, wave crash, or reset before the fight reopens.",
       "secondaryFocus": "Use camera/map-state checks after bot pressure: if ally front, free tower, or safe wave is gone, click back before another fight starts.",
       "mistakeTypes": [
         "tower branch exit",
@@ -737,7 +751,7 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames, so exact inputs and cooldowns are not judged.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 46021230,
       "captureFps": 2,
@@ -814,7 +828,7 @@
       "confidence": "high",
       "feedbackTitle": "Fight wins need exit branch",
       "feedback": "Mistake: the fights kept staying open after the useful damage window, so kills did not reliably become objective, wave, or reset value. Fix: after the first winning exchange, choose objective, safe wave, recall, or back behind ally front before spending another forward click.",
-      "gameDetail": "At 19:12 you are in the bot-side jungle with an ally rooted in front of you and an enemy visible from the lower-left; the branch is to hit only from behind the ally front, rotate to objective if the fight is won, or leave if enemy tools are still live. At 5:41 the early safe branch is clearer because you are under allied bot turret with wave and two enemies in front, so the job is wave defense before forward trading. By 22:40 you are grouped around a river camp or objective fight with several allies, which is useful only if it becomes objective control or a reset path. The 25/8/9, 162 CS, 41-minute line says the problem is not damage, it is that eight deaths and low income stability stretch winning fights into more enemy chances. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
+      "gameDetail": "At 19:12, a bot-side jungle fight with ally front and an enemy angle from lower-left; mistake category: side value over map defense; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. At 5:41 the early safe branch is clearer because you are under allied bot turret with wave and two enemies in front, so the job is wave defense before forward trading. By 22:40 you are grouped around a river camp or objective fight with several allies, which is useful only if it becomes objective control or a reset path. The 25/8/9, 162 CS, 41-minute line says the problem is not damage, it is that eight deaths and low income stability stretch winning fights into more enemy chances.",
       "secondaryFocus": "Work on post-fight camera checks: after the first useful damage window, look at ally front, nearest objective, and whether one enemy angle is still open.",
       "mistakeTypes": [
         "fight exit branch",
@@ -880,7 +894,7 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames and cannot prove exact cooldowns or every enemy position.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 73312301,
       "captureFps": 2,
@@ -957,7 +971,7 @@
       "confidence": "high",
       "feedbackTitle": "Cait deaths hide useful damage",
       "feedback": "Mistake: you let playable Cait states become extra forward or side-value clicks before checking who could reach you, so deaths erased the pressure your lane damage was creating. Fix: after a wave, camp, or fight is handled, click back behind an allied body, check the nearest threatened turret/objective, and only continue if Cait can hit from max range.",
-      "gameDetail": "Around 2:16, Cait is bot with an allied duo and a minion wave while enemy pressure is visible elsewhere; the useful next click is to stay behind the wave and allied body, hit only max-range targets, then choose safe wave, tower hit, objective path, or reset instead of walking into another loose trade. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the pressure Cait creates. At 14:21 the ability bar shows Piltover Peacemaker, confirming this is Cait footage. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
+      "gameDetail": "At 2:16, cait's bot-side lane state with ally and wave cover; mistake category: side value over map defense; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the pressure Cait creates. At 14:21 the ability bar shows Piltover Peacemaker, confirming this is Cait footage. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
       "secondaryFocus": "Next Cait game, before every camp, side wave, or forward fight after 15 minutes, check ally deaths, nearest threatened turret, and whether an ally can stand between Cait and the collapse.",
       "mistakeTypes": [
         "Cait spacing before forward clicks",
@@ -1012,7 +1026,7 @@
       ],
       "reviewLimit": "This is a Cait-identity and visible-state repair from sampled 2 FPS footage, not a full frame-perfect Cait mechanics review.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 34335204,
       "captureFps": 2,
@@ -1089,7 +1103,7 @@
       "confidence": "high",
       "feedbackTitle": "Side waves need death-state discipline",
       "feedback": "Mistake: side-wave pressure kept turning into death-state exposure, so the game gave enemies repeated reset windows. Fix: clear the safe wave, then leave toward ally front or base unless a free tower, safe blocker, or objective is already visible.",
-      "gameDetail": "At 25:49 you are bottom with support clearing a wave near the destroyed bottom inhibitor turret; before any forward click, clear the safe wave, check ally deaths and who can stand in front, then leave toward team unless a free tower, safe blocker, or objective is visible. The cost is visible earlier at 22:59, where you are dead after a river or jungle fight while the map keeps moving without you. The 9/13/11, 162 CS, 39-minute line says the biggest issue is not refusing to fight; it is thirteen deaths and side-wave exposure turning pressure into enemy reset windows. Your support-and-wave position at 25:49 is the correct shape only if it ends as wave clear plus exit, not another isolated forward path. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
+      "gameDetail": "At 25:49, Samira and support clearing a bottom wave near the destroyed bottom inhibitor turret; mistake category: side value over map defense; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. The cost is visible earlier at 22:59, where you are dead after a river or jungle fight while the map keeps moving without you. The 9/13/11, 162 CS, 39-minute line says the biggest issue is not refusing to fight; it is thirteen deaths and side-wave exposure turning pressure into enemy reset windows. Your support-and-wave position at 25:49 is the correct shape only if it ends as wave clear plus exit, not another isolated forward path. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
       "secondaryFocus": "Use camera/map-state checks after each side wave: if ally front or a free structure is not visible, leave toward team before the next fight starts.",
       "mistakeTypes": [
         "side wave exit",
@@ -1144,7 +1158,7 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames and cannot judge exact combo speed, only visible death state, wave state, ally front, and pathing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 70126406,
       "captureFps": 2,
@@ -1152,18 +1166,18 @@
       "poster": "/recordings/posters/auto-na1-5566563083-01.jpg",
       "rankEstimate": {
         "version": "2026-05-22-exact-rank-trend-v4",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 25,
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 20,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
+        "percentile": "new ranked fundamentals",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -1180,7 +1194,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, shutdown or unspent-gold protection. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "Iron I read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, shutdown or unspent-gold protection. Ranked-transfer confidence is high from ranked solo evidence."
       }
     },
     {
@@ -1221,7 +1235,7 @@
       "confidence": "high",
       "feedbackTitle": "Six deaths from bad-state clicks",
       "feedback": "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and another death. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
-      "gameDetail": "At 23:33, in a 1/6/1, 152 CS, 25-minute ranked game, you are taking a side jungle camp while enemies are pressuring through your side of the map; your job is to leave the camp, walk toward the inhibitor/base line, and clear only the wave that reaches turret instead of spending more seconds on camp gold. At 23:33 the feeding pattern is not that you never farm; it is that normal farm stays on the menu after the map state already says defend. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
+      "gameDetail": "At 23:33, Samira alone on a side jungle camp while the enemy map state is pushing in; mistake category: side value over map defense; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. At 23:33 the feeding pattern is not that you never farm; it is that normal farm stays on the menu after the map state already says defend. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
       "secondaryFocus": "Next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
       "mistakeTypes": [
         "side farm over base defense",
@@ -1298,7 +1312,7 @@
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed or every cooldown. It can judge map state, side-camp timing, ally location, death state, and whether the next click protects base.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 49207218,
       "captureFps": 2,
@@ -1375,7 +1389,7 @@
       "confidence": "medium",
       "feedbackTitle": "Mid wave needed a side check",
       "feedback": "Mistake: you kept turning mid priority into another mid wave after the map was asking for a side-lane or objective check. Fix: after the mid wave is handled, move your camera first, then choose ally/objective movement or reset before touching the next wave.",
-      "gameDetail": "At 16:05 Samira is mid alone last-hitting after the wave is already under control; move the camera to both side lanes, then either path toward the closest ally/objective or reset instead of autoing the next neutral mid wave. The leak is not that mid farm is bad; it is that mid stayed as default farm when the wave had already bought you time to look elsewhere. At 9:46 the same neutral pattern appears at mid turret, and by 21:49 the game has already produced a death/reset cycle, so the bigger climb habit is to turn one handled mid wave into a map check before the next minion. This matters because mid priority only helps Samira climb if it becomes information, vision, structure access, or a safer reset before enemies get another collapse window.",
+      "gameDetail": "At 16:05, Samira last-hitting mid alone with no immediate structure hit; mistake category: side value over map defense; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. The leak is not that mid farm is bad; it is that mid stayed as default farm when the wave had already bought you time to look elsewhere. At 9:46 the same neutral pattern appears at mid turret, and by 21:49 the game has already produced a death/reset cycle, so the bigger climb habit is to turn one handled mid wave into a map check before the next minion. This matters because mid priority only helps Samira climb if it becomes information, vision, structure access, or a safer reset before enemies get another collapse window.",
       "secondaryFocus": "Next game, after every mid wave past 14 minutes, flick camera to both side lanes and death timers before autoing the next wave; if a fight or threatened turret is visible, leave mid.",
       "mistakeTypes": [
         "mid wave autopilot",
@@ -1457,7 +1471,7 @@
       ],
       "reviewLimit": "The 2 FPS review can judge repeated mid-wave state, map movement, and respawn timing. It cannot judge exact camera hotkey timing or frame-perfect mechanics.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 43843823,
       "captureFps": 2,
@@ -1534,7 +1548,7 @@
       "confidence": "high",
       "feedbackTitle": "Losing fights need a next-click script",
       "feedback": "Mistake: you kept playing messy or losing states as if one more fight would fix them, even when enemies were alive, your health was dropping, or teammates were dead. Fix: at the mistake timestamp, back out, clear only the safe wave, or wait behind the first ally before entering again.",
-      "gameDetail": "At 23:33 the mid push has turned into a crowded fight with three enemy bodies still in front of you and an enemy turret/base line behind them; your job is to stand behind the first ally, hit the nearest safe target or wave, and leave as soon as your health drops instead of staying available for the full re-engage. By 23:43 you are dead with multiple allies also down, so the leak is not that you lacked damage; the leak is that the fight continued after the safe damage window ended and gave the enemy a clean push back. At 24:20, when you respawn with several teammates still dead, do not run out looking for a fight or a side route; hold base, clear the closest wave under turret, and wait for at least two teammates to spawn. At 26:54 the same rule appears again with four allies dead: stop at the base/inhibitor line, do not walk up bottom jungle or lane, and only clear minions that enter tower range. The simple next-game script is fight from behind a body while the state is even, and when the state is losing, defend one safe wave until teammates are alive.",
+      "gameDetail": "At 23:33, Samira behind a Baron-powered mid push with multiple enemy defenders still alive; mistake category: side value over map defense; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. By 23:43 you are dead with multiple allies also down, so the leak is not that you lacked damage; the leak is that the fight continued after the safe damage window ended and gave the enemy a clean push back. At 24:20, when you respawn with several teammates still dead, do not run out looking for a fight or a side route; hold base, clear the closest wave under turret, and wait for at least two teammates to spawn. At 26:54 the same rule appears again with four allies dead: stop at the base/inhibitor line, do not walk up bottom jungle or lane, and only clear minions that enter tower range. The simple next-game script is fight from behind a body while the state is even, and when the state is losing, defend one safe wave until teammates are alive.",
       "secondaryFocus": "Next game, do not cross past your support/frontline until the enemy engage tool is used; at 4:55 and 7:16 the safer habit is last-hit from Q range and let the wave come to you.",
       "mistakeTypes": [
         "spacing/entry discipline",
@@ -1627,7 +1641,7 @@
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed, reaction time, or every cooldown. It can judge the visible fight state, ally death timers, spacing, and forward pathing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 47751708,
       "captureFps": 2,
@@ -1979,7 +1993,7 @@
       "confidence": "medium",
       "feedbackTitle": "Won fight needed low-HP reset",
       "feedback": "Mistake: after a fight win, you let the next state become another low-health stay instead of turning the win into recall, structure, or wave. Fix: if the fight is won and your HP is low, recall unless a free structure is already directly in front of your team.",
-      "gameDetail": "Around 14:47, a grouped objective fight near dragon pit; this is the start or nearest visible start of the main mistake window. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure. At 14:47, run the branch before any forward click: check closest threatened turret, ally deaths, and who can stand in front; if enemy tower is free, hit it; if one enemy body blocks it and an ally can front, hit that body safely; if only the wave is guaranteed, push or clear it then recall; if none of those are true, leave. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
+      "gameDetail": "Around 14:47, a grouped objective fight near dragon pit; this is the start or nearest visible start of the main mistake window. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure. At 14:47, a grouped objective fight near dragon pit; mistake category: pressure mode after safe payout vanished; correct next click: hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
       "secondaryFocus": "Next game, in lane and river fights, stop taking the next forward step once health is below one enemy spell; hold behind ally or wave until the threat is used.",
       "mistakeTypes": [
         "reset/overstay discipline",
@@ -2044,7 +2058,7 @@
       ],
       "reviewLimit": "The 2 FPS review can judge HP-state, fight aftermath, death timer, and grouped objective shape. It cannot judge exact spell cooldowns or combo timing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "analysisVersion": "2026-05-24-key-click-rule-v18",
       "sampledFrames": 14,
       "publicVideoBytes": 31469760,
       "captureFps": 1,

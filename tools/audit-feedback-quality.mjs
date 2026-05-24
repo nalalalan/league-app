@@ -30,6 +30,17 @@ function hasTimestampedActionScript(text) {
   ));
 }
 
+function hasKeyTimestampClickRule(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g)?.some((sentence) => (
+      /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
+      /\bmistake category\s*:/i.test(sentence) &&
+      /\bcorrect next click\s*:/i.test(sentence) &&
+      /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click)\b/i.test(sentence)
+    )) || false;
+}
+
 function isFullReview(recording = {}) {
   return /full/i.test(recording.kind || "") || Number(recording.durationSeconds || 0) > 90;
 }
@@ -60,6 +71,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-24-key-click-rule-v18",
     "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
     "2026-05-23-champion-source-coaching-v15",
@@ -70,6 +82,7 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
   const actionScriptVersions = new Set([
+    "2026-05-24-key-click-rule-v18",
     "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
     "2026-05-23-champion-source-coaching-v15",
@@ -77,6 +90,7 @@ function feedbackIssues(recording = {}) {
     "2026-05-22-action-script-coaching-v13"
   ]);
   const evidenceLaneVersions = new Set([
+    "2026-05-24-key-click-rule-v18",
     "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
     "2026-05-23-champion-source-coaching-v15",
@@ -84,7 +98,9 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
   const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
-  const needsDecisionBranch = recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
+  const needsDecisionBranch = recording.analysisVersion === "2026-05-24-key-click-rule-v18" ||
+    recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
+  const needsKeyClickRule = recording.analysisVersion === "2026-05-24-key-click-rule-v18";
   const hasStats = Number.isFinite(Number(recording.kills)) &&
     Number.isFinite(Number(recording.deaths)) &&
     Number.isFinite(Number(recording.assists)) &&
@@ -122,6 +138,12 @@ function feedbackIssues(recording = {}) {
   }
   if (needsActionScript && !hasTimestampedActionScript(detail)) {
     issues.push("full review missing a timestamped do-this-instead action script");
+  }
+  if (needsKeyClickRule && !hasKeyTimestampClickRule(detail)) {
+    issues.push("full review missing one key timestamp with visible state, mistake category, and correct next click");
+  }
+  if (needsKeyClickRule && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test(allVisible)) {
+    issues.push("full review uses generic review-frame or broad branch wording");
   }
   if (needsDecisionBranch && /\b(?:map cash[-\s]?outs?|cash(?:ing)? (?:those )?(?:wins|moments|it)? ?out(?:s)? cleaner|cash[-\s]?out timing|cleaner map|wrong task after the map state changes|call free structure, blocked structure, or reset)\b/i.test(allVisible)) {
     issues.push("full review uses abstract cash-out wording instead of exact branch rules");

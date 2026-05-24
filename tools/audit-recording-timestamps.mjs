@@ -13,6 +13,7 @@ const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
 const fallbackModel = process.env.LEAGUE_TIMESTAMP_AUDIT_FALLBACK_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-24-key-click-rule-v18",
   "2026-05-23-decision-branch-coaching-v17",
   "2026-05-23-evidence-lanes-coaching-v14",
   "2026-05-22-action-script-coaching-v13",
@@ -84,6 +85,15 @@ function timestampedActionScriptSentences(text) {
 function hasTimestampedActionScript(text) {
   return timestampedActionScriptSentences(text).some((sentence) => (
     /\b(?:instead|rather than|not|never|should|job\s+is|is\s+to|next\s+(?:click|move|job|decision|check)|do|walk|stand|hold|wait|recall|reset|leave|back|kite|hit|clear|catch|push|defend|stop|stay|save|let|keep)\b/i.test(sentence)
+  ));
+}
+
+function hasKeyTimestampClickRule(text) {
+  return sentenceParts(text).some((sentence) => (
+    /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
+    /\bmistake category\s*:/i.test(sentence) &&
+    /\bcorrect next click\s*:/i.test(sentence) &&
+    /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click)\b/i.test(sentence)
   ));
 }
 
@@ -167,6 +177,12 @@ function visibleParagraphStandardIssues(recording, anchors) {
   }
   if (currentPrimaryMistakeAnalysisVersions.has(recording.analysisVersion) && !hasTimestampedActionScript(detail)) {
     issues.push("visible paragraph must include a timestamped replacement action script");
+  }
+  if (recording.analysisVersion === "2026-05-24-key-click-rule-v18" && !hasKeyTimestampClickRule(detail)) {
+    issues.push("visible paragraph must include one key timestamp with visible state, mistake category, and correct next click");
+  }
+  if (recording.analysisVersion === "2026-05-24-key-click-rule-v18" && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
+    issues.push("visible paragraph uses generic review-frame or broad branch wording");
   }
   if (eventEvidence.length < 60) {
     issues.push("eventEvidence must name visible proof");
