@@ -19,9 +19,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-5-mini";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-23-champion-source-coaching-v15";
+const analysisVersion = "2026-05-23-deterministic-publish-fallback-v16";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-23-champion-source-coaching-v15",
   "2026-05-22-action-script-coaching-v13",
   "2026-05-22-challenger-direct-coaching-v12",
   "2026-05-22-two-focus-coaching-v11",
@@ -1129,6 +1130,7 @@ function anchorEvidenceScore(anchor, analysis, index = 0) {
 function normalizeEvidenceDescription(description, champion = "Samira") {
   const name = clean(champion, "Samira");
   return coachClean(description)
+    .replace(new RegExp(`\\ballied\\s+${escapeRegExp(name)}\\b`, "gi"), name)
     .replace(/\bat\s*,\s*/gi, "")
     .replace(/\benemy champion\b/gi, "enemy")
     .replace(/\bchampion damage\b/gi, `${name} damage`)
@@ -1343,14 +1345,14 @@ function actionScriptForAnchor(recording = {}, anchor = null) {
     anchor.description
   ].join(" ").toLowerCase();
   const anchorText = String(anchor.description || "").toLowerCase();
+  if (/\b(base|inhib|inhibitor|nexus|tower|turret|structure|open structure|end)\b/i.test(text)) {
+    return `At ${anchor.clock}, your next job is to call free structure, blocked structure, or reset; hit the structure if it is free, kill only the body blocking it, and leave if neither is available instead of chasing away from the payout.`;
+  }
   if (/\b(side|jungle|camp|farm|defend|defense|turret has fallen|base defense|wave|inhibitor turret)\b/i.test(text) && !/\b(low hp|low-health|half hp)\b/i.test(anchorText)) {
     return `At ${anchor.clock}, your next job is to stop the camp or side-wave click, check death timers and the nearest threatened turret, then walk to the defensive wave, group, or reset instead of trading base defense for small farm.`;
   }
   if (/\b(low hp|low-health|half hp|recall|reset|shop|spend|shutdown|overstay|stay|stayed|greed|death|dead|died)\b/i.test(text)) {
     return `At ${anchor.clock}, your next job is to leave the lane or fight, recall on the first safe screen, and spend before touching another wave instead of farming while one engage can kill you.`;
-  }
-  if (/\b(base|inhib|inhibitor|nexus|tower|turret|structure|open structure|end)\b/i.test(text)) {
-    return `At ${anchor.clock}, your next job is to call free structure, blocked structure, or reset; hit the structure if it is free, kill only the body blocking it, and leave if neither is available instead of chasing away from the payout.`;
   }
   if (/\b(fight|spacing|entry|cc|crowd control|hook|target|kite|collapse|fog|vision)\b/i.test(text)) {
     return `At ${anchor.clock}, your next job is to wait outside engage range until the first enemy tool is used, then enter behind an ally or kite back instead of being the first catchable target.`;
@@ -1427,10 +1429,35 @@ function ensureTeachingReasonAndLength(recording) {
   }
 }
 
+function ensureMistakeFixFeedback(recording, champion = "Samira") {
+  if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(recording.feedback || "")) {
+    recording.feedback = deterministicFallbackFeedback(recording, champion);
+  }
+  if (/^\d+\s*\/\s*\d+\s+means\b/i.test(recording.feedbackTitle || "")) {
+    recording.feedbackTitle = "Damage lead needs map cash-out";
+  }
+}
+
+function detailStartsWithEvidence(detail) {
+  return /^(?:At|Around|By|Then|In|During|After|When|Samira|Cait|Caitlyn|Fizz|You|\d{1,2}:[0-5]\d)\b/i.test(coachClean(detail, ""));
+}
+
+function ensureEvidenceLeadSentence(recording, champion = "Samira") {
+  if (detailStartsWithEvidence(recording.gameDetail)) return;
+  const anchor = firstUsefulReviewAnchor(recording);
+  if (!anchor?.clock || !anchor.description) return;
+  const lead = `Around ${anchor.clock}, ${clauseDescription(anchor.description, champion)}; this is the start or nearest visible start of the main mistake window.`;
+  recording.gameDetail = normalizeCoachPunctuation(`${lead} ${recording.gameDetail || ""}`);
+}
+
 function repairVisibleReviewForStandard(recording, fileName) {
   if (!requiresVisibleParagraphStandard(fileName, recording)) return;
   const champion = recording.champion || "Samira";
   sanitizeVisibleReviewNames(recording, champion);
+  ensureMistakeFixFeedback(recording, champion);
+  if (recording.analysisSource === "fallback") {
+    applyDeterministicVisibleReviewFallback(recording, fileName);
+  }
   if (primaryActionTimestampNeedsRepair(recording)) {
     const repairedDetail = teachingDetailFromMoments(
       recording,
@@ -1446,10 +1473,25 @@ function repairVisibleReviewForStandard(recording, fileName) {
   ensureFailureEvidence(recording, champion);
   ensureTimestampedReplacementAction(recording, champion);
   ensureTeachingReasonAndLength(recording);
+  ensureEvidenceLeadSentence(recording, champion);
   sanitizeVisibleReviewNames(recording, champion);
   recording.gameDetail = stripUnmatchedClockTokens(recording.gameDetail, recording.clockAnchors);
   recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
   recording.evidence = stripUnmatchedClockTokens(recording.evidence || recording.eventEvidence || "", recording.clockAnchors);
+  if (visibleParagraphStandardIssues(recording).length) {
+    applyDeterministicVisibleReviewFallback(recording, fileName);
+    ensureMistakeFixFeedback(recording, champion);
+    ensureMistakeTypes(recording);
+    ensureSecondaryFocus(recording, champion);
+    ensureFailureEvidence(recording, champion);
+    ensureTimestampedReplacementAction(recording, champion);
+    ensureTeachingReasonAndLength(recording);
+    ensureEvidenceLeadSentence(recording, champion);
+    sanitizeVisibleReviewNames(recording, champion);
+    recording.gameDetail = stripUnmatchedClockTokens(recording.gameDetail, recording.clockAnchors);
+    recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
+    recording.evidence = stripUnmatchedClockTokens(recording.evidence || recording.eventEvidence || "", recording.clockAnchors);
+  }
 }
 
 function hasRepeatedConversionGlossary(recording = {}) {
@@ -1846,11 +1888,12 @@ function adviceTextForTeaching(analysis, champion = "Samira") {
   );
 }
 
-function shorthandTeachingSentence(analysis) {
+function shorthandTeachingSentence(analysis, champion = "Samira") {
   const text = analysisCoachText(analysis);
   const parts = [];
+  const subject = clean(champion, "your champion");
   if (/\b(grouped mid|group mid|mid pressure)\b/i.test(text)) {
-    parts.push("Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between Samira and the collapse, and enemies have to defend structure instead of chasing through fog.");
+    parts.push(`Grouped mid is better only when the visible state supports it, because mid is the shortest lane to towers/base, allies can stand between ${subject} and the collapse, and enemies have to defend structure instead of chasing through fog.`);
   }
   return parts.join(" ");
 }
@@ -1884,8 +1927,10 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
     clauses.push(`${lead}, ${clauseDescription(moment.description, champion)}`);
   }
   const advice = stripUnmatchedClockTokens(adviceTextForTeaching(analysis, champion), moments);
-  const shorthand = shorthandTeachingSentence(analysis);
-  const why = "This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.";
+  const shorthand = shorthandTeachingSentence(analysis, champion);
+  const subject = clean(champion, "your champion");
+  const leadSubject = subject === "Unknown" ? "your lead" : `a ${subject} lead`;
+  const why = `This matters because ${leadSubject} only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.`;
   return coachClean([
     `${clauses.join("; ")}.`,
     advice,
@@ -1911,18 +1956,104 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
     .filter((moment) => moment.description)
     .map((moment) => ({ ...moment, description: normalizeEvidenceDescription(moment.description, champion) }))
     .filter((moment) => !anchorDescriptionLooksWeak(moment.description));
-  if (existing.length) return existing.slice(0, 4);
-  return cleanClockAnchors(clockAnchors)
+  if (existing.length) {
+    return existing
+      .map((anchor, index) => ({
+        anchor,
+        score: anchorEvidenceScore(anchor, analysis, index) +
+          (Number(clockSeconds(anchor.clock)) >= 900 ? 6 : 0) +
+          (Number(clockSeconds(anchor.clock)) >= 1200 ? 6 : 0)
+      }))
+      .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)
+      .map((item) => item.anchor)
+      .slice(0, 4);
+  }
+  const candidates = cleanClockAnchors(clockAnchors)
     .filter((anchor) => anchor.description)
     .map((anchor, index) => ({
       anchor: { ...anchor, description: normalizeEvidenceDescription(anchor.description, champion) },
-      score: anchorEvidenceScore(anchor, analysis, index)
+      score: anchorEvidenceScore(anchor, analysis, index) +
+        (Number(clockSeconds(anchor.clock)) >= 900 ? 6 : 0) +
+        (Number(clockSeconds(anchor.clock)) >= 1200 ? 6 : 0)
     }))
-    .filter((item) => !anchorDescriptionLooksWeak(item.anchor.description))
-    .filter((item) => item.score >= -4)
+    .filter((item) => item.anchor.description);
+  const nonWeak = candidates.filter((item) => !anchorDescriptionLooksWeak(item.anchor.description));
+  const scored = nonWeak.filter((item) => item.score >= -4);
+  const pool = scored.length ? scored : (nonWeak.length ? nonWeak : candidates);
+  return pool
     .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)
     .map((item) => item.anchor)
     .slice(0, 4);
+}
+
+function deterministicFallbackFeedback(recording, champion = "Samira") {
+  const text = [recording.gameDetail, recording.feedback, recording.pattern, recording.eventEvidence].join(" ").toLowerCase();
+  if (/\b(base|inhib|inhibitor|nexus|tower|turret|structure|end)\b/i.test(text)) {
+    return "Mistake: the map win can turn into extra fighting or side movement after structure access appears. Fix: choose free structure, body blocking the structure, or reset before taking another fight.";
+  }
+  if (/\b(side|jungle|camp|farm|wave|defend|defense|turret)\b/i.test(text)) {
+    return "Mistake: side farm stayed on the menu after the map state needed wave defense or grouped pressure. Fix: leave the camp or side wave, check death timers and the nearest threatened turret, then defend, group, or reset.";
+  }
+  if (/\b(low hp|low-health|death|dead|died|shutdown|reset|recall|spend|shop|gold)\b/i.test(text)) {
+    return "Mistake: the next fight stayed available after the safe reset or spend window appeared. Fix: leave on the first safe screen, spend, then re-enter with health, item power, and allies.";
+  }
+  if (/\b(fight|spacing|entry|cc|crowd control|target|kite|collapse|fog|vision)\b/i.test(text)) {
+    return "Mistake: the fight entry became catchable before the enemy threat was spent or blocked. Fix: hold outside engage range until an ally or enemy cooldown creates the entry window.";
+  }
+  return `Mistake: ${champion} kept taking a loose next click after the visible map state changed. Fix: pause, check allies, enemy threat, and nearest objective, then choose defend, reset, or hit structure.`;
+}
+
+function applyDeterministicVisibleReviewFallback(recording, fileName) {
+  if (!requiresVisibleParagraphStandard(fileName, recording)) return;
+  const champion = recording.champion || "Samira";
+  const moments = standardRepairMoments(
+    recording,
+    Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [],
+    Array.isArray(recording.clockMoments) ? recording.clockMoments : [],
+    champion
+  );
+  if (!moments.length) return;
+  recording.clockMoments = dedupeClockAnchorsPreserveOrder([
+    ...moments,
+    ...(Array.isArray(recording.clockMoments) ? recording.clockMoments : [])
+  ], 4);
+  recording.clockAnchors = annotateClockAnchorsWithMoments(recording.clockAnchors, recording.clockMoments);
+  const fallbackFeedback = deterministicFallbackFeedback(recording, champion);
+  if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(recording.feedback || "")) {
+    recording.feedback = fallbackFeedback;
+  }
+  const repairedDetail = teachingDetailFromMoments(recording, recording.clockMoments, champion);
+  if (repairedDetail) {
+    recording.gameDetail = stripRedundantLessonEcho(stripRepeatedConversionGlossary(repairedDetail));
+  }
+  const repairedEvidence = eventEvidenceFromMoments(recording.clockMoments, champion);
+  if (repairedEvidence) {
+    recording.eventEvidence = repairedEvidence;
+    recording.evidence = repairedEvidence;
+  }
+  const primaryMoment = cleanClockAnchors(recording.clockMoments)[0];
+  if (primaryMoment?.clock && primaryMoment.description) {
+    recording.failureEvidence = repairUnverifiedVisibleNames(
+      `At ${primaryMoment.clock}, ${clauseDescription(primaryMoment.description, champion)}; the failure is letting the next click stay on the wrong task after the map state changes, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.`,
+      champion
+    );
+  }
+  if (!recording.goodThing) {
+    recording.goodThing = `${champion} found at least one visible lane, fight, structure, or objective state to work from; keep the willingness to move with the map, but make the next click safer.`;
+  }
+  recording.pattern = recording.pattern || "The visible pattern is the next-click decision after a fight, wave, camp, structure, or defense state changes.";
+  recording.diamondRule = recording.diamondRule || "When the state changes, the next click must defend, reset, group, hit structure, or take a safe objective.";
+  recording.drill = recording.drill || "Before the next forward click after 15 minutes, say defend, reset, group, structure, or objective.";
+  const fallbackLimit = "The detailed AI pass failed, so this review is a conservative timestamped fallback from verified visible frames.";
+  if (!recording.whyTrust || /\b\d+\s*\/\s*\d+\s+Samira\b/i.test(recording.whyTrust)) {
+    recording.whyTrust = "This fallback review uses verified game-clock frames from the recording instead of invented champion names, guessed jungle camps, or unverified events.";
+  }
+  const baseLimit = coachClean(String(recording.reviewLimit || "")
+    .replace(new RegExp(`${escapeRegExp(fallbackLimit)}\\s*`, "gi"), ""));
+  recording.reviewLimit = coachClean(
+    [baseLimit, fallbackLimit].filter(Boolean).join(" "),
+    "Conservative timestamped fallback from verified visible frames."
+  );
 }
 
 async function readExistingManifest() {
@@ -2056,7 +2187,7 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (/\b(this leads|the consequence|the better play|the core lesson|the critical lesson|the simple lesson)\b/i.test(detail.slice(0, 80))) {
     issues.push("visible paragraph starts with a conclusion instead of evidence");
   }
-  if (!/^(?:At|Around|By|Then|In|During|After|When|Samira|You|\d{1,2}:[0-5]\d)\b/i.test(detail)) {
+  if (!detailStartsWithEvidence(detail)) {
     issues.push("visible paragraph starts with a broken fragment instead of evidence");
   }
   if (needsSecondaryFocus) {
@@ -2524,7 +2655,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Cait deaths hide useful damage",
       feedback: "Mistake: you let playable Cait states become extra forward or side-value clicks before checking who could reach you, so deaths erased the pressure your lane damage was creating. Fix: after a wave, camp, or fight is handled, click back behind an allied body, check the nearest threatened turret/objective, and only continue if Cait can hit from max range.",
-      gameDetail: "Around 2:16, Cait is bot with an allied duo and a minion wave while enemy pressure is visible elsewhere; the useful next click is to stay behind the wave and allied body, hit only what is in max range, then choose safe wave, tower hit, objective path, or reset instead of walking into another loose trade. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the amount of pressure Cait creates. At 14:21 the frame shows the ability bar with Piltover Peacemaker, which confirms this is Cait footage and makes the rule sharper: Cait climbs by staying unavailable while dealing damage from range, not by playing the map like a short-range cleanup champion. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys.",
+      gameDetail: "Around 2:16, Cait is bot with an allied duo and a minion wave while enemy pressure is visible elsewhere; the useful next click is to stay behind the wave and allied body, hit only max-range targets, then choose safe wave, tower hit, objective path, or reset instead of walking into another loose trade. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the pressure Cait creates. At 14:21 the ability bar shows Piltover Peacemaker, confirming this is Cait footage. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys.",
       whyTrust: "The champion identity is source-checked from the visible Cait HUD and Piltover Peacemaker frame, and the stat line is from League Client match history.",
       eventEvidence: "2:16 shows Cait's bot-side lane state with ally and wave cover; 14:21 shows the Cait ability bar with Piltover Peacemaker; the synced stat line is 0/5/6 K/D/A and 112 CS.",
       failureEvidence: "Cait had enough lane presence to be involved in fights, but the visible review and 0/5/6 stat line show deaths outvaluing the pressure; the failure is letting Cait become reachable before the next click has a safe target, ally body, or objective payout.",
@@ -3149,15 +3280,15 @@ function fallbackFeedback(file, duration, context = {}) {
     return {
       champion: "Samira",
       confidence: "medium",
-      feedbackTitle: "16/10 means conversion gap",
-      feedback: "The full-game read says damage is enough; the next useful rep is ending won fights through wave, tower, dragon, Baron, nexus, or recall.",
-      gameDetail: "This full review shows Samira can already create kills, so the climb gap is what happens right after the first win. The next useful rep is converting the won fight into wave, tower, objective, nexus, or recall before the next fight gives shutdown gold back.",
-      whyTrust: "A 16/10 Samira can already create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
+      feedbackTitle: "Damage lead needs map cash-out",
+      feedback: "Mistake: the damage lead kept needing cleaner map cash-outs after playable or winning moments. Fix: after a won fight, side wave, camp, or structure state, choose wave, tower, objective, nexus, or recall before taking another fight.",
+      gameDetail: "This full review shows Samira can create damage, so the climb gap is what happens right after the first playable or winning moment. The next useful rep is converting the moment into wave, tower, objective, nexus, or recall before the next fight gives shutdown gold back.",
+      whyTrust: "The visible frames and client stats show enough damage pressure to create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
       eventEvidence: "",
       goodThing: "You are finding fights and creating damage pressure; the fix is cashing those wins out cleaner.",
       focusTag: "overstay control",
       evidence: "",
-      pattern: "The carry score says damage is available, so the rank leak is likely conversion after the first winning moment.",
+      pattern: "The carry score says damage is available, so the rank leak is likely converting the first winning moment into a permanent map result.",
       diamondRule: "After a won fight, take the guaranteed payout before looking for the next fight.",
       drill: "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
       nuance: ["High kills only matter when the map state changes.", "Shutdown deaths after a win erase the lead Samira already created."],
