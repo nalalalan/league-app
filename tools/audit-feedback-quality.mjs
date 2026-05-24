@@ -60,14 +60,27 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-23-deterministic-publish-fallback-v16",
+    "2026-05-23-champion-source-coaching-v15",
     "2026-05-23-evidence-lanes-coaching-v14",
     "2026-05-22-action-script-coaching-v13",
     "2026-05-22-two-focus-coaching-v11",
     "2026-05-22-challenger-direct-coaching-v12"
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
-  const needsActionScript = recording.analysisVersion === "2026-05-23-evidence-lanes-coaching-v14" || recording.analysisVersion === "2026-05-22-action-script-coaching-v13";
-  const needsEvidenceLanes = recording.analysisVersion === "2026-05-23-evidence-lanes-coaching-v14";
+  const actionScriptVersions = new Set([
+    "2026-05-23-deterministic-publish-fallback-v16",
+    "2026-05-23-champion-source-coaching-v15",
+    "2026-05-23-evidence-lanes-coaching-v14",
+    "2026-05-22-action-script-coaching-v13"
+  ]);
+  const evidenceLaneVersions = new Set([
+    "2026-05-23-deterministic-publish-fallback-v16",
+    "2026-05-23-champion-source-coaching-v15",
+    "2026-05-23-evidence-lanes-coaching-v14"
+  ]);
+  const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
+  const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
 
   if (/\bAlan\b/.test(allVisible)) {
     issues.push("visible feedback refers to Alan in third person");

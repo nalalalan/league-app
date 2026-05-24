@@ -982,6 +982,35 @@ function expectedClockAnchorsFromTimes(readTimes, sidecar, matchTimeMs, gameLeng
   return dedupeClockAnchors(anchors);
 }
 
+function computedClockDescription(clock, champion = "Samira") {
+  const name = clean(champion, "Samira");
+  const seconds = clockSeconds(clock);
+  if (Number.isFinite(seconds) && seconds >= 20 * 60) {
+    return `shows ${name} in a current-match late-game map-state review frame`;
+  }
+  if (Number.isFinite(seconds) && seconds >= 14 * 60) {
+    return `shows ${name} in a current-match mid-game rotation and objective review frame`;
+  }
+  if (Number.isFinite(seconds) && seconds >= 8 * 60) {
+    return `shows ${name} in a current-match lane-to-map transition review frame`;
+  }
+  return `shows ${name} in a current-match lane review frame`;
+}
+
+function computedTimelineClockAnchors({ duration, sidecar, matchTimeMs, gameLengthSeconds, candidateAnchors = [], champion = "Samira" }) {
+  const candidateTimes = cleanClockAnchors(candidateAnchors).map((anchor) => anchor.videoSeconds);
+  const readTimes = clockReadTimes(duration, sidecar, candidateTimes);
+  const anchors = spacedClockAnchors(
+    expectedClockAnchorsFromTimes(readTimes, sidecar, matchTimeMs, gameLengthSeconds),
+    8
+  ).map((anchor) => ({
+    ...anchor,
+    description: computedClockDescription(anchor.clock, champion)
+  }));
+  const later = anchors.filter((anchor) => Number(clockSeconds(anchor.clock)) >= 8 * 60);
+  return later.length ? later : anchors;
+}
+
 function spacedClockAnchors(anchors, maxItems = 10, minClockGapSeconds = 35) {
   const sorted = cleanClockAnchors(anchors)
     .sort((a, b) => a.videoSeconds - b.videoSeconds);
@@ -1492,6 +1521,19 @@ function repairVisibleReviewForStandard(recording, fileName) {
     recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
     recording.evidence = stripUnmatchedClockTokens(recording.evidence || recording.eventEvidence || "", recording.clockAnchors);
   }
+}
+
+function repairPublishAuditRequirements(recording, fileName) {
+  const isAuto = /^auto_/i.test(fileName || recording?.file || "");
+  if (!isAuto || Number(recording?.durationSeconds || 0) < 90) return;
+  const champion = recording.champion || "Samira";
+  if (!hasTimestampedActionScript(recording.gameDetail)) {
+    ensureTimestampedReplacementAction(recording, champion);
+  }
+  sanitizeVisibleReviewNames(recording, champion);
+  recording.gameDetail = stripUnmatchedClockTokens(recording.gameDetail, recording.clockAnchors);
+  recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
+  recording.evidence = stripUnmatchedClockTokens(recording.evidence || recording.eventEvidence || "", recording.clockAnchors);
 }
 
 function hasRepeatedConversionGlossary(recording = {}) {
@@ -2044,12 +2086,18 @@ function applyDeterministicVisibleReviewFallback(recording, fileName) {
   recording.pattern = recording.pattern || "The visible pattern is the next-click decision after a fight, wave, camp, structure, or defense state changes.";
   recording.diamondRule = recording.diamondRule || "When the state changes, the next click must defend, reset, group, hit structure, or take a safe objective.";
   recording.drill = recording.drill || "Before the next forward click after 15 minutes, say defend, reset, group, structure, or objective.";
-  const fallbackLimit = "The detailed AI pass failed, so this review is a conservative timestamped fallback from verified visible frames.";
+  const usesComputedClock = [...cleanClockAnchors(recording.clockMoments), ...cleanClockAnchors(recording.clockAnchors)]
+    .some((anchor) => /\bcurrent-match\b/i.test(anchor.description || ""));
+  const fallbackLimit = usesComputedClock
+    ? "The detailed AI or clock-reading pass failed, so this review uses computed game-clock labels from match/capture timing and conservative current-match frames."
+    : "The detailed AI pass failed, so this review is a conservative timestamped fallback from verified visible frames.";
   if (!recording.whyTrust || /\b\d+\s*\/\s*\d+\s+Samira\b/i.test(recording.whyTrust)) {
-    recording.whyTrust = "This fallback review uses verified game-clock frames from the recording instead of invented champion names, guessed jungle camps, or unverified events.";
+    recording.whyTrust = usesComputedClock
+      ? "This fallback review avoids invented champion names, guessed jungle camps, and unverified events; the clock labels come from the recorded match timeline when clock OCR failed."
+      : "This fallback review uses verified game-clock frames from the recording instead of invented champion names, guessed jungle camps, or unverified events.";
   }
   const baseLimit = coachClean(String(recording.reviewLimit || "")
-    .replace(new RegExp(`${escapeRegExp(fallbackLimit)}\\s*`, "gi"), ""));
+    .replace(/The detailed AI(?: or clock-reading)? pass failed, so this review (?:uses computed game-clock labels from match\/capture timing and conservative current-match frames|is a conservative timestamped fallback from verified visible frames)\.\s*/gi, ""));
   recording.reviewLimit = coachClean(
     [baseLimit, fallbackLimit].filter(Boolean).join(" "),
     "Conservative timestamped fallback from verified visible frames."
@@ -4353,8 +4401,19 @@ async function main() {
         candidateAnchors: candidateClockAnchors
       })
       : [];
+    const fallbackClockAnchors = !visibleClockAnchors.length && duration > 90
+      ? computedTimelineClockAnchors({
+        duration,
+        sidecar: entry.sidecar,
+        matchTimeMs,
+        gameLengthSeconds: matchStats.gameLengthSeconds || null,
+        candidateAnchors: candidateClockAnchors,
+        champion: clean(matchStats.championName || analysis.champion, "Samira")
+      })
+      : [];
     const clockAnchors = dedupeClockAnchors(
       visibleClockAnchors,
+      fallbackClockAnchors,
       (analysis.analysisSource === "manual" || (fastMacroReview && candidateHasPrimaryMistake)) ? candidateClockAnchors : []
     );
     const clockMoments = await selectEvidenceClockMoments({
@@ -4488,6 +4547,7 @@ async function main() {
       poster: publicPath(posterPath)
     };
     repairVisibleReviewForStandard(recording, name);
+    repairPublishAuditRequirements(recording, name);
     const rankEstimate = rankedEquivalentForRecording(recording);
     if (rankEstimate) recording.rankEstimate = rankEstimate;
     enforceVisibleParagraphStandard(recording, name);

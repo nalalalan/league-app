@@ -1485,6 +1485,20 @@ async function finalizeSession(session) {
         return;
       }
       const combinedOutput = `${error.stdout || ""}\n${error.stderr || ""}`;
+      if (/failed visible feedback standard|No JSON object returned|Feedback fallback|Clock anchor fallback|sync:recordings/i.test(combinedOutput)) {
+        const retryFields = {
+          ...sessionStatusFields(session, "Review clip saved; feedback generation is retrying."),
+          label: "review retrying",
+          progress: 86,
+          matchId: replay?.matchId || "",
+          outputFile,
+          ...(await etaFor("clip_to_live", clipToLiveEtaFallbackSeconds, new Date().toISOString(), publishEtaContext))
+        };
+        await log(`Review generation failed after clip creation; keeping status retrying instead of blocked: ${error.message}`);
+        await publishRecorderStatus("processing", retryFields, { force: true });
+        holdIdleStatus("processing", retryFields);
+        return;
+      }
       const blockedLine = combinedOutput.match(/Publish blocked[^\r\n]*/i)?.[0];
       const detail = blockedLine || "Review clip created, but the site publish failed. Check publisher log.";
       await log(`Publish failed after review clip creation: ${error.message}`);
