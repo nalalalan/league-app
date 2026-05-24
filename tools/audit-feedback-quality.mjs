@@ -35,9 +35,12 @@ function hasKeyTimestampClickRule(text) {
     .replace(/\s+/g, " ")
     .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g)?.some((sentence) => (
       /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
-      /\bmistake category\s*:/i.test(sentence) &&
-      /\bcorrect next click\s*:/i.test(sentence) &&
-      /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click)\b/i.test(sentence)
+      (
+        (/\bmistake category\s*:/i.test(sentence) && /\bcorrect next click\s*:/i.test(sentence)) ||
+        /\bso\s+(?:the\s+)?next\s+click\s+is\b|\bthe\s+next\s+click\s+is\b|\bclick\s+(?:back|out|away|toward|only)\b/i.test(sentence)
+      ) &&
+      /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free)\b/i.test(sentence) &&
+      /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back)\b/i.test(sentence)
     )) || false;
 }
 
@@ -71,6 +74,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-24-example-review-v19",
     "2026-05-24-key-click-rule-v18",
     "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
@@ -82,6 +86,7 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
   const actionScriptVersions = new Set([
+    "2026-05-24-example-review-v19",
     "2026-05-24-key-click-rule-v18",
     "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
@@ -90,6 +95,7 @@ function feedbackIssues(recording = {}) {
     "2026-05-22-action-script-coaching-v13"
   ]);
   const evidenceLaneVersions = new Set([
+    "2026-05-24-example-review-v19",
     "2026-05-24-key-click-rule-v18",
     "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
@@ -98,9 +104,12 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
   const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
-  const needsDecisionBranch = recording.analysisVersion === "2026-05-24-key-click-rule-v18" ||
+  const needsDecisionBranch = recording.analysisVersion === "2026-05-24-example-review-v19" ||
+    recording.analysisVersion === "2026-05-24-key-click-rule-v18" ||
     recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
-  const needsKeyClickRule = recording.analysisVersion === "2026-05-24-key-click-rule-v18";
+  const needsKeyClickRule = recording.analysisVersion === "2026-05-24-example-review-v19" ||
+    recording.analysisVersion === "2026-05-24-key-click-rule-v18";
+  const needsExampleReview = recording.analysisVersion === "2026-05-24-example-review-v19";
   const hasStats = Number.isFinite(Number(recording.kills)) &&
     Number.isFinite(Number(recording.deaths)) &&
     Number.isFinite(Number(recording.assists)) &&
@@ -141,6 +150,12 @@ function feedbackIssues(recording = {}) {
   }
   if (needsKeyClickRule && !hasKeyTimestampClickRule(detail)) {
     issues.push("full review missing one key timestamp with visible state, mistake category, and correct next click");
+  }
+  if (needsExampleReview && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
+    issues.push("full review uses field labels instead of natural key timestamp prose");
+  }
+  if (needsExampleReview && !/^Rep\s*:/i.test(secondaryFocus || clean(recording.drill))) {
+    issues.push("pink next-game instruction must be one Rep sentence");
   }
   if (needsKeyClickRule && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test(allVisible)) {
     issues.push("full review uses generic review-frame or broad branch wording");

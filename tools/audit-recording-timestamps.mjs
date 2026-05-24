@@ -13,6 +13,7 @@ const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
 const fallbackModel = process.env.LEAGUE_TIMESTAMP_AUDIT_FALLBACK_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-24-example-review-v19",
   "2026-05-24-key-click-rule-v18",
   "2026-05-23-decision-branch-coaching-v17",
   "2026-05-23-evidence-lanes-coaching-v14",
@@ -91,10 +92,19 @@ function hasTimestampedActionScript(text) {
 function hasKeyTimestampClickRule(text) {
   return sentenceParts(text).some((sentence) => (
     /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
-    /\bmistake category\s*:/i.test(sentence) &&
-    /\bcorrect next click\s*:/i.test(sentence) &&
-    /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click)\b/i.test(sentence)
+    (
+      (/\bmistake category\s*:/i.test(sentence) && /\bcorrect next click\s*:/i.test(sentence)) ||
+      /\bso\s+(?:the\s+)?next\s+click\s+is\b|\bthe\s+next\s+click\s+is\b|\bclick\s+(?:back|out|away|toward|only)\b/i.test(sentence)
+    ) &&
+    /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free)\b/i.test(sentence) &&
+    /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back)\b/i.test(sentence)
   ));
+}
+
+function keyClickRuleTimestampSeconds(text) {
+  return sentenceParts(text)
+    .filter((sentence) => hasKeyTimestampClickRule(sentence))
+    .flatMap(timestampSecondsInText);
 }
 
 function mmss(seconds) {
@@ -168,7 +178,11 @@ function visibleParagraphStandardIssues(recording, anchors) {
   const eventEvidence = clean(recording.eventEvidence || recording.evidence);
   const issues = [];
   if (detail.length < 240) issues.push("visible paragraph is too short");
-  if (!primaryMistakeTimestampSeconds(detail, eventEvidence).length) issues.push("primary mistake window must have a game-clock timestamp");
+  const primaryReviewSeconds = [
+    ...primaryMistakeTimestampSeconds(detail, eventEvidence),
+    ...keyClickRuleTimestampSeconds(detail)
+  ];
+  if (!primaryReviewSeconds.length) issues.push("primary mistake window must have a game-clock timestamp");
   if (!/\b(leak|cost|punish|punished|shutdown|tempo|missed|risk|risky|death|died|gave|lost|blocked|blocker|mistake|danger|punishment|consequence|window|delay|stall|throw)\b/i.test(detail)) {
     issues.push("visible paragraph must name the leak or consequence");
   }
@@ -178,16 +192,25 @@ function visibleParagraphStandardIssues(recording, anchors) {
   if (currentPrimaryMistakeAnalysisVersions.has(recording.analysisVersion) && !hasTimestampedActionScript(detail)) {
     issues.push("visible paragraph must include a timestamped replacement action script");
   }
-  if (recording.analysisVersion === "2026-05-24-key-click-rule-v18" && !hasKeyTimestampClickRule(detail)) {
-    issues.push("visible paragraph must include one key timestamp with visible state, mistake category, and correct next click");
+  if ((recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && !hasKeyTimestampClickRule(detail)) {
+    issues.push("visible paragraph must include one key timestamp with visible state and exact next click");
   }
-  if (recording.analysisVersion === "2026-05-24-key-click-rule-v18" && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
+  if (recording.analysisVersion === "2026-05-24-example-review-v19" && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
+    issues.push("visible paragraph uses field labels instead of natural key timestamp prose");
+  }
+  if (recording.analysisVersion === "2026-05-24-example-review-v19" && !/^Rep\s*:/i.test(clean(recording.secondaryFocus || recording.drill))) {
+    issues.push("pink next-game instruction must be one Rep sentence");
+  }
+  if ((recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
     issues.push("visible paragraph uses generic review-frame or broad branch wording");
   }
   if (eventEvidence.length < 60) {
     issues.push("eventEvidence must name visible proof");
   }
-  const primarySeconds = [...new Set(primaryMistakeTimestampSeconds(detail, eventEvidence).map((seconds) => Math.round(seconds)))];
+  const primarySeconds = [...new Set([
+    ...primaryMistakeTimestampSeconds(detail, eventEvidence),
+    ...keyClickRuleTimestampSeconds(detail)
+  ].map((seconds) => Math.round(seconds)))];
   const anchorSeconds = anchors
     .map((anchor) => clockSeconds(anchor.clock))
     .filter((seconds) => Number.isFinite(seconds));
@@ -218,7 +241,10 @@ function unanchoredNarrativeTimestamps(recording, anchors) {
 }
 
 function displayClockAnchors(recording, anchors) {
-  const primarySeconds = [...new Set(primaryMistakeTimestampSeconds(recording.gameDetail, recording.eventEvidence || recording.evidence).map((seconds) => Math.round(seconds)))];
+  const primarySeconds = [...new Set([
+    ...primaryMistakeTimestampSeconds(recording.gameDetail, recording.eventEvidence || recording.evidence),
+    ...keyClickRuleTimestampSeconds(recording.gameDetail)
+  ].map((seconds) => Math.round(seconds)))];
   const visibleTimestamps = new Set(primarySeconds.map(mmss));
   const momentTimestamps = new Set((Array.isArray(recording.clockMoments) ? recording.clockMoments : [])
     .map((moment) => normalizeClock(moment?.clock))

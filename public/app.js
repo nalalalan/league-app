@@ -1701,7 +1701,7 @@ function displayPraise(item) {
 }
 
 function displaySecondaryFocus(item) {
-  let text = stripVisibleCoachLabel(stripCoachPrefix(item.secondaryFocus || item.secondaryImprovement || ""));
+  let text = stripVisibleCoachLabel(stripCoachPrefix(item.secondaryFocus || item.secondaryImprovement || item.drill || ""));
   if (!hasText(text)) return "";
   text = text
     .replace(/^Also\s+/i, "")
@@ -1709,6 +1709,14 @@ function displaySecondaryFocus(item) {
     .replace(/\s+/g, " ")
     .trim();
   return normalizeActionInstruction(text);
+}
+
+function recordingOutcomeLabel(item) {
+  const explicit = String(item?.outcomeLabel || item?.outcome || "").trim();
+  if (/^(victory|win|won)$/i.test(explicit)) return "VICTORY";
+  if (/^(defeat|loss|lost)$/i.test(explicit)) return "DEFEAT";
+  if (typeof item?.win === "boolean") return item.win ? "VICTORY" : "DEFEAT";
+  return "";
 }
 
 function displayFailureEvidence(item) {
@@ -2074,6 +2082,7 @@ function recordingStoryParagraph(item) {
   const paragraph = document.createElement("p");
   paragraph.className = "recording-list-story";
   appendStoryText(paragraph, [
+    recordingOutcomeLabel(item),
     compactGameType(item.gameType || item.kind),
     item.champion || "Unknown",
     compactRecordingDate(item),
@@ -2092,7 +2101,7 @@ function recordingStoryParagraph(item) {
   const praiseIndex = praise ? praiseInsertIndex(sentences) : -1;
   const timestampOptions = { linkTimestamps: true, item };
   sentences.forEach((sentence, index) => {
-    appendActionAwareStorySentence(paragraph, sentence, timestampOptions);
+    appendStoryText(paragraph, sentence, timestampOptions);
     if (index + 1 === critiqueIndex) appendStorySpan(paragraph, critique, "recording-story-critique", timestampOptions);
     if (index + 1 === praiseIndex) appendStorySpan(paragraph, praise, "recording-story-praise", timestampOptions);
   });
