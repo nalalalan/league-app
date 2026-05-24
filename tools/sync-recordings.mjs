@@ -23,12 +23,14 @@ const fightEntryRep = "Rep: after 15 minutes, before stepping into a fight, ask:
 const fightEntryDrill = "After 15 minutes, before stepping into a fight: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.";
 const cleanerWinExitRep = "Rep: after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.";
 const deathExitRep = "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.";
+const laneDeathExitRep = "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. Do not E/dash toward an enemy under tower unless support is between you and them and the wave still protects you.";
 const firstWinCashoutRep = "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.";
 const basePushRep = "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.";
 const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
-const analysisVersion = "2026-05-24-game-specific-rep-v22";
+const analysisVersion = "2026-05-24-lane-specific-rep-v23";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-24-game-specific-rep-v22",
   "2026-05-24-dense-click-review-v21",
   "2026-05-24-tight-click-review-v20",
   "2026-05-24-example-review-v19",
@@ -52,6 +54,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5567367431_01.mp4",
   "auto_NA1-5567223507_01.mp4",
   "auto_NA1-5566943774_01.mp4",
   "auto_NA1-5566860300_01.mp4",
@@ -1535,17 +1538,24 @@ function reviewRepCategory(recording = {}) {
   const csPerMinute = Number.isFinite(cs) && gameLengthSeconds > 0 ? cs / (gameLengthSeconds / 60) : NaN;
   const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
 
-  if (/\b(base|inhib|inhibitor|nexus|structure|exposed structures|enemy base|base push)\b/i.test(text)) {
-    return "basePush";
-  }
   if (Number.isFinite(kills) && kills >= 18 && /\b(defeat|loss|lost|eight deaths|death|objective|won exchange|first useful damage|reset)\b/i.test(text)) {
     return "firstWinCashout";
   }
-  if (won && Number.isFinite(deaths) && deaths <= 3 && Number.isFinite(csPerMinute) && csPerMinute >= 5) {
-    return "cleanerWinExit";
+  if (/\b(bot|lane|outer turret|under turret|support|wave is already thin|Samira E|dash\/chase|tower dive)\b/i.test(text) &&
+      ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) {
+    return "laneDeathExit";
+  }
+  if (!won && Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) {
+    return "deathExit";
   }
   if ((Number.isFinite(deaths) && deaths >= 9) || /\b(low hp|low-health|death-heavy|ten deaths|thirteen deaths|death timer|death-state|catchable death)\b/i.test(text)) {
     return "deathExit";
+  }
+  if (/\b(base|inhib|inhibitor|nexus|structure|exposed structures|enemy base|base push)\b/i.test(text)) {
+    return "basePush";
+  }
+  if (won && Number.isFinite(deaths) && deaths <= 3 && Number.isFinite(csPerMinute) && csPerMinute >= 5) {
+    return "cleanerWinExit";
   }
   if (/\b(side|jungle|camp|farm|side wave|side-wave|defend|defense|threatened turret|base defense)\b/i.test(text)) {
     return "sideFarmDefense";
@@ -1562,6 +1572,8 @@ function specificRepForRecording(recording = {}) {
       return basePushRep;
     case "firstWinCashout":
       return firstWinCashoutRep;
+    case "laneDeathExit":
+      return laneDeathExitRep;
     case "deathExit":
       return deathExitRep;
     case "sideFarmDefense":
@@ -1586,8 +1598,10 @@ function repMatchesGameCategory(recording = {}) {
       return /\bstructure,\s*blocker,\s*wave,\s*or\s*exit\b/i.test(rep);
     case "firstWinCashout":
       return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
+    case "laneDeathExit":
+      return /\bdeath-heavy lane sequence\b|\bDo not E\/dash\b|\bwave still protects you\b|\bone step behind support\b/i.test(rep);
     case "deathExit":
-      return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b/i.test(rep);
+      return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":
       return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b/i.test(rep);
     case "fightEntry":
@@ -1612,6 +1626,9 @@ function ensurePinkRep(recording, champion = "Samira") {
   const categoryRep = specificRepForRecording(recording);
   if (current && !repMatchesGameCategory(recording)) {
     recording.secondaryFocus = repairUnverifiedVisibleNames(categoryRep, champion);
+    return;
+  }
+  if (/^Rep\s*:/i.test(current) && repMatchesGameCategory(recording) && !secondaryFocusStandardIssues({ ...recording, secondaryFocus: current }).length && !/\bwhat permanent thing\b/i.test(current)) {
     return;
   }
   const visibleText = [
@@ -3251,6 +3268,56 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5567367431_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Bot-tower dash after lane value ended",
+      feedback: "The leak is treating one catchable enemy under turret as a legal Samira entry after the wave/front/body no longer protects you, so lane pressure becomes another death timer instead of a reset or wave result.",
+      gameDetail: "At 9:02, you are 0/2/0 with 44 CS beside enemy bot outer turret, support is near you but not clearly between you and the enemy, the wave is already thin, and the visible enemy is under turret, so the wrong click is the forward dash/chase and the next click is back through your minion wave behind support, or reset if the wave cannot safely be played. By 9:22 you are dead, the score has moved to 0/3/0, and the lane gained no tower or objective from the entry. The final 0/5/0, 57 CS in 16 minutes says the first blocker is death-state exposure: the lane ideas are not useless, but the all-in button is being pressed after the legal setup is gone.",
+      secondaryFocus: laneDeathExitRep,
+      mistakeTypes: [
+        "lane all-in after setup ends",
+        "death-state exposure",
+        "ally-frontline check",
+        "wave-thin tower discipline",
+        "CS loss through death timers"
+      ],
+      eventEvidence: "8:32 shows Samira and support using bot wave pressure together; 8:52 shows the pair walking at enemy bot outer turret; 9:02 shows the forward entry beside enemy turret with the wave already thin; 9:22 shows the death timer and 0/3/0 scoreboard state.",
+      failureEvidence: "At 9:02 the visible state no longer guarantees tower, wave, or ally-front entry value; by 9:22 the cost is another death timer and lost lane tempo.",
+      goodThing: "At 8:32 and 8:52 you are at least playing through your support and the bot wave, which is the lane shape to keep before the setup expires.",
+      whyTrust: "This uses inspected 8:32, 8:52, 9:02, and 9:22 frames plus the League Client 0/5/0, 57 CS defeat line.",
+      focusTag: "lane entry exit",
+      evidence: "Manual frame inspection of 8:32, 8:52, 9:02, and 9:22 plus League Client stats.",
+      pattern: "This game is a death-state lane-control problem: the first improvement is not a fancy macro branch, it is refusing the dash after the wave and ally-front setup expires.",
+      diamondRule: "Samira E is legal only when wave, ally front, enemy cooldowns, and the exit path still make the target safe enough to cash.",
+      drill: laneDeathExitRep.replace(/^Rep\s*:\s*/i, ""),
+      timeline: [
+        "8:32 - Samira and support push bot wave together before the tower setup expires.",
+        "8:52 - Samira walks near enemy bot outer turret with support nearby.",
+        "9:02 - Samira dashes/steps forward beside enemy bot turret after the wave is already thin.",
+        "9:22 - Samira is dead, the scoreboard shows 0/3/0, and no tower or objective was gained."
+      ],
+      clockAnchors: [
+        { clock: "8:32", videoSeconds: 560, description: "Samira and support push bot wave together before the tower setup expires." },
+        { clock: "8:52", videoSeconds: 580, description: "Samira walks near enemy bot outer turret with support nearby." },
+        { clock: "9:02", videoSeconds: 590, description: "Samira dashes or steps forward beside enemy bot turret after the wave is already thin." },
+        { clock: "9:22", videoSeconds: 610, description: "Samira is dead, the scoreboard shows 0/3/0, and no tower or objective was gained." }
+      ],
+      nuance: [
+        "This is a lane-entry issue, not a base-push issue.",
+        "The useful part is moving with support and wave before the entry.",
+        "The mistake starts when the setup expires but the forward click still happens.",
+        "The 0/5/0 line means deaths, not lack of aggression, are the first blocker.",
+        "The next-game rep is about refusing Samira E when the wave, ally front, or exit is missing."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact inputs or every cooldown, but it can verify the bot-turret entry window, the death timer, and the 0/5/0, 57 CS defeat context.",
+      outcome: "defeat",
+      outcomeLabel: "DEFEAT",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5567223507_01.mp4") {
     return {
       champion: "Samira",

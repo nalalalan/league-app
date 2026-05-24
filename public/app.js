@@ -1720,7 +1720,7 @@ function recordingOutcomeLabel(item) {
 }
 
 function isTightClickReview(item) {
-  return /2026-05-24-(?:dense|tight)-click-review-v2[01]/.test(String(item?.analysisVersion || ""));
+  return /2026-05-24-(?:lane-specific-rep-v23|game-specific-rep-v22|dense-click-review-v21|tight-click-review-v20)/.test(String(item?.analysisVersion || ""));
 }
 
 function displayFailureEvidence(item) {
