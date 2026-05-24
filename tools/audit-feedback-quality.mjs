@@ -79,6 +79,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-24-dense-click-review-v21",
     "2026-05-24-tight-click-review-v20",
     "2026-05-24-example-review-v19",
     "2026-05-24-key-click-rule-v18",
@@ -92,6 +93,7 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
   const actionScriptVersions = new Set([
+    "2026-05-24-dense-click-review-v21",
     "2026-05-24-tight-click-review-v20",
     "2026-05-24-example-review-v19",
     "2026-05-24-key-click-rule-v18",
@@ -102,6 +104,7 @@ function feedbackIssues(recording = {}) {
     "2026-05-22-action-script-coaching-v13"
   ]);
   const evidenceLaneVersions = new Set([
+    "2026-05-24-dense-click-review-v21",
     "2026-05-24-tight-click-review-v20",
     "2026-05-24-example-review-v19",
     "2026-05-24-key-click-rule-v18",
@@ -112,16 +115,22 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
   const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
-  const needsDecisionBranch = recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
+  const needsDecisionBranch = recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
+    recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18" ||
     recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
-  const needsKeyClickRule = recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
+  const needsKeyClickRule = recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
+    recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18";
-  const needsExampleReview = recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
+  const needsExampleReview = recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
+    recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19";
-  const needsTightReview = recording.analysisVersion === "2026-05-24-tight-click-review-v20" &&
+  const needsTightReview = (recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
+    recording.analysisVersion === "2026-05-24-tight-click-review-v20") &&
+    (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
+  const needsDenseReview = recording.analysisVersion === "2026-05-24-dense-click-review-v21" &&
     (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
   const hasStats = Number.isFinite(Number(recording.kills)) &&
     Number.isFinite(Number(recording.deaths)) &&
@@ -152,6 +161,9 @@ function feedbackIssues(recording = {}) {
   if (needsTightReview && detail.length > 850) {
     issues.push("tight review gameDetail repeats too much context");
   }
+  if (needsDenseReview && detail.length > 650) {
+    issues.push("dense review gameDetail is too loose");
+  }
   if (!/\b(because|this matters|reason|so that|which means|which makes|which proves|so\s+(?:the|a|every|your|you))\b/i.test(detail)) {
     issues.push("full review does not explain why the advice is correct");
   }
@@ -172,6 +184,12 @@ function feedbackIssues(recording = {}) {
   }
   if (needsExampleReview && !/^Rep\s*:/i.test(secondaryFocus || clean(recording.drill))) {
     issues.push("pink next-game instruction must be one Rep sentence");
+  }
+  if (needsDenseReview && /\bwhat permanent thing\b/i.test(secondaryFocus)) {
+    issues.push("pink Rep uses vague permanent-thing wording");
+  }
+  if (needsDenseReview && /\bfight|entry|front\b/i.test([detail, allVisible].join(" ")) && !/\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(secondaryFocus)) {
+    issues.push("pink Rep must use the literal fight-entry checklist");
   }
   if (needsTightReview && repeatedPayoutChecklistCount(allVisible) > 1) {
     issues.push("tight review repeats the payout checklist instead of saying it once");

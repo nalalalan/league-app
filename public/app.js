@@ -1720,7 +1720,7 @@ function recordingOutcomeLabel(item) {
 }
 
 function isTightClickReview(item) {
-  return String(item?.analysisVersion || "") === "2026-05-24-tight-click-review-v20";
+  return /2026-05-24-(?:dense|tight)-click-review-v2[01]/.test(String(item?.analysisVersion || ""));
 }
 
 function displayFailureEvidence(item) {
