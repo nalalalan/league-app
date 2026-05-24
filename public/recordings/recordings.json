@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-24T02:14:41.471Z",
+  "generatedAt": "2026-05-24T02:19:39.727Z",
   "source": "League of Legends Highlights folder",
   "match": "35 matches",
   "matches": [
@@ -768,7 +768,7 @@
         "Camera stayed focused on Samira but did not check minimap info aggressively enough before advancing past river.",
         "In Challenger, every mid/late isolated death results in immediate Baron, Dragon, or structure loss—fixing this is transferrable at every rank."
       ],
-      "reviewLimit": "Can't judge detailed micro-mechanics (e.g. combo cancels or animation finesse) due to 2 FPS capture; ally comms, detailed vision control, and fog-of-war trap checks are partially readable only through minimap and visible deaths. Early lane setup cannot be fully reviewed from these samples. The exact camp or objective context for each isolated death is limited by lack of extended fight sequence. Detail refresh kept the previous review because model analysis failed: No JSON object returned. Detail refresh kept the previous review because model analysis failed: No JSON object returned. Detail refresh kept the previous review because model analysis failed: No JSON object returned. Detail refresh kept the previous review because model analysis failed: No JSON object returned. Detail refresh kept the previous review because model analysis failed: No JSON object returned. Detail refresh kept the previous review because model analysis failed: No JSON object returned.",
+      "reviewLimit": "Can't judge detailed micro-mechanics (e.g. combo cancels or animation finesse) due to 2 FPS capture; ally comms, detailed vision control, and fog-of-war trap checks are partially readable only through minimap and visible deaths. Early lane setup cannot be fully reviewed from these samples. The exact camp or objective context for each isolated death is limited by lack of extended fight sequence.",
       "analysisSource": "openai",
       "analysisVersion": "2026-05-23-evidence-lanes-coaching-v14",
       "sampledFrames": 14,

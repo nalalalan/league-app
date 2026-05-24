@@ -1549,6 +1549,11 @@ function normalizeCoachPunctuation(text) {
     .trim();
 }
 
+function stripDetailRefreshFailureNotes(text) {
+  return normalizeCoachPunctuation(String(text || "")
+    .replace(/Detail refresh kept the previous review because model analysis failed:[^.]+\.?\s*/gi, " "));
+}
+
 function stripRepeatedConversionGlossary(text) {
   return normalizeCoachPunctuation(String(text || "")
     .replace(/\s*Conversion means turning a fight win or gold lead into something that remains after the fight ends: tower damage, base damage, dragon\/Baron setup, or a safe reset with spent gold\.\s*/gi, " ")
@@ -1616,6 +1621,7 @@ function needsCachedTextRepair(recording = {}) {
     hasRepeatedConversionGlossary(recording) ||
     hasRedundantLessonEcho(recording) ||
     primaryActionTimestampNeedsRepair(recording) ||
+    /Detail refresh kept the previous review because model analysis failed:/i.test(recording.reviewLimit || "") ||
     /\b(?:Failure evidence|Other mistake types|Second focus)\s*:/i.test(text) ||
     /[.!?]\s*;|;\s*[.!?]|[.!?]{2,}/.test(text)
   );
@@ -4002,10 +4008,8 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     if (previousAnalysis) {
       return {
         ...previousAnalysis,
-        reviewLimit: coachClean(
-          [previousAnalysis.reviewLimit, `Detail refresh kept the previous review because model analysis failed: ${error.message}.`].filter(Boolean).join(" "),
-          "Detail refresh kept the previous review because model analysis failed."
-        )
+        reviewLimit: stripDetailRefreshFailureNotes(previousAnalysis.reviewLimit) ||
+          "The previous review was kept because the model refresh failed."
       };
     }
     return fallbackFeedback(file, duration, { reviewPhase: phase });
@@ -4537,7 +4541,7 @@ async function main() {
       clockAnchors: annotatedClockAnchors,
       clockMoments,
       nuance: cleanList(analysis.nuance, 5).map((item) => normalizeVisibleCoachText(item, championName)),
-      reviewLimit: normalizeVisibleCoachText(analysis.reviewLimit || "The review is based on sampled frames, not full input/cooldown telemetry.", championName),
+      reviewLimit: normalizeVisibleCoachText(stripDetailRefreshFailureNotes(analysis.reviewLimit) || "The review is based on sampled frames, not full input/cooldown telemetry.", championName),
       analysisSource: analysis.analysisSource || "cache",
       analysisVersion: analysis.analysisVersion || analysisVersion,
       sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : analysisSampleTimes(duration, entry.sidecar).length),
