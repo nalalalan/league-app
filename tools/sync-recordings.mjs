@@ -21,9 +21,15 @@ const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-5-mini";
 const timeZone = "America/New_York";
 const fightEntryRep = "Rep: after 15 minutes, before stepping into a fight, ask: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.";
 const fightEntryDrill = "After 15 minutes, before stepping into a fight: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.";
-const analysisVersion = "2026-05-24-dense-click-review-v21";
+const cleanerWinExitRep = "Rep: after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.";
+const deathExitRep = "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.";
+const firstWinCashoutRep = "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.";
+const basePushRep = "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.";
+const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
+const analysisVersion = "2026-05-24-game-specific-rep-v22";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-24-dense-click-review-v21",
   "2026-05-24-tight-click-review-v20",
   "2026-05-24-example-review-v19",
   "2026-05-24-key-click-rule-v18",
@@ -46,6 +52,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5567223507_01.mp4",
   "auto_NA1-5566943774_01.mp4",
   "auto_NA1-5566860300_01.mp4",
   "auto_NA1-5566823161_01.mp4",
@@ -1133,7 +1140,7 @@ function anchorDescriptionLooksWeak(anchorText) {
   return /\b(player|champion)\s+(uses ability|casts abilities|begins walking out|moving in river|farming minions|last-hits minions|is moving alone|walks toward|running down)\b/i.test(anchorText) ||
     /\bcurrent-match\b/i.test(anchorText) ||
     /\breview frame\b/i.test(anchorText) ||
-    /\b(scuttle crab|scoreboard open|shop open|item shop|shop interface|stealth ward selected|loaded into the game at fountain|game start|standing at (the )?fountain|leaving (?:base|fountain)|near base fountain|running from fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
+    /\b(minions have spawned|scuttle crab|scoreboard open|shop open|item shop|shop interface|stealth ward selected|loaded into the game at fountain|game start|standing at (the )?fountain|leaving (?:base|fountain)|near base fountain|running from fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
 }
 
 function anchorIsConsequenceOnly(anchorText) {
@@ -1347,15 +1354,16 @@ function firstUsefulReviewAnchor(recording = {}) {
     ...(Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [])
   ]).filter((anchor) => anchor.clock && anchor.description && !anchorDescriptionLooksWeak(anchor.description));
   if (!anchors.length) return null;
+  const reviewAnchors = anchors;
   const firstDetailSecond = timestampSecondsInText(recording.gameDetail)[0];
   if (Number.isFinite(firstDetailSecond)) {
-    const direct = anchors.find((anchor) => {
+    const direct = reviewAnchors.find((anchor) => {
       const anchorSeconds = clockSeconds(anchor.clock);
       return Number.isFinite(anchorSeconds) && Math.abs(anchorSeconds - firstDetailSecond) <= 5;
     });
     if (direct && !anchorIsConsequenceOnly(direct.description)) return direct;
     if (direct && anchorIsConsequenceOnly(direct.description)) {
-      const previous = anchors
+      const previous = reviewAnchors
         .filter((anchor) => !anchorIsConsequenceOnly(anchor.description))
         .filter((anchor) => Number(anchor.videoSeconds) < Number(direct.videoSeconds))
         .sort((a, b) => Number(b.videoSeconds) - Number(a.videoSeconds))[0];
@@ -1367,7 +1375,7 @@ function firstUsefulReviewAnchor(recording = {}) {
     ...keyClickRuleTimestampSeconds(recording.gameDetail)
   ].map((seconds) => Math.round(seconds));
   if (primarySeconds.length) {
-    const matching = anchors.find((anchor) => {
+    const matching = reviewAnchors.find((anchor) => {
       const anchorSeconds = clockSeconds(anchor.clock);
       return Number.isFinite(anchorSeconds) &&
         !anchorIsConsequenceOnly(anchor.description) &&
@@ -1375,15 +1383,15 @@ function firstUsefulReviewAnchor(recording = {}) {
     });
     if (matching) return matching;
   }
-  const consequence = anchors.find((anchor) => anchorIsConsequenceOnly(anchor.description));
+  const consequence = reviewAnchors.find((anchor) => anchorIsConsequenceOnly(anchor.description));
   if (consequence) {
-    const previous = anchors
+    const previous = reviewAnchors
       .filter((anchor) => !anchorIsConsequenceOnly(anchor.description))
       .filter((anchor) => Number(anchor.videoSeconds) < Number(consequence.videoSeconds))
       .sort((a, b) => Number(b.videoSeconds) - Number(a.videoSeconds))[0];
     if (previous) return previous;
   }
-  return anchors.find((anchor) => !anchorIsConsequenceOnly(anchor.description)) || anchors[0];
+  return reviewAnchors.find((anchor) => !anchorIsConsequenceOnly(anchor.description)) || reviewAnchors[0];
 }
 
 function actionScriptForAnchor(recording = {}, anchor = null) {
@@ -1431,13 +1439,21 @@ function ensureTimestampedReplacementAction(recording, champion = "Samira") {
     recording.gameDetail = action;
     return;
   }
-  const insertAt = Math.min(2, sentences.length);
+  const insertAt = 0;
   sentences.splice(insertAt, 0, action);
   recording.gameDetail = normalizeCoachPunctuation(sentences.join(" "));
 }
 
 function ensureKeyTimestampClickRule(recording, champion = "Samira") {
-  if (hasKeyTimestampClickRule(recording.gameDetail) && !/\b(?:mistake category|correct next click)\s*:/i.test(recording.gameDetail || "")) return;
+  const firstSentence = sentenceParts(recording.gameDetail)[0] || "";
+  const firstDetailSecond = timestampSecondsInText(recording.gameDetail)[0];
+  const hasNonOpeningVisibleAnchor = [
+    ...(Array.isArray(recording.clockMoments) ? recording.clockMoments : []),
+    ...(Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [])
+  ].some((anchor) => Number(clockSeconds(anchor.clock)) >= 180 && anchor.description && !anchorDescriptionLooksWeak(anchor.description));
+  const needsOpeningAnchorRepair = hasNonOpeningVisibleAnchor && Number.isFinite(firstDetailSecond) && firstDetailSecond < 120;
+  const needsLeadKeyRule = !hasKeyTimestampClickRule(firstSentence);
+  if (!needsOpeningAnchorRepair && !needsLeadKeyRule && hasKeyTimestampClickRule(recording.gameDetail) && !/\b(?:mistake category|correct next click)\s*:/i.test(recording.gameDetail || "")) return;
   const anchor = firstUsefulReviewAnchor(recording);
   if (!anchor?.clock) return;
   const rule = repairUnverifiedVisibleNames(keyClickRuleSentence(recording, anchor, champion), champion);
@@ -1445,11 +1461,26 @@ function ensureKeyTimestampClickRule(recording, champion = "Samira") {
   const anchorSeconds = clockSeconds(anchor.clock);
   const sentences = sentenceParts(recording.gameDetail);
   const filtered = sentences.filter((sentence, index) => {
-    if (index !== 0) return true;
     const sentenceClocks = timestampSecondsInText(sentence);
     return !sentenceClocks.some((seconds) => Number.isFinite(anchorSeconds) && Math.abs(seconds - anchorSeconds) <= 5);
   });
   recording.gameDetail = normalizeCoachPunctuation([rule, ...filtered].join(" "));
+}
+
+function stripDuplicateLeadClockEcho(recording) {
+  const sentences = sentenceParts(recording.gameDetail);
+  if (sentences.length < 2) return;
+  const leadClock = normalizeClock(sentences[0]);
+  if (!leadClock) return;
+  recording.gameDetail = normalizeCoachPunctuation(sentences
+    .filter((sentence, index) => {
+      if (index === 0) return true;
+      const clocks = timestampSecondsInText(sentence);
+      const leadSeconds = clockSeconds(leadClock);
+      if (!Number.isFinite(leadSeconds)) return true;
+      return !clocks.some((seconds) => Math.abs(seconds - leadSeconds) <= 5);
+    })
+    .join(" "));
 }
 
 function ensureFailureEvidence(recording, champion = "Samira") {
@@ -1477,17 +1508,112 @@ function ensureMistakeTypes(recording) {
   recording.mistakeTypes = [...new Set([...existing, ...fills, ...fallback])].slice(0, 5);
 }
 
+function kdaParts(recording = {}) {
+  const parsed = String(recording.kda || "").match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/);
+  return {
+    kills: Number.isFinite(Number(recording.kills)) ? Number(recording.kills) : (parsed ? Number(parsed[1]) : NaN),
+    deaths: Number.isFinite(Number(recording.deaths)) ? Number(recording.deaths) : (parsed ? Number(parsed[2]) : NaN),
+    assists: Number.isFinite(Number(recording.assists)) ? Number(recording.assists) : (parsed ? Number(parsed[3]) : NaN)
+  };
+}
+
+function reviewRepCategory(recording = {}) {
+  const text = [
+    recording.feedbackTitle,
+    recording.feedback,
+    recording.gameDetail,
+    recording.goodThing,
+    recording.failureEvidence,
+    recording.pattern,
+    Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.join(" ") : "",
+    recording.eventEvidence,
+    recording.evidence
+  ].join(" ").toLowerCase();
+  const { kills, deaths } = kdaParts(recording);
+  const cs = Number(recording.cs);
+  const gameLengthSeconds = Number(recording.gameLengthSeconds || recording.durationSeconds || 0);
+  const csPerMinute = Number.isFinite(cs) && gameLengthSeconds > 0 ? cs / (gameLengthSeconds / 60) : NaN;
+  const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
+
+  if (/\b(base|inhib|inhibitor|nexus|structure|exposed structures|enemy base|base push)\b/i.test(text)) {
+    return "basePush";
+  }
+  if (Number.isFinite(kills) && kills >= 18 && /\b(defeat|loss|lost|eight deaths|death|objective|won exchange|first useful damage|reset)\b/i.test(text)) {
+    return "firstWinCashout";
+  }
+  if (won && Number.isFinite(deaths) && deaths <= 3 && Number.isFinite(csPerMinute) && csPerMinute >= 5) {
+    return "cleanerWinExit";
+  }
+  if ((Number.isFinite(deaths) && deaths >= 9) || /\b(low hp|low-health|death-heavy|ten deaths|thirteen deaths|death timer|death-state|catchable death)\b/i.test(text)) {
+    return "deathExit";
+  }
+  if (/\b(side|jungle|camp|farm|side wave|side-wave|defend|defense|threatened turret|base defense)\b/i.test(text)) {
+    return "sideFarmDefense";
+  }
+  if (/\b(fight|entry|front|catchable|collapse|cc|crowd control|target|kite)\b/i.test(text)) {
+    return "fightEntry";
+  }
+  return "cleanerWinExit";
+}
+
+function specificRepForRecording(recording = {}) {
+  switch (reviewRepCategory(recording)) {
+    case "basePush":
+      return basePushRep;
+    case "firstWinCashout":
+      return firstWinCashoutRep;
+    case "deathExit":
+      return deathExitRep;
+    case "sideFarmDefense":
+      return sideFarmDefenseRep;
+    case "fightEntry":
+      return fightEntryRep;
+    case "cleanerWinExit":
+    default:
+      return cleanerWinExitRep;
+  }
+}
+
+function specificDrillForRecording(recording = {}) {
+  return specificRepForRecording(recording).replace(/^Rep\s*:\s*/i, "");
+}
+
+function repMatchesGameCategory(recording = {}) {
+  const rep = coachClean(recording.secondaryFocus || recording.secondaryImprovement || recording.drill || "");
+  if (!rep) return false;
+  switch (reviewRepCategory(recording)) {
+    case "basePush":
+      return /\bstructure,\s*blocker,\s*wave,\s*or\s*exit\b/i.test(rep);
+    case "firstWinCashout":
+      return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
+    case "deathExit":
+      return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b/i.test(rep);
+    case "sideFarmDefense":
+      return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b/i.test(rep);
+    case "fightEntry":
+      return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
+    case "cleanerWinExit":
+    default:
+      return /\bwave,\s*tower hit,\s*or\s*fight start\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
+  }
+}
+
 function ensureSecondaryFocus(recording, champion = "Samira") {
   const issues = secondaryFocusStandardIssues(recording);
-  if (!issues.length) return;
+  if (!issues.length && repMatchesGameCategory(recording)) return;
   recording.secondaryFocus = repairUnverifiedVisibleNames(
-    fightEntryRep,
+    specificRepForRecording(recording),
     champion
   );
 }
 
 function ensurePinkRep(recording, champion = "Samira") {
   const current = coachClean(recording.secondaryFocus || recording.secondaryImprovement || "");
+  const categoryRep = specificRepForRecording(recording);
+  if (current && !repMatchesGameCategory(recording)) {
+    recording.secondaryFocus = repairUnverifiedVisibleNames(categoryRep, champion);
+    return;
+  }
   const visibleText = [
     recording.feedback,
     recording.gameDetail,
@@ -1498,17 +1624,17 @@ function ensurePinkRep(recording, champion = "Samira") {
     recording.goodThing
   ].join(" ");
   if (/\b(fight|entry|front|enter|re-enter|collapse|catchable)\b/i.test(visibleText) && !/\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(current)) {
-    recording.secondaryFocus = repairUnverifiedVisibleNames(fightEntryRep, champion);
+    recording.secondaryFocus = repairUnverifiedVisibleNames(categoryRep, champion);
     return;
   }
   if (/^Rep\s*:/i.test(current) && !secondaryFocusStandardIssues({ ...recording, secondaryFocus: current }).length && !/\bwhat permanent thing\b/i.test(current)) return;
   const drill = coachClean(recording.drill || "");
-  let source = (drill || current || fightEntryRep)
+  let source = (drill || current || categoryRep)
     .replace(/^Rep\s*:\s*/i, "")
     .replace(/^next game[:,]?\s*/i, "")
     .trim();
   if (/\bwhat permanent thing\b/i.test(source) || source.length < 70 || !/\b(click|check|ask|front|tower|wave|objective|reset|recall|leave|enter|back)\b/i.test(source)) {
-    source = fightEntryRep.replace(/^Rep\s*:\s*/i, "");
+    source = categoryRep.replace(/^Rep\s*:\s*/i, "");
   }
   recording.secondaryFocus = repairUnverifiedVisibleNames(
     `Rep: ${source}`,
@@ -1643,6 +1769,7 @@ function repairVisibleReviewForStandard(recording, fileName) {
   ensureFailureEvidence(recording, champion);
   ensureTimestampedReplacementAction(recording, champion);
   ensureKeyTimestampClickRule(recording, champion);
+  stripDuplicateLeadClockEcho(recording);
   ensureTeachingReasonAndLength(recording);
   ensureEvidenceLeadSentence(recording, champion);
   sanitizeVisibleReviewNames(recording, champion);
@@ -1658,6 +1785,7 @@ function repairVisibleReviewForStandard(recording, fileName) {
     ensureFailureEvidence(recording, champion);
     ensureTimestampedReplacementAction(recording, champion);
     ensureKeyTimestampClickRule(recording, champion);
+    stripDuplicateLeadClockEcho(recording);
     ensureTeachingReasonAndLength(recording);
     ensureEvidenceLeadSentence(recording, champion);
     sanitizeVisibleReviewNames(recording, champion);
@@ -1676,6 +1804,7 @@ function repairPublishAuditRequirements(recording, fileName) {
     ensureTimestampedReplacementAction(recording, champion);
   }
   ensureKeyTimestampClickRule(recording, champion);
+  stripDuplicateLeadClockEcho(recording);
   sanitizeVisibleReviewNames(recording, champion);
   recording.gameDetail = stripUnmatchedClockTokens(recording.gameDetail, recording.clockAnchors);
   recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
@@ -1726,6 +1855,18 @@ function stripRedundantLessonEcho(text) {
 
 function hasRedundantLessonEcho(recording = {}) {
   return sentenceParts(recording.gameDetail || "").some((sentence) => /^\s*(Mistake|Fix):/i.test(sentence));
+}
+
+function hasDuplicateLeadClockEcho(recording = {}) {
+  const sentences = sentenceParts(recording.gameDetail || "");
+  if (sentences.length < 2) return false;
+  const leadClock = normalizeClock(sentences[0]);
+  if (!leadClock) return false;
+  const leadSeconds = clockSeconds(leadClock);
+  if (!Number.isFinite(leadSeconds)) return false;
+  return sentences.slice(1).some((sentence) => (
+    timestampSecondsInText(sentence).some((seconds) => Math.abs(seconds - leadSeconds) <= 5)
+  ));
 }
 
 function primaryActionTimestampNeedsRepair(recording = {}) {
@@ -1780,7 +1921,9 @@ function needsCachedTextRepair(recording = {}) {
     hasRepeatedConversionGlossary(recording) ||
     hasAbstractCashoutReview(recording) ||
     hasRedundantLessonEcho(recording) ||
+    hasDuplicateLeadClockEcho(recording) ||
     primaryActionTimestampNeedsRepair(recording) ||
+    (requiresVisibleParagraphStandard(recording.file || "", recording) && !repMatchesGameCategory(recording)) ||
     /Detail refresh kept the previous review because model analysis failed:/i.test(recording.reviewLimit || "") ||
     /\b(?:Failure evidence|Other mistake types|Second focus)\s*:/i.test(text) ||
     /[.!?]\s*;|;\s*[.!?]|[.!?]{2,}/.test(text)
@@ -2126,6 +2269,50 @@ function statContextSentence(recording = {}, champion = "Samira") {
   return `The ${kills}/${deaths}/${assists}, ${cs} CS in ${roundedMinutes} minutes says ${subject} can fight, so the review should judge the next decision after pressure.`;
 }
 
+function inferredStatsFromAnalysis(analysis = {}) {
+  const text = [
+    analysis.gameDetail,
+    analysis.feedback,
+    analysis.goodThing,
+    analysis.failureEvidence,
+    analysis.pattern,
+    analysis.whyTrust,
+    analysis.evidence,
+    Array.isArray(analysis.nuance) ? analysis.nuance.join(" ") : ""
+  ].join(" ");
+  const kdaMatch = text.match(/\b(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)\b[\s\S]{0,80}?\b(\d+)\s*CS\b/i) ||
+    text.match(/\b(\d+)\s*CS\b[\s\S]{0,80}?\b(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)\b/i);
+  let kills = Number(analysis.kills);
+  let deaths = Number(analysis.deaths);
+  let assists = Number(analysis.assists);
+  let cs = Number(analysis.cs);
+  if (kdaMatch) {
+    if (kdaMatch[4] && /\bCS\b/i.test(kdaMatch[0].slice(kdaMatch[0].indexOf(kdaMatch[4])))) {
+      kills = Number(kdaMatch[1]);
+      deaths = Number(kdaMatch[2]);
+      assists = Number(kdaMatch[3]);
+      cs = Number(kdaMatch[4]);
+    } else {
+      cs = Number(kdaMatch[1]);
+      kills = Number(kdaMatch[2]);
+      deaths = Number(kdaMatch[3]);
+      assists = Number(kdaMatch[4]);
+    }
+  }
+  const minutesMatch = text.match(/\b(\d+)\s*(?:min|minute)[-\s]*(?:game|line|ranked|full-game|full game|victory|defeat|minutes)?\b/i);
+  const minutes = Number(analysis.gameLengthMinutes || (minutesMatch ? minutesMatch[1] : NaN));
+  return {
+    kda: [kills, deaths, assists].every(Number.isFinite) ? `${kills}/${deaths}/${assists}` : "",
+    kills: Number.isFinite(kills) ? kills : null,
+    deaths: Number.isFinite(deaths) ? deaths : null,
+    assists: Number.isFinite(assists) ? assists : null,
+    cs: Number.isFinite(cs) ? cs : null,
+    gameLength: Number.isFinite(minutes) ? `${minutes} min` : "",
+    gameLengthSeconds: Number.isFinite(minutes) ? minutes * 60 : null,
+    statsSource: [kills, deaths, assists, cs].every(Number.isFinite) ? "Manual review stat context" : ""
+  };
+}
+
 function mistakeCategoryForAnalysis(analysis = {}) {
   const text = analysisCoachText(analysis);
   const deaths = Number(analysis.deaths);
@@ -2253,13 +2440,21 @@ function eventEvidenceFromMoments(clockMoments, champion = "Samira") {
 }
 
 function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = "Samira") {
+  const allAnchors = [
+    ...cleanClockAnchors(clockMoments),
+    ...cleanClockAnchors(clockAnchors)
+  ];
+  const minimumUsefulClock = 0;
+  const isUsefulClock = (anchor) => Number(clockSeconds(anchor.clock)) >= minimumUsefulClock;
   const existing = cleanClockAnchors(clockMoments)
+    .filter(isUsefulClock)
     .filter((moment) => moment.description)
     .map((moment) => ({ ...moment, description: normalizeEvidenceDescription(moment.description, champion) }))
     .filter((moment) => !anchorDescriptionLooksWeak(moment.description));
   if (existing.length) {
     const existingKeys = new Set(existing.map((anchor) => `${anchor.clock}@${anchor.videoSeconds}`));
     const fill = cleanClockAnchors(clockAnchors)
+      .filter(isUsefulClock)
       .filter((anchor) => anchor.description)
       .map((anchor, index) => ({
         anchor: { ...anchor, description: normalizeEvidenceDescription(anchor.description, champion) },
@@ -2284,6 +2479,7 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
       .slice(0, 4);
   }
   const candidates = cleanClockAnchors(clockAnchors)
+    .filter(isUsefulClock)
     .filter((anchor) => anchor.description)
     .map((anchor, index) => ({
       anchor: { ...anchor, description: normalizeEvidenceDescription(anchor.description, champion) },
@@ -2358,7 +2554,7 @@ function applyDeterministicVisibleReviewFallback(recording, fileName) {
   }
   recording.pattern = recording.pattern || "The visible pattern is the next-click branch after a fight, wave, camp, structure, or defense state changes: free tower, safe blocker, wave then recall, or leave.";
   recording.diamondRule = recording.diamondRule || "After 15 minutes, every forward click needs a visible payout branch before the click happens.";
-  recording.drill = recording.drill || fightEntryDrill;
+  recording.drill = recording.drill || specificDrillForRecording(recording);
   const usesComputedClock = [...cleanClockAnchors(recording.clockMoments), ...cleanClockAnchors(recording.clockAnchors)]
     .some((anchor) => /\bcurrent-match\b/i.test(anchor.description || ""));
   const fallbackLimit = usesComputedClock
@@ -2470,6 +2666,18 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (needsTightReview && detail.length > 850) {
     issues.push("visible paragraph is too long for the tight review standard");
   }
+  const firstDetailSecond = timestampSecondsInText(detail)[0];
+  const hasNonOpeningVisibleAnchor = [
+    ...(Array.isArray(recording.clockMoments) ? recording.clockMoments : []),
+    ...(Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [])
+  ].some((anchor) => Number(clockSeconds(anchor.clock)) >= 180 && anchor.description && !anchorDescriptionLooksWeak(anchor.description));
+  if (needsTightReview && hasNonOpeningVisibleAnchor && Number.isFinite(firstDetailSecond) && firstDetailSecond < 120) {
+    issues.push("key timestamp should use the decision window, not an opening-game frame");
+  }
+  const firstSentence = sentenceParts(detail)[0] || "";
+  if (needsTightReview && firstSentence && !hasKeyTimestampClickRule(firstSentence)) {
+    issues.push("visible paragraph must start with the key timestamp click rule");
+  }
   const primaryReviewSeconds = [
     ...primaryMistakeTimestampSeconds(detail, eventEvidence),
     ...keyClickRuleTimestampSeconds(detail)
@@ -2559,6 +2767,9 @@ function visibleParagraphStandardIssues(recording = {}) {
   }
   if (needsSecondaryFocus) {
     issues.push(...secondaryFocusStandardIssues(recording));
+  }
+  if (needsTightReview && !repMatchesGameCategory(recording)) {
+    issues.push("pink Rep must match the game-specific mistake type");
   }
   return issues;
 }
@@ -3040,6 +3251,56 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5567223507_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Cleaner win, one overstay pattern remains",
+      feedback: "The leak is that one or two pressure moments still continue after the map stops offering a safe tower, wave, objective, or ally-front entry, so a winning or neutral sequence can still become a preventable death.",
+      gameDetail: "At 8:47, you are under the enemy bot turret with an ally behind you, a pushed wave already used for pressure, multiple enemies still able to collapse, and no guaranteed tower or objective left, so the wrong click is continuing the fight and the next click is one step back through the wave toward reset. By 9:01 that overstay becomes a death timer instead of a clean exit. The 8/3/6, 202 CS in 38 minutes is real improvement: fewer deaths, better farming, and cleaner exits mean this is a cleaner win with one remaining overstay branch, not the same old collapse game.",
+      secondaryFocus: cleanerWinExitRep,
+      mistakeTypes: [
+        "post-pressure exit branch",
+        "tower dive/overstay discipline",
+        "ally-frontline check",
+        "camera/map-state check",
+        "reset after wave pressure"
+      ],
+      eventEvidence: "8:27 shows Samira farming the pushed bot wave; 8:47 shows the fight continuing under enemy bot turret after the wave pressure; 9:01 shows the death timer; 17:32 shows later jungle farming in a calmer won-game state.",
+      failureEvidence: "At 8:47 the wave and turret pressure have already paid enough to require an exit check; by 9:01 the cost is visible as a death timer, which is the remaining overstay pattern inside an otherwise cleaner win.",
+      goodThing: "The strong part is that this is clearly an improvement game: 202 CS in 38 minutes, only 3 deaths, and multiple better reset/exit choices show that you are applying the discipline instead of perma-fighting.",
+      whyTrust: "This uses inspected 8:27, 8:47, 9:01, and 17:32 frames plus the League Client 8/3/6, 202 CS victory line.",
+      focusTag: "cleaner win exit",
+      evidence: "Manual frame inspection of 8:27, 8:47, 9:01, and 17:32 plus League Client stats.",
+      pattern: "This game is a better baseline. The remaining pattern is not lack of damage or farming; it is ending the one pressure window when the safe payout disappears.",
+      diamondRule: "After a wave, tower hit, or fight start, Samira clicks forward only if tower, wave, objective, or ally front is still visible.",
+      drill: cleanerWinExitRep.replace(/^Rep\s*:\s*/i, ""),
+      timeline: [
+        "8:27 - Samira farms a pushed bot wave with enemy pressure still possible.",
+        "8:47 - Samira continues fighting under enemy bot turret after the wave pressure.",
+        "9:01 - Samira is dead with the respawn timer visible.",
+        "17:32 - Samira farms a jungle camp later in the cleaner winning game."
+      ],
+      clockAnchors: [
+        { clock: "8:27", videoSeconds: 480, description: "Samira farms a pushed bot wave with enemy pressure still possible." },
+        { clock: "8:47", videoSeconds: 500, description: "Samira continues fighting under enemy bot turret after the wave pressure." },
+        { clock: "9:01", videoSeconds: 514.462, description: "Samira is dead with the respawn timer visible." },
+        { clock: "17:32", videoSeconds: 1024.923, description: "Samira attacks a jungle camp later in the cleaner winning game." }
+      ],
+      nuance: [
+        "This is a cleaner win, not another feeding pattern.",
+        "The improvement is fewer deaths, stronger CS, and better reset discipline.",
+        "The remaining mistake is one pressure window continuing after the safe payoff disappears.",
+        "The 9:01 death is the cost of not exiting the 8:47 bot-turret state.",
+        "The next-game check is wave, tower, objective, ally front, or reset/group."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact inputs or every cooldown, but it can verify the bot-turret overstay window, the death timer, and the improved 8/3/6, 202 CS victory context.",
+      outcome: "victory",
+      outcomeLabel: "VICTORY",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5566943774_01.mp4") {
     return {
       champion: "Samira",
@@ -3960,7 +4221,7 @@ function fallbackFeedback(file, duration, context = {}) {
       evidence: "",
       pattern: "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
       diamondRule: "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
-      drill: fightEntryDrill,
+      drill: cleanerWinExitRep.replace(/^Rep\s*:\s*/i, ""),
       nuance: ["High kills only matter when the next click creates tower, wave, objective, reset, or base value.", "Low CS makes every unclear forward click more expensive because income is already unstable."],
       reviewLimit: "",
       analysisSource: "fallback"
@@ -4580,6 +4841,8 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "The feedback field must be one short red sentence beginning with 'The leak is ...'. It names the actual bad decision once and the cost once. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed result.",
     "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
     "Alan's latest correction: keep the single-paragraph colored format, but make the review tighter, denser, and more direct. Ideal visible structure: sharp title, outcome header, one key timestamp, visible state, wrong click, correct click, one green habit to keep, one red leak, one pink Rep. Do not repeat the same payout checklist several times. Mention tower/wave/objective/ally-front style checks once when it is the playable rule, then stay short.",
+    "The pink Rep must be game-specific, not a universal template. A death-heavy loss should drill low-HP exits and no re-entry; a huge-kill loss should drill cashing out after the first won fight; a controlled base-push win should drill structure, blocker, wave, or exit; a cleaner win with fewer deaths and better CS should first recognize the improvement and drill the one remaining overstay/exit branch.",
+    "If the game is a victory with clearly improved K/D/A, CS, reset discipline, or fewer chain deaths, frame it as improvement first. Do not describe it like the same older pressure-mode loss; name the remaining leak as one narrower pattern inside a better game.",
     "Do not stop at category advice like group, reset, pressure mid, spacing, target selection, cash out cleaner, map cash-out, or wrong task after map state changes. The first sentence of gameDetail must be one natural key click-rule sentence in this shape: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' It must name the concrete screen state and translate the concept into a literal if-this-then-that click rule.",
     "At the main timestamp, name the concrete visible state precisely: where the followed champion is, which tower or wave matters, which allies are present or dead if visible, which enemies are visible or missing if visible, whether an ally can stand between the followed champion and enemy collapse, and what the nearest permanent result is. If death timers, missing enemies, or a tower state are not visible enough, say the limit and make the action conditional instead of pretending certainty.",
     "For tower, wave, inhibitor, base, or pressure states, separate the branch options instead of blending them: hit tower if it is free; hit only the enemy body blocking tower if it is safe and an ally can front; push or clear wave then recall if wave is the only guaranteed value; leave if no permanent result is available. Avoid slogans such as cash out cleaner, map cash-out, and wrong task after map state changes.",
@@ -4589,7 +4852,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like one smooth, short replay-review paragraph, not a stat audit and not a field list: include the main visible mistake window, what happened next or almost happened, and the K/D/A-CS blocker if available. The red feedback field names the leak, the green goodThing names the keep habit, and the pink secondaryFocus names the drill, so do not repeat those claims in gameDetail unless the timestamp evidence needs one short bridge. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must include the exact visible state, the wrong click, and the correct next click. Extra timestamps are optional and should appear only when they make the critique clearer. Current-standard gameDetail should usually stay under 650 characters.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
-    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. For fight-entry states, the ideal drill is: 'Rep: after 15 minutes, before stepping into a fight, ask: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.' Do not start with 'Second focus:' or a label.",
+    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: low-HP exit, first-win cashout, base-push click order, side-farm defense, or fight entry. Do not start with 'Second focus:' or a label.",
     "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
@@ -5141,6 +5404,7 @@ async function main() {
       ? `full review ${String(++fullGameCount).padStart(2, "0")}`
       : `highlight ${String(++highlightCount).padStart(2, "0")}`;
     const fingerprint = crypto.createHash("sha1").update(`${name}:${cacheKey}`).digest("hex").slice(0, 12);
+    const inferredStats = inferredStatsFromAnalysis(analysis);
     const sidecarRecordedMs = Date.parse(entry.sidecar?.createdAt || entry.sidecar?.endedAt || "");
     const recordedDate = new Date(Number.isFinite(sidecarRecordedMs) ? sidecarRecordedMs : stat.mtimeMs);
     sourceStats.push({ mtimeMs: recordedDate.getTime() });
@@ -5173,14 +5437,14 @@ async function main() {
       title: clean(analysis.feedbackTitle, shortTitle),
       duration: mmss(duration),
       durationSeconds: Math.round(duration * 1000) / 1000,
-      gameLength: matchStats.gameLength || "",
-      gameLengthSeconds: matchStats.gameLengthSeconds || null,
-      kda: matchStats.kda || "",
-      kills: Number.isFinite(matchStats.kills) ? matchStats.kills : null,
-      deaths: Number.isFinite(matchStats.deaths) ? matchStats.deaths : null,
-      assists: Number.isFinite(matchStats.assists) ? matchStats.assists : null,
-      cs: Number.isFinite(matchStats.cs) ? matchStats.cs : null,
-      statsSource: matchStats.statsSource || "",
+      gameLength: matchStats.gameLength || inferredStats.gameLength || "",
+      gameLengthSeconds: matchStats.gameLengthSeconds || inferredStats.gameLengthSeconds || null,
+      kda: matchStats.kda || inferredStats.kda || "",
+      kills: Number.isFinite(matchStats.kills) ? matchStats.kills : inferredStats.kills,
+      deaths: Number.isFinite(matchStats.deaths) ? matchStats.deaths : inferredStats.deaths,
+      assists: Number.isFinite(matchStats.assists) ? matchStats.assists : inferredStats.assists,
+      cs: Number.isFinite(matchStats.cs) ? matchStats.cs : inferredStats.cs,
+      statsSource: matchStats.statsSource || inferredStats.statsSource || "",
       win: typeof matchStats.win === "boolean" ? matchStats.win : (typeof analysis.win === "boolean" ? analysis.win : null),
       outcome: matchStats.outcome || analysis.outcome || "",
       outcomeLabel: matchStats.outcomeLabel || analysis.outcomeLabel || "",

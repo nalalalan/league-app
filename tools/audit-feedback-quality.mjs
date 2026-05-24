@@ -71,6 +71,61 @@ function repeatedPayoutChecklistCount(text) {
   return (source.match(/\b(?:no\s+)?(?:tower|turret)\s*,\s*(?:safe\s+)?wave\s*,\s*(?:dragon\s+or\s+baron|objective)\s*(?:setup)?\s*,?\s*(?:and|or)\s*(?:no\s+clear\s+)?ally[-\s]?front\b|\btower\/wave\/objective\/ally[-\s]?front\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/g) || []).length;
 }
 
+function kdaParts(recording = {}) {
+  const parsed = String(recording.kda || "").match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/);
+  return {
+    kills: Number.isFinite(Number(recording.kills)) ? Number(recording.kills) : (parsed ? Number(parsed[1]) : NaN),
+    deaths: Number.isFinite(Number(recording.deaths)) ? Number(recording.deaths) : (parsed ? Number(parsed[2]) : NaN),
+    assists: Number.isFinite(Number(recording.assists)) ? Number(recording.assists) : (parsed ? Number(parsed[3]) : NaN)
+  };
+}
+
+function repCategory(recording = {}) {
+  const text = [
+    recording.feedbackTitle,
+    recording.feedback,
+    recording.gameDetail,
+    recording.goodThing,
+    recording.failureEvidence,
+    recording.pattern,
+    Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.join(" ") : "",
+    recording.eventEvidence,
+    recording.evidence
+  ].join(" ").toLowerCase();
+  const { kills, deaths } = kdaParts(recording);
+  const cs = Number(recording.cs);
+  const gameLengthSeconds = Number(recording.gameLengthSeconds || recording.durationSeconds || 0);
+  const csPerMinute = Number.isFinite(cs) && gameLengthSeconds > 0 ? cs / (gameLengthSeconds / 60) : NaN;
+  const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
+  if (/\b(base|inhib|inhibitor|nexus|structure|exposed structures|enemy base|base push)\b/i.test(text)) return "basePush";
+  if (Number.isFinite(kills) && kills >= 18 && /\b(defeat|loss|lost|eight deaths|death|objective|won exchange|first useful damage|reset)\b/i.test(text)) return "firstWinCashout";
+  if (won && Number.isFinite(deaths) && deaths <= 3 && Number.isFinite(csPerMinute) && csPerMinute >= 5) return "cleanerWinExit";
+  if ((Number.isFinite(deaths) && deaths >= 9) || /\b(low hp|low-health|death-heavy|ten deaths|thirteen deaths|death timer|death-state|catchable death)\b/i.test(text)) return "deathExit";
+  if (/\b(side|jungle|camp|farm|side wave|side-wave|defend|defense|threatened turret|base defense)\b/i.test(text)) return "sideFarmDefense";
+  if (/\b(fight|entry|front|catchable|collapse|cc|crowd control|target|kite)\b/i.test(text)) return "fightEntry";
+  return "cleanerWinExit";
+}
+
+function repMatchesGameCategory(recording = {}) {
+  const rep = clean(recording.secondaryFocus || recording.secondaryImprovement || recording.drill || "");
+  if (!rep) return false;
+  switch (repCategory(recording)) {
+    case "basePush":
+      return /\bstructure,\s*blocker,\s*wave,\s*or\s*exit\b/i.test(rep);
+    case "firstWinCashout":
+      return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
+    case "deathExit":
+      return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b/i.test(rep);
+    case "sideFarmDefense":
+      return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b/i.test(rep);
+    case "fightEntry":
+      return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
+    case "cleanerWinExit":
+    default:
+      return /\bwave,\s*tower hit,\s*or\s*fight start\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
+  }
+}
+
 function feedbackIssues(recording = {}) {
   const issues = [];
   const title = clean(recording.feedbackTitle);
@@ -79,6 +134,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-24-game-specific-rep-v22",
     "2026-05-24-dense-click-review-v21",
     "2026-05-24-tight-click-review-v20",
     "2026-05-24-example-review-v19",
@@ -93,6 +149,7 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
   const actionScriptVersions = new Set([
+    "2026-05-24-game-specific-rep-v22",
     "2026-05-24-dense-click-review-v21",
     "2026-05-24-tight-click-review-v20",
     "2026-05-24-example-review-v19",
@@ -104,6 +161,7 @@ function feedbackIssues(recording = {}) {
     "2026-05-22-action-script-coaching-v13"
   ]);
   const evidenceLaneVersions = new Set([
+    "2026-05-24-game-specific-rep-v22",
     "2026-05-24-dense-click-review-v21",
     "2026-05-24-tight-click-review-v20",
     "2026-05-24-example-review-v19",
@@ -115,22 +173,27 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
   const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
-  const needsDecisionBranch = recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
+  const needsDecisionBranch = recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+    recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18" ||
     recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
-  const needsKeyClickRule = recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
+  const needsKeyClickRule = recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+    recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18";
-  const needsExampleReview = recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
+  const needsExampleReview = recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+    recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19";
-  const needsTightReview = (recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
+  const needsTightReview = (recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+    recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20") &&
     (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
-  const needsDenseReview = recording.analysisVersion === "2026-05-24-dense-click-review-v21" &&
+  const needsDenseReview = (recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+    recording.analysisVersion === "2026-05-24-dense-click-review-v21") &&
     (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
   const hasStats = Number.isFinite(Number(recording.kills)) &&
     Number.isFinite(Number(recording.deaths)) &&
@@ -188,8 +251,8 @@ function feedbackIssues(recording = {}) {
   if (needsDenseReview && /\bwhat permanent thing\b/i.test(secondaryFocus)) {
     issues.push("pink Rep uses vague permanent-thing wording");
   }
-  if (needsDenseReview && /\bfight|entry|front\b/i.test([detail, allVisible].join(" ")) && !/\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(secondaryFocus)) {
-    issues.push("pink Rep must use the literal fight-entry checklist");
+  if (needsDenseReview && !repMatchesGameCategory(recording)) {
+    issues.push("pink Rep must match the game-specific mistake type");
   }
   if (needsTightReview && repeatedPayoutChecklistCount(allVisible) > 1) {
     issues.push("tight review repeats the payout checklist instead of saying it once");
