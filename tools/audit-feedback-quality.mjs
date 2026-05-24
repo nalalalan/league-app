@@ -60,6 +60,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
     "2026-05-23-champion-source-coaching-v15",
     "2026-05-23-evidence-lanes-coaching-v14",
@@ -69,18 +70,25 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
   const actionScriptVersions = new Set([
+    "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
     "2026-05-23-champion-source-coaching-v15",
     "2026-05-23-evidence-lanes-coaching-v14",
     "2026-05-22-action-script-coaching-v13"
   ]);
   const evidenceLaneVersions = new Set([
+    "2026-05-23-decision-branch-coaching-v17",
     "2026-05-23-deterministic-publish-fallback-v16",
     "2026-05-23-champion-source-coaching-v15",
     "2026-05-23-evidence-lanes-coaching-v14"
   ]);
   const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
   const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
+  const needsDecisionBranch = recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
+  const hasStats = Number.isFinite(Number(recording.kills)) &&
+    Number.isFinite(Number(recording.deaths)) &&
+    Number.isFinite(Number(recording.assists)) &&
+    Number.isFinite(Number(recording.cs));
 
   if (/\bAlan\b/.test(allVisible)) {
     issues.push("visible feedback refers to Alan in third person");
@@ -115,6 +123,15 @@ function feedbackIssues(recording = {}) {
   if (needsActionScript && !hasTimestampedActionScript(detail)) {
     issues.push("full review missing a timestamped do-this-instead action script");
   }
+  if (needsDecisionBranch && /\b(?:map cash[-\s]?outs?|cash(?:ing)? (?:those )?(?:wins|moments|it)? ?out(?:s)? cleaner|cash[-\s]?out timing|cleaner map|wrong task after the map state changes|call free structure, blocked structure, or reset)\b/i.test(allVisible)) {
+    issues.push("full review uses abstract cash-out wording instead of exact branch rules");
+  }
+  if (needsDecisionBranch && recording.analysisSource !== "manual" && /\b(tower|turret|structure|wave|inhib|inhibitor|nexus|payout|pressure)\b/i.test(allVisible) && !/\b(?:free tower|tower is free|hit tower|body blocks|blocker|push or clear|clear the wave|wave then recall|leave if none|closest threatened turret|who can stand in front)\b/i.test(allVisible)) {
+    issues.push("full review must separate concrete branch options");
+  }
+  if (needsDecisionBranch && recording.analysisSource !== "manual" && hasStats && !/\b\d+\s*\/\s*\d+\s*\/\s*\d+\b[\s\S]{0,120}\bCS\b|\bCS\b[\s\S]{0,120}\b\d+\s*\/\s*\d+\s*\/\s*\d+\b/i.test(allVisible)) {
+    issues.push("full review must include K/D/A and CS context when client stats exist");
+  }
   if (needsActionScript) {
     const unverifiedNames = unverifiedChampionNames(allVisible, [recording.champion || "Samira"]);
     if (unverifiedNames.length) {
@@ -123,6 +140,9 @@ function feedbackIssues(recording = {}) {
     if (hasExactJungleBuffName(allVisible)) {
       issues.push("visible review names an exact jungle buff without verified camp evidence; use jungle camp unless the camp label is verified");
     }
+  }
+  if (recording.analysisSource !== "manual" && /\b(shop interface|shop open|item shop|stealth ward selected|standing at (the )?fountain|leaving (?:base|fountain)|near base fountain|running from fountain|fountain at game start|game start)\b/i.test([detail, evidence].join(" "))) {
+    issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
   }
   if (!evidence || evidence.length < 55 || /generated from sampled|limited to sampled|conservative read|match-level/i.test(evidence)) {
     issues.push("full review evidence is too weak");

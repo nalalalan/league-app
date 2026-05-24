@@ -13,6 +13,7 @@ const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
 const fallbackModel = process.env.LEAGUE_TIMESTAMP_AUDIT_FALLBACK_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-23-decision-branch-coaching-v17",
   "2026-05-23-evidence-lanes-coaching-v14",
   "2026-05-22-action-script-coaching-v13",
   "2026-05-22-challenger-direct-coaching-v12",

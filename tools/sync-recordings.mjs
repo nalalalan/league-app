@@ -19,9 +19,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-5-mini";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-23-deterministic-publish-fallback-v16";
+const analysisVersion = "2026-05-23-decision-branch-coaching-v17";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-23-deterministic-publish-fallback-v16",
   "2026-05-23-champion-source-coaching-v15",
   "2026-05-22-action-script-coaching-v13",
   "2026-05-22-challenger-direct-coaching-v12",
@@ -39,6 +40,11 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5566860300_01.mp4",
+  "auto_NA1-5566823161_01.mp4",
+  "auto_NA1-5566786855_01.mp4",
+  "auto_NA1-5566726915_01.mp4",
+  "auto_NA1-5566563083_01.mp4",
   "auto_NA1-5566620104_01.mp4",
   "auto_NA1-5565911037_01.mp4",
   "auto_NA1-5565964482_01.mp4",
@@ -1111,7 +1117,7 @@ function tagOverlapScore(first, second) {
 
 function anchorDescriptionLooksWeak(anchorText) {
   return /\b(player|champion)\s+(uses ability|casts abilities|begins walking out|moving in river|farming minions|last-hits minions|is moving alone|walks toward|running down)\b/i.test(anchorText) ||
-    /\b(scuttle crab|scoreboard open|shop open|item shop|shop interface|stealth ward selected|loaded into the game at fountain|game start|standing at (the )?fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
+    /\b(scuttle crab|scoreboard open|shop open|item shop|shop interface|stealth ward selected|loaded into the game at fountain|game start|standing at (the )?fountain|leaving (?:base|fountain)|near base fountain|running from fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
 }
 
 function anchorIsConsequenceOnly(anchorText) {
@@ -1374,6 +1380,9 @@ function actionScriptForAnchor(recording = {}, anchor = null) {
     anchor.description
   ].join(" ").toLowerCase();
   const anchorText = String(anchor.description || "").toLowerCase();
+  if (/\b(tower|turret|structure|inhib|inhibitor|nexus|wave|minion)\b/i.test(text)) {
+    return `At ${anchor.clock}, run the branch before any forward click: check closest threatened turret, ally deaths, and who can stand in front; if enemy tower is free, hit it; if one enemy body blocks it and an ally can front, hit that body safely; if only the wave is guaranteed, push or clear it then recall; if none of those are true, leave.`;
+  }
   if (/\b(base|inhib|inhibitor|nexus|tower|turret|structure|open structure|end)\b/i.test(text)) {
     return `At ${anchor.clock}, your next job is to call free structure, blocked structure, or reset; hit the structure if it is free, kill only the body blocking it, and leave if neither is available instead of chasing away from the payout.`;
   }
@@ -1414,7 +1423,7 @@ function ensureFailureEvidence(recording, champion = "Samira") {
   const clockLead = anchor?.clock ? `At ${anchor.clock}, ` : "";
   const description = anchor?.description ? `${clauseDescription(anchor.description, champion)}; ` : "";
   recording.failureEvidence = repairUnverifiedVisibleNames(
-    `${clockLead}${description}the failure is letting the next click stay on the wrong task after the map state changes, which leaks time, safety, or defense and gives the enemy another fight or push window.`,
+    `${clockLead}${description}the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.`,
     champion
   );
 }
@@ -1436,7 +1445,7 @@ function ensureSecondaryFocus(recording, champion = "Samira") {
   const issues = secondaryFocusStandardIssues(recording);
   if (!issues.length) return;
   recording.secondaryFocus = repairUnverifiedVisibleNames(
-    "Also work on camera and map-state checks: before taking a camp, side wave, or forward fight after 15 minutes, check ally deaths, the closest threatened turret, and whether your team can stand between you and the collapse.",
+    "After 15 minutes, before any forward click: closest threatened turret, ally deaths, and who can stand in front of me.",
     champion
   );
 }
@@ -1459,11 +1468,73 @@ function ensureTeachingReasonAndLength(recording) {
 }
 
 function ensureMistakeFixFeedback(recording, champion = "Samira") {
-  if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(recording.feedback || "")) {
+  if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(recording.feedback || "") || hasAbstractCashoutReview(recording)) {
     recording.feedback = deterministicFallbackFeedback(recording, champion);
   }
-  if (/^\d+\s*\/\s*\d+\s+means\b/i.test(recording.feedbackTitle || "")) {
-    recording.feedbackTitle = "Damage lead needs map cash-out";
+  if (/^\d+\s*\/\s*\d+\s+means\b/i.test(recording.feedbackTitle || "") || /\bmap cash[-\s]?out|cash[-\s]?out/i.test(recording.feedbackTitle || "")) {
+    recording.feedbackTitle = "Pressure mode after payout vanished";
+  }
+}
+
+function replaceAbstractBranchLanguage(value) {
+  return String(value || "")
+    .replace(/\bcash[-\s]?out after the first win\b/gi, "take value after the first win")
+    .replace(/\bcash[-\s]?out after first win\b/gi, "take value after first win")
+    .replace(/\bcash(?:ing)? out the winning push\b/gi, "turning the winning push into structure or reset")
+    .replace(/\bcash out wave, tower, reset, or end\b/gi, "take wave, tower, reset, or end")
+    .replace(/\bclean cashout\/reset\b/gi, "clean wave/tower/reset branch")
+    .replace(/\bcashout\/reset\b/gi, "wave/tower/reset branch")
+    .replace(/\bcashout moment\b/gi, "wave/tower/reset moment")
+    .replace(/\bcash out first\b/gi, "take tower, wave, objective, or recall first")
+    .replace(/\bwrong task after the map state changes\b/gi, "pressure mode after the safe value disappeared")
+    .replace(/\bmap cash[-\s]?outs?\b/gi, "map payout")
+    .replace(/\bcash[-\s]?out timing\b/gi, "exit timing")
+    .replace(/\bcleaner map cash[-\s]?out\b/gi, "cleaner wave, tower, objective, or reset branch")
+    .replace(/\bcashing the win out safely\b/gi, "turning the win into recall, structure, or wave")
+    .replace(/\bcash[-\s]?out\b/gi, "take the permanent value")
+    .replace(/\bcashout\b/gi, "permanent-value branch");
+}
+
+function sanitizeAbstractBranchLanguage(recording = {}) {
+  const scalarFields = [
+    "title",
+    "feedbackTitle",
+    "feedback",
+    "gameDetail",
+    "eventEvidence",
+    "failureEvidence",
+    "goodThing",
+    "whyTrust",
+    "focusTag",
+    "evidence",
+    "pattern",
+    "diamondRule",
+    "drill",
+    "secondaryFocus",
+    "secondaryImprovement",
+    "reviewLimit"
+  ];
+  for (const field of scalarFields) {
+    if (recording[field]) recording[field] = normalizeCoachPunctuation(replaceAbstractBranchLanguage(recording[field]));
+  }
+  if (/^take value after/i.test(recording.feedbackTitle || "")) recording.feedbackTitle = "Take value after the first win";
+  if (/^take value after/i.test(recording.title || "")) recording.title = "Take value after the first win";
+  for (const field of ["timeline", "nuance", "mistakeTypes"]) {
+    if (Array.isArray(recording[field])) {
+      recording[field] = recording[field].map((item) => normalizeCoachPunctuation(replaceAbstractBranchLanguage(item)));
+    }
+  }
+  if (Array.isArray(recording.clockAnchors)) {
+    recording.clockAnchors = recording.clockAnchors.map((anchor) => ({
+      ...anchor,
+      description: anchor?.description ? normalizeCoachPunctuation(replaceAbstractBranchLanguage(anchor.description)) : anchor?.description
+    }));
+  }
+  if (Array.isArray(recording.clockMoments)) {
+    recording.clockMoments = recording.clockMoments.map((moment) => ({
+      ...moment,
+      description: moment?.description ? normalizeCoachPunctuation(replaceAbstractBranchLanguage(moment.description)) : moment?.description
+    }));
   }
 }
 
@@ -1487,7 +1558,7 @@ function repairVisibleReviewForStandard(recording, fileName) {
   if (recording.analysisSource === "fallback") {
     applyDeterministicVisibleReviewFallback(recording, fileName);
   }
-  if (primaryActionTimestampNeedsRepair(recording)) {
+  if (recording.analysisSource !== "manual" && primaryActionTimestampNeedsRepair(recording)) {
     const repairedDetail = teachingDetailFromMoments(
       recording,
       Array.isArray(recording.clockMoments) && recording.clockMoments.length ? recording.clockMoments : recording.clockAnchors,
@@ -1507,7 +1578,7 @@ function repairVisibleReviewForStandard(recording, fileName) {
   recording.gameDetail = stripUnmatchedClockTokens(recording.gameDetail, recording.clockAnchors);
   recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
   recording.evidence = stripUnmatchedClockTokens(recording.evidence || recording.eventEvidence || "", recording.clockAnchors);
-  if (visibleParagraphStandardIssues(recording).length) {
+  if (recording.analysisSource !== "manual" && visibleParagraphStandardIssues(recording).length) {
     applyDeterministicVisibleReviewFallback(recording, fileName);
     ensureMistakeFixFeedback(recording, champion);
     ensureMistakeTypes(recording);
@@ -1521,6 +1592,7 @@ function repairVisibleReviewForStandard(recording, fileName) {
     recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
     recording.evidence = stripUnmatchedClockTokens(recording.evidence || recording.eventEvidence || "", recording.clockAnchors);
   }
+  sanitizeAbstractBranchLanguage(recording);
 }
 
 function repairPublishAuditRequirements(recording, fileName) {
@@ -1538,6 +1610,19 @@ function repairPublishAuditRequirements(recording, fileName) {
 
 function hasRepeatedConversionGlossary(recording = {}) {
   return /\b(?:A\s+)?conversion\s+(?:just\s+)?means\b/i.test(recording.gameDetail || "");
+}
+
+function hasAbstractCashoutReview(recording = {}) {
+  const text = [
+    recording.feedbackTitle,
+    recording.feedback,
+    recording.gameDetail,
+    recording.goodThing,
+    recording.failureEvidence,
+    recording.pattern,
+    recording.drill
+  ].join(" ");
+  return /\b(?:map cash[-\s]?outs?|cash(?:ing)? (?:those )?(?:wins|moments|it)? ?out(?:s)? cleaner|cash[-\s]?out timing|cleaner map|wrong task after the map state changes|call free structure, blocked structure, or reset)\b/i.test(text);
 }
 
 function normalizeCoachPunctuation(text) {
@@ -1619,6 +1704,7 @@ function needsCachedTextRepair(recording = {}) {
   ].filter(Boolean).join(" ");
   return (
     hasRepeatedConversionGlossary(recording) ||
+    hasAbstractCashoutReview(recording) ||
     hasRedundantLessonEcho(recording) ||
     primaryActionTimestampNeedsRepair(recording) ||
     /Detail refresh kept the previous review because model analysis failed:/i.test(recording.reviewLimit || "") ||
@@ -1946,6 +2032,30 @@ function shorthandTeachingSentence(analysis, champion = "Samira") {
   return parts.join(" ");
 }
 
+function statContextSentence(recording = {}, champion = "Samira") {
+  const kills = Number(recording.kills);
+  const deaths = Number(recording.deaths);
+  const assists = Number(recording.assists);
+  const cs = Number(recording.cs);
+  const gameLengthSeconds = Number(recording.gameLengthSeconds);
+  if (![kills, deaths, assists, cs, gameLengthSeconds].every(Number.isFinite) || gameLengthSeconds <= 0) return "";
+  const minutes = Math.max(1, gameLengthSeconds / 60);
+  const csPerMinute = cs / minutes;
+  const roundedMinutes = Math.round(minutes);
+  const subject = clean(champion, "your champion");
+  if (csPerMinute < 4.2 && deaths <= 4) {
+    return `The ${kills}/${deaths}/${assists}, ${cs} CS in ${roundedMinutes} minutes says ${subject} is affecting fights, but income is low; the bigger issue is stable wave, tower, objective, or reset value before another forward click erases it.`;
+  }
+  if (deaths >= 6) {
+    return `The ${kills}/${deaths}/${assists}, ${cs} CS in ${roundedMinutes} minutes says the biggest cost is death-state exposure: the damage exists, but too many decisions end in timers before the result is locked.`;
+  }
+  return `The ${kills}/${deaths}/${assists}, ${cs} CS in ${roundedMinutes} minutes says ${subject} can fight, so the review should judge the next decision after pressure.`;
+}
+
+function branchActionSentence(clock) {
+  return `At ${clock}, branch before any forward click: closest threatened turret, ally deaths, and front body; if tower is free, hit it; if one body blocks it and an ally can front, hit that body safely; if only wave is guaranteed, clear it then recall; if none are true, leave.`;
+}
+
 function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") {
   const moments = cleanClockAnchors(clockMoments)
     .filter((moment) => moment.description)
@@ -1968,20 +2078,23 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
     .sort((a, b) => b.score - a.score || a.moment.videoSeconds - b.moment.videoSeconds)[0]?.moment || moments[0];
   const rest = moments.filter((moment) => moment !== primary);
   const clauses = [
-    `Around ${primary.clock}, ${clauseDescription(primary.description, champion)}; this is the start or nearest visible start of the main mistake window`
+    `At ${primary.clock}, the mistake window is ${clauseDescription(primary.description, champion)}.`
   ];
-  for (const moment of rest.slice(0, 3)) {
+  for (const moment of rest.slice(0, 1)) {
     const lead = Number(moment.videoSeconds) < Number(primary.videoSeconds) ? `earlier at ${moment.clock}` : `by ${moment.clock}`;
-    clauses.push(`${lead}, ${clauseDescription(moment.description, champion)}`);
+    clauses.push(`${lead}, ${clauseDescription(moment.description, champion)}.`);
   }
   const advice = stripUnmatchedClockTokens(adviceTextForTeaching(analysis, champion), moments);
   const shorthand = shorthandTeachingSentence(analysis, champion);
   const subject = clean(champion, "your champion");
   const leadSubject = subject === "Unknown" ? "your lead" : `a ${subject} lead`;
-  const why = `This matters because ${leadSubject} only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.`;
+  const branch = branchActionSentence(primary.clock);
+  const stats = statContextSentence(analysis, champion);
+  const why = `The sharper leak is staying in pressure mode after the safe payout is no longer proven; ${leadSubject} climbs when the next click turns the wave or fight into a stable result before enemies get another collapse window.`;
   return coachClean([
-    `${clauses.join("; ")}.`,
-    advice,
+    clauses.join(" "),
+    branch || advice,
+    stats,
     shorthand,
     why
   ].filter(Boolean).join(" "));
@@ -2005,7 +2118,21 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
     .map((moment) => ({ ...moment, description: normalizeEvidenceDescription(moment.description, champion) }))
     .filter((moment) => !anchorDescriptionLooksWeak(moment.description));
   if (existing.length) {
-    return existing
+    const existingKeys = new Set(existing.map((anchor) => `${anchor.clock}@${anchor.videoSeconds}`));
+    const fill = cleanClockAnchors(clockAnchors)
+      .filter((anchor) => anchor.description)
+      .map((anchor, index) => ({
+        anchor: { ...anchor, description: normalizeEvidenceDescription(anchor.description, champion) },
+        score: anchorEvidenceScore(anchor, analysis, index) +
+          (Number(clockSeconds(anchor.clock)) >= 900 ? 6 : 0) +
+          (Number(clockSeconds(anchor.clock)) >= 1200 ? 5 : 0)
+      }))
+      .filter((item) => item.anchor.description && !anchorDescriptionLooksWeak(item.anchor.description))
+      .filter((item) => !existingKeys.has(`${item.anchor.clock}@${item.anchor.videoSeconds}`))
+      .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)
+      .map((item) => item.anchor)
+      .slice(0, Math.max(0, 4 - existing.length));
+    return [...existing, ...fill]
       .map((anchor, index) => ({
         anchor,
         score: anchorEvidenceScore(anchor, analysis, index) +
@@ -2037,10 +2164,10 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
 function deterministicFallbackFeedback(recording, champion = "Samira") {
   const text = [recording.gameDetail, recording.feedback, recording.pattern, recording.eventEvidence].join(" ").toLowerCase();
   if (/\b(base|inhib|inhibitor|nexus|tower|turret|structure|end)\b/i.test(text)) {
-    return "Mistake: the map win can turn into extra fighting or side movement after structure access appears. Fix: choose free structure, body blocking the structure, or reset before taking another fight.";
+    return "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.";
   }
   if (/\b(side|jungle|camp|farm|wave|defend|defense|turret)\b/i.test(text)) {
-    return "Mistake: side farm stayed on the menu after the map state needed wave defense or grouped pressure. Fix: leave the camp or side wave, check death timers and the nearest threatened turret, then defend, group, or reset.";
+    return "Mistake: a side or farm click stayed on the menu after the map needed a wave or tower decision. Fix: check closest threatened turret, ally deaths, and who can stand in front; defend the wave, group behind allies, or reset instead of adding another loose forward click.";
   }
   if (/\b(low hp|low-health|death|dead|died|shutdown|reset|recall|spend|shop|gold)\b/i.test(text)) {
     return "Mistake: the next fight stayed available after the safe reset or spend window appeared. Fix: leave on the first safe screen, spend, then re-enter with health, item power, and allies.";
@@ -2082,16 +2209,16 @@ function applyDeterministicVisibleReviewFallback(recording, fileName) {
   const primaryMoment = cleanClockAnchors(recording.clockMoments)[0];
   if (primaryMoment?.clock && primaryMoment.description) {
     recording.failureEvidence = repairUnverifiedVisibleNames(
-      `At ${primaryMoment.clock}, ${clauseDescription(primaryMoment.description, champion)}; the failure is letting the next click stay on the wrong task after the map state changes, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.`,
+      `At ${primaryMoment.clock}, ${clauseDescription(primaryMoment.description, champion)}; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.`,
       champion
     );
   }
   if (!recording.goodThing) {
     recording.goodThing = `${champion} found at least one visible lane, fight, structure, or objective state to work from; keep the willingness to move with the map, but make the next click safer.`;
   }
-  recording.pattern = recording.pattern || "The visible pattern is the next-click decision after a fight, wave, camp, structure, or defense state changes.";
-  recording.diamondRule = recording.diamondRule || "When the state changes, the next click must defend, reset, group, hit structure, or take a safe objective.";
-  recording.drill = recording.drill || "Before the next forward click after 15 minutes, say defend, reset, group, structure, or objective.";
+  recording.pattern = recording.pattern || "The visible pattern is the next-click branch after a fight, wave, camp, structure, or defense state changes: free tower, safe blocker, wave then recall, or leave.";
+  recording.diamondRule = recording.diamondRule || "After 15 minutes, every forward click needs a visible payout branch before the click happens.";
+  recording.drill = recording.drill || "After 15 minutes, before any forward click: closest threatened turret, ally deaths, who can stand in front of me.";
   const usesComputedClock = [...cleanClockAnchors(recording.clockMoments), ...cleanClockAnchors(recording.clockAnchors)]
     .some((anchor) => /\bcurrent-match\b/i.test(anchor.description || ""));
   const fallbackLimit = usesComputedClock
@@ -2177,7 +2304,7 @@ function requiresVisibleParagraphStandard(fileName, recording = {}) {
 function visibleParagraphStandardIssues(recording = {}) {
   const detail = coachClean(recording.gameDetail, "");
   const eventEvidence = coachClean(recording.eventEvidence || recording.evidence, "");
-  const allVisibleText = [recording.feedback, detail, eventEvidence, recording.pattern].filter(Boolean).join(" ");
+  const allVisibleText = [recording.feedbackTitle, recording.feedback, detail, eventEvidence, recording.failureEvidence, recording.pattern, recording.goodThing, recording.secondaryFocus || recording.secondaryImprovement].filter(Boolean).join(" ");
   const issues = [];
   const needsTeachingReason = recording.analysisSource !== "manual" || recording.file === "auto_NA1-5565387627_01.mp4";
   const needsSecondaryFocus = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
@@ -2185,6 +2312,10 @@ function visibleParagraphStandardIssues(recording = {}) {
   const needsEvidenceLanes = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
   const failureEvidence = coachClean(recording.failureEvidence, "");
   const mistakeTypes = Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.filter(Boolean) : [];
+  const hasStats = Number.isFinite(Number(recording.kills)) &&
+    Number.isFinite(Number(recording.deaths)) &&
+    Number.isFinite(Number(recording.assists)) &&
+    Number.isFinite(Number(recording.cs));
   if (detail.length < 240) {
     issues.push("visible paragraph is too short");
   }
@@ -2206,12 +2337,24 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (needsActionScript && !hasTimestampedActionScript(detail)) {
     issues.push("visible paragraph must include a timestamped replacement action script");
   }
+  if (needsActionScript && /\b(?:map cash[-\s]?outs?|cash(?:ing)? (?:those )?(?:wins|moments|it)? ?out(?:s)? cleaner|cash[-\s]?out timing|cleaner map|wrong task after the map state changes|call free structure, blocked structure, or reset)\b/i.test(allVisibleText)) {
+    issues.push("visible paragraph uses abstract cash-out wording instead of exact branch rules");
+  }
+  if (needsActionScript && recording.analysisSource !== "manual" && /\b(tower|turret|structure|wave|inhib|inhibitor|nexus|payout|pressure)\b/i.test(allVisibleText) && !/\b(?:free tower|tower is free|hit tower|body blocks|blocker|push or clear|clear the wave|wave then recall|leave if none|closest threatened turret|who can stand in front)\b/i.test(allVisibleText)) {
+    issues.push("visible paragraph must separate concrete branch options");
+  }
+  if (needsActionScript && recording.analysisSource !== "manual" && hasStats && !/\b\d+\s*\/\s*\d+\s*\/\s*\d+\b[\s\S]{0,120}\bCS\b|\bCS\b[\s\S]{0,120}\b\d+\s*\/\s*\d+\s*\/\s*\d+\b/i.test(allVisibleText)) {
+    issues.push("visible paragraph must include K/D/A and CS context when client stats exist");
+  }
   const unverifiedNames = unverifiedChampionNames(allVisibleText, [recording.champion || "Samira"]);
   if (needsActionScript && unverifiedNames.length) {
     issues.push(`visible review names unverified champion(s): ${unverifiedNames.join(", ")}; use ally/enemy/team unless roster evidence is verified`);
   }
   if (needsActionScript && hasExactJungleBuffName(allVisibleText)) {
     issues.push("visible review names an exact jungle buff without verified camp evidence; use jungle camp unless the camp label is verified");
+  }
+  if (recording.analysisSource !== "manual" && /\b(shop interface|shop open|item shop|stealth ward selected|standing at (the )?fountain|leaving (?:base|fountain)|near base fountain|running from fountain|fountain at game start|game start)\b/i.test([detail, eventEvidence].join(" "))) {
+    issues.push("uses non-evidence shop/fountain/game-start timestamp as proof");
   }
   if (needsTeachingReason && /\b(grouped mid|group mid|mid pressure)\b/i.test(detail) && !/\b(mid[^.]*because|because[^.]*mid|mid[^.]*shortest|mid[^.]*team|mid[^.]*allies|mid[^.]*base|mid[^.]*tower|mid[^.]*fog|mid[^.]*collapse)\b/i.test(detail)) {
     issues.push("visible paragraph must explain why mid/grouping is better in this state");
@@ -2703,6 +2846,233 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5566860300_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Grouped base push needs click discipline",
+      feedback: "Mistake: the grouped base push was good, but the next click still needs to be structure, safe blocker, wave, or exit instead of another vague forward move. Fix: when allies are in front in base, hit free structure, hit only the defender blocking it, clear the wave, or leave as soon as those stop being true.",
+      gameDetail: "At 19:43 the mistake risk is inside the enemy base: you are grouped with multiple allies in front, an enemy is near the base entrance, and the nearest permanent value is the exposed inhibitor/base structure, so the branch is hit free structure, hit only the defender blocking it from behind ally front, clear wave if the structure is not hittable, or leave when defenders and respawns make the structure no longer free. At 16:07 the stronger version already happened because your team is grouped near enemy mid turret as it falls, which is real conversion. At 10:43 you are 3/0/1 with 76 CS and 1031 gold in bot lane, so the lead exists before the base push. The 5/1/7, 123 CS, 23-minute line says deaths are controlled and fight impact is good; the next Challenger-path improvement is making every base click either structure, blocker, wave, or exit.",
+      whyTrust: "This uses inspected 1:43, 10:43, 16:07, and 19:43 frames plus the 5/1/7 and 123 CS stat line.",
+      eventEvidence: "1:43 shows bot lane with ally-and-wave cover against two enemies; 10:43 shows Samira farming bot at 3/0/1 with 76 CS and 1031 gold; 16:07 shows the enemy mid turret falling with allies nearby; 19:43 shows Samira grouped with allies in the enemy base near exposed structures.",
+      failureEvidence: "At 19:43 the grouped base state is good, but it becomes a leak only if the next click leaves the structure/blocker/wave/exit branch, because defenders can respawn and turn a won base position into another fight.",
+      mistakeTypes: [
+        "base structure target priority",
+        "ally-frontline check",
+        "wave into exit timing",
+        "camera/map-state check",
+        "fight-to-structure conversion"
+      ],
+      goodThing: "At 16:07 and 19:43 you are grouped with allies while structures are falling or exposed; keep that base-pressure habit.",
+      focusTag: "base click discipline",
+      evidence: "Manual frame inspection of 1:43, 10:43, 16:07, and 19:43 plus League Client stats.",
+      pattern: "This game is a better shape: low deaths, grouped pressure, and structure access. The improvement is not fighting less; it is making the base click sequence exact.",
+      diamondRule: "In base, every Samira click is structure, blocker, wave, or exit.",
+      drill: "In every base push, say structure, blocker, wave, exit before moving forward.",
+      timeline: [
+        "1:43 - Bot lane has ally-and-wave cover against two enemies.",
+        "10:43 - Samira farms bot at 3/0/1 with 76 CS and 1031 gold.",
+        "16:07 - Enemy mid turret falls with allies nearby.",
+        "19:43 - Samira is grouped with allies in enemy base near exposed structures."
+      ],
+      clockAnchors: [
+        { clock: "1:43", videoSeconds: 112.077, description: "Bot lane has ally-and-wave cover against two enemies." },
+        { clock: "10:43", videoSeconds: 652.462, description: "Samira farms bot at 3/0/1 with 76 CS and 1031 gold." },
+        { clock: "16:07", videoSeconds: 976.692, description: "Enemy mid turret falls with allies nearby." },
+        { clock: "19:43", videoSeconds: 1192.846, description: "Samira is grouped with allies in enemy base near exposed structures." }
+      ],
+      nuance: [
+        "The good part is grouped base pressure with allies in front.",
+        "The mistake risk is not entering base; it is losing the exact structure/blocker/wave/exit branch after entry.",
+        "5/1/7 means deaths were controlled, so this is a better game state than the recent feeding games.",
+        "123 CS in 23 minutes is stable enough that the next gain is target priority and exit timing.",
+        "The next-game check is structure, blocker, wave, exit."
+      ],
+      reviewLimit: "Manual frame review used 2 FPS sampled frames and cannot prove exact clicks or cooldowns; it can judge grouped base state, structure access, stats, and exit-branch discipline.",
+      secondaryFocus: "Work on base target priority: once allies are in front, keep the camera on structure and defenders so the next click is structure, blocker, wave, or exit.",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5566786855_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Bot pressure needs exit branch",
+      feedback: "Mistake: you created bot pressure, but the later fight windows stayed open after the safe tower or wave branch should have ended. Fix: hit tower while it is free, hit only a safe blocker, push wave then recall, or leave before the collapse returns.",
+      gameDetail: "At 15:01 you are bot with an ally, a minion wave, and the enemy bot turret directly in front; the branch is to hit tower while it is free, stop only for a safe blocker, then push the next wave or recall before the enemy collapse returns. At 10:03 you were already low under allied bot turret while the wave was ahead of you, so pressure had to start from turret and wave safety rather than another forward trade. By 11:54 you are near the enemy bot side again with enemies visible around lane and the jungle entrance, which means the next click needs ally front and turret value before it becomes a chase. The 12/6/5, 156 CS, 26-minute line says your damage and lane pressure are real, but six deaths are the bigger blocker; the improvement is ending bot pressure as tower damage, wave crash, or reset before the fight reopens.",
+      whyTrust: "This is tied to visible bot-lane tower frames at 10:03, 11:54, and 15:01 plus the 12/6/5 and 156 CS stat line.",
+      eventEvidence: "10:03 shows Samira low under allied bot turret with wave pressure ahead; 11:54 shows Samira near enemy bot-side lane and jungle entrance with enemies visible; 15:01 shows Samira and an ally hitting enemy bot turret with a wave.",
+      failureEvidence: "At 15:01 the tower branch is good while it is free, but the failure risk is staying forward after that branch disappears, because the enemy gets a new collapse window and the final six-death line shows those reopenings are still too expensive.",
+      mistakeTypes: [
+        "tower branch exit",
+        "death-state exposure",
+        "ally-frontline check",
+        "wave crash into reset",
+        "camera/map-state check"
+      ],
+      goodThing: "At 15:01 you did create real bot tower pressure with an ally and a wave; keep that part.",
+      focusTag: "tower exit branch",
+      evidence: "Manual frame inspection of 10:03, 11:54, and 15:01 plus League Client stats.",
+      pattern: "The repeat is not lack of aggression; it is keeping pressure mode active after the free tower or wave value is no longer guaranteed.",
+      diamondRule: "When bot tower is the payout, hit it while free, then exit through wave or recall before the next fight opens.",
+      drill: "After 15 minutes, say tower, wave, exit before every bot-side forward click.",
+      timeline: [
+        "10:03 - Samira is low under allied bot turret with wave pressure ahead.",
+        "11:54 - Samira is near enemy bot-side lane and jungle entrance with enemies visible.",
+        "15:01 - Samira and an ally hit enemy bot turret with a wave."
+      ],
+      clockAnchors: [
+        { clock: "10:03", videoSeconds: 559.577, description: "Samira is low under allied bot turret with wave pressure ahead." },
+        { clock: "11:54", videoSeconds: 670.692, description: "Samira is near enemy bot-side lane and jungle entrance with enemies visible." },
+        { clock: "15:01", videoSeconds: 781.808, description: "Samira and an ally hit enemy bot turret with a wave." }
+      ],
+      nuance: [
+        "The good part is the 15:01 tower pressure with an ally and wave.",
+        "The bad part is letting the next fight stay available after tower or wave value is no longer free.",
+        "The 12/6/5 line says deaths are the bigger blocker than damage.",
+        "156 CS in 26 minutes is playable, so the next gain is exit timing, not farming forever.",
+        "The next-game check is tower, wave, exit before the forward click."
+      ],
+      reviewLimit: "Manual frame review used sampled 2 FPS frames, so exact inputs and cooldowns are not judged.",
+      secondaryFocus: "Use camera/map-state checks after bot pressure: if ally front, free tower, or safe wave is gone, click back before another fight starts.",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5566726915_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Fight wins need exit branch",
+      feedback: "Mistake: the fights kept staying open after the useful damage window, so kills did not reliably become objective, wave, or reset value. Fix: after the first winning exchange, choose objective, safe wave, recall, or back behind ally front before spending another forward click.",
+      gameDetail: "At 19:12 you are in the bot-side jungle with an ally rooted in front of you and an enemy visible from the lower-left; the branch is to hit only from behind the ally front, rotate to objective if the fight is won, or leave if enemy tools are still live. At 5:41 the early safe branch is clearer because you are under allied bot turret with wave and two enemies in front, so the job is wave defense before forward trading. By 22:40 you are grouped around a river camp or objective fight with several allies, which is useful only if it becomes objective control or a reset path. The 25/8/9, 162 CS, 41-minute line says the problem is not damage, it is that eight deaths and low income stability stretch winning fights into more enemy chances.",
+      whyTrust: "This uses inspected 5:41, 19:12, and 22:40 frames plus the 25/8/9 and 162 CS stat line.",
+      eventEvidence: "5:41 shows Samira under allied bot turret with a wave and two enemies in front; 19:12 shows a bot-side jungle fight with ally front and an enemy angle from lower-left; 22:40 shows several allies grouped around a river camp or objective fight.",
+      failureEvidence: "At 19:12 the ally-front shape is playable, but the enemy angle is still visible and the fight is not yet a guaranteed objective; if the next click is another forward fight instead of objective, safe wave, reset, or back behind allies, the eight-death final line is the cost.",
+      mistakeTypes: [
+        "fight exit branch",
+        "death-state exposure",
+        "objective after first win",
+        "low CS income stability",
+        "ally-frontline check"
+      ],
+      goodThing: "You are clearly creating fight impact; 25 kills and the grouped 22:40 river state show that you can be present when fights matter.",
+      focusTag: "fight exit branch",
+      evidence: "Manual frame inspection of 5:41, 19:12, and 22:40 plus League Client stats.",
+      pattern: "The repeated issue is the decision after the first useful damage window: objective, safe wave, recall, or back behind allies has to happen before the fight reopens.",
+      diamondRule: "After the first winning exchange, decide objective, wave, reset, or ally front before another forward click.",
+      drill: "After a won exchange, say objective, wave, reset, or back.",
+      timeline: [
+        "5:41 - Samira is under allied bot turret with wave and two enemies in front.",
+        "19:12 - Samira fights bot-side jungle with ally front and enemy angle visible.",
+        "22:40 - Samira is grouped around river camp or objective with several allies."
+      ],
+      clockAnchors: [
+        { clock: "5:41", videoSeconds: 335.077, description: "Samira is under allied bot turret with wave and two enemies in front." },
+        { clock: "19:12", videoSeconds: 997.231, description: "Samira fights bot-side jungle with ally front and enemy angle visible." },
+        { clock: "22:40", videoSeconds: 1162.769, description: "Samira is grouped around river camp or objective with several allies." }
+      ],
+      nuance: [
+        "The good part is fight presence; the stat line shows real kill pressure.",
+        "The bad part is letting the fight continue after the first useful window.",
+        "Eight deaths matter more than squeezing one more risky hit from an already won exchange.",
+        "162 CS in 41 minutes says income is unstable, so clean resets and waves matter.",
+        "The next-game check is objective, wave, reset, or back."
+      ],
+      reviewLimit: "Manual frame review used sampled 2 FPS frames and cannot prove exact cooldowns or every enemy position.",
+      secondaryFocus: "Work on post-fight camera checks: after the first useful damage window, look at ally front, nearest objective, and whether one enemy angle is still open.",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5566563083_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Side waves need death-state discipline",
+      feedback: "Mistake: side-wave pressure kept turning into death-state exposure, so the game gave enemies repeated reset windows. Fix: clear the safe wave, then leave toward ally front or base unless a free tower, safe blocker, or objective is already visible.",
+      gameDetail: "At 25:49 you are bottom with support clearing a wave near the destroyed bottom inhibitor turret; before any forward click, clear the safe wave, check ally deaths and who can stand in front, then leave toward team unless a free tower, safe blocker, or objective is visible. The cost is visible earlier at 22:59, where you are dead after a river or jungle fight while the map keeps moving without you. The 9/13/11, 162 CS, 39-minute line says the biggest issue is not refusing to fight; it is thirteen deaths and side-wave exposure turning pressure into enemy reset windows. Your support-and-wave position at 25:49 is the correct shape only if it ends as wave clear plus exit, not another isolated forward path.",
+      whyTrust: "This is tied to inspected 22:59 and 25:49 frames plus the 9/13/11 and 162 CS stat line.",
+      eventEvidence: "22:59 shows Samira dead after a river or jungle fight; 25:49 shows Samira and support clearing a bottom wave near the destroyed bottom inhibitor turret.",
+      failureEvidence: "At 25:49 the wave clear is useful, but the failure appears when the next click stays side instead of exiting toward allies or base; the 22:59 death frame and thirteen-death final line show how side pressure becomes lost tempo.",
+      mistakeTypes: [
+        "side wave exit",
+        "death-state exposure",
+        "ally-frontline check",
+        "base-defense timing",
+        "camera/map-state check"
+      ],
+      goodThing: "At 25:49 you are at least clearing a real wave with support nearby; keep choosing visible wave value instead of random fog fights.",
+      focusTag: "side wave exit",
+      evidence: "Manual frame inspection of 22:59 and 25:49 plus League Client stats.",
+      pattern: "The repeat is side pressure after the safe wave value: the wave is good, but the next click must be exit, ally front, or base unless a permanent result is visible.",
+      diamondRule: "A side wave is a job, not permission to stay side after the wave is gone.",
+      drill: "After each side wave, say wave done, front body, exit.",
+      timeline: [
+        "22:59 - Samira is dead after a river or jungle fight.",
+        "25:49 - Samira and support clear bottom wave near the destroyed bottom inhibitor turret."
+      ],
+      clockAnchors: [
+        { clock: "22:59", videoSeconds: 1195.346, description: "Samira is dead after a river or jungle fight." },
+        { clock: "25:49", videoSeconds: 1365.538, description: "Samira and support clear bottom wave near the destroyed bottom inhibitor turret." }
+      ],
+      nuance: [
+        "The good part is identifying a real bottom wave at 25:49.",
+        "The bad part is staying side after the wave job is done.",
+        "Thirteen deaths are the main blocker in this review.",
+        "162 CS in 39 minutes means income exists, but deaths are erasing its value.",
+        "The next-game check is wave done, front body, exit."
+      ],
+      reviewLimit: "Manual frame review used sampled 2 FPS frames and cannot judge exact combo speed, only visible death state, wave state, ally front, and pathing.",
+      secondaryFocus: "Use camera/map-state checks after each side wave: if ally front or a free structure is not visible, leave toward team before the next fight starts.",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5566823161_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Pressure mode after payout vanished",
+      feedback: "Mistake: you stayed in pressure mode after the safe mid wave or turret-defense payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
+      gameDetail: "At 16:55 the mistake window is Samira mid with one ally beside you, a minion wave nearby, a very low allied mid turret on screen, and the team kill score down 12-16; before any forward click, check closest threatened turret, ally deaths, and who can stand in front: hit enemy tower if it is free, hit only the blocker if safe, clear the wave then recall if wave is the only value, or leave if none of those are true. Earlier at 5:26 the cleaner version is visible bot side because you have ally-and-wave cover before pressure continues, and by 18:50 and 20:44 you are still around mid turret with an ally and waves rather than a guaranteed forward structure. The leak is that you stayed in pressure mode after the safe payout stopped being clear; with a 6/3/6, 81 CS, 25-minute ranked line, the issue is not raw damage or a huge death count, it is low income plus unstable wave/tower conversion before the next forward click.",
+      whyTrust: "This review is based on inspected 5:26, 16:55, 18:50, and 20:44 frames plus the League Client 6/3/6 and 81 CS stat line.",
+      eventEvidence: "5:26 shows bot-side ally-and-wave cover; 16:55 shows Samira mid beside one ally, a nearby wave, a low allied mid turret, minimap, and a 12-16 team kill score; 18:50 and 20:44 show Samira still around mid turret with an ally and waves.",
+      failureEvidence: "At 16:55 the visible state does not prove a free forward tower, a safe enemy blocker, or known enemy positions, so continuing pressure without first choosing wave clear, protected hit, or exit risks time loss instead of a permanent result.",
+      mistakeTypes: [
+        "mid wave/turret branch discipline",
+        "low CS income stability",
+        "ally-frontline check",
+        "camera/map-state check",
+        "reset after wave"
+      ],
+      goodThing: "At 5:26, 18:50, and 20:44 you are often near allies and waves instead of randomly fighting alone; keep using ally-and-wave cover.",
+      focusTag: "forward-click branch",
+      evidence: "Manual frame inspection of 5:26, 16:55, 18:50, and 20:44 plus League Client stats.",
+      pattern: "The repeated issue is the branch after a wave or turret state appears: you can fight and stand with allies, but the next click has to prove a tower, blocker, wave, or reset before pressure continues.",
+      diamondRule: "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
+      drill: "Before each forward click after 15 minutes, say: turret, deaths, front body.",
+      timeline: [
+        "5:26 - Bot-side ally-and-wave cover before pressure continues.",
+        "16:55 - Samira mid beside one ally near a low allied mid turret while team score is 12-16.",
+        "18:50 - Samira remains around mid turret with an ally and a wave.",
+        "20:44 - Samira and ally clear mid wave under turret."
+      ],
+      clockAnchors: [
+        { clock: "5:26", videoSeconds: 348.308, description: "Bot-side ally-and-wave cover before pressure continues." },
+        { clock: "16:55", videoSeconds: 1036.923, description: "Samira mid beside one ally near a low allied mid turret with wave and minimap visible." },
+        { clock: "18:50", videoSeconds: 1151.692, description: "Samira and ally around mid turret with wave pressure nearby." },
+        { clock: "20:44", videoSeconds: 1266.462, description: "Samira and ally clear mid wave under allied turret." }
+      ],
+      nuance: [
+        "The visible issue is not pure mechanics; the 6/3/6 line shows fight impact exists.",
+        "81 CS in 25 minutes is the income warning, so wave handling and resets matter as much as kills.",
+        "The 16:55 frame does not prove all death timers or missing enemies, which is why the branch has to be conditional.",
+        "The nearest permanent value is defending or converting the mid wave/turret state, not vague pressure.",
+        "The next-game check is turret, ally deaths, and front body before the click."
+      ],
+      reviewLimit: "Manual frame review used 2 FPS sampled frames and cannot prove exact inputs, every enemy position, or every death timer; the branch is therefore conditional on visible tower, wave, ally, and minimap state.",
+      secondaryFocus: "After 15 minutes, before any forward click, use camera/map-state discipline: closest threatened turret, ally deaths, and who can stand in front of me.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5566620104_01.mp4") {
     return {
       champion: "Cait",
@@ -2894,7 +3264,7 @@ function manualFeedback(file) {
       champion: "Samira",
       confidence: "medium",
       feedbackTitle: "Won fight needed low-HP reset",
-      feedback: "Mistake: after a fight win, you let the next state become another low-health stay instead of cashing the win out safely. Fix: if the fight is won and your HP is low, recall unless a free structure is already directly in front of your team.",
+      feedback: "Mistake: after a fight win, you let the next state become another low-health stay instead of turning the win into recall, structure, or wave. Fix: if the fight is won and your HP is low, recall unless a free structure is already directly in front of your team.",
       gameDetail: "At 16:27 the cost is already visible: Samira is dead in mid river after the fight sequence, so your next-game script is reset immediately after a won fight when HP is low unless a free structure is already in front of the team. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure. At 10:42 the earlier warning sign is visible in bot lane because both sides are still trading while you and your ally are low, so the smaller version of the same habit is one extra forward step after health already says stop. At 14:47 you are near a grouped objective fight, which is the kind of useful team shape to keep if the exit happens cleanly afterward.",
       whyTrust: "The visible anchors show a low-health trade pattern at 10:42, a grouped objective fight at 14:47, and the death timer at 16:27, so the review is about post-fight exit timing and HP-state discipline.",
       eventEvidence: "10:42 shows a bot-lane skirmish with both sides still trading and Samira plus ally low. 14:47 shows a grouped objective fight near dragon pit. 16:27 shows Samira dead with the death timer open while allies push mid.",
@@ -3111,7 +3481,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Finish-window all-in",
       feedback: "Mistake: over-learning this clip would make you throw; the same dash is bad if it starts without wave, teammate body, or nexus pressure. Fix: full send only when every reset moves toward the payout.",
-      gameDetail: "At 14:21 the fight is already in their base, not in river or a side lane: allies and minions are in front, enemy defenders are packed near nexus, and Samira is close enough to chain resets without walking into fog. At 14:27 the first two kills land and the play becomes a real cleanup instead of a random chase. At 14:33 the chain reaches triple, at 14:38 the quadra happens beside the nexus area, and at 14:41 the penta lands because the fight never leaves the ending window. Learn this exactly: the all-in is good when the map is already ending; outside that condition, cash out first.",
+      gameDetail: "At 14:21 the fight is already in their base, not in river or a side lane: allies and minions are in front, enemy defenders are packed near nexus, and Samira is close enough to chain resets without walking into fog. At 14:27 the first two kills land and the play becomes a real cleanup instead of a random chase. At 14:33 the chain reaches triple, at 14:38 the quadra happens beside the nexus area, and at 14:41 the penta lands because the fight never leaves the ending window. Learn this exactly: the all-in is good when the map is already ending; outside that condition, take the tower, wave, objective, or recall before another fight.",
       whyTrust: "The penta is not random: the clip shows the conditions that made it valid, with allies and minions already in base and every reset moving toward nexus.",
       eventEvidence: "14:21 fight starts inside the enemy base with multiple enemy defenders still alive; 14:27 double kill; 14:33 triple; 14:38 quadra near nexus; 14:41 penta as the base remains open.",
       goodThing: "The strong part is the finish discipline: once the enemy line collapses, Samira stays with the ally/minion push and cleans through the defenders instead of drifting sideways.",
@@ -3190,8 +3560,8 @@ function manualFeedback(file) {
       champion: "Samira",
       confidence: "high",
       feedbackTitle: "You re-fight after winning",
-      feedback: "Mistake: you keep playing for another fight after the first win. Fix: cash out wave, tower, reset, or end before touching another champion.",
-      gameDetail: "Honest read: this is improved, but the same leak keeps coming back after the good moment. Around 1:24 Samira is fighting under the friendly bot tower with Jinx and Braum still on screen; the movement is forward into a contested lane pocket while the safer value is to thin the wave, hold the tower line, and make them walk into you. Around 7:58 the good version happens: the bot push is already under enemy tower, the wave is with you, and the won pressure turns into turret damage instead of another random chase. Around 10:32 Samira is low in bot lane while Braum and Jinx can still answer, so every extra step forward is a shutdown invitation unless the next click is reset or structure. Around 12:44 the punishment is visible: the fight is still extended near the enemy side, crowd control lands, and the screen shows a shutdown instead of a clean cashout. The lesson is not to fight less; it is to make the first won fight buy the wave, turret, reset, or end before accepting the second one.",
+      feedback: "Mistake: you keep playing for another fight after the first win. Fix: take wave, tower, reset, or end before touching another champion.",
+      gameDetail: "Honest read: this is improved, but the same leak keeps coming back after the good moment. Around 1:24 Samira is fighting under the friendly bot tower with Jinx and Braum still on screen; the movement is forward into a contested lane pocket while the safer value is to thin the wave, hold the tower line, and make them walk into you. Around 7:58 the good version happens: the bot push is already under enemy tower, the wave is with you, and the won pressure turns into turret damage instead of another random chase. Around 10:32 Samira is low in bot lane while Braum and Jinx can still answer, so every extra step forward is a shutdown invitation unless the next click is reset or structure. Around 12:44 the punishment is visible: the fight is still extended near the enemy side, crowd control lands, and the screen shows a shutdown instead of a clean wave/tower/reset branch. The lesson is not to fight less; it is to make the first won fight buy the wave, turret, reset, or end before accepting the second one.",
       whyTrust: "The same game shows both sides: turret conversion is the right version, and the later low-health re-fight is how stronger opponents get shutdown gold back.",
       eventEvidence: "1:24 contested fight under friendly bot tower; 7:58 won bot push becomes turret damage; 10:32 low-health lane stay; 12:44 crowd control and shutdown punish the extended fight.",
       goodThing: "The good part was real: you turned one bot-side win into turret pressure instead of only chasing kills.",
@@ -3199,11 +3569,11 @@ function manualFeedback(file) {
       evidence: "Manual storyboard review of the May 18 8:10 PM game: early bot pressure, double-kill conversion, turret take, inhibitor take, and nexus pressure.",
       pattern: "The damage is already there. The leak is the second decision: after the first win, you often accept another fight before the map payout is locked.",
       diamondRule: "First win buys wave, tower, reset, or end before the next fight is allowed.",
-      drill: "After the first kill or forced recall, say cash out before moving forward.",
+      drill: "After the first kill or forced recall, say wave, tower, reset, or end before moving forward.",
       timeline: [
         "1:24 - Early bot fight is still near friendly tower with both lane enemies able to answer.",
         "7:58 - Bot pressure becomes turret, which is the good conversion.",
-        "10:32-12:44 - Low-health extended fighting replaces the clean cashout/reset."
+        "10:32-12:44 - Low-health extended fighting replaces the clean wave/tower/reset branch."
       ],
       clockAnchors: [
         { clock: "0:19", videoSeconds: 4.000 },
@@ -3238,7 +3608,7 @@ function manualFeedback(file) {
       nuance: [
         "At 3:40 the bot fight becomes a double kill because Samira stays near the wave and ally pressure.",
         "At 7:58 the won lane becomes turret gold instead of more random fighting.",
-        "At 10:32 Samira is low while Braum is still present; that is a cashout moment, not a retest moment.",
+        "At 10:32 Samira is low while Braum is still present; that is a wave/tower/reset moment, not a retest moment.",
         "At 12:44 Samira is still in the extended lane fight with enemy tools active; that habit gets punished fast.",
         "Beginner bot games reward extra fighting, so the transferable skill is conversion first, second fight only if it protects the payout."
       ],
@@ -3334,18 +3704,18 @@ function fallbackFeedback(file, duration, context = {}) {
     return {
       champion: "Samira",
       confidence: "medium",
-      feedbackTitle: "Damage lead needs map cash-out",
-      feedback: "Mistake: the damage lead kept needing cleaner map cash-outs after playable or winning moments. Fix: after a won fight, side wave, camp, or structure state, choose wave, tower, objective, nexus, or recall before taking another fight.",
-      gameDetail: "This full review shows Samira can create damage, so the climb gap is what happens right after the first playable or winning moment. The next useful rep is converting the moment into wave, tower, objective, nexus, or recall before the next fight gives shutdown gold back.",
-      whyTrust: "The visible frames and client stats show enough damage pressure to create leads; reducing deaths after wins keeps shutdown gold and turns mechanics into rank pressure.",
+      feedbackTitle: "Pressure mode after payout vanished",
+      feedback: "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
+      gameDetail: "At the first visible mid-game pressure window, Samira needs a branch before the forward click: hit tower if it is free, hit only the enemy body blocking tower if an ally can stand in front, push or clear the wave then recall if wave is the only guaranteed value, or leave if none of those are true. The leak is staying in pressure mode after the safe payout is no longer proven, because that turns a playable wave or tower state into enemy time, another collapse window, or a lost reset. The next useful rep is not a slogan; it is checking closest threatened turret, ally deaths, and front body before the click.",
+      whyTrust: "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
       eventEvidence: "",
-      goodThing: "You are finding fights and creating damage pressure; the fix is cashing those wins out cleaner.",
+      goodThing: "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
       focusTag: "overstay control",
       evidence: "",
-      pattern: "The carry score says damage is available, so the rank leak is likely converting the first winning moment into a permanent map result.",
-      diamondRule: "After a won fight, take the guaranteed payout before looking for the next fight.",
-      drill: "Say the payout out loud after every kill: wave, tower, dragon, Baron, nexus, or recall.",
-      nuance: ["High kills only matter when the map state changes.", "Shutdown deaths after a win erase the lead Samira already created."],
+      pattern: "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
+      diamondRule: "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
+      drill: "After 15 minutes, before any forward click: closest threatened turret, ally deaths, who can stand in front of me.",
+      nuance: ["High kills only matter when the next click creates tower, wave, objective, reset, or base value.", "Low CS makes every unclear forward click more expensive because income is already unstable."],
       reviewLimit: "",
       analysisSource: "fallback"
     };
@@ -3426,7 +3796,7 @@ function fallbackFeedback(file, duration, context = {}) {
       diamondRule: "Protect shutdown gold after the first payout.",
       drill: "Recall after the payout unless an objective is already free.",
       nuance: ["This preserves carry pressure by making the next item arrive sooner."],
-      focusTag: "cash-out timing"
+      focusTag: "shutdown protection"
     },
     {
       feedbackTitle: "Count before helping",
@@ -3560,6 +3930,10 @@ function analysisSpecificityIssues(parsed, context = {}) {
   const combined = [feedback, gameDetail, eventEvidence, failureEvidence, secondaryFocus, pattern, mistakeTypes.join(" "), nuance.join(" ")].join(" ");
   const issues = [];
   const isAutoFullReview = /^auto_/i.test(context.file || "") && Number(context.duration || 0) >= 90;
+  const hasStats = Number.isFinite(Number(context.kills)) &&
+    Number.isFinite(Number(context.deaths)) &&
+    Number.isFinite(Number(context.assists)) &&
+    Number.isFinite(Number(context.cs));
   if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback)) {
     issues.push("feedback must keep Mistake/Fix shape");
   }
@@ -3592,6 +3966,15 @@ function analysisSpecificityIssues(parsed, context = {}) {
   }
   if (isAutoFullReview && !hasTimestampedActionScript(gameDetail)) {
     issues.push("gameDetail must include a timestamped replacement action script");
+  }
+  if (isAutoFullReview && /\b(?:map cash[-\s]?outs?|cash(?:ing)? (?:those )?(?:wins|moments|it)? ?out(?:s)? cleaner|cash[-\s]?out timing|cleaner map|wrong task after the map state changes|call free structure, blocked structure, or reset)\b/i.test(combined)) {
+    issues.push("visible review uses abstract cash-out wording instead of exact branch rules");
+  }
+  if (isAutoFullReview && /\b(tower|turret|structure|wave|inhib|inhibitor|nexus|payout|pressure)\b/i.test(combined) && !/\b(?:free tower|tower is free|hit tower|body blocks|blocker|push or clear|clear the wave|wave then recall|leave if none|closest threatened turret|who can stand in front)\b/i.test(combined)) {
+    issues.push("structure/wave review must separate concrete branch options");
+  }
+  if (isAutoFullReview && hasStats && !/\b\d+\s*\/\s*\d+\s*\/\s*\d+\b[\s\S]{0,120}\bCS\b|\bCS\b[\s\S]{0,120}\b\d+\s*\/\s*\d+\s*\/\s*\d+\b/i.test(combined)) {
+    issues.push("full-game review with client stats must include K/D/A and CS context");
   }
   const unverifiedNames = unverifiedChampionNames(combined, [parsed?.champion || "Unknown"]);
   if (isAutoFullReview && unverifiedNames.length) {
@@ -3929,7 +4312,10 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Write the visible coaching fields like one smooth paragraph from a highly experienced League coach. Do not expose field labels such as 'Failure evidence:', 'Other mistake types:', or 'Second focus:'. Green/red/pink highlighting is handled by the page; all unhighlighted prose should read as context, proof, and supporting detail for the green/red/pink claims. The red-readable mistake text should name only what was bad or leaking, the green-readable goodThing should name only what to keep doing, and the pink-readable action text should tell Alan exactly what to do next game if he reads only pink.",
     "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
     "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
-    "Alan's latest correction: do not stop at category advice like group, reset, pressure mid, spacing, or target selection. For the main mistake, gameDetail must include a replayable action script tied to the timestamp: 'At MM:SS, do X instead of Y; if Z is true, do A; if not, do B.' This should tell him what to click or wait for in that exact state.",
+    "Alan's latest correction: do not stop at category advice like group, reset, pressure mid, spacing, target selection, cash out cleaner, map cash-out, or wrong task after map state changes. For the main mistake, gameDetail must include a replayable action script tied to the timestamp: 'At MM:SS, do X instead of Y; if Z is true, do A; if not, do B.' This should tell him what to click or wait for in that exact state.",
+    "At the main timestamp, name the concrete visible state precisely: where the followed champion is, which tower or wave matters, which allies are present or dead if visible, which enemies are visible or missing if visible, whether an ally can stand between the followed champion and enemy collapse, and what the nearest permanent result is. If death timers, missing enemies, or a tower state are not visible enough, say the limit and make the action conditional instead of pretending certainty.",
+    "For tower, wave, inhibitor, base, or pressure states, separate the branch options instead of blending them: hit tower if it is free; hit only the enemy body blocking tower if it is safe and an ally can front; push or clear wave then recall if wave is the only guaranteed value; leave if no permanent result is available. Avoid slogans such as cash out cleaner, map cash-out, and wrong task after map state changes.",
+    "If client K/D/A and CS context is available in the recording metadata, use it in the visible review and name the bigger blocker: deaths, low CS, missed tower, bad reset, overchase, wave defense, objective timing, or fight entry. Do not treat K/D/A and CS as decoration; use them to decide what the player should work on first.",
     "Also include eventEvidence and failureEvidence. eventEvidence is one compact sentence naming the actual visible things that prove the coaching claim. failureEvidence is the same proof written as the failure chain: what Alan did, what visible state made it wrong, what leaked, and what happened next or almost happened. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, missed reset window, or tempo leak; if the advice is structure conversion, the evidence must show structure access, a free structure, a blocked structure, or the chase away from it. This is proof, not advice.",
     "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
@@ -4355,14 +4741,16 @@ async function main() {
       else highlightCount += 1;
       const cachedRankEstimate = rankedEquivalentForRecording(cached);
       const cachedCaptureFps = captureFpsForEntry(entry, cached.captureFps);
-      recordings.push({
+      const cachedRecording = {
         ...cached,
         ...(cachedRankEstimate ? { rankEstimate: cachedRankEstimate } : {}),
         ...(cachedCaptureFps ? { captureFps: cachedCaptureFps } : {}),
         publicVideoBytes,
         src: publicPath(destPath),
         poster: publicPath(posterPath)
-      });
+      };
+      sanitizeAbstractBranchLanguage(cachedRecording);
+      recordings.push(cachedRecording);
       console.log(`${name}: ${recordings.at(-1).reviewPhase || phase} - ${recordings.at(-1).champion} - ${recordings.at(-1).feedbackTitle}`);
       continue;
     }
@@ -4405,7 +4793,7 @@ async function main() {
         candidateAnchors: candidateClockAnchors
       })
       : [];
-    const fallbackClockAnchors = !visibleClockAnchors.length && duration > 90
+    const fallbackClockAnchors = !isManualAnalysis && !visibleClockAnchors.length && duration > 90
       ? computedTimelineClockAnchors({
         duration,
         sidecar: entry.sidecar,
@@ -4552,6 +4940,7 @@ async function main() {
     };
     repairVisibleReviewForStandard(recording, name);
     repairPublishAuditRequirements(recording, name);
+    sanitizeAbstractBranchLanguage(recording);
     const rankEstimate = rankedEquivalentForRecording(recording);
     if (rankEstimate) recording.rankEstimate = rankEstimate;
     enforceVisibleParagraphStandard(recording, name);
