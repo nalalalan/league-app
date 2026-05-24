@@ -1719,13 +1719,19 @@ function recordingOutcomeLabel(item) {
   return "";
 }
 
+function isTightClickReview(item) {
+  return String(item?.analysisVersion || "") === "2026-05-24-tight-click-review-v20";
+}
+
 function displayFailureEvidence(item) {
+  if (isTightClickReview(item)) return "";
   const evidence = stripVisibleCoachLabel(stripCoachPrefix(item.failureEvidence || recordingEvidence(item)));
   if (!hasText(evidence) || isGenericEvidence(evidence)) return "";
   return sentenceCase(evidence);
 }
 
 function displayMistakeTypes(item) {
+  if (isTightClickReview(item)) return "";
   const explicit = Array.isArray(item.mistakeTypes)
     ? item.mistakeTypes.map((value) => String(value || "").replace(/\s+/g, " ").trim()).filter(Boolean)
     : [];

@@ -13,6 +13,7 @@ const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
 const fallbackModel = process.env.LEAGUE_TIMESTAMP_AUDIT_FALLBACK_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-24-tight-click-review-v20",
   "2026-05-24-example-review-v19",
   "2026-05-24-key-click-rule-v18",
   "2026-05-23-decision-branch-coaching-v17",
@@ -99,6 +100,11 @@ function hasKeyTimestampClickRule(text) {
     /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free)\b/i.test(sentence) &&
     /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back)\b/i.test(sentence)
   ));
+}
+
+function repeatedPayoutChecklistCount(text) {
+  const source = String(text || "").toLowerCase();
+  return (source.match(/\b(?:no\s+)?(?:tower|turret)\s*,\s*(?:safe\s+)?wave\s*,\s*(?:dragon\s+or\s+baron|objective)\s*(?:setup)?\s*,?\s*(?:and|or)\s*(?:no\s+clear\s+)?ally[-\s]?front\b|\btower\/wave\/objective\/ally[-\s]?front\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/g) || []).length;
 }
 
 function keyClickRuleTimestampSeconds(text) {
@@ -192,16 +198,24 @@ function visibleParagraphStandardIssues(recording, anchors) {
   if (currentPrimaryMistakeAnalysisVersions.has(recording.analysisVersion) && !hasTimestampedActionScript(detail)) {
     issues.push("visible paragraph must include a timestamped replacement action script");
   }
-  if ((recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && !hasKeyTimestampClickRule(detail)) {
+  if ((recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && !hasKeyTimestampClickRule(detail)) {
     issues.push("visible paragraph must include one key timestamp with visible state and exact next click");
   }
-  if (recording.analysisVersion === "2026-05-24-example-review-v19" && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
+  if ((recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
     issues.push("visible paragraph uses field labels instead of natural key timestamp prose");
   }
-  if (recording.analysisVersion === "2026-05-24-example-review-v19" && !/^Rep\s*:/i.test(clean(recording.secondaryFocus || recording.drill))) {
+  if ((recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && !/^Rep\s*:/i.test(clean(recording.secondaryFocus || recording.drill))) {
     issues.push("pink next-game instruction must be one Rep sentence");
   }
-  if ((recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
+  const needsTightReview = recording.analysisVersion === "2026-05-24-tight-click-review-v20" &&
+    (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
+  if (needsTightReview && detail.length > 850) {
+    issues.push("visible paragraph is too long for the tight review standard");
+  }
+  if (needsTightReview && repeatedPayoutChecklistCount([detail, recording.feedback, recording.goodThing, recording.secondaryFocus || recording.drill].join(" ")) > 1) {
+    issues.push("visible paragraph repeats the payout checklist instead of saying it once");
+  }
+  if ((recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
     issues.push("visible paragraph uses generic review-frame or broad branch wording");
   }
   if (eventEvidence.length < 60) {

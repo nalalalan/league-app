@@ -19,9 +19,10 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-5-mini";
 const timeZone = "America/New_York";
-const analysisVersion = "2026-05-24-example-review-v19";
+const analysisVersion = "2026-05-24-tight-click-review-v20";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-24-example-review-v19",
   "2026-05-24-key-click-rule-v18",
   "2026-05-23-decision-branch-coaching-v17",
   "2026-05-23-deterministic-publish-fallback-v16",
@@ -1519,7 +1520,7 @@ function ensureTeachingReasonAndLength(recording) {
 function ensureMistakeFixFeedback(recording, champion = "Samira") {
   const feedback = recording.feedback || "";
   const hasLegacyMistakeFix = /Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback);
-  const hasNaturalLeak = /\bThe leak is that\b[\s\S]{40,}\b(?:if|when|so|because|instead|by)\b/i.test(feedback);
+  const hasNaturalLeak = /\bThe leak is(?:\s+that)?\b[\s\S]{40,}\b(?:if|when|so|because|instead|by|after)\b/i.test(feedback);
   if ((!hasLegacyMistakeFix && !hasNaturalLeak) || hasAbstractCashoutReview(recording)) {
     recording.feedback = deterministicFallbackFeedback(recording, champion);
   }
@@ -2130,18 +2131,35 @@ function mistakeCategoryForAnalysis(analysis = {}) {
 function correctNextClickForAnalysis(analysis = {}) {
   const text = analysisCoachText(analysis);
   if (/\b(tower|turret|structure|inhib|inhibitor|nexus|wave|payout|pressure)\b/i.test(text)) {
-    return "hit a free tower, hit only a safe blocker from behind ally front, clear only the safe wave then recall, or leave if none of those are true";
+    return "take the visible payout now, or click back if none is guaranteed";
   }
   if (/\b(side|jungle|camp|farm|defend|defense|turret has fallen|base defense|inhibitor turret)\b/i.test(text)) {
-    return "drop the camp or side click and walk to the threatened turret, safe wave, ally line, or reset";
+    return "drop the farm click and walk to the threatened wave, ally line, or reset";
   }
   if (/\b(low hp|low-health|death|dead|died|shutdown|reset|recall|spend|shop|gold)\b/i.test(text)) {
-    return "recall on the first safe screen and spend before touching another wave or fight";
+    return "recall on the first safe screen before touching another wave or fight";
   }
   if (/\b(fight|spacing|entry|cc|crowd control|target|kite|collapse|fog|vision)\b/i.test(text)) {
-    return "hold behind the ally line, wait for the first enemy tool to be used, then enter only if an ally is still between you and the collapse";
+    return "hold behind the ally line and re-enter only after the enemy commits";
   }
   return "stop the forward click, check ally front and nearest objective, then choose defend, reset, or hit a free structure";
+}
+
+function wrongDecisionForAnalysis(analysis = {}) {
+  const text = analysisCoachText(analysis);
+  if (/\b(side|jungle|camp|farm)\b/i.test(text) && /\b(defend|defense|base|turret|tower|wave)\b/i.test(text)) {
+    return "staying on farm after the map needed defense";
+  }
+  if (/\b(tower|turret|structure|inhib|inhibitor|nexus|wave|payout|pressure)\b/i.test(text)) {
+    return "stepping forward after the safe payout disappeared";
+  }
+  if (/\b(low hp|low-health|recall|reset|shop|spend|overstay|stay|stayed|shutdown|death|dead|died)\b/i.test(text)) {
+    return "playing one more screen before the reset";
+  }
+  if (/\b(fight|spacing|entry|cc|crowd control|target|kite|collapse|fog|vision)\b/i.test(text)) {
+    return "entering when the screen only offers a catchable fight";
+  }
+  return "letting the old plan continue after the state changed";
 }
 
 function keyVisibleStateForAnchor(anchor, champion = "Samira") {
@@ -2154,13 +2172,13 @@ function keyVisibleStateForAnchor(anchor, champion = "Samira") {
 function keyClickRuleSentence(analysis = {}, anchor = null, champion = "Samira") {
   if (!anchor?.clock) return "";
   const state = keyVisibleStateForAnchor(anchor, champion);
-  const category = mistakeCategoryForAnalysis(analysis);
+  const wrong = wrongDecisionForAnalysis(analysis);
   const click = correctNextClickForAnalysis(analysis);
-  return `At ${anchor.clock}, ${state}; this is ${category}, so the next click is to ${click}.`;
+  return `At ${anchor.clock}, ${state}, so the wrong click is ${wrong} and the next click is to ${click}.`;
 }
 
 function branchActionSentence(clock) {
-  return `At ${clock}, if no tower, wave, objective, or ally-front payout is visible, the next click is back; hit tower only if it is free, hit only a safe blocker from behind ally front, clear the safe wave then recall, or leave if none are true.`;
+  return `At ${clock}, if no permanent payout is visible, the next click is back; stay forward only for a free tower, safe blocker, or guaranteed wave.`;
 }
 
 function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") {
@@ -2270,18 +2288,18 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
 function deterministicFallbackFeedback(recording, champion = "Samira") {
   const text = [recording.gameDetail, recording.feedback, recording.pattern, recording.eventEvidence].join(" ").toLowerCase();
   if (/\b(base|inhib|inhibitor|nexus|tower|turret|structure|end)\b/i.test(text)) {
-    return "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.";
+    return "The leak is staying in pressure mode after the safe result stops being clear, so the next forward click gives enemies another collapse window.";
   }
   if (/\b(side|jungle|camp|farm|wave|defend|defense|turret)\b/i.test(text)) {
-    return "Mistake: a side or farm click stayed on the menu after the map needed a wave or tower decision. Fix: check closest threatened turret, ally deaths, and who can stand in front; defend the wave, group behind allies, or reset instead of adding another loose forward click.";
+    return "The leak is keeping the side or farm click after the map has already asked for defense, so small gold trades into lost wave or turret time.";
   }
   if (/\b(low hp|low-health|death|dead|died|shutdown|reset|recall|spend|shop|gold)\b/i.test(text)) {
-    return "Mistake: the next fight stayed available after the safe reset or spend window appeared. Fix: leave on the first safe screen, spend, then re-enter with health, item power, and allies.";
+    return "The leak is playing one more screen after the safe reset appears, so the gold or health lead stays exposed.";
   }
   if (/\b(fight|spacing|entry|cc|crowd control|target|kite|collapse|fog|vision)\b/i.test(text)) {
-    return "Mistake: the fight entry became catchable before the enemy threat was spent or blocked. Fix: hold outside engage range until an ally or enemy cooldown creates the entry window.";
+    return "The leak is entering before the enemy threat is spent or blocked, so a playable fight becomes a catchable death.";
   }
-  return `Mistake: ${champion} kept taking a loose next click after the visible map state changed. Fix: pause, check allies, enemy threat, and nearest objective, then choose defend, reset, or hit structure.`;
+  return `The leak is that ${champion} keeps taking a loose next click after the visible map state changes, so pressure does not become a stable result.`;
 }
 
 function applyDeterministicVisibleReviewFallback(recording, fileName) {
@@ -2418,6 +2436,8 @@ function visibleParagraphStandardIssues(recording = {}) {
   const eventEvidence = coachClean(recording.eventEvidence || recording.evidence, "");
   const allVisibleText = [recording.feedbackTitle, recording.feedback, detail, eventEvidence, recording.failureEvidence, recording.pattern, recording.goodThing, recording.secondaryFocus || recording.secondaryImprovement].filter(Boolean).join(" ");
   const issues = [];
+  const needsTightReview = (recording.analysisVersion === analysisVersion || !recording.analysisVersion) &&
+    (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
   const needsTeachingReason = recording.analysisSource !== "manual" || recording.file === "auto_NA1-5565387627_01.mp4";
   const needsSecondaryFocus = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
   const needsActionScript = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
@@ -2430,6 +2450,9 @@ function visibleParagraphStandardIssues(recording = {}) {
     Number.isFinite(Number(recording.cs));
   if (detail.length < 240) {
     issues.push("visible paragraph is too short");
+  }
+  if (needsTightReview && detail.length > 850) {
+    issues.push("visible paragraph is too long for the tight review standard");
   }
   const primaryReviewSeconds = [
     ...primaryMistakeTimestampSeconds(detail, eventEvidence),
@@ -2458,6 +2481,9 @@ function visibleParagraphStandardIssues(recording = {}) {
   }
   if (needsActionScript && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
     issues.push("visible paragraph uses labels instead of a natural key timestamp click rule");
+  }
+  if (needsTightReview && repeatedPayoutChecklistCount(allVisibleText) > 1) {
+    issues.push("visible paragraph repeats the payout checklist instead of saying it once");
   }
   if (needsActionScript && !/^Rep\s*:/i.test(coachClean(recording.secondaryFocus || recording.drill || ""))) {
     issues.push("pink next-game instruction must be one Rep sentence");
@@ -2562,6 +2588,12 @@ function hasTimestampedActionScript(text) {
   return timestampedActionScriptSentences(text).some((sentence) => (
     /\b(?:instead|rather than|not|never|should|job\s+is|is\s+to|next\s+(?:click|move|job|decision|check)|do|walk|stand|hold|wait|recall|reset|leave|back|kite|hit|clear|catch|push|defend|stop|stay|save|let|keep)\b/i.test(sentence)
   ));
+}
+
+function repeatedPayoutChecklistCount(text) {
+  const source = String(text || "").toLowerCase();
+  const matches = source.match(/\b(?:no\s+)?(?:tower|turret)\s*,\s*(?:safe\s+)?wave\s*,\s*(?:dragon\s+or\s+baron|objective)\s*(?:setup)?\s*,?\s*(?:and|or)\s*(?:no\s+clear\s+)?ally[-\s]?front\b|\btower\/wave\/objective\/ally[-\s]?front\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/g) || [];
+  return matches.length;
 }
 
 function hasKeyTimestampClickRule(text) {
@@ -2997,9 +3029,9 @@ function manualFeedback(file) {
       champion: "Samira",
       confidence: "high",
       feedbackTitle: "Late entry when no payout is visible",
-      feedback: "The leak is that when the only visible option is a catchable fight with no guaranteed payout, you treat maybe I can enter as enough reason to step forward; by 24:00, that becomes another death instead of a reset or map result.",
-      gameDetail: "At 22:00, you are on the left edge of an upper-river fight with two allies near you and enemies in front, but the screen is showing fight-only value: no free tower, no safe wave, no dragon or Baron setup, and no clear ally front that guarantees your entry, so the next click is back behind the ally line, not forward into the fight. This is a late-entry and unsafe re-entry problem: Samira can hover and threaten, but she cannot be the first reachable body when no tower, wave, objective, or ally-front payout is visible. Earlier at 15:32, you showed the exact reset habit by recalling under bot turret with more than 1100 gold instead of forcing another lane play, so the issue is not that you never reset; it is that later no-payout fights still stay on the menu. By 24:00 the cost is visible: another death near the upper-river/jungle area, and the final 2/10/8 with 103 CS in 27 minutes says deaths are the main blocker while the low CS is partly downstream of dead time. The repeatable rule is simple: after 15 minutes, if the screen does not show tower, wave, objective, or ally front, the next click is back.",
-      secondaryFocus: "Rep: after 15 minutes, before casting or stepping forward into any fight, ask tower, wave, objective, or ally front. If none is visible, take one step back first. Re-enter only when an ally is still between you and the enemy and the target is CC'd, low, or already committed.",
+      feedback: "The leak is treating a catchable fight as playable after the payout is gone, so pressure turns into another death timer instead of a reset or map result.",
+      gameDetail: "At 22:00, you are on the left edge of an upper-river fight with two allies nearby and enemies in front, but nothing permanent is visible to win, so the wrong click is forward entry and the next click is back behind the ally line. By 24:00 that habit becomes another death; the 2/10/8, 103 CS ranked line says death timers are the first blocker, with CS partly bleeding from dead time.",
+      secondaryFocus: "Rep: after 15 minutes, before stepping into a fight, ask what permanent thing do we win. If the answer is nothing, click one step back and re-enter only from behind an ally.",
       mistakeTypes: [
         "catchable fight entry",
         "death-state exposure",
@@ -3008,14 +3040,14 @@ function manualFeedback(file) {
         "low CS income stability"
       ],
       eventEvidence: "7:59 and 12:44 show death timers after bot-side fights; 15:32 shows the correct recall under bot turret with over 1100 gold; 22:00 shows the upper-river fight with enemies in front and no tower or wave payout on screen; 24:00 shows another death in the same upper-river/jungle area.",
-      failureEvidence: "At 22:00 the visible state is fight-only value with no structure, wave, or objective payout on screen, so stepping in only works if ally front stays between you and the enemies; by 24:00 that condition has failed and another death timer has replaced the reset or map result.",
-      goodThing: "The good part is that you are still willing to fight, and at 15:32 you showed the exact reset habit by recalling under bot turret with more than 1100 gold; keep that reset instinct.",
+      failureEvidence: "At 22:00 the visible state is fight-only value with no permanent result on screen; by 24:00 another death timer replaces the reset or map result.",
+      goodThing: "At 15:32 you recalled under bot turret with more than 1100 gold; keep that reset instinct.",
       whyTrust: "This uses inspected 7:59, 12:44, 15:32, 22:00, and 24:00 frames plus the 2/10/8, 103 CS ranked stat line.",
       focusTag: "fight entry reset",
       evidence: "Manual frame inspection of the visible death timers, 15:32 recall, 22:00 upper-river fight, and 24:00 death plus League Client stats.",
-      pattern: "The game shows playable damage and some correct reset decisions, but the repeated failure is treating fight-only screens as if they still contain a permanent payout.",
-      diamondRule: "If the next screen has no tower, wave, objective, or ally front, Samira clicks back before she clicks in.",
-      drill: "After 15 minutes, ask tower, wave, objective, or ally front before every forward fight click.",
+      pattern: "The game shows playable damage and a real reset habit, but the repeat failure is treating fight-only screens as if they still contain a permanent result.",
+      diamondRule: "If the screen has no permanent result, Samira clicks back before she clicks in.",
+      drill: "After 15 minutes, ask what permanent thing the fight wins before every forward click.",
       timeline: [
         "7:59 - Samira is on a death timer after a bot-side fight.",
         "12:44 - Samira is dead again after a bot-side river/jungle fight.",
@@ -3032,10 +3064,10 @@ function manualFeedback(file) {
       ],
       nuance: [
         "The good part is the 15:32 recall; the reset button exists in your game.",
-        "The bad part is entering later fight-only screens when no permanent payout is visible.",
+        "The bad part is entering later fight-only screens when no permanent result is visible.",
         "Ten deaths are the main blocker in this ranked game.",
         "103 CS in 27 minutes is also low, but the CS issue is partly caused by dead time.",
-        "The next-game check is payout, ally front, or back."
+        "The next-game check is permanent result or one step back."
       ],
       reviewLimit: "Manual 2 FPS frame review cannot prove exact inputs or cooldowns, but it can verify the visible death timers, recall, fight-only state, missing tower/wave payout, and final K/D/A/CS context.",
       outcome: "defeat",
@@ -4132,8 +4164,8 @@ function analysisSpecificityIssues(parsed, context = {}) {
     Number.isFinite(Number(context.deaths)) &&
     Number.isFinite(Number(context.assists)) &&
     Number.isFinite(Number(context.cs));
-  if (!/Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback)) {
-    issues.push("feedback must keep Mistake/Fix shape");
+  if (!(/\bThe leak is(?:\s+that)?\b[\s\S]{40,}/i.test(feedback) || /Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback))) {
+    issues.push("feedback must name the leak in one direct red sentence");
   }
   if (gameDetail.length < 180) {
     issues.push("gameDetail too short for a useful decision-chain recap");
@@ -4173,6 +4205,12 @@ function analysisSpecificityIssues(parsed, context = {}) {
   }
   if (isAutoFullReview && !/^Rep\s*:/i.test(coachClean(parsed?.secondaryFocus || parsed?.drill || ""))) {
     issues.push("secondaryFocus must be one pink next-game Rep sentence");
+  }
+  if (isAutoFullReview && gameDetail.length > 850) {
+    issues.push("gameDetail is too long for the tight single-paragraph review");
+  }
+  if (isAutoFullReview && repeatedPayoutChecklistCount(combined) > 1) {
+    issues.push("visible review repeats the payout checklist instead of saying it once");
   }
   if (isAutoFullReview && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test(combined)) {
     issues.push("visible review uses generic review-frame or broad branch wording");
@@ -4523,18 +4561,19 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Coach like a blunt but serious Challenger-path League coach: name the actual mistake, do not soften it, and do not insult Alan. If a play is greedy, late, unsafe, low-value, disconnected, or not transferable to stronger ranked games, say that plainly and tie it to visible evidence.",
     "Give one highest-value main mistake plus at least two supporting mistake lanes after scanning the whole visible game. The main mistake stays in feedback/gameDetail. The next easiest lane goes in secondaryFocus. The broader lane list goes in mistakeTypes so the page can show more kinds of mistakes without becoming a giant checklist.",
     "Write the visible coaching fields like one smooth paragraph from a highly experienced League coach. Do not expose field labels such as 'Failure evidence:', 'Other mistake types:', or 'Second focus:'. Green/red/pink highlighting is handled by the page; all unhighlighted prose should read as context, proof, and supporting detail for the green/red/pink claims. The red-readable mistake text should name only what was bad or leaking, the green-readable goodThing should name only what to keep doing, and the pink-readable action text should tell Alan exactly what to do next game if he reads only pink.",
-    "The feedback field must be one boldable coach sentence in this exact shape: 'Mistake: ... Fix: ...'. It must say what he did wrong and what to do differently. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed payout.",
+    "The feedback field must be one short red sentence beginning with 'The leak is ...'. It names the actual bad decision once and the cost once. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed result.",
     "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
-    "Alan's latest correction: keep the single-paragraph colored format, but make the review read like a coach's forensic note. Do not stop at category advice like group, reset, pressure mid, spacing, target selection, cash out cleaner, map cash-out, or wrong task after map state changes. The first sentence of gameDetail must be one natural key click-rule sentence in this shape: 'At MM:SS, [exact visible state], so the next click is [the click/check to do now].' It must name the concrete screen state and translate the concept into a literal if-this-then-that click rule.",
+    "Alan's latest correction: keep the single-paragraph colored format, but make the review tighter and more direct. Ideal visible structure: sharp title, outcome header, one key timestamp, visible state, wrong click, correct click, one green habit to keep, one red leak, one pink Rep. Do not repeat the same payout checklist several times. Mention tower/wave/objective/ally-front style checks once if needed, then use shorter phrases such as permanent payout, safe result, or click back.",
+    "Do not stop at category advice like group, reset, pressure mid, spacing, target selection, cash out cleaner, map cash-out, or wrong task after map state changes. The first sentence of gameDetail must be one natural key click-rule sentence in this shape: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' It must name the concrete screen state and translate the concept into a literal if-this-then-that click rule.",
     "At the main timestamp, name the concrete visible state precisely: where the followed champion is, which tower or wave matters, which allies are present or dead if visible, which enemies are visible or missing if visible, whether an ally can stand between the followed champion and enemy collapse, and what the nearest permanent result is. If death timers, missing enemies, or a tower state are not visible enough, say the limit and make the action conditional instead of pretending certainty.",
     "For tower, wave, inhibitor, base, or pressure states, separate the branch options instead of blending them: hit tower if it is free; hit only the enemy body blocking tower if it is safe and an ally can front; push or clear wave then recall if wave is the only guaranteed value; leave if no permanent result is available. Avoid slogans such as cash out cleaner, map cash-out, and wrong task after map state changes.",
     "If client K/D/A and CS context is available in the recording metadata, use it in the visible review and name the bigger blocker: deaths, low CS, missed tower, bad reset, overchase, wave defense, objective timing, or fight entry. Do not treat K/D/A and CS as decoration; use them to decide what the player should work on first.",
     "Also include eventEvidence and failureEvidence. eventEvidence is one compact sentence naming the actual visible things that prove the coaching claim. failureEvidence is the same proof written as the failure chain: what Alan did, what visible state made it wrong, what leaked, and what happened next or almost happened. If the advice is overstay/reset, the evidence must show the overstay, low-health stay, respawn danger, missed reset window, or tempo leak; if the advice is structure conversion, the evidence must show structure access, a free structure, a blocked structure, or the chase away from it. This is proof, not advice.",
     "For base, inhibitor, nexus, and open-structure situations, separate three states: free structure, enemy body blocking the structure, and objective not currently possible. Do not call a wave-to-structure or structure-hitting moment a mistake. If the footage shows Alan correctly pathing to the objective, say that as the goodThing and critique only the remaining leak.",
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
-    "Write gameDetail like one smooth replay-review paragraph, not a stat audit and not a field list: include the main visible mistake window, what leaked, what happened next or almost happened, and one final simple lesson sentence. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must include the exact visible state and the correct next click. Extra timestamps are optional and should appear only when they make the critique clearer.",
+    "Write gameDetail like one smooth, short replay-review paragraph, not a stat audit and not a field list: include the main visible mistake window, what happened next or almost happened, and the K/D/A-CS blocker if available. The red feedback field names the leak, the green goodThing names the keep habit, and the pink secondaryFocus names the drill, so do not repeat those claims in gameDetail unless the timestamp evidence needs one short bridge. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must include the exact visible state, the wrong click, and the correct next click. Extra timestamps are optional and should appear only when they make the critique clearer.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
-    "secondaryFocus must be one concise natural sentence and must not repeat the main mistake. Choose the strongest second lane from visible mechanics-adjacent habits, camera stability, spacing, target choice, cursor/click pattern when visible, entry timing, cooldown/CC accounting, lane trade discipline, wave handling, pathing, fog/vision, or reset pattern. Include an easy next-game action, but do not start with 'Second focus:' or a label.",
+    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Do not start with 'Second focus:' or a label.",
     "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
@@ -4555,7 +4594,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
     "Visible output must address the player as 'you' or the detected player champion, never 'Alan' in third person.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short sharp title naming the actual mistake","feedback":"The leak is that [exact wrong decision and what it costs].","gameDetail":"one concise decision-chain paragraph with visible moments, leak/consequence, timestamped if-this-then-that next-click rule, and one simple lesson sentence; no field labels","secondaryFocus":"Rep: one pink next-game drill Alan can apply immediately; must be click-specific","mistakeTypes":["3-5 short distinct mistake lanes visible or honestly limited by the recording"],"eventEvidence":"compact proof of what visibly happened in the game","failureEvidence":"one natural sentence proving failure: what Alan did, what state made it wrong, what leaked, and what happened next or almost happened; no label prefix","goodThing":"one honest keep-doing-this sentence, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, second/third mistake lane, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short sharp title naming the actual mistake","feedback":"The leak is that [exact wrong decision and what it costs].","gameDetail":"short decision paragraph with one key timestamp, exact visible state, wrong click, correct click, and compact consequence/stat context; no field labels","secondaryFocus":"Rep: one pink next-game drill Alan can apply immediately; must be click-specific","mistakeTypes":["3-5 short distinct mistake lanes visible or honestly limited by the recording"],"eventEvidence":"compact proof of what visibly happened in the game","failureEvidence":"one natural sentence proving failure: what Alan did, what state made it wrong, what leaked, and what happened next or almost happened; no label prefix","goodThing":"one concrete keep-doing-this habit, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, second/third mistake lane, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -4567,7 +4606,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact, but make it specific enough for Alan to study: what he did, what leaked, what happened next or almost happened, why the better next click/check is better, and exactly what to do differently at the timestamp. Be direct enough for a Challenger-path review without insulting him. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the next click is [the click/check to do now].' Include failureEvidence as visible proof of failure, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, wrong click, correct click, one green keep habit, one red leak, one pink Rep. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' Do not repeat the tower/wave/objective/ally-front checklist more than once. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
