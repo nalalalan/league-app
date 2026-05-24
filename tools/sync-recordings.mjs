@@ -19,6 +19,8 @@ const replayDir = process.env.LEAGUE_REPLAY_DIR || path.join(path.dirname(source
 const leagueLogsRoot = process.env.LEAGUE_LOGS_DIR || "C:\\Riot Games\\League of Legends\\Logs";
 const model = process.env.LEAGUE_ANALYSIS_MODEL || "gpt-5-mini";
 const timeZone = "America/New_York";
+const fightEntryRep = "Rep: after 15 minutes, before stepping into a fight, ask: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.";
+const fightEntryDrill = "After 15 minutes, before stepping into a fight: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.";
 const analysisVersion = "2026-05-24-dense-click-review-v21";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
@@ -1479,21 +1481,34 @@ function ensureSecondaryFocus(recording, champion = "Samira") {
   const issues = secondaryFocusStandardIssues(recording);
   if (!issues.length) return;
   recording.secondaryFocus = repairUnverifiedVisibleNames(
-    "Rep: after 15 minutes, before any forward click, ask: closest threatened turret, ally deaths, and who can stand in front of me; if any answer is bad, click back first.",
+    fightEntryRep,
     champion
   );
 }
 
 function ensurePinkRep(recording, champion = "Samira") {
   const current = coachClean(recording.secondaryFocus || recording.secondaryImprovement || "");
+  const visibleText = [
+    recording.feedback,
+    recording.gameDetail,
+    recording.secondaryFocus,
+    recording.failureEvidence,
+    recording.pattern,
+    recording.eventEvidence,
+    recording.goodThing
+  ].join(" ");
+  if (/\b(fight|entry|front|enter|re-enter|collapse|catchable)\b/i.test(visibleText) && !/\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(current)) {
+    recording.secondaryFocus = repairUnverifiedVisibleNames(fightEntryRep, champion);
+    return;
+  }
   if (/^Rep\s*:/i.test(current) && !secondaryFocusStandardIssues({ ...recording, secondaryFocus: current }).length && !/\bwhat permanent thing\b/i.test(current)) return;
   const drill = coachClean(recording.drill || "");
-  let source = (drill || current || "after 15 minutes, before stepping into a fight, ask: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally")
+  let source = (drill || current || fightEntryRep)
     .replace(/^Rep\s*:\s*/i, "")
     .replace(/^next game[:,]?\s*/i, "")
     .trim();
   if (/\bwhat permanent thing\b/i.test(source) || source.length < 70 || !/\b(click|check|ask|front|tower|wave|objective|reset|recall|leave|enter|back)\b/i.test(source)) {
-    source = "after 15 minutes, before stepping into a fight, ask: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally";
+    source = fightEntryRep.replace(/^Rep\s*:\s*/i, "");
   }
   recording.secondaryFocus = repairUnverifiedVisibleNames(
     `Rep: ${source}`,
@@ -2179,7 +2194,7 @@ function keyClickRuleSentence(analysis = {}, anchor = null, champion = "Samira")
 }
 
 function branchActionSentence(clock) {
-  return `At ${clock}, if no permanent payout is visible, the next click is back; stay forward only for a free tower, safe blocker, or guaranteed wave.`;
+  return `At ${clock}, if no tower, wave, objective, or ally front is visible, the next click is one step back; re-enter only from behind an ally.`;
 }
 
 function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") {
@@ -2343,7 +2358,7 @@ function applyDeterministicVisibleReviewFallback(recording, fileName) {
   }
   recording.pattern = recording.pattern || "The visible pattern is the next-click branch after a fight, wave, camp, structure, or defense state changes: free tower, safe blocker, wave then recall, or leave.";
   recording.diamondRule = recording.diamondRule || "After 15 minutes, every forward click needs a visible payout branch before the click happens.";
-  recording.drill = recording.drill || "After 15 minutes, before any forward click: closest threatened turret, ally deaths, who can stand in front of me.";
+  recording.drill = recording.drill || fightEntryDrill;
   const usesComputedClock = [...cleanClockAnchors(recording.clockMoments), ...cleanClockAnchors(recording.clockAnchors)]
     .some((anchor) => /\bcurrent-match\b/i.test(anchor.description || ""));
   const fallbackLimit = usesComputedClock
@@ -3945,7 +3960,7 @@ function fallbackFeedback(file, duration, context = {}) {
       evidence: "",
       pattern: "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
       diamondRule: "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
-      drill: "After 15 minutes, before any forward click: closest threatened turret, ally deaths, who can stand in front of me.",
+      drill: fightEntryDrill,
       nuance: ["High kills only matter when the next click creates tower, wave, objective, reset, or base value.", "Low CS makes every unclear forward click more expensive because income is already unstable."],
       reviewLimit: "",
       analysisSource: "fallback"
