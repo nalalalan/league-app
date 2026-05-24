@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-24T17:59:27.079Z",
+  "generatedAt": "2026-05-24T18:06:24.384Z",
   "source": "League of Legends Highlights folder",
   "match": "39 matches",
   "matches": [
@@ -49,9 +49,9 @@
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 24, 2026, 1:09 PM: newest full-game read Silver III; current 3-game read Silver IV; archive median Bronze IV across 36 full games, used only as baseline context. The newest game is around the current three-game read.",
+    "focus": "Synced through May 24, 2026, 1:09 PM: newest full-game read Silver IV; current 3-game read Silver IV; archive median Bronze IV across 36 full games, used only as baseline context. The newest game is around the current three-game read.",
     "rule": "The newest-game blocker is reset/overstay discipline and side farm over map defense; the current repeat across the latest games is ally-frontline check, reset/overstay discipline, and side farm over map defense. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-    "nextRep": "Rep: after 15 minutes, before any forward click, ask: closest threatened turret, ally deaths, and who can stand in front of me; if any answer is bad, click back first.",
+    "nextRep": "Rep: after 15 minutes, before stepping into a fight, ask: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5567223507_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
@@ -222,8 +222,8 @@
       "confidence": "medium",
       "feedbackTitle": "Pressure mode after payout vanished",
       "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      "gameDetail": "At 26:02, two allied champions moving toward enemy base; chat window open, so the wrong click is stepping forward after the safe payout disappeared and the next click is to take the visible payout now, or click back if none is guaranteed. by 31:43, two allies near top inhibitor in base; minimap and HUD visible. The 8/3/6, 202 CS in 38 minutes says Samira can fight, so the review should judge the next decision after pressure. The sharper leak is staying in pressure mode after the safe payout is no longer proven; a Samira lead climbs when the next click turns the wave or fight into a stable result before enemies get another collapse window.",
-      "secondaryFocus": "Rep: after 15 minutes, before any forward click, ask: closest threatened turret, ally deaths, and who can stand in front of me; if any answer is bad, click back first.",
+      "gameDetail": "At 0:31, 'Minions have spawned' message; two bot-lane champions visible near river, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. by 9:01, Samira is dead with 'BACK IN 10' respawn UI visible. The 8/3/6, 202 CS in 38 minutes says Samira can fight, so the review should judge the next decision after pressure. The sharper leak is staying in pressure mode after the safe payout is no longer proven; a Samira lead climbs when the next click turns the wave or fight into a stable result before enemies get another collapse window.",
+      "secondaryFocus": "Rep: after 15 minutes, before stepping into a fight, ask: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.",
       "mistakeTypes": [
         "reset/overstay discipline",
         "side farm over map defense",
@@ -231,12 +231,12 @@
         "wave/objective conversion",
         "camera/map-state check"
       ],
-      "eventEvidence": "31:43 shows two allies near top inhibitor in base; minimap and HUD visible. 26:02 shows two allied champions moving toward enemy base; chat window open. 28:53 shows Samira moving in river near Baron pit; minimap shows team positions. 9:01 shows Samira is dead with 'BACK IN 10' respawn UI visible; lane minions present.",
-      "failureEvidence": "At 31:43, two allies near top inhibitor in base; minimap and HUD visible; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.",
+      "eventEvidence": "9:01 shows Samira is dead with 'BACK IN 10' respawn UI visible. 14:42 shows two allies in bottom lane with minions; small-map timer visible. 17:32 shows Samira attacking a jungle camp near river. 0:31 shows 'Minions have spawned' message; two bot-lane champions visible near river.",
+      "failureEvidence": "At 9:01, Samira is dead with 'BACK IN 10' respawn UI visible; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.",
       "goodThing": "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
       "whyTrust": "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
       "focusTag": "overstay control",
-      "evidence": "31:43 shows two allies near top inhibitor in base; minimap and HUD visible. 26:02 shows two allied champions moving toward enemy base; chat window open. 28:53 shows Samira moving in river near Baron pit; minimap shows team positions. 9:01 shows Samira is dead with 'BACK IN 10' respawn UI visible; lane minions present.",
+      "evidence": "9:01 shows Samira is dead with 'BACK IN 10' respawn UI visible. 14:42 shows two allies in bottom lane with minions; small-map timer visible. 17:32 shows Samira attacking a jungle camp near river. 0:31 shows 'Minions have spawned' message; two bot-lane champions visible near river.",
       "pattern": "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
       "diamondRule": "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
       "drill": "After 15 minutes, before any forward click: closest threatened turret, ally deaths, who can stand in front of me.",
@@ -258,14 +258,56 @@
           "description": "Two champions trading in bottom lane with minions around."
         },
         {
+          "clock": "8:58",
+          "videoSeconds": 514.462,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
           "clock": "9:01",
           "videoSeconds": 514.462,
           "description": "Player is dead with 'BACK IN 10' respawn UI visible; lane minions present."
         },
         {
+          "clock": "11:48",
+          "videoSeconds": 684.615,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
           "clock": "11:52",
           "videoSeconds": 684.615,
           "description": "Champion near river and three red traps/wards visible on the ground."
+        },
+        {
+          "clock": "14:38",
+          "videoSeconds": 854.769,
+          "description": "shows Samira in a current-match mid-game rotation and objective review frame"
+        },
+        {
+          "clock": "14:42",
+          "videoSeconds": 854.769,
+          "description": "Two allies in bottom lane with minions; small-map timer visible."
+        },
+        {
+          "clock": "17:29",
+          "videoSeconds": 1024.923,
+          "description": "shows Samira in a current-match mid-game rotation and objective review frame"
+        },
+        {
+          "clock": "17:32",
+          "videoSeconds": 1024.923,
+          "description": "Champion attacking a jungle camp near river."
+        },
+        {
+          "clock": "20:19",
+          "videoSeconds": 1195.077,
+          "description": "shows Samira in a current-match late-game map-state review frame"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "9:01",
+          "videoSeconds": 514.462,
+          "description": "shows Samira is dead with 'BACK IN 10' respawn UI visible"
         },
         {
           "clock": "14:42",
@@ -275,61 +317,19 @@
         {
           "clock": "17:32",
           "videoSeconds": 1024.923,
-          "description": "Champion attacking a jungle camp near river."
+          "description": "Samira attacking a jungle camp near river."
         },
         {
-          "clock": "20:22",
-          "videoSeconds": 1195.077,
-          "description": "Three allied champions in mid lane; dark circular ability effect visible."
-        },
-        {
-          "clock": "23:12",
-          "videoSeconds": 1365.231,
-          "description": "Teamfight near dragon pit with multiple champions and ability effects."
-        },
-        {
-          "clock": "26:02",
-          "videoSeconds": 1535.385,
-          "description": "Two allied champions moving toward enemy base; chat window open."
-        },
-        {
-          "clock": "28:53",
-          "videoSeconds": 1705.538,
-          "description": "Champion moving in river near Baron pit; minimap shows team positions."
-        },
-        {
-          "clock": "31:43",
-          "videoSeconds": 1875.692,
-          "description": "Two allies near top inhibitor in base; minimap and HUD visible."
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "31:43",
-          "videoSeconds": 1875.692,
-          "description": "Two allies near top inhibitor in base; minimap and HUD visible."
-        },
-        {
-          "clock": "26:02",
-          "videoSeconds": 1535.385,
-          "description": "Two allied champions moving toward enemy base; chat window open."
-        },
-        {
-          "clock": "28:53",
-          "videoSeconds": 1705.538,
-          "description": "Samira moving in river near Baron pit; minimap shows team positions."
-        },
-        {
-          "clock": "9:01",
-          "videoSeconds": 514.462,
-          "description": "Samira is dead with 'BACK IN 10' respawn UI visible; lane minions present."
+          "clock": "0:31",
+          "videoSeconds": 4,
+          "description": "'Minions have spawned' message; two bot-lane champions visible near river."
         }
       ],
       "nuance": [
         "High kills only matter when the next click creates tower, wave, objective, reset, or base value.",
         "Low CS makes every unclear forward click more expensive because income is already unstable."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry. The detailed AI pass failed, so this review is a conservative timestamped fallback from verified visible frames.",
+      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry. The detailed AI or clock-reading pass failed, so this review uses computed game-clock labels from match/capture timing and conservative current-match frames.",
       "analysisSource": "fallback",
       "analysisVersion": "2026-05-24-dense-click-review-v21",
       "sampledFrames": 14,
@@ -341,9 +341,9 @@
         "version": "2026-05-22-exact-rank-trend-v4",
         "label": "Silver",
         "range": "Bronze I-Silver II",
-        "exactRank": "Silver III",
-        "exactRankValue": 9,
-        "score": 45,
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
+        "score": 40,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -367,7 +367,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Silver III read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "Silver IV read from macro habits: death count stayed controlled; held down by reset discipline after wins, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
       }
     },
     {
