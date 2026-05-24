@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-24T04:12:30.872Z",
+  "generatedAt": "2026-05-24T04:49:39.980Z",
   "source": "League of Legends Highlights folder",
-  "match": "37 matches",
+  "match": "38 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -39,19 +39,20 @@
     "NA1-5566726915",
     "NA1-5566786855",
     "NA1-5566823161",
-    "NA1-5566860300"
+    "NA1-5566860300",
+    "NA1-5566943774"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 23, 2026, 11:14 PM ET",
-  "totalDuration": "517:03",
-  "totalRecordings": 49,
+  "captured": "May 18, 2026, 5:46 PM to May 24, 2026, 12:48 AM ET",
+  "totalDuration": "544:38",
+  "totalRecordings": 50,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 23, 2026, 10:51 PM: newest full-game read Gold II; current 3-game read Silver IV; archive median Bronze IV across 34 full games, used only as baseline context. The newest game is above the current three-game read.",
-    "rule": "The newest-game blocker is base structure target priority and ally-frontline check; the current repeat across the latest games is ally-frontline check, base structure target priority, and wave into exit timing. The keep-habit is At 16:07 and 19:43 you are grouped with allies while structures are falling or exposed; keep that base-pressure habit.",
-    "nextRep": "Work on base target priority: once allies are in front, keep the camera on structure and defenders so the next click is structure, blocker, wave, or exit.",
+    "focus": "Synced through May 24, 2026, 12:18 AM: newest full-game read Iron IV; current 3-game read Bronze I; archive median Bronze IV across 35 full games, used only as baseline context. The newest game is below the current three-game read.",
+    "rule": "The newest-game blocker is reset/overstay discipline and side farm over map defense; the current repeat across the latest games is ally-frontline check, reset/overstay discipline, and side farm over map defense. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
+    "nextRep": "After 15 minutes, before any forward click: closest threatened turret, ally deaths, and who can stand in front of me.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
-    "pattern": "Latest file auto_NA1-5566860300_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
+    "pattern": "Latest file auto_NA1-5566943774_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
       "Read the newest-game point.",
       "Use the latest-game next action.",
@@ -64,21 +65,21 @@
     "method": "research-calibrated macro rank estimate with confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 35,
+    "fullReviewGames": 36,
     "queueCounts": {
       "unknown": 4,
       "bot": 18,
-      "ranked_solo": 13
+      "ranked_solo": 14
     },
-    "rankedFullGames": 13,
-    "pvpFullGames": 13,
+    "rankedFullGames": 14,
+    "pvpFullGames": 14,
     "botFullGames": 18,
-    "anchoredFullGames": 35,
-    "statFullGames": 35,
+    "anchoredFullGames": 36,
+    "statFullGames": 36,
     "rankLabelCounts": {
       "Bronze": 17,
       "Silver": 4,
-      "Iron": 12,
+      "Iron": 13,
       "Gold": 2
     },
     "exactRankScale": [
@@ -162,7 +163,7 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 48,
+      "recordings": 49,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
@@ -178,6 +179,152 @@
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5566943774_01.mp4",
+      "publicFile": "auto_NA1-5566943774_01.mp4",
+      "cacheKey": "53058250:1779598103504",
+      "fingerprint": "2a9c75649632",
+      "matchId": "NA1-5566943774",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779596322460,
+      "gameHappenedAt": "2026-05-24T04:18:42.460Z",
+      "gameHappenedAtLabel": "May 24, 2026, 12:18 AM",
+      "recordedAt": "2026-05-24T04:48:23.571Z",
+      "recordedAtLabel": "May 24, 2026, 12:48 AM",
+      "recordedAtTimeLabel": "12:48 AM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Pressure mode after payout vanished",
+      "duration": "27:35",
+      "durationSeconds": 1655,
+      "gameLength": "27:16",
+      "gameLengthSeconds": 1636,
+      "kda": "2/10/8",
+      "kills": 2,
+      "deaths": 10,
+      "assists": 8,
+      "cs": 103,
+      "statsSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "medium",
+      "feedbackTitle": "Pressure mode after payout vanished",
+      "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
+      "gameDetail": "At 15:32, the mistake window is Samira in a current-match mid-game rotation and objective review frame. earlier at 9:12, Samira in a current-match lane-to-map transition review frame. At 15:32, branch before any forward click: closest threatened turret, ally deaths, and front body; if tower is free, hit it; if one body blocks it and an ally can front, hit that body safely; if only wave is guaranteed, clear it then recall; if none are true, leave. The 2/10/8, 103 CS in 27 minutes says the biggest cost is death-state exposure: the damage exists, but too many decisions end in timers before the result is locked. The sharper leak is staying in pressure mode after the safe payout is no longer proven; a Samira lead climbs when the next click turns the wave or fight into a stable result before enemies get another collapse window. This matters because the climb comes from clean damage windows, spent gold, and protected entries, not through loose seconds where the enemy gets another collapse.",
+      "secondaryFocus": "After 15 minutes, before any forward click: closest threatened turret, ally deaths, and who can stand in front of me.",
+      "mistakeTypes": [
+        "reset/overstay discipline",
+        "side farm over map defense",
+        "spacing/entry discipline",
+        "wave/objective conversion",
+        "camera/map-state check"
+      ],
+      "eventEvidence": "15:32 shows Samira in a current-match mid-game rotation and objective review frame. 9:12 shows Samira in a current-match lane-to-map transition review frame. 11:19 shows Samira in a current-match lane-to-map transition review frame. 13:25 shows Samira in a current-match lane-to-map transition review frame.",
+      "failureEvidence": "At 15:32, Samira in a current-match mid-game rotation and objective review frame; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.",
+      "goodThing": "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
+      "whyTrust": "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
+      "focusTag": "overstay control",
+      "evidence": "15:32 shows Samira in a current-match mid-game rotation and objective review frame. 9:12 shows Samira in a current-match lane-to-map transition review frame. 11:19 shows Samira in a current-match lane-to-map transition review frame. 13:25 shows Samira in a current-match lane-to-map transition review frame.",
+      "pattern": "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
+      "diamondRule": "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
+      "drill": "After 15 minutes, before any forward click: closest threatened turret, ally deaths, who can stand in front of me.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "9:12",
+          "videoSeconds": 510.769,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
+          "clock": "11:19",
+          "videoSeconds": 637.462,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
+          "clock": "13:25",
+          "videoSeconds": 764.154,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
+          "clock": "15:32",
+          "videoSeconds": 890.846,
+          "description": "shows Samira in a current-match mid-game rotation and objective review frame"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "15:32",
+          "videoSeconds": 890.846,
+          "description": "shows Samira in a current-match mid-game rotation and objective review frame"
+        },
+        {
+          "clock": "9:12",
+          "videoSeconds": 510.769,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
+          "clock": "11:19",
+          "videoSeconds": 637.462,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
+          "clock": "13:25",
+          "videoSeconds": 764.154,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        }
+      ],
+      "nuance": [
+        "High kills only matter when the next click creates tower, wave, objective, reset, or base value.",
+        "Low CS makes every unclear forward click more expensive because income is already unstable."
+      ],
+      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry. The detailed AI or clock-reading pass failed, so this review uses computed game-clock labels from match/capture timing and conservative current-match frames.",
+      "analysisSource": "fallback",
+      "analysisVersion": "2026-05-23-decision-branch-coaching-v17",
+      "sampledFrames": 14,
+      "publicVideoBytes": 53058250,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5566943774_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5566943774-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-22-exact-rank-trend-v4",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "score": 0,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 98,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "Iron IV read from macro habits: the recording still shows playable fighting instincts; held down by very high death count for a bot game, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Ranked-transfer confidence is high from ranked solo evidence."
+      }
+    },
     {
       "file": "auto_NA1-5566860300_01.mp4",
       "publicFile": "auto_NA1-5566860300_01.mp4",
@@ -519,7 +666,7 @@
       "cs": 156,
       "statsSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Bot pressure needs exit branch",
