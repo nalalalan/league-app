@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T22:50:12.899Z",
+  "generatedAt": "2026-05-25T22:55:00.749Z",
   "source": "League of Legends Highlights folder",
   "match": "44 matches",
   "matches": [
@@ -225,18 +225,18 @@
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Mid wave turned into a river chase",
-      "feedback": "The leak is chasing from mid into river after the wave-and-ally setup stops protecting you, so pressure becomes another death timer instead of wave, recall, or regroup.",
-      "gameDetail": "At 23:05, you leave a safe mid-wave setup with an ally nearby and a target deeper toward river, but no tower hit or guaranteed objective is on screen and the ally line is not clearly between you and the collapse, so the wrong click is the forward river chase and the next click is catch mid wave, step back toward turret, or reset/group. By 23:20 the state flip is visible: multiple enemies are on you and the play becomes a death timer, which matters because 4/6/1 with 148 CS means the farm pace is usable but the fight impact keeps getting paid back through avoidable exits.",
+      "feedback": "The leak is chasing from mid into river after the wave-and-ally setup stops protecting you, so pressure becomes another death instead of wave, recall, or regroup.",
+      "gameDetail": "At 23:05, you leave a safe mid-wave setup with an ally nearby and a target deeper toward river, but no tower hit or guaranteed objective is on screen and the ally line is not clearly between you and the collapse, so the wrong click is the forward river chase and the next click is catch mid wave, step back toward turret, or reset/group. By 23:20 the state flip is visible: multiple enemies are on you and the play becomes a death, which matters because 4/6/1 with 148 CS means the farm pace is usable but the fight impact keeps getting paid back through avoidable exits.",
       "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
       "mistakeTypes": [
         "mid wave to river chase",
         "ally-front check",
         "exit after first value",
         "fight-entry discipline",
-        "death-state exposure"
+        "avoidable river death"
       ],
       "eventEvidence": "22:40 and 23:00 show Samira grouped mid with wave and ally context; 23:05 shows the move from mid toward river; 23:15 shows the collapse beginning; 23:20 shows the death timer.",
-      "failureEvidence": "At 23:05 the visible value is still mid wave, turret safety, or regroup, but the click goes toward river before an ally-front guarantee or free target is proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death timer.",
+      "failureEvidence": "At 23:05 the visible value is still mid wave, turret safety, or regroup, but the click goes toward river before an ally-front guarantee or free target is proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death.",
       "goodThing": "At 19:47 you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
       "whyTrust": "This uses the inspected 19:47, 22:40, 23:05, 23:15, and 23:20 frames plus the League Client 4/6/1, 148 CS ranked context.",
       "focusTag": "mid-to-river exit",
