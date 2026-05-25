@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T20:59:12.415Z",
+  "generatedAt": "2026-05-25T21:05:16.428Z",
   "source": "League of Legends Highlights folder",
   "match": "43 matches",
   "matches": [
@@ -225,7 +225,7 @@
       "confidence": "high",
       "feedbackTitle": "Cleaner win, one mid re-entry death remains",
       "feedback": "The leak is staying forward for a second mid-fight re-entry after the first value window has already become wave, recall, or regroup.",
-      "gameDetail": "At 21:09, the first mid fight is legal enough because allies and a wave are near you and value has already happened, but the state flip is exit/value: you are low, enemy bodies can still re-engage, and the next click is one step back through the wave, then recall or group. The first bad next click is staying forward for another Samira re-entry. At 19:23 you had already shown the keepable habit by recalling after bot-side pressure with about 1687 gold. By 22:02 the re-entry becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one mid-fight exit leak.",
+      "gameDetail": "At 21:09, the first mid fight is legal enough because allies and a wave are near you and value has already happened, but the state flip is exit/value: you are low, enemy bodies can still re-engage, and the next click is one step back through the wave, then recall or group. The first bad next click is staying forward for another Samira re-entry. By 22:02 the re-entry becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one mid-fight exit leak.",
       "secondaryFocus": "Rep: after a mid fight gives one kill, assist, wave, or turret pressure, say wave, recall, or regroup. If you are low or no ally is clearly in front, no second forward E; take one step back through the wave first.",
       "mistakeTypes": [
         "mid-fight exit after value",
