@@ -114,7 +114,7 @@ function repCategory(recording = {}) {
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) return "laneDeathExit";
   if (/\bmid[-\s]?wave\b/i.test(text) &&
       /\briver\b/i.test(text) &&
-      /\b(chase|entry|front|collapse|ally[-\s]?front)\b/i.test(text)) return "fightEntry";
+      /\b(chase|entry|front|collapse|ally[-\s]?front)\b/i.test(text)) return "midRiverChase";
   if (/\b(dragon|baron|objective|pit)\b/i.test(text) &&
       /\b(fight|entry|engaged|committed|first value|second fight|value window|state flip|re-entry|reenter|exit)\b/i.test(text)) return "objectiveFight";
   if (!won && Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) return "deathExit";
@@ -142,6 +142,8 @@ function repMatchesGameCategory(recording = {}) {
       return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":
       return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b/i.test(rep);
+    case "midRiverChase":
+      return /\bafter mid wave gives value\b|\bwave,\s*turret,\s*reset,\s*or\s*river\b|\bRiver is legal only if\b|\bcatch the wave and take one step back\b/i.test(rep);
     case "fightEntry":
       return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
     case "cleanerWinExit":

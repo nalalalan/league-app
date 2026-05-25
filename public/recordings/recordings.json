@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T23:01:12.137Z",
+  "generatedAt": "2026-05-25T23:26:08.701Z",
   "source": "League of Legends Highlights folder",
   "match": "44 matches",
   "matches": [
@@ -55,8 +55,8 @@
   "mainFeedback": {
     "title": "Samira latest synced state",
     "focus": "Synced through May 25, 2026, 6:01 PM: newest full-game read Iron I; current 3-game read Bronze II; archive median Bronze III across 41 full games, used only as baseline context. The newest game is below the current three-game read.",
-    "rule": "The newest-game blocker is mid wave to river chase and ally-front check; the current repeat across the latest games is ally-front check, exit after first value, and mid wave to river chase. The keep-habit is you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
-    "nextRep": "Rep: before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
+    "rule": "The newest-game blocker is mid wave to river chase and ally-front check; the current repeat across the latest games is ally-front check, exit after first value, and mid wave to river chase. The keep-habit is you recall safely under turret after pressure, and earlier you play near wave plus ally context; keep that exit/setup habit.",
+    "nextRep": "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5568185590_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
@@ -205,7 +205,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Mid wave turned into a river chase",
+      "title": "Mid wave became an illegal river chase",
       "duration": "25:45",
       "durationSeconds": 1545,
       "gameLength": "27:28",
@@ -224,10 +224,10 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Mid wave turned into a river chase",
-      "feedback": "The leak is chasing from mid into river after the wave-and-ally setup stops protecting you, so pressure becomes another death instead of wave, recall, or regroup.",
-      "gameDetail": "At 23:05, you leave a safe mid-wave setup with an ally nearby and a target deeper toward river, but no tower hit or guaranteed objective is on screen and the ally line is not clearly between you and the collapse, so the wrong click is the forward river chase and the next click is catch mid wave, step back toward turret, or reset/group. By 23:20 the state flip is visible: multiple enemies are on you and the play becomes a death, which matters because 4/6/1 with 148 CS means the farm pace is usable but the fight impact keeps getting paid back through avoidable exits.",
-      "secondaryFocus": "Rep: before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
+      "feedbackTitle": "Mid wave became an illegal river chase",
+      "feedback": "The leak is that a safe mid-wave state turns into a river chase once wave and ally cover stop protecting you, so pressure becomes another avoidable death instead of wave, turret safety, reset, or group.",
+      "gameDetail": "At 23:05, you have mid wave near you, an ally nearby, and a retreat path back toward turret while the target is deeper toward river with no tower hit, dragon/baron setup, or guaranteed kill on screen, so the wrong click is chasing into river and the next click is catch mid wave, step back toward turret, reset, or group. By 23:20 multiple enemies can reach you and the playable wave has become another death.",
+      "secondaryFocus": "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.",
       "mistakeTypes": [
         "mid wave to river chase",
         "ally-front check",
@@ -236,14 +236,14 @@
         "avoidable river death"
       ],
       "eventEvidence": "22:40 and 23:00 show Samira grouped mid with wave and ally context; 23:05 shows the move from mid toward river; 23:15 shows the collapse beginning; 23:20 shows the death.",
-      "failureEvidence": "At 23:05 the visible value is still mid wave, turret safety, or regroup, but the click goes toward river before an ally-front guarantee or free target is proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death.",
-      "goodThing": "At 19:47 you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
+      "failureEvidence": "At 23:05 the visible value is still mid wave, turret safety, reset, or group; river is not legal yet because ally front, objective, or a CC'd/low target is not proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death.",
+      "goodThing": "At 19:47 you recall safely under turret after pressure, and earlier you play near wave plus ally context; keep that exit/setup habit.",
       "whyTrust": "This uses the inspected 19:47, 22:40, 23:05, 23:15, and 23:20 frames plus the League Client 4/6/1, 148 CS ranked context.",
       "focusTag": "mid-to-river exit",
       "evidence": "Manual frame inspection of the mid-to-river fight window and League Client ranked stats for the same match.",
       "pattern": "The first mid setup is playable because wave and ally context exist; the mistake starts when the next click leaves that setup for river without a clear front body, tower, wave, objective, or low/CC'd target.",
       "diamondRule": "After mid pressure, a Samira river chase is legal only when an ally is still in front and the target is already CC'd or low; otherwise the result is mid wave, turret safety, reset, or regroup.",
-      "drill": "before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
+      "drill": "after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.",
       "timeline": [
         "19:47 - Samira recalls safely under mid turret after pressure.",
         "22:40 - Samira is grouped mid with an ally and wave context.",
@@ -350,13 +350,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min and 6 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
+        "reason": "5.4 CS/min is usable, but 4/6/1 K/D/A, 6 deaths, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at Iron I."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "5.4 CS/min and 6 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
+        "reason": "5.4 CS/min is usable, but 4/6/1 K/D/A, 6 deaths, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at Iron I."
       }
     },
     {

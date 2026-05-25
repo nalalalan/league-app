@@ -29,6 +29,7 @@ const firstWinCashoutRep = "Rep: after the first won exchange, choose one result
 const basePushRep = "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.";
 const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
 const jungleFightExitRep = "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.";
+const midRiverChaseRep = "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.";
 const analysisVersion = "2026-05-25-forensic-performance-rank-v25";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
@@ -1630,7 +1631,7 @@ function reviewRepCategory(recording = {}) {
   if (/\bmid[-\s]?wave\b/i.test(text) &&
       /\briver\b/i.test(text) &&
       /\b(chase|entry|front|collapse|ally[-\s]?front)\b/i.test(text)) {
-    return "fightEntry";
+    return "midRiverChase";
   }
   if (!won &&
       Number.isFinite(deaths) &&
@@ -1684,6 +1685,8 @@ function specificRepForRecording(recording = {}) {
         return jungleFightExitRep;
       }
       return sideFarmDefenseRep;
+    case "midRiverChase":
+      return midRiverChaseRep;
     case "fightEntry":
       return fightEntryRep;
     case "cleanerWinExit":
@@ -1712,6 +1715,8 @@ function repMatchesGameCategory(recording = {}) {
       return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":
       return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b|\bjungle fight gives first value\b|\bexit to turret,\s*catch mid wave,\s*reset,\s*or\s*regroup\b|\bDo not keep chasing through jungle\b/i.test(rep);
+    case "midRiverChase":
+      return /\bafter mid wave gives value\b|\bwave,\s*turret,\s*reset,\s*or\s*river\b|\bRiver is legal only if\b|\bcatch the wave and take one step back\b/i.test(rep);
     case "fightEntry":
       return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
     case "cleanerWinExit":
@@ -3526,6 +3531,9 @@ function performanceRankReason(recording = {}, context = {}) {
   if (category === "laneDeathExit") {
     return `${csText} and ${deathText} pull the game to ${rank} because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline.`;
   }
+  if (category === "midRiverChase") {
+    return `${csText} is usable, but ${kdaText}, ${deathText}, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at ${rank}.`;
+  }
   if (category === "sideFarmDefense") {
     if (/\b(blue-side jungle|jungle fight|jungle value|jungle-exit)\b/i.test(analysisCoachText(recording))) {
       return `${csText} and only ${deathText} show calmer farming and survival than the death-heavy games, but ${kdaText} fight impact and the late jungle-fight exit/value leak keep the performance at ${rank}.`;
@@ -3591,10 +3599,10 @@ function manualFeedback(file) {
     return {
       champion: "Samira",
       confidence: "high",
-      feedbackTitle: "Mid wave turned into a river chase",
-      feedback: "The leak is chasing from mid into river after the wave-and-ally setup stops protecting you, so pressure becomes another death instead of wave, recall, or regroup.",
-      gameDetail: "At 23:05, you leave a safe mid-wave setup with an ally nearby and a target deeper toward river, but no tower hit or guaranteed objective is on screen and the ally line is not clearly between you and the collapse, so the wrong click is the forward river chase and the next click is catch mid wave, step back toward turret, or reset/group. By 23:20 the state flip is visible: multiple enemies are on you and the play becomes a death, which matters because 4/6/1 with 148 CS means the farm pace is usable but the fight impact keeps getting paid back through avoidable exits.",
-      secondaryFocus: "Rep: before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
+      feedbackTitle: "Mid wave became an illegal river chase",
+      feedback: "The leak is that a safe mid-wave state turns into a river chase once wave and ally cover stop protecting you, so pressure becomes another avoidable death instead of wave, turret safety, reset, or group.",
+      gameDetail: "At 23:05, you have mid wave near you, an ally nearby, and a retreat path back toward turret while the target is deeper toward river with no tower hit, dragon/baron setup, or guaranteed kill on screen, so the wrong click is chasing into river and the next click is catch mid wave, step back toward turret, reset, or group. By 23:20 multiple enemies can reach you and the playable wave has become another death.",
+      secondaryFocus: midRiverChaseRep,
       mistakeTypes: [
         "mid wave to river chase",
         "ally-front check",
@@ -3603,14 +3611,14 @@ function manualFeedback(file) {
         "avoidable river death"
       ],
       eventEvidence: "22:40 and 23:00 show Samira grouped mid with wave and ally context; 23:05 shows the move from mid toward river; 23:15 shows the collapse beginning; 23:20 shows the death.",
-      failureEvidence: "At 23:05 the visible value is still mid wave, turret safety, or regroup, but the click goes toward river before an ally-front guarantee or free target is proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death.",
-      goodThing: "At 19:47 you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
+      failureEvidence: "At 23:05 the visible value is still mid wave, turret safety, reset, or group; river is not legal yet because ally front, objective, or a CC'd/low target is not proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death.",
+      goodThing: "At 19:47 you recall safely under turret after pressure, and earlier you play near wave plus ally context; keep that exit/setup habit.",
       whyTrust: "This uses the inspected 19:47, 22:40, 23:05, 23:15, and 23:20 frames plus the League Client 4/6/1, 148 CS ranked context.",
       focusTag: "mid-to-river exit",
       evidence: "Manual frame inspection of the mid-to-river fight window and League Client ranked stats for the same match.",
       pattern: "The first mid setup is playable because wave and ally context exist; the mistake starts when the next click leaves that setup for river without a clear front body, tower, wave, objective, or low/CC'd target.",
       diamondRule: "After mid pressure, a Samira river chase is legal only when an ally is still in front and the target is already CC'd or low; otherwise the result is mid wave, turret safety, reset, or regroup.",
-      drill: "before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
+      drill: "after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.",
       timeline: [
         "19:47 - Samira recalls safely under mid turret after pressure.",
         "22:40 - Samira is grouped mid with an ally and wave context.",
@@ -5489,7 +5497,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like one smooth, short replay-review paragraph, not a stat audit and not a field list: include the main visible mistake window, what happened next or almost happened, and the K/D/A-CS blocker if available. The red feedback field names the leak, the green goodThing names the keep habit, and the pink secondaryFocus names the drill, so do not repeat those claims in gameDetail unless the timestamp evidence needs one short bridge. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must include the exact visible state, the wrong click, and the correct next click. Extra timestamps are optional and should appear only when they make the critique clearer. Current-standard gameDetail should usually stay under 650 characters.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
-    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after first won fight; grouped base push = structure, blocker, wave, or exit. Do not start with 'Second focus:' or a label.",
+    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after first won fight; grouped base push = structure, blocker, wave, or exit; mid-wave river chase = after mid wave gives value, ask wave, turret, reset, or river. Do not start with 'Second focus:' or a label.",
     "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
