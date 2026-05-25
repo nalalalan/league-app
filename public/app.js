@@ -1720,7 +1720,7 @@ function recordingOutcomeLabel(item) {
 }
 
 function isTightClickReview(item) {
-  return /2026-05-24-(?:command-lane-rep-v24|lane-specific-rep-v23|game-specific-rep-v22|dense-click-review-v21|tight-click-review-v20)/.test(String(item?.analysisVersion || ""));
+  return /(?:2026-05-25-forensic-performance-rank-v25|2026-05-24-(?:command-lane-rep-v24|lane-specific-rep-v23|game-specific-rep-v22|dense-click-review-v21|tight-click-review-v20))/.test(String(item?.analysisVersion || ""));
 }
 
 function displayFailureEvidence(item) {
@@ -2064,7 +2064,21 @@ function recordingClockMomentText(item, existingTimes = new Set()) {
   return parts.join("; ");
 }
 
+function recordingPerformanceRank(item) {
+  const performance = item?.performanceRank || {};
+  const rank = String(performance.exactRank || performance.rank || "").trim();
+  if (!rank) return null;
+  return {
+    rank,
+    reason: String(performance.reason || "").replace(/\s+/g, " ").trim()
+  };
+}
+
 function recordingRankSentence(item) {
+  const performance = recordingPerformanceRank(item);
+  if (performance) {
+    return `Approx performance rank: ${performance.rank}.${performance.reason ? ` Reason: ${performance.reason}` : ""}`;
+  }
   const estimate = item?.rankEstimate || {};
   const exact = recordingExactRank(item);
   const label = exact?.rank || String(estimate.label || "").trim();
@@ -2188,7 +2202,8 @@ function championLatestMainFeedback(champion, championRecordings = []) {
   const statLine = [latest.kda ? `${latest.kda} K/D/A` : "", Number.isFinite(Number(latest.cs)) ? `${latest.cs} CS` : ""]
     .filter(Boolean)
     .join(", ");
-  const rankLine = latest.rankEstimate?.exactRank ? `Approx rank read: ${latest.rankEstimate.exactRank}` : "";
+  const performance = recordingPerformanceRank(latest);
+  const rankLine = performance ? `Approx performance ${performance.rank}` : (latest.rankEstimate?.exactRank ? `Approx rank read: ${latest.rankEstimate.exactRank}` : "");
   const sourceLine = [
     rankLine,
     statLine ? `stats ${statLine}` : "",

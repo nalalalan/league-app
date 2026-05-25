@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T06:25:00.256Z",
+  "generatedAt": "2026-05-25T07:18:04.868Z",
   "source": "League of Legends Highlights folder",
   "match": "41 matches",
   "matches": [
@@ -45,15 +45,15 @@
     "NA1-5567367431",
     "NA1-5567787430"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 25, 2026, 2:21 AM ET",
-  "totalDuration": "620:03",
-  "totalRecordings": 54,
+  "captured": "May 18, 2026, 5:46 PM to May 25, 2026, 2:24 AM ET",
+  "totalDuration": "624:11",
+  "totalRecordings": 55,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 25, 2026, 1:32 AM: newest full-game read Iron IV; current 3-game read Iron I; archive median Bronze IV across 38 full games, used only as baseline context. The newest game is below the current three-game read.",
-    "rule": "The newest-game blocker is reset/overstay discipline and side farm over map defense; the current repeat across the latest games is ally-frontline check, reset/overstay discipline, and side farm over map defense. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-    "nextRep": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+    "focus": "Synced through May 25, 2026, 1:32 AM: newest full-game read Iron III; current 3-game read Iron III; archive median Bronze III across 39 full games, used only as baseline context. The newest game is around the current three-game read.",
+    "rule": "The newest-game blocker is objective-fight state flip and second fight after value; the current repeat across the latest games is exit/re-entry discipline, objective-fight state flip, and second fight after value. The keep-habit is you are starting to recognize real objective fight windows with allies already committed; keep entering when bodies are engaged and the fight.",
+    "nextRep": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5567787430_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
@@ -64,25 +64,25 @@
     "reviewLimit": "Rank read is a macro-equivalent estimate, not Riot MMR."
   },
   "rankCalibration": {
-    "version": "2026-05-22-exact-rank-trend-v4",
+    "version": "2026-05-25-performance-rank-v5",
     "method": "research-calibrated macro rank estimate with confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 39,
+    "fullReviewGames": 40,
     "queueCounts": {
       "unknown": 14,
       "bot": 14,
-      "ranked_solo": 11
+      "ranked_solo": 12
     },
-    "rankedFullGames": 11,
-    "pvpFullGames": 11,
+    "rankedFullGames": 12,
+    "pvpFullGames": 12,
     "botFullGames": 14,
-    "anchoredFullGames": 39,
-    "statFullGames": 39,
+    "anchoredFullGames": 40,
+    "statFullGames": 40,
     "rankLabelCounts": {
-      "Bronze": 18,
-      "Silver": 5,
-      "Iron": 14,
+      "Bronze": 16,
+      "Silver": 6,
+      "Iron": 16,
       "Gold": 2
     },
     "exactRankScale": [
@@ -166,7 +166,7 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 53,
+      "recordings": 54,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
@@ -203,7 +203,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Pressure mode after payout vanished",
+      "title": "Objective entry is improving; the leak is second fight after value",
       "duration": "21:54",
       "durationSeconds": 1314,
       "gameLength": "27:59",
@@ -221,91 +221,77 @@
       "kind": "full review",
       "reviewPhase": "current form",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Pressure mode after payout vanished",
-      "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      "gameDetail": "At 9:58, teamfight at the dragon pit with dragon and multiple champions engaged, so the wrong click is stepping forward after the safe payout disappeared and the next click is to take the visible payout now, or click back if none is guaranteed. earlier at 0:16, allied champions and minions near base as they leave the fountain. The 5/9/3, 119 CS in 28 minutes says the biggest cost is death-state exposure: the damage exists, but too many decisions end in timers before the result is locked. The sharper leak is staying in pressure mode after the safe payout is no longer proven; a Samira lead climbs when the next click turns the wave or fight into a stable result before enemies get another collapse window.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "confidence": "high",
+      "feedbackTitle": "Objective entry is improving; the leak is second fight after value",
+      "feedback": "The leak is taking a second fight after the first objective value window instead of re-checking whether dragon, wave, recall, group, or ally front is still available.",
+      "gameDetail": "At 9:58, the dragon fight starts as a partly legal entry: dragon is on screen, allies are already committed, enemies are in front, and you are close enough to follow, so the first value window is playable, but once that dragon/kill pressure resolves the wrong click is taking a second forward fight and the next click is dragon, wave, recall, group, or one step back if none is visible. That state flip is where deaths stack: legal entry, value gained, state flip, and exit check are not separated. With 5/9/3 and 119 CS in 28 minutes, damage pressure exists, but death timers and low-CS time keep the pressure from becoming stable conversion.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
-        "reset/overstay discipline",
-        "side farm over map defense",
-        "spacing/entry discipline",
-        "wave/objective conversion",
-        "camera/map-state check"
+        "objective-fight state flip",
+        "second fight after value",
+        "exit/re-entry discipline",
+        "low CS from death timers",
+        "objective/wave/recall conversion"
       ],
-      "eventEvidence": "9:58 shows teamfight at the dragon pit with dragon and multiple champions engaged. 0:16 shows allied champions and minions near base as they leave the fountain. 24:09 shows death screen showing 'BACK IN 33' overlay and minimap, Samira currently dead. 1:56 shows bot-lane laning: Samira Samira with 'LEVEL UP!' text and minions present.",
-      "failureEvidence": "At 9:58, teamfight at the dragon pit with dragon and multiple champions engaged; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.",
-      "goodThing": "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-      "whyTrust": "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
-      "focusTag": "overstay control",
-      "evidence": "9:58 shows teamfight at the dragon pit with dragon and multiple champions engaged. 0:16 shows allied champions and minions near base as they leave the fountain. 24:09 shows death screen showing 'BACK IN 33' overlay and minimap, Samira currently dead. 1:56 shows bot-lane laning: Samira Samira with 'LEVEL UP!' text and minions present.",
-      "pattern": "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
-      "diamondRule": "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
-      "drill": "after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
-      "timeline": [],
+      "eventEvidence": "9:58 shows dragon on screen with several champions engaged near pit; 24:09 shows another death timer; the final 5/9/3, 119 CS in a 28-minute ranked loss shows damage pressure existed but deaths and low CS kept conversion unstable.",
+      "failureEvidence": "At 9:58 the first objective entry is playable, but the failure starts after the initial dragon/kill value: the next forward fight happens before dragon, wave, recall, group, or ally-front safety is proven, which turns pressure into another death-state pattern.",
+      "goodThing": "At 9:58 you are starting to recognize real objective fight windows with allies already committed; keep entering when bodies are engaged and the fight can create dragon or kill pressure.",
+      "whyTrust": "This uses the visible 9:58 dragon-pit fight, the later death-state frame, and the 5/9/3, 119 CS ranked stat line instead of judging only the defeat.",
+      "focusTag": "objective fight state flip",
+      "evidence": "Manual frame inspection of the 9:58 objective fight, 24:09 death-state frame, and League Client stats.",
+      "pattern": "The entry is improving when objective value and allied commitment are visible; the leak is the next phase, where the same fight keeps being treated as legal after the first value window has already changed.",
+      "diamondRule": "After an objective fight gives value, choose dragon, wave, recall, or group before another forward fight.",
+      "drill": "after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
+      "timeline": [
+        "9:58 - Dragon is on screen with several champions engaged near pit.",
+        "24:09 - Samira is dead with the death timer visible."
+      ],
       "clockAnchors": [
-        {
-          "clock": "0:16",
-          "videoSeconds": 4,
-          "description": "Allied champions and minions near base as they leave the fountain."
-        },
-        {
-          "clock": "1:56",
-          "videoSeconds": 104.462,
-          "description": "Bot-lane laning: player champion with 'LEVEL UP!' text and minions present."
-        },
         {
           "clock": "9:58",
           "videoSeconds": 506.308,
-          "description": "Teamfight at the dragon pit with dragon and multiple champions engaged."
+          "description": "Dragon is on screen with several champions engaged near pit."
         },
         {
           "clock": "24:09",
           "videoSeconds": 1109.077,
-          "description": "Death screen showing 'BACK IN 33' overlay and minimap, player currently dead."
+          "description": "Samira is dead with the death timer visible."
         }
       ],
       "clockMoments": [
         {
           "clock": "9:58",
           "videoSeconds": 506.308,
-          "description": "Teamfight at the dragon pit with dragon and multiple champions engaged."
-        },
-        {
-          "clock": "0:16",
-          "videoSeconds": 4,
-          "description": "Allied champions and minions near base as they leave the fountain."
+          "description": "shows dragon on screen with several champions engaged near pit"
         },
         {
           "clock": "24:09",
           "videoSeconds": 1109.077,
-          "description": "Death screen showing 'BACK IN 33' overlay and minimap, Samira currently dead."
-        },
-        {
-          "clock": "1:56",
-          "videoSeconds": 104.462,
-          "description": "Bot-lane laning: Samira Samira with 'LEVEL UP!' text and minions present."
+          "description": "shows another death timer"
         }
       ],
       "nuance": [
-        "High kills only matter when the next click creates tower, wave, objective, reset, or base value.",
-        "Low CS makes every unclear forward click more expensive because income is already unstable."
+        "Good: the first objective entry is partly legal because dragon and committed bodies are visible.",
+        "Leak: the second fight after first value is being treated like the same legal window.",
+        "Cost: 5/9/3 and 119 CS in 28 minutes means death timers are erasing farm and conversion.",
+        "Next branch: dragon, wave, recall, group, or step back.",
+        "Limit: sampled frames cannot prove every cooldown, so the re-entry rule stays conditional on visible ally front and enemy commitment."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry. The detailed AI pass failed, so this review is a conservative timestamped fallback from verified visible frames.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "reviewLimit": "Manual frame review used sampled 2 FPS frames and cannot prove exact cooldowns or every enemy position; the decision rule is based on visible objective, allied commitment, death state, K/D/A, and CS.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 42312514,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5567787430_01.mp4",
       "poster": "/recordings/posters/auto-na1-5567787430-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron IV",
-        "exactRankValue": 0,
-        "score": 3,
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "score": 8,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -329,7 +315,156 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron IV read from macro habits: the recording still shows playable fighting instincts; held down by too many punishable deaths, kill pressure is not yet consistent, reset discipline after wins. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "4.3 CS/min with a 5/9/3 K/D/A and 9 deaths sets the performance grade; the objective entry is partly legal, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "reason": "4.3 CS/min with a 5/9/3 K/D/A and 9 deaths sets the performance grade; the objective entry is partly legal, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+      }
+    },
+    {
+      "file": "auto_NA1-5567787430_02.mp4",
+      "publicFile": "auto_NA1-5567787430_02.mp4",
+      "cacheKey": "4878730:1779690264302",
+      "fingerprint": "087e20a98a23",
+      "matchId": "NA1-5567787430",
+      "score": "auto",
+      "clipNumber": 2,
+      "matchTimeMs": 1779687159589,
+      "gameHappenedAt": "2026-05-25T05:32:39.589Z",
+      "gameHappenedAtLabel": "May 25, 2026, 1:32 AM",
+      "recordedAt": "2026-05-25T06:24:24.385Z",
+      "recordedAtLabel": "May 25, 2026, 2:24 AM",
+      "recordedAtTimeLabel": "2:24 AM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Do not turn level 1 into a blind brush test",
+      "duration": "4:08",
+      "durationSeconds": 247.5,
+      "gameLength": "27:59",
+      "gameLengthSeconds": 1679,
+      "kda": "5/9/3",
+      "kills": 5,
+      "deaths": 9,
+      "assists": 3,
+      "cs": 119,
+      "statsSource": "League Client match history",
+      "win": false,
+      "outcome": "defeat",
+      "outcomeLabel": "DEFEAT",
+      "outcomeSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "medium",
+      "feedbackTitle": "Do not turn level 1 into a blind brush test",
+      "feedback": "The leak is treating an early bot-brush setup as a commit by itself instead of waiting for enemy reveal, wave control, or a free first trade to make the next step legal.",
+      "gameDetail": "At 0:53, Samira and support are holding the bot-side brush before minions meet and no enemy body, wave payout, or forced first trade is visible, so the wrong click is stepping deeper for a blind first contact and the next click is to hold the brush edge, wait for enemy reveal, or walk to lane on time if nothing appears. By 1:21, the first minions are already in lane and the setup only mattered if it created health, summoner, or wave value. The final 5/9/3, 119 CS in 28 minutes says the bigger rank cost is still turning early pressure into stable lane and fight value instead of later death timers.",
+      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "mistakeTypes": [
+        "level-1 blind commit",
+        "early lane payout check",
+        "wave-first discipline",
+        "ally-front timing",
+        "death-state exposure later"
+      ],
+      "eventEvidence": "0:53 shows Samira and support sitting in the bot-side brush before minions meet with no enemy body or wave payout visible; 1:21 shows the first lane wave already in front, which means the setup needed to create health, summoner, or wave value immediately to be worth the hold.",
+      "failureEvidence": "At 0:53, Samira and support sitting in the bot-side brush before minions meet with no enemy body or wave payout visible; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.",
+      "goodThing": "You are grouped with support instead of wandering into lane alone, which is the right base shape to keep before the reveal happens.",
+      "whyTrust": "This uses the visible 0:53 brush hold, the 1:21 lane state, and the final 5/9/3, 119 CS ranked stat line to keep the note tied to what the clip actually shows.",
+      "focusTag": "level 1 payout",
+      "evidence": "Manual frame inspection of the 0:53 bot-brush hold, the 1:21 first-wave lane state, and the League Client stats for the same ranked game.",
+      "pattern": "The early setup is only useful when the reveal creates a concrete payout. If nothing appears, lane timing and first-wave control matter more than proving willingness to fight from fog.",
+      "diamondRule": "Level-1 brush pressure is only worth keeping when the next visible step creates a first trade, wave control, or a forced enemy detour.",
+      "drill": "before any level-1 brush hold, ask what the reveal buys right now: first trade, wave control, or leave. If none is visible, walk to lane on time instead of forcing first contact.",
+      "timeline": [
+        "0:53 - Samira and support hold bot-side brush before minions meet.",
+        "1:21 - The first minion wave is already in lane with Samira and support beside it."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "0:53",
+          "videoSeconds": 53,
+          "description": "Samira and support hold bot-side brush before minions meet."
+        },
+        {
+          "clock": "1:21",
+          "videoSeconds": 125,
+          "description": "The first minion wave is already in lane with Samira and support beside it."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "0:53",
+          "videoSeconds": 53,
+          "description": "shows Samira and support sitting in the bot-side brush before minions meet with no enemy body or wave payout visible"
+        },
+        {
+          "clock": "1:21",
+          "videoSeconds": 125,
+          "description": "shows the first lane wave already in front, which means the setup needed to create health, summoner, or wave value immediately to be worth the hold."
+        }
+      ],
+      "nuance": [
+        "Good: the setup is grouped with support instead of a solo face-check.",
+        "Leak: the brush hold needs a visible payout before it becomes a commit.",
+        "Branch: if no enemy reveal or free trade appears, lane timing and first-wave control are the better conversion.",
+        "Cost: the full ranked line still ends 5/9/3 with 119 CS in 28 minutes, so later deaths and low farm remain the bigger carry leak.",
+        "Limit: sampled frames do not prove the unseen enemy positions inside fog, so the rule stays tied to visible reveal and wave state."
+      ],
+      "reviewLimit": "Manual frame review used sampled 2 FPS replay frames and cannot prove hidden enemy positions or exact pings; the note is limited to the visible brush hold, lane timing, and the synced match stat line.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
+      "sampledFrames": 14,
+      "publicVideoBytes": 4878730,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5567787430_02.mp4",
+      "poster": "/recordings/posters/auto-na1-5567787430-02.jpg",
+      "rankEstimate": {
+        "version": "2026-05-25-performance-rank-v5",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "score": 15,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 84,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "confidenceSignals": [
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [
+          "recording is not long enough to prove full-game macro"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "4.3 CS/min with a 5/9/3 K/D/A and 9 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "reason": "4.3 CS/min with a 5/9/3 K/D/A and 9 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       }
     },
     {
@@ -470,7 +605,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Bot-tower dash after lane value ended",
@@ -552,19 +687,19 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs or every cooldown, but it can verify the bot-turret entry window, the death timer, and the 0/5/0, 57 CS defeat context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 28151483,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5567367431_01.mp4",
       "poster": "/recordings/posters/auto-na1-5567367431-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "score": 14,
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "score": 3,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -588,7 +723,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron II read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "3.7 CS/min with a 0/5/0 K/D/A and 5 deaths sets the performance grade; fight entry is catchable or illegal, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "reason": "3.7 CS/min with a 0/5/0 K/D/A and 5 deaths sets the performance grade; fight entry is catchable or illegal, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
       }
     },
     {
@@ -634,7 +775,7 @@
       "feedbackTitle": "Cleaner win, one overstay pattern remains",
       "feedback": "The leak is that one or two pressure moments still continue after the map stops offering a safe tower, wave, objective, or ally-front entry, so a winning or neutral sequence can still become a preventable death.",
       "gameDetail": "At 8:47, you are under the enemy bot turret with an ally behind you, a pushed wave already used for pressure, multiple enemies still able to collapse, and no guaranteed tower or objective left, so the wrong click is continuing the fight and the next click is one step back through the wave toward reset. By 9:01 that overstay becomes a death timer instead of a clean exit. The 8/3/6, 202 CS in 38 minutes is real improvement: fewer deaths, better farming, and cleaner exits mean this is a cleaner win with one remaining overstay branch, not the same old collapse game.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "post-pressure exit branch",
         "tower dive/overstay discipline",
@@ -710,19 +851,19 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs or every cooldown, but it can verify the bot-turret overstay window, the death timer, and the improved 8/3/6, 202 CS victory context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 73132790,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5567223507_01.mp4",
       "poster": "/recordings/posters/auto-na1-5567223507-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Silver",
         "range": "Bronze I-Silver II",
-        "exactRank": "Silver IV",
-        "exactRankValue": 8,
-        "score": 40,
+        "exactRank": "Silver II",
+        "exactRankValue": 10,
+        "score": 48,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -746,7 +887,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Silver IV read from macro habits: death count stayed controlled; held down by lethal-health stays, reset discipline after wins. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "5.3 CS/min with a 8/3/6 K/D/A and 3 deaths sets the performance grade; the objective entry is partly legal, but exits are mostly controlled, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Silver II",
+        "exactRankValue": 10,
+        "reason": "5.3 CS/min with a 8/3/6 K/D/A and 3 deaths sets the performance grade; the objective entry is partly legal, but exits are mostly controlled, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -874,19 +1021,19 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs or cooldowns, but it can verify the visible death timers, recall, fight-only state, missing tower/wave payout, and final K/D/A/CS context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 53058250,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5566943774_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566943774-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron III",
-        "exactRankValue": 1,
-        "score": 7,
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "score": 1,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -910,7 +1057,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron III read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "3.8 CS/min with a 2/10/8 K/D/A and 10 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "reason": "3.8 CS/min with a 2/10/8 K/D/A and 10 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       }
     },
     {
@@ -1032,19 +1185,19 @@
       ],
       "reviewLimit": "Manual frame review used 2 FPS sampled frames and cannot prove exact clicks or cooldowns; it can judge grouped base state, structure access, stats, and exit-branch discipline.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 48482093,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5566860300_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566860300-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Gold",
         "range": "Silver I-Gold II",
-        "exactRank": "Gold II",
-        "exactRankValue": 14,
-        "score": 62,
+        "exactRank": "Gold IV",
+        "exactRankValue": 12,
+        "score": 56,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -1068,7 +1221,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Gold II read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by kill pressure is not yet consistent, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "5.4 CS/min with a 5/1/7 K/D/A and 1 deaths sets the performance grade; fight entry is catchable or illegal, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Gold IV",
+        "exactRankValue": 12,
+        "reason": "5.4 CS/min with a 5/1/7 K/D/A and 1 deaths sets the performance grade; fight entry is catchable or illegal, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
       }
     },
     {
@@ -1190,19 +1349,19 @@
       ],
       "reviewLimit": "Manual frame review used 2 FPS sampled frames and cannot prove exact inputs, every enemy position, or every death timer; the branch is therefore conditional on visible tower, wave, ally, and minimap state.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 49011046,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5566823161_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566823161-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze II",
-        "exactRankValue": 6,
-        "score": 35,
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "score": 29,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -1226,7 +1385,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze II read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by farm pace is too low for reliable ranked climbing, reset discipline after wins, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "3.2 CS/min with a 6/3/6 K/D/A and 3 deaths sets the performance grade; fight entry is catchable or illegal, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "3.2 CS/min with a 6/3/6 K/D/A and 3 deaths sets the performance grade; fight entry is catchable or illegal, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
       }
     },
     {
@@ -1337,19 +1502,19 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames, so exact inputs and cooldowns are not judged.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 46021230,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5566786855_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566786855-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron I",
-        "exactRankValue": 3,
-        "score": 23,
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "score": 17,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -1373,7 +1538,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron I read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, reset discipline after wins, missed structure/objective conversion. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "5.9 CS/min with a 12/6/5 K/D/A and 6 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "reason": "5.9 CS/min with a 12/6/5 K/D/A and 6 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       }
     },
     {
@@ -1484,19 +1655,19 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames and cannot prove exact cooldowns or every enemy position.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 73312301,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5566726915_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566726915-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze II",
-        "exactRankValue": 6,
-        "score": 35,
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "score": 31,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -1520,7 +1691,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze II read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by too many punishable deaths, farm pace is too low for reliable ranked climbing, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "4.0 CS/min with a 25/8/9 K/D/A and 8 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "4.0 CS/min with a 25/8/9 K/D/A and 8 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       }
     },
     {
@@ -1566,7 +1743,7 @@
       "feedbackTitle": "Cait deaths hide useful damage",
       "feedback": "Mistake: you let playable Cait states become extra forward or side-value clicks before checking who could reach you, so deaths erased the pressure your lane damage was creating. Fix: after a wave, camp, or fight is handled, click back behind an allied body, check the nearest threatened turret/objective, and only continue if Cait can hit from max range.",
       "gameDetail": "At 2:16, cait's bot-side lane state with ally and wave cover, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the pressure Cait creates. At 14:21 the ability bar shows Piltover Peacemaker, confirming this is Cait footage. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "Cait spacing before forward clicks",
         "death-state exposure",
@@ -1620,26 +1797,26 @@
       ],
       "reviewLimit": "This is a Cait-identity and visible-state repair from sampled 2 FPS footage, not a full frame-perfect Cait mechanics review.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 34335204,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5566620104_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566620104-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze II",
-        "exactRankValue": 6,
-        "score": 35,
+        "version": "2026-05-25-performance-rank-v5",
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "exactRank": "Silver III",
+        "exactRankValue": 9,
+        "score": 47,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "confidenceScore": 72,
         "queueClass": "unknown",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
+        "percentile": "middle",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -1657,7 +1834,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze II read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, side chase or fog drift. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "5.2 CS/min with a 0/5/6 K/D/A and 5 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Silver III",
+        "exactRankValue": 9,
+        "reason": "5.2 CS/min with a 0/5/6 K/D/A and 5 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -1703,7 +1886,7 @@
       "feedbackTitle": "Side waves need death-state discipline",
       "feedback": "Mistake: side-wave pressure kept turning into death-state exposure, so the game gave enemies repeated reset windows. Fix: clear the safe wave, then leave toward ally front or base unless a free tower, safe blocker, or objective is already visible.",
       "gameDetail": "At 25:49, Samira and support clearing a bottom wave near the destroyed bottom inhibitor turret, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. The cost is visible earlier at 22:59, where you are dead after a river or jungle fight while the map keeps moving without you. The 9/13/11, 162 CS, 39-minute line says the biggest issue is not refusing to fight; it is thirteen deaths and side-wave exposure turning pressure into enemy reset windows.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "side wave exit",
         "death-state exposure",
@@ -1757,19 +1940,19 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames and cannot judge exact combo speed, only visible death state, wave state, ally front, and pathing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 70126406,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5566563083_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566563083-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 24,
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "score": 30,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -1794,7 +1977,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze IV read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "4.1 CS/min with a 9/13/11 K/D/A and 13 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "4.1 CS/min with a 9/13/11 K/D/A and 13 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -1916,26 +2105,26 @@
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed or every cooldown. It can judge map state, side-camp timing, ally location, death state, and whether the next click protects base.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 49207218,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5566120017_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566120017-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 24,
+        "version": "2026-05-25-performance-rank-v5",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 18,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "confidenceScore": 72,
         "queueClass": "unknown",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
+        "percentile": "new ranked fundamentals",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -1953,7 +2142,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze IV read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, missed structure/objective conversion. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "5.9 CS/min with a 1/6/1 K/D/A and 6 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "reason": "5.9 CS/min with a 1/6/1 K/D/A and 6 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       }
     },
     {
@@ -2080,19 +2275,19 @@
       ],
       "reviewLimit": "The 2 FPS review can judge repeated mid-wave state, map movement, and respawn timing. It cannot judge exact camera hotkey timing or frame-perfect mechanics.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 43843823,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5565964482_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565964482-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron III",
         "exactRankValue": 1,
-        "score": 10,
+        "score": 6,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -2117,7 +2312,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron III read from macro habits: you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, kill pressure is not yet consistent, reset discipline after wins. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "6.2 CS/min with a 0/7/1 K/D/A and 7 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "reason": "6.2 CS/min with a 0/7/1 K/D/A and 7 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       }
     },
     {
@@ -2163,7 +2364,7 @@
       "feedbackTitle": "Losing fights need a next-click script",
       "feedback": "Mistake: you kept playing messy or losing states as if one more fight would fix them, even when enemies were alive, your health was dropping, or teammates were dead. Fix: at the mistake timestamp, back out, clear only the safe wave, or wait behind the first ally before entering again.",
       "gameDetail": "At 23:33, Samira behind a Baron-powered mid push with multiple enemy defenders still alive, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. By 23:43 you are dead with multiple allies also down, so the leak is not that you lacked damage; the leak is that the fight continued after the safe damage window ended and gave the enemy a clean push back. At 24:20, when you respawn with several teammates still dead, do not run out looking for a fight or a side route; hold base, clear the closest wave under turret, and wait for at least two teammates to spawn. At 26:54 the same rule appears again with four allies dead: stop at the base/inhibitor line, do not walk up bottom jungle or lane, and only clear minions that enter tower range. The simple next-game script is fight from behind a body while the state is even, and when the state is losing, defend one safe wave until teammates are alive.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "spacing/entry discipline",
         "shutdown or death-state exposure",
@@ -2255,19 +2456,19 @@
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed, reaction time, or every cooldown. It can judge the visible fight state, ally death timers, spacing, and forward pathing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 47751708,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5565911037_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565911037-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 25,
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "score": 31,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -2292,7 +2493,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, kill pressure is not yet consistent. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "4.8 CS/min with a 3/10/5 K/D/A and 10 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "4.8 CS/min with a 3/10/5 K/D/A and 10 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -2543,12 +2750,12 @@
       "src": "/recordings/auto_NA1-5565856492_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565856492-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "score": 20,
+        "score": 22,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -2571,12 +2778,18 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron I read from macro habits: team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "5.7 CS/min with a 15/7/5 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
       },
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "reason": "5.7 CS/min with a 15/7/5 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+      }
     },
     {
       "file": "auto_NA1-5565818690_01.mp4",
@@ -2621,7 +2834,7 @@
       "feedbackTitle": "Won fight needed low-HP reset",
       "feedback": "Mistake: after a fight win, you let the next state become another low-health stay instead of turning the win into recall, structure, or wave. Fix: if the fight is won and your HP is low, recall unless a free structure is already directly in front of your team.",
       "gameDetail": "At 14:47, a grouped objective fight near dragon pit, so the wrong click is stepping forward after the safe payout disappeared and the next click is to take the visible payout now, or click back if none is guaranteed. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "reset/overstay discipline",
         "low-HP spacing",
@@ -2685,19 +2898,19 @@
       ],
       "reviewLimit": "The 2 FPS review can judge HP-state, fight aftermath, death timer, and grouped objective shape. It cannot judge exact spell cooldowns or combo timing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 31469760,
       "captureFps": 1,
       "src": "/recordings/auto_NA1-5565818690_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565818690-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
-        "score": 25,
+        "score": 27,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -2722,7 +2935,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, missed structure/objective conversion. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "5.3 CS/min with a 7/9/8 K/D/A and 9 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "reason": "5.3 CS/min with a 7/9/8 K/D/A and 9 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -2862,7 +3081,7 @@
       "src": "/recordings/auto_NA1-5565804951_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565804951-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze IV",
@@ -2890,13 +3109,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, kill pressure is not yet consistent, reset discipline after wins. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "5.7 CS/min with a 1/6/3 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 1,
       "win": false,
       "outcome": "defeat",
       "outcomeLabel": "DEFEAT",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "reason": "5.7 CS/min with a 1/6/3 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565779781_01.mp4",
@@ -3040,7 +3265,7 @@
       "src": "/recordings/auto_NA1-5565779781_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565779781-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron II",
@@ -3068,13 +3293,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron II read from macro habits: team grouping or sync appears in the review; held down by very high death count for a bot game, kill pressure is not yet consistent, side chase or fog drift. Ranked-transfer confidence is high from ranked solo evidence."
+        "reason": "5.3 CS/min with a 2/13/4 K/D/A and 13 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 1,
       "win": false,
       "outcome": "defeat",
       "outcomeLabel": "DEFEAT",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "reason": "5.3 CS/min with a 2/13/4 K/D/A and 13 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565766659_01.mp4",
@@ -3205,7 +3436,7 @@
       "src": "/recordings/auto_NA1-5565766659_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565766659-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -3234,13 +3465,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze III read from macro habits: death count stayed controlled; held down by farm pace is too low for reliable ranked climbing, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "4.0 CS/min with a 6/1/2 K/D/A and 1 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 1,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "4.0 CS/min with a 6/1/2 K/D/A and 1 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565758308_01.mp4",
@@ -3329,7 +3566,7 @@
       "src": "/recordings/auto_NA1-5565758308_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565758308-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "exactRank": "Silver I",
@@ -3358,13 +3595,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Silver I read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "5.5 CS/min with a 14/3/3 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
       },
       "captureFps": 1,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Silver I",
+        "exactRankValue": 11,
+        "reason": "5.5 CS/min with a 14/3/3 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+      }
     },
     {
       "file": "auto_NA1-5565578420_01.mp4",
@@ -3453,7 +3696,7 @@
       "src": "/recordings/auto_NA1-5565578420_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565578420-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Gold",
         "range": "Silver I-Gold II",
         "exactRank": "Gold IV",
@@ -3482,13 +3725,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Gold IV read from macro habits: death count stayed controlled, fight conversion and damage output are clearly above beginner mechanics; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "6.5 CS/min with a 19/3/2 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 1,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Gold IV",
+        "exactRankValue": 12,
+        "reason": "6.5 CS/min with a 19/3/2 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565518539_01.mp4",
@@ -3602,7 +3851,7 @@
       "src": "/recordings/auto_NA1-5565518539_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565518539-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -3631,13 +3880,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze III read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, reset discipline after wins, missed structure/objective conversion. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "5.8 CS/min with a 29/6/1 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 2,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "5.8 CS/min with a 29/6/1 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565445744_01.mp4",
@@ -3682,7 +3937,7 @@
       "feedbackTitle": "Spend the base win before the next fight",
       "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
       "gameDetail": "At 3:23, around, at you are already farming bot safely with the wave in front, and by you take the first bot-side fight instead of only bleeding CS, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. This matters because a Samira lead only climbs when the next click protects the shutdown and turns the won moment into a map result before enemies get another collapse window.",
-      "secondaryFocus": "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "reset/overstay discipline",
         "side farm over map defense",
@@ -3804,12 +4059,12 @@
       "src": "/recordings/auto_NA1-5565445744_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565445744-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
-        "score": 26,
+        "score": 24,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -3834,7 +4089,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by avoidable deaths still show up, reset discipline after wins, missed structure/objective conversion. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "4.6 CS/min with a 8/6/5 K/D/A and 6 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "reason": "4.6 CS/min with a 8/6/5 K/D/A and 6 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -3980,19 +4241,19 @@
       "src": "/recordings/auto_NA1-5565387627_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565387627-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
-        "label": "Silver",
-        "range": "Bronze I-Silver II",
-        "exactRank": "Silver III",
-        "exactRankValue": 9,
-        "score": 45,
+        "version": "2026-05-25-performance-rank-v5",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "score": 39,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "confidenceScore": 58,
         "queueClass": "unknown",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "middle",
+        "percentile": "developing",
         "confidenceSignals": [
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
@@ -4010,7 +4271,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Silver III read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "5.5 CS/min with a 24/5/3 K/D/A and 5 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "reason": "5.5 CS/min with a 24/5/3 K/D/A and 5 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       }
     },
     {
@@ -4140,12 +4407,12 @@
       "src": "/recordings/auto_NA1-5565356454_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565356454-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze I",
-        "exactRankValue": 7,
-        "score": 37,
+        "exactRank": "Bronze II",
+        "exactRankValue": 6,
+        "score": 32,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "medium",
@@ -4169,13 +4436,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze I read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by kill pressure is not yet consistent, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "5.4 CS/min with a 4/3/7 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 2,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze II",
+        "exactRankValue": 6,
+        "reason": "5.4 CS/min with a 4/3/7 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565308644_01.mp4",
@@ -4220,7 +4493,7 @@
       "feedbackTitle": "Base break became a delayed sync",
       "feedback": "Mistake: after the base was cracked, you let the next minute become mid-wave cleanup and a late rejoin instead of an immediate finish-or-reset call. Fix: once the inhibitor/nexus area opens, say finish, reset, or sync next wave before touching another mid wave.",
       "gameDetail": "At 11:12, the base already cracked with Samira and allies inside, so the wrong click is stepping forward after the safe payout disappeared and the next click is to take the visible payout now, or click back if none is guaranteed. At 11:27 you correctly fight with allies in the base and get the takedown instead of chasing somewhere useless. At 11:47 the next decision point appears: the tower is down, you have about 3034 gold, minions and allies are still in the base, and the clean Master-climb call is either finish now or reset on the same timing as the team. At 12:32 and 12:42 you are back mid collecting waves after spending, which means the old reset critique was too vague; the actual leak is that the next base hit is no longer clearly synced. By 12:52 your team is fighting again near the opened base while you are still arriving from mid, and at 13:00 the rejoin works in this game, but stronger teams use that delay to clear waves, respawn, or collapse on the late carry. The lesson is: after base breaks, do not let a correct reset turn into a disconnected re-entry.",
-      "secondaryFocus": "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "reset/overstay discipline",
         "side farm over map defense",
@@ -4345,12 +4618,12 @@
       "src": "/recordings/auto_NA1-5565308644_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565308644-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Silver",
         "range": "Bronze I-Silver II",
-        "exactRank": "Silver III",
-        "exactRankValue": 9,
-        "score": 44,
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
+        "score": 40,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -4375,7 +4648,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Silver III read from macro habits: death count stayed controlled, team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, side chase or fog drift. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "5.8 CS/min with a 14/2/2 K/D/A and 2 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
+        "reason": "5.8 CS/min with a 14/2/2 K/D/A and 2 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -4415,13 +4694,13 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "implementation",
+      "reviewPhase": "baseline",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Base win becomes side chase",
       "feedback": "Mistake: after the base was cracked, you kept accepting second and third fights away from the cleanest payout. Fix: after inhibitor/base pressure, call the state out loud: free structure, body blocking structure, or reset; only fight if it directly protects one of those.",
       "gameDetail": "At 20:58, Samira is in the enemy base hitting through minions and defenders, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. At 21:14 the fight has paid you, two allies are dead, and you are holding about 2700 unspent gold, so the next Master-climb decision is to reset or regroup instead of staying available for the next collapse. At 22:27 you run down bot side alone with the base still cracked, which leaks the map win into travel time and gives enemies another respawn window. The lesson is not stop fighting forever; it is stop fighting unless the fight removes the body between you and the structure.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "reset/overstay discipline",
         "side farm over map defense",
@@ -4545,7 +4824,7 @@
       "src": "/recordings/auto_NA1-5565242641_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565242641-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron IV",
@@ -4575,7 +4854,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron IV read from macro habits: farm pace is a real strength, you are already finding fights, waves, towers, or base pressure; held down by very high death count for a bot game, lethal-health stays, reset discipline after wins. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "7.7 CS/min with a 15/12/3 K/D/A and 12 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "reason": "7.7 CS/min with a 15/12/3 K/D/A and 12 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -4702,12 +4987,12 @@
       "src": "/recordings/auto_NA1-5565226188_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565226188-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "score": 21,
+        "score": 23,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -4731,13 +5016,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron I read from macro habits: death count stayed controlled; held down by lethal-health stays, reset discipline after wins, missed structure/objective conversion. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "4.7 CS/min with a 17/3/4 K/D/A and 3 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exits are mostly controlled, so objective conversion has to become dragon, wave, recall, or group."
       },
       "captureFps": 4,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "reason": "4.7 CS/min with a 17/3/4 K/D/A and 3 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exits are mostly controlled, so objective conversion has to become dragon, wave, recall, or group."
+      }
     },
     {
       "file": "auto_NA1-5565193158_01.mp4",
@@ -4831,19 +5122,19 @@
       "src": "/recordings/auto_NA1-5565193158_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565193158-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze I",
-        "exactRankValue": 7,
-        "score": 39,
+        "version": "2026-05-25-performance-rank-v5",
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
+        "score": 43,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "confidenceScore": 62,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
+        "percentile": "middle",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -4860,13 +5151,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze I read from macro habits: team grouping or sync appears in the review; held down by reset discipline after wins, missed structure/objective conversion, shutdown or unspent-gold protection. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "5.8 CS/min with a 16/4/4 K/D/A and 4 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
       },
       "captureFps": 4,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
+        "reason": "5.8 CS/min with a 16/4/4 K/D/A and 4 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+      }
     },
     {
       "file": "auto_NA1-5565145132_01.mp4",
@@ -4995,7 +5292,7 @@
       "src": "/recordings/auto_NA1-5565145132_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565145132-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron IV",
@@ -5024,13 +5321,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron IV read from macro habits: the recording still shows playable fighting instincts; held down by very high death count for a bot game, farm pace is too low for reliable ranked climbing, missed structure/objective conversion. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "3.9 CS/min with a 8/12/2 K/D/A and 12 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 6,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "reason": "3.9 CS/min with a 8/12/2 K/D/A and 12 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565058943_01.mp4",
@@ -5144,7 +5447,7 @@
       "src": "/recordings/auto_NA1-5565058943_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565058943-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze I",
@@ -5173,13 +5476,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze I read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "7.5 CS/min with a 22/5/2 K/D/A and 5 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
       },
       "captureFps": 6,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "reason": "7.5 CS/min with a 22/5/2 K/D/A and 5 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+      }
     },
     {
       "file": "auto_NA1-5565048601_01.mp4",
@@ -5313,7 +5622,7 @@
       "src": "/recordings/auto_NA1-5565048601_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565048601-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze I",
@@ -5342,13 +5651,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze I read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "6.3 CS/min with a 24/5/2 K/D/A and 5 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 6,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "reason": "6.3 CS/min with a 24/5/2 K/D/A and 5 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565044205_01.mp4",
@@ -5467,7 +5782,7 @@
       "src": "/recordings/auto_NA1-5565044205_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565044205-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron I",
@@ -5496,13 +5811,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron I read from macro habits: fight conversion and damage output are clearly above beginner mechanics, farm pace is a real strength; held down by avoidable deaths still show up, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "6.9 CS/min with a 19/6/2 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 6,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "reason": "6.9 CS/min with a 19/6/2 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "auto_NA1-5565025543_01.mp4",
@@ -5631,12 +5952,12 @@
       "src": "/recordings/auto_NA1-5565025543_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565025543-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "score": 30,
+        "score": 28,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -5660,13 +5981,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze III read from macro habits: fight conversion and damage output are clearly above beginner mechanics, team grouping or sync appears in the review; held down by avoidable deaths still show up, missed structure/objective conversion, side chase or fog drift. Evidence across the bot-game review set is high, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "4.6 CS/min with a 20/6/3 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
       },
       "captureFps": 6,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "4.6 CS/min with a 20/6/3 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+      }
     },
     {
       "file": "auto_NA1-5564835832_01.mp4",
@@ -5810,7 +6137,7 @@
       "src": "/recordings/auto_NA1-5564835832_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564835832-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron III",
@@ -5839,13 +6166,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron III read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, lethal-health stays, reset discipline after wins. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "4.6 CS/min with a 15/7/0 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
       },
       "captureFps": 6,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "reason": "4.6 CS/min with a 15/7/0 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+      }
     },
     {
       "file": "auto_NA1-5564718141_01.mp4",
@@ -5959,7 +6292,7 @@
       "src": "/recordings/auto_NA1-5564718141_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564718141-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron IV",
@@ -5988,13 +6321,19 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron IV read from macro habits: team grouping or sync appears in the review, you are already finding fights, waves, towers, or base pressure; held down by too many punishable deaths, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Evidence across the bot-game review set is medium, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment."
+        "reason": "2.7 CS/min with a 4/7/2 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
       },
       "captureFps": 10,
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "reason": "2.7 CS/min with a 4/7/2 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "16-10_NA1-5564259818_01.webm",
@@ -6151,7 +6490,7 @@
       "feedbackTitle": "You drift after base opens",
       "feedback": "Mistake: you chase sideways after the base is already open. Fix: stand behind the first body in and hit the structure as soon as space is made.",
       "gameDetail": "At 12:10, low Samira below the open enemy base entrance, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. Around 13:05 the map slows down: champion walks away mid, an ally is channeling recall, and Samira is full HP with the lane already open, which is exactly the moment to choose wave/base route before another target appears. Around 13:15 the camera follows champion again and Samira casts Q/Flair into him from close range; the spell connects, but the leak is that the fight is sideways while the open base is still the real payout. Around 14:19 the clean version finally shows up: multiple enemies are dead, minions are in the base, Samira is behind the front body, and the team is hitting the ending area instead of wandering after another duel. The lesson is to treat the open base as the destination, because structure damage ends the game while side duels only reopen collapse windows.",
-      "secondaryFocus": "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
         "reset/overstay discipline",
         "side farm over map defense",
@@ -6159,12 +6498,12 @@
         "wave/objective conversion",
         "camera/map-state check"
       ],
-      "eventEvidence": "12:10 low Samira below the open enemy base entrance; 13:15 Q/Flair into champion during a sideways mid fight; 14:19 team and minions are back inside the base to end.",
+      "eventEvidence": "12:10 low Samira below the open enemy base entrance; 13:15 Q/Flair into Samira during a sideways mid fight; 14:19 team and minions are back inside the base to end.",
       "failureEvidence": "At 12:10, low Samira below the open enemy base entrance; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.",
       "goodThing": "You did group back toward the base and finish the game instead of letting the push fully dissolve.",
       "whyTrust": "The win came from returning to the open base, not from a cleaner combo. Your damage was not the limiting factor; target discipline was.",
       "focusTag": "end the push",
-      "evidence": "Review clip frames with visible game clock: base pressure near 12:10, champion Q/Flair around 13:15, final base push around 14:19.",
+      "evidence": "Review clip frames with visible game clock: base pressure near 12:10, Samira Q/Flair around 13:15, final base push around 14:19.",
       "pattern": "The winning pressure was already available. The mistake is treating a nearby Samira like the win condition after the actual win condition is already open.",
       "diamondRule": "If a base structure is available, a chase is wrong unless it directly removes the body blocking the structure.",
       "drill": "Next game: when inhibitor or nexus is open, say front line, structure, no chase.",
@@ -6229,12 +6568,12 @@
         {
           "clock": "13:05",
           "videoSeconds": 83.3,
-          "description": "Around the map slows down: champion walks away mid, an ally is channeling recall, and Samira is full HP with the lane already open, which is exactly the moment to choose wave/base route before another target appears."
+          "description": "Around the map slows down: Samira walks away mid, an ally is channeling recall, and Samira is full HP with the lane already open, which is exactly the moment to choose wave/base route before another target appears."
         },
         {
           "clock": "13:15",
           "videoSeconds": 92.5,
-          "description": "Q/Flair into champion during a sideways mid fight"
+          "description": "Q/Flair into Samira during a sideways mid fight"
         },
         {
           "clock": "14:19",
@@ -6257,12 +6596,12 @@
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
       "poster": "/recordings/posters/auto-na1-5563660362-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "score": 14,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 18,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -6287,7 +6626,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Iron II read from macro habits: team grouping or sync appears in the review; held down by avoidable deaths still show up, kill pressure is not yet consistent, farm pace is too low for reliable ranked climbing. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "2.4 CS/min with a 3/6/4 K/D/A and 6 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "reason": "2.4 CS/min with a 3/6/4 K/D/A and 6 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
       }
     },
     {
@@ -6488,12 +6833,12 @@
       "src": "/recordings/16-10_NA1-5563352800_01.mp4",
       "poster": "/recordings/posters/16-10-na1-5563352800-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze I",
-        "exactRankValue": 7,
-        "score": 37,
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "score": 30,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -6518,12 +6863,18 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze I read from macro habits: death count stayed controlled, you are already finding fights, waves, towers, or base pressure; held down by reset discipline after wins, side chase or fog drift, shutdown or unspent-gold protection. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "4.2 CS/min with a 8/3/2 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
       },
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "4.2 CS/min with a 8/3/2 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "16-10_NA1-5563301586_01.webm",
@@ -6722,12 +7073,12 @@
       "src": "/recordings/16-10_NA1-5563301586_01.mp4",
       "poster": "/recordings/posters/16-10-na1-5563301586-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Silver",
         "range": "Bronze I-Silver II",
-        "exactRank": "Silver III",
-        "exactRankValue": 9,
-        "score": 47,
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
+        "score": 42,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -6752,12 +7103,18 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Silver III read from macro habits: farm pace is a real strength, team grouping or sync appears in the review; held down by lethal-health stays, reset discipline after wins. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "6.6 CS/min with a 6/4/2 K/D/A and 4 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
       },
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
+        "reason": "6.6 CS/min with a 6/4/2 K/D/A and 4 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+      }
     },
     {
       "file": "16-10_NA1-5563247854_13.webm",
@@ -6896,12 +7253,12 @@
       "src": "/recordings/16-10_NA1-5563247854_13.mp4",
       "poster": "/recordings/posters/16-10-na1-5563247854-13.jpg",
       "rankEstimate": {
-        "version": "2026-05-22-exact-rank-trend-v4",
+        "version": "2026-05-25-performance-rank-v5",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "score": 29,
+        "score": 31,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "medium",
@@ -6925,12 +7282,18 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "Bronze III read from macro habits: farm pace is a real strength, team grouping or sync appears in the review; held down by too many punishable deaths, reset discipline after wins, side chase or fog drift. Ranked-transfer confidence is low from unknown evidence."
+        "reason": "7.3 CS/min with a 15/7/5 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
       },
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history"
+      "outcomeSource": "League Client match history",
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v1",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "reason": "7.3 CS/min with a 15/7/5 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+      }
     },
     {
       "file": "16-10_NA1-5563247854_12.webm",

@@ -13,6 +13,7 @@ const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
 const fallbackModel = process.env.LEAGUE_TIMESTAMP_AUDIT_FALLBACK_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-25-forensic-performance-rank-v25",
   "2026-05-24-command-lane-rep-v24",
   "2026-05-24-dense-click-review-v21",
   "2026-05-24-tight-click-review-v20",
@@ -200,13 +201,13 @@ function visibleParagraphStandardIssues(recording, anchors) {
   if (currentPrimaryMistakeAnalysisVersions.has(recording.analysisVersion) && !hasTimestampedActionScript(detail)) {
     issues.push("visible paragraph must include a timestamped replacement action script");
   }
-  if ((recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && !hasKeyTimestampClickRule(detail)) {
+  if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && !hasKeyTimestampClickRule(detail)) {
     issues.push("visible paragraph must include one key timestamp with visible state and exact next click");
   }
-  if ((recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
+  if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
     issues.push("visible paragraph uses field labels instead of natural key timestamp prose");
   }
-  if ((recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && !/^Rep\s*:/i.test(clean(recording.secondaryFocus || recording.drill))) {
+  if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && !/^Rep\s*:/i.test(clean(recording.secondaryFocus || recording.drill))) {
     issues.push("pink next-game instruction must be one Rep sentence");
   }
   const needsTightReview = (recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
@@ -231,8 +232,13 @@ function visibleParagraphStandardIssues(recording, anchors) {
   if (needsDenseReview && /\bfight|entry|front\b/i.test([detail, recording.feedback, recording.secondaryFocus].join(" ")) && !/\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(clean(recording.secondaryFocus || recording.drill))) {
     issues.push("pink Rep must use the literal fight-entry checklist");
   }
-  if ((recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
+  if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
     issues.push("visible paragraph uses generic review-frame or broad branch wording");
+  }
+  if (recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" &&
+      (!/\b(legal|illegal|not automatically wrong|partly legal|mostly legal|setup expires|setup is gone)\b/i.test(detail) ||
+       !/\b(value|state flip|state flips|first value|second fight|first bad next click|setup expires|setup is gone)\b/i.test([detail, eventEvidence].join(" ")))) {
+    issues.push("v25 paragraph must separate entry legality, value, state flip, and first bad next click");
   }
   if (eventEvidence.length < 60) {
     issues.push("eventEvidence must name visible proof");

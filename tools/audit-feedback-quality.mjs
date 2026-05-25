@@ -102,6 +102,8 @@ function repCategory(recording = {}) {
   if (isSamira &&
       /\b(bot|lane|outer turret|under turret|support|wave is already thin|samira e|dash\/chase|tower dive)\b/i.test(text) &&
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) return "laneDeathExit";
+  if (/\b(dragon|baron|objective|pit)\b/i.test(text) &&
+      /\b(fight|entry|engaged|committed|first value|second fight|value window|state flip|re-entry|reenter|exit)\b/i.test(text)) return "objectiveFight";
   if (!won && Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) return "deathExit";
   if ((Number.isFinite(deaths) && deaths >= 9) || /\b(low hp|low-health|death-heavy|ten deaths|thirteen deaths|death timer|death-state|catchable death)\b/i.test(text)) return "deathExit";
   if (/\b(base|inhib|inhibitor|nexus|structure|exposed structures|enemy base|base push)\b/i.test(text)) return "basePush";
@@ -121,6 +123,8 @@ function repMatchesGameCategory(recording = {}) {
       return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
     case "laneDeathExit":
       return /\bdeath-heavy lane sequence\b|\bNo E toward\b|\bDo not E\/dash\b|\bwave still protects (?:me|you)\b|\bone step behind support\b/i.test(rep);
+    case "objectiveFight":
+      return /\bdid we already get the value\b|\bdragon,\s*wave,\s*recall,\s*or\s*group\b|\bsecond fight\b[\s\S]{0,100}\blow or unsupported\b/i.test(rep);
     case "deathExit":
       return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":
@@ -141,6 +145,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-command-lane-rep-v24",
     "2026-05-24-lane-specific-rep-v23",
     "2026-05-24-game-specific-rep-v22",
@@ -158,6 +163,7 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
   const actionScriptVersions = new Set([
+    "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-game-specific-rep-v22",
     "2026-05-24-dense-click-review-v21",
     "2026-05-24-tight-click-review-v20",
@@ -170,6 +176,7 @@ function feedbackIssues(recording = {}) {
     "2026-05-22-action-script-coaching-v13"
   ]);
   const evidenceLaneVersions = new Set([
+    "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-game-specific-rep-v22",
     "2026-05-24-dense-click-review-v21",
     "2026-05-24-tight-click-review-v20",
@@ -182,26 +189,31 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
   const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
-  const needsDecisionBranch = recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+  const needsDecisionBranch = recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+    recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18" ||
     recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
-  const needsKeyClickRule = recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+  const needsKeyClickRule = recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+    recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18";
-  const needsExampleReview = recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+  const needsExampleReview = recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+    recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19";
-  const needsTightReview = (recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+  const needsTightReview = (recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+    recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20") &&
     (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
-  const needsDenseReview = (recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
+  const needsDenseReview = (recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+    recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21") &&
     (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
   const hasStats = Number.isFinite(Number(recording.kills)) &&
@@ -304,6 +316,26 @@ function feedbackIssues(recording = {}) {
   }
   if (!recording.rankEstimate?.exactRank) {
     issues.push("full review missing exact rank read");
+  }
+  if (recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25") {
+    const performanceRank = clean(recording.performanceRank?.exactRank || recording.rankEstimate?.exactRank);
+    const performanceReason = clean(recording.performanceRank?.reason || recording.rankEstimate?.reason);
+    if (!performanceRank) {
+      issues.push("v25 review missing exact performance rank");
+    }
+    if (!/\bCS(?:\/min)?\b/i.test(performanceReason) ||
+        !/\bdeath|deaths|K\/D\/A\b/i.test(performanceReason) ||
+        !/\bentry|fight\b/i.test(performanceReason) ||
+        !/\bexit|re-entry|cash-out|value\b/i.test(performanceReason) ||
+        !/\bconversion|dragon|baron|objective|tower|wave|recall|group\b/i.test(performanceReason)) {
+      issues.push("v25 performance rank reason must tie CS, deaths, entry, exit/value, and conversion together");
+    }
+    if (!/\b(legal|illegal|not automatically wrong|partly legal|mostly legal|setup expires|setup is gone)\b/i.test(allVisible)) {
+      issues.push("v25 review must judge entry legality");
+    }
+    if (!/\b(value|state flip|state flips|first value|second fight|first bad next click|setup expires|setup is gone)\b/i.test(allVisible)) {
+      issues.push("v25 review must separate value, state flip, and first bad next click");
+    }
   }
   if (needsSecondaryFocus) {
     if (!secondaryFocus) {

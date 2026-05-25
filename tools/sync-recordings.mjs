@@ -24,12 +24,14 @@ const fightEntryDrill = "After 15 minutes, before stepping into a fight: tower, 
 const cleanerWinExitRep = "Rep: after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.";
 const deathExitRep = "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.";
 const laneDeathExitRep = "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.";
+const objectiveFightRep = "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.";
 const firstWinCashoutRep = "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.";
 const basePushRep = "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.";
 const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
-const analysisVersion = "2026-05-24-command-lane-rep-v24";
+const analysisVersion = "2026-05-25-forensic-performance-rank-v25";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-24-command-lane-rep-v24",
   "2026-05-24-lane-specific-rep-v23",
   "2026-05-24-game-specific-rep-v22",
   "2026-05-24-dense-click-review-v21",
@@ -50,11 +52,13 @@ const compatibleAnalysisVersions = new Set([
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
-const rankEstimateVersion = "2026-05-22-exact-rank-trend-v4";
+const rankEstimateVersion = "2026-05-25-performance-rank-v5";
+const performanceRankVersion = "2026-05-25-performance-rank-v1";
 const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5567787430_01.mp4",
   "auto_NA1-5567367431_01.mp4",
   "auto_NA1-5567223507_01.mp4",
   "auto_NA1-5566943774_01.mp4",
@@ -1548,6 +1552,10 @@ function reviewRepCategory(recording = {}) {
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) {
     return "laneDeathExit";
   }
+  if (/\b(dragon|baron|objective|pit)\b/i.test(text) &&
+      /\b(fight|entry|engaged|committed|first value|second fight|value window|state flip|re-entry|reenter|exit)\b/i.test(text)) {
+    return "objectiveFight";
+  }
   if (!won && Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) {
     return "deathExit";
   }
@@ -1577,6 +1585,8 @@ function specificRepForRecording(recording = {}) {
       return firstWinCashoutRep;
     case "laneDeathExit":
       return laneDeathExitRep;
+    case "objectiveFight":
+      return objectiveFightRep;
     case "deathExit":
       return deathExitRep;
     case "sideFarmDefense":
@@ -1603,6 +1613,8 @@ function repMatchesGameCategory(recording = {}) {
       return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
     case "laneDeathExit":
       return /\bdeath-heavy lane sequence\b|\bNo E toward\b|\bDo not E\/dash\b|\bwave still protects (?:me|you)\b|\bone step behind support\b/i.test(rep);
+    case "objectiveFight":
+      return /\bdid we already get the value\b|\bdragon,\s*wave,\s*recall,\s*or\s*group\b|\bsecond fight\b[\s\S]{0,100}\blow or unsupported\b/i.test(rep);
     case "deathExit":
       return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":
@@ -3066,7 +3078,11 @@ function rankTextFlags(recording) {
     chaseDrift: /\b(chase|chasing|side chase|side jungle|side[-\s]?lane|drift|fog|away from (?:structure|tower|base)|solo bot|alone)\b/i.test(text),
     shutdownGold: /\b(shutdown|unspent gold|big gold|spend|spent|shop|item tempo)\b/i.test(text),
     syncedTeamplay: /\b(grouped|with allies|behind allies|sync|synced|team|body-block|body block)\b/i.test(text),
-    positiveConversion: /\b(good|correctly|converted|created real|base pressure|tower damage|structure pressure|ending pressure|did spend|did group|ended)\b/i.test(text)
+    positiveConversion: /\b(good|correctly|converted|created real|base pressure|tower damage|structure pressure|ending pressure|did spend|did group|ended)\b/i.test(text),
+    objectiveFight: /\b(dragon|baron|objective|pit)\b/i.test(text),
+    legalEntry: /\b(legal entry|partly legal|mostly legal|not automatically wrong|allies? (?:are )?(?:already )?(?:engaged|committed)|enemies? (?:are )?(?:already )?committed|ally front|allied body|front body)\b/i.test(text),
+    illegalEntry: /\b(illegal entry|illegal re-entry|wrong click|dash\/chase|forward dash|no ally(?: is)? in front|wave\/front\/body no longer protects|wave is already thin|catchable)\b/i.test(text),
+    stateFlipExit: /\b(state flip|state flips|first value window|after the first value|after first value|second fight|second forward fight|re-enter|re-entry|reenter|exit check|setup expires|setup is gone)\b/i.test(text)
   };
 }
 
@@ -3075,6 +3091,7 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   if (!isFullReviewRecording(recording)) return null;
 
   const flags = rankTextFlags(recording);
+  const reviewCategory = reviewRepCategory(recording);
   const queueClass = rankQueueClass(recording);
   const beginnerBot = queueClass === "bot";
   const deaths = Number(recording.deaths);
@@ -3147,9 +3164,12 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   if (Number.isFinite(deaths)) {
     if (deaths >= 10) {
       score -= 22;
-      leaks.push("very high death count for a bot game");
+      leaks.push("very high avoidable-death pressure");
+    } else if (deaths >= 9) {
+      score -= 17;
+      leaks.push("nine deaths creating death-timer CS loss");
     } else if (deaths >= 7) {
-      score -= 15;
+      score -= 13;
       leaks.push("too many punishable deaths");
     } else if (deaths >= 5) {
       score -= 8;
@@ -3162,7 +3182,7 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   if (Number.isFinite(kills) && kills >= 18) {
     score += 5;
     strengths.push("fight conversion and damage output are clearly above beginner mechanics");
-  } else if (Number.isFinite(kills) && kills <= 5) {
+  } else if (Number.isFinite(kills) && kills <= 5 && reviewCategory !== "objectiveFight") {
     score -= 4;
     leaks.push("kill pressure is not yet consistent");
   }
@@ -3180,7 +3200,8 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
       score -= 8;
       leaks.push("farm pace is too low for reliable ranked climbing");
     } else if (csPerMinute < 5) {
-      score -= 3;
+      score -= 5;
+      leaks.push("ADC CS/min is below stable ranked pace");
     }
   }
   if (flags.lethalHp) {
@@ -3203,6 +3224,18 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
     score -= 4;
     leaks.push("shutdown or unspent-gold protection");
   }
+  if (flags.objectiveFight && reviewCategory === "objectiveFight") {
+    score += flags.legalEntry ? 8 : 4;
+    strengths.push(flags.legalEntry ? "objective entry is at least partly legal" : "objective fight presence exists");
+  }
+  if (flags.illegalEntry && reviewCategory !== "objectiveFight") {
+    score -= 6;
+    leaks.push("illegal or catchable entry shape");
+  }
+  if (flags.stateFlipExit) {
+    score -= reviewCategory === "objectiveFight" ? 8 : 5;
+    leaks.push("exit or re-entry after value is unstable");
+  }
   if (flags.syncedTeamplay) {
     score += 5;
     strengths.push("team grouping or sync appears in the review");
@@ -3221,11 +3254,21 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
     ? "high"
     : (confidenceScore >= 55 && rankedComparableQueue ? "medium" : "low");
   const evidenceConfidence = confidenceScore >= 52 && context.fullReviewGames >= 10 ? "high" : (confidenceScore >= 34 ? "medium" : "low");
-  const leakText = [...new Set(leaks)].slice(0, 3).join(", ") || "the review does not show enough ranked-punishable leaks";
-  const strengthText = [...new Set(strengths)].slice(0, 2).join(", ") || "the recording still shows playable fighting instincts";
-  const reason = beginnerBot
-    ? `${exactRank.name} read from macro habits: ${strengthText}; held down by ${leakText}. Evidence across the bot-game review set is ${evidenceConfidence}, but ranked-transfer confidence stays low because Co-op vs AI cannot prove PvP pressure, vision denial, objective contest, or shutdown punishment.`
-    : `${exactRank.name} read from macro habits: ${strengthText}; held down by ${leakText}. Ranked-transfer confidence is ${rankedTransferConfidence} from ${queueClass.replace("_", " ")} evidence.`;
+  const reason = performanceRankReason(recording, {
+    exactRank: exactRank.name,
+    flags,
+    reviewCategory,
+    csPerMinute,
+    kills,
+    deaths,
+    assists,
+    strengths,
+    leaks,
+    rankedTransferConfidence,
+    evidenceConfidence,
+    queueClass,
+    beginnerBot
+  });
   return {
     version: rankEstimateVersion,
     label: band.label,
@@ -3244,6 +3287,58 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
     confidenceBlockers: [...new Set(confidenceBlockers)],
     researchBasis: rankCalibrationResearch.map((item) => item.id),
     reason
+  };
+}
+
+function performanceRankReason(recording = {}, context = {}) {
+  const csPerMinute = Number(context.csPerMinute);
+  const deaths = Number(context.deaths);
+  const kills = Number(context.kills);
+  const assists = Number(context.assists);
+  const kda = [kills, deaths, assists].every(Number.isFinite)
+    ? `${kills}/${deaths}/${assists}`
+    : clean(recording.kda || "");
+  const csText = Number.isFinite(csPerMinute)
+    ? `${csPerMinute.toFixed(1)} CS/min`
+    : (Number.isFinite(Number(recording.cs)) ? `${Math.round(Number(recording.cs))} CS` : "CS evidence is limited");
+  const deathText = Number.isFinite(deaths)
+    ? `${deaths} deaths`
+    : "death evidence is limited";
+  const category = context.reviewCategory || reviewRepCategory(recording);
+  const flags = context.flags || rankTextFlags(recording);
+  const entryText = category === "objectiveFight"
+    ? (flags.legalEntry ? "the objective entry is partly legal" : "objective fight presence exists but entry quality is not fully proven")
+    : (flags.illegalEntry ? "fight entry is catchable or illegal" : "fight entry quality is mixed");
+  const exitText = flags.stateFlipExit
+    ? "exit/re-entry after first value is the main leak"
+    : (Number.isFinite(deaths) && deaths <= 3 ? "exits are mostly controlled" : "exit discipline is still inconsistent");
+  const conversionText = category === "basePush"
+    ? "conversion depends on structure, blocker, wave, or exit clicks"
+    : (category === "objectiveFight" ? "objective conversion has to become dragon, wave, recall, or group" : "tower/objective conversion is still the deciding branch");
+  const statLead = kda
+    ? `${csText} with a ${kda} K/D/A and ${deathText}`
+    : `${csText} with ${deathText}`;
+  return `${statLead} sets the performance grade; ${entryText}, but ${exitText}, so ${conversionText}.`;
+}
+
+function performanceRankForRecording(recording = {}, rankEstimate = null) {
+  const estimate = rankEstimate || recording.rankEstimate;
+  if (!estimate?.exactRank) return null;
+  return {
+    version: performanceRankVersion,
+    exactRank: estimate.exactRank,
+    exactRankValue: estimate.exactRankValue,
+    reason: performanceRankReason(recording, {
+      exactRank: estimate.exactRank,
+      flags: rankTextFlags(recording),
+      reviewCategory: reviewRepCategory(recording),
+      csPerMinute: Number.isFinite(Number(recording.cs)) && Number.isFinite(Number(recording.gameLengthSeconds)) && Number(recording.gameLengthSeconds) > 0
+        ? Number(recording.cs) / (Number(recording.gameLengthSeconds) / 60)
+        : null,
+      kills: Number(recording.kills),
+      deaths: Number(recording.deaths),
+      assists: Number(recording.assists)
+    })
   };
 }
 
@@ -3271,6 +3366,92 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5567787430_02.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "medium",
+      feedbackTitle: "Do not turn level 1 into a blind brush test",
+      feedback: "The leak is treating an early bot-brush setup as a commit by itself instead of waiting for enemy reveal, wave control, or a free first trade to make the next step legal.",
+      gameDetail: "At 0:53, Samira and support are holding the bot-side brush before minions meet and no enemy body, wave payout, or forced first trade is visible, so the wrong click is stepping deeper for a blind first contact and the next click is to hold the brush edge, wait for enemy reveal, or walk to lane on time if nothing appears. By 1:21, the first minions are already in lane and the setup only mattered if it created health, summoner, or wave value. The final 5/9/3, 119 CS in 28 minutes says the bigger rank cost is still turning early pressure into stable lane and fight value instead of later death timers.",
+      secondaryFocus: "Rep: before any level-1 brush hold, ask what the reveal buys right now: first trade, wave control, or leave. If none is visible, walk to lane on time instead of forcing first contact.",
+      mistakeTypes: [
+        "level-1 blind commit",
+        "early lane payout check",
+        "wave-first discipline",
+        "ally-front timing",
+        "death-state exposure later"
+      ],
+      eventEvidence: "0:53 shows Samira and support sitting in the bot-side brush before minions meet with no enemy body or wave payout visible; 1:21 shows the first lane wave already in front, which means the setup needed to create health, summoner, or wave value immediately to be worth the hold.",
+      failureEvidence: "At 0:53 the setup is not automatically wrong, but it is not yet a legal commit either; if the next step becomes deeper brush or blind first contact before reveal or wave value, the lane gives up timing for a guess instead of a controlled first trade or lane start.",
+      goodThing: "You are grouped with support instead of wandering into lane alone, which is the right base shape to keep before the reveal happens.",
+      whyTrust: "This uses the visible 0:53 brush hold, the 1:21 lane state, and the final 5/9/3, 119 CS ranked stat line to keep the note tied to what the clip actually shows.",
+      focusTag: "level 1 payout",
+      evidence: "Manual frame inspection of the 0:53 bot-brush hold, the 1:21 first-wave lane state, and the League Client stats for the same ranked game.",
+      pattern: "The early setup is only useful when the reveal creates a concrete payout. If nothing appears, lane timing and first-wave control matter more than proving willingness to fight from fog.",
+      diamondRule: "Level-1 brush pressure is only worth keeping when the next visible step creates a first trade, wave control, or a forced enemy detour.",
+      drill: "before any level-1 brush hold, ask what the reveal buys right now: first trade, wave control, or leave. If none is visible, walk to lane on time instead of forcing first contact.",
+      timeline: [
+        "0:53 - Samira and support hold bot-side brush before minions meet.",
+        "1:21 - The first minion wave is already in lane with Samira and support beside it."
+      ],
+      clockAnchors: [
+        { clock: "0:53", videoSeconds: 53, description: "Samira and support hold bot-side brush before minions meet." },
+        { clock: "1:21", videoSeconds: 125, description: "The first minion wave is already in lane with Samira and support beside it." }
+      ],
+      nuance: [
+        "Good: the setup is grouped with support instead of a solo face-check.",
+        "Leak: the brush hold needs a visible payout before it becomes a commit.",
+        "Branch: if no enemy reveal or free trade appears, lane timing and first-wave control are the better conversion.",
+        "Cost: the full ranked line still ends 5/9/3 with 119 CS in 28 minutes, so later deaths and low farm remain the bigger carry leak.",
+        "Limit: sampled frames do not prove the unseen enemy positions inside fog, so the rule stays tied to visible reveal and wave state."
+      ],
+      reviewLimit: "Manual frame review used sampled 2 FPS replay frames and cannot prove hidden enemy positions or exact pings; the note is limited to the visible brush hold, lane timing, and the synced match stat line.",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5567787430_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Objective entry is improving; the leak is second fight after value",
+      feedback: "The leak is taking a second fight after the first objective value window instead of re-checking whether dragon, wave, recall, group, or ally front is still available.",
+      gameDetail: "At 9:58, the dragon fight starts as a partly legal entry: dragon is on screen, allies are already committed, enemies are in front, and you are close enough to follow, so the first value window is playable, but once that dragon/kill pressure resolves the wrong click is taking a second forward fight and the next click is dragon, wave, recall, group, or one step back if none is visible. That state flip is where deaths stack: legal entry, value gained, state flip, and exit check are not separated. With 5/9/3 and 119 CS in 28 minutes, damage pressure exists, but death timers and low-CS time keep the pressure from becoming stable conversion.",
+      secondaryFocus: objectiveFightRep,
+      mistakeTypes: [
+        "objective-fight state flip",
+        "second fight after value",
+        "exit/re-entry discipline",
+        "low CS from death timers",
+        "objective/wave/recall conversion"
+      ],
+      eventEvidence: "9:58 shows dragon on screen with several champions engaged near pit; 24:09 shows another death timer; the final 5/9/3, 119 CS in a 28-minute ranked loss shows damage pressure existed but deaths and low CS kept conversion unstable.",
+      failureEvidence: "At 9:58 the first objective entry is playable, but the failure starts after the initial dragon/kill value: the next forward fight happens before dragon, wave, recall, group, or ally-front safety is proven, which turns pressure into another death-state pattern.",
+      goodThing: "At 9:58 you are starting to recognize real objective fight windows with allies already committed; keep entering when bodies are engaged and the fight can create dragon or kill pressure.",
+      whyTrust: "This uses the visible 9:58 dragon-pit fight, the later death-state frame, and the 5/9/3, 119 CS ranked stat line instead of judging only the defeat.",
+      focusTag: "objective fight state flip",
+      evidence: "Manual frame inspection of the 9:58 objective fight, 24:09 death-state frame, and League Client stats.",
+      pattern: "The entry is improving when objective value and allied commitment are visible; the leak is the next phase, where the same fight keeps being treated as legal after the first value window has already changed.",
+      diamondRule: "After an objective fight gives value, choose dragon, wave, recall, or group before another forward fight.",
+      drill: objectiveFightRep.replace(/^Rep\s*:\s*/i, ""),
+      timeline: [
+        "9:58 - Dragon is on screen with several champions engaged near pit.",
+        "24:09 - Samira is dead with the death timer visible."
+      ],
+      clockAnchors: [
+        { clock: "9:58", videoSeconds: 506.308, description: "Dragon is on screen with several champions engaged near pit." },
+        { clock: "24:09", videoSeconds: 1109.077, description: "Samira is dead with the death timer visible." }
+      ],
+      nuance: [
+        "Good: the first objective entry is partly legal because dragon and committed bodies are visible.",
+        "Leak: the second fight after first value is being treated like the same legal window.",
+        "Cost: 5/9/3 and 119 CS in 28 minutes means death timers are erasing farm and conversion.",
+        "Next branch: dragon, wave, recall, group, or step back.",
+        "Limit: sampled frames cannot prove every cooldown, so the re-entry rule stays conditional on visible ally front and enemy commitment."
+      ],
+      reviewLimit: "Manual frame review used sampled 2 FPS frames and cannot prove exact cooldowns or every enemy position; the decision rule is based on visible objective, allied commitment, death state, K/D/A, and CS.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5567367431_01.mp4") {
     return {
       champion: "Samira",
@@ -4547,6 +4728,12 @@ function analysisSpecificityIssues(parsed, context = {}) {
   if (isAutoFullReview && !hasKeyTimestampClickRule(gameDetail)) {
     issues.push("gameDetail must start with one key timestamp sentence containing visible state and the exact next click");
   }
+  if (isAutoFullReview && !/\b(legal|illegal|not automatically wrong|partly legal|mostly legal|setup expires|setup is gone)\b/i.test(gameDetail)) {
+    issues.push("gameDetail must judge entry legality at the key timestamp");
+  }
+  if (isAutoFullReview && !/\b(value|dragon|baron|objective|tower|turret|wave|recall|group|state flip|state flips|first bad next click|setup expires|setup is gone)\b/i.test(gameDetail)) {
+    issues.push("gameDetail must separate value, state flip, and correct branch");
+  }
   if (isAutoFullReview && /\b(?:mistake category|correct next click)\s*:/i.test(gameDetail)) {
     issues.push("gameDetail uses labels instead of natural replay-coaching prose");
   }
@@ -4912,6 +5099,9 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
     "Alan's latest correction: keep the single-paragraph colored format, but make the review tighter, denser, and more direct. Ideal visible structure: sharp title, outcome header, one key timestamp, visible state, wrong click, correct click, one green habit to keep, one red leak, one pink Rep. Do not repeat the same payout checklist several times. Mention tower/wave/objective/ally-front style checks once when it is the playable rule, then stay short.",
     "The pink Rep must be game-specific, not a universal template. A death-heavy loss should drill low-HP exits and no re-entry; a huge-kill loss should drill cashing out after the first won fight; a controlled base-push win should drill structure, blocker, wave, or exit; a cleaner win with fewer deaths and better CS should first recognize the improvement and drill the one remaining overstay/exit branch.",
+    "For the key timestamp, split the play into phases inside natural prose: legal or illegal entry, value created or not, the exact state-flip moment, the first bad next click, and the correct next click. Do not label those phases as fields; make the sentence sound like a coach replaying the moment.",
+    "For objective fights, do not mark the first entry wrong just because the final result was bad. If dragon/baron/objective is visible, allies are committed, and enemies are already engaged, say the entry is legal or partly legal; then critique the second fight after value if that is the real leak.",
+    "The downstream rank line is generated from your evidence, so your review must expose the inputs clearly: CS/min context, avoidable death pattern, entry legality, exit/re-entry quality, and whether damage pressure became tower, dragon, baron, inhib, wave, recall, or group.",
     "If the game is a victory with clearly improved K/D/A, CS, reset discipline, or fewer chain deaths, frame it as improvement first. Do not describe it like the same older pressure-mode loss; name the remaining leak as one narrower pattern inside a better game.",
     "Do not stop at category advice like group, reset, pressure mid, spacing, target selection, cash out cleaner, map cash-out, or wrong task after map state changes. The first sentence of gameDetail must be one natural key click-rule sentence in this shape: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' It must name the concrete screen state and translate the concept into a literal if-this-then-that click rule.",
     "At the main timestamp, name the concrete visible state precisely: where the followed champion is, which tower or wave matters, which allies are present or dead if visible, which enemies are visible or missing if visible, whether an ally can stand between the followed champion and enemy collapse, and what the nearest permanent result is. If death timers, missing enemies, or a tower state are not visible enough, say the limit and make the action conditional instead of pretending certainty.",
@@ -4922,7 +5112,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like one smooth, short replay-review paragraph, not a stat audit and not a field list: include the main visible mistake window, what happened next or almost happened, and the K/D/A-CS blocker if available. The red feedback field names the leak, the green goodThing names the keep habit, and the pink secondaryFocus names the drill, so do not repeat those claims in gameDetail unless the timestamp evidence needs one short bridge. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must include the exact visible state, the wrong click, and the correct next click. Extra timestamps are optional and should appear only when they make the critique clearer. Current-standard gameDetail should usually stay under 650 characters.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
-    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: low-HP exit, first-win cashout, base-push click order, side-farm defense, or fight entry. Do not start with 'Second focus:' or a label.",
+    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after first won fight; grouped base push = structure, blocker, wave, or exit. Do not start with 'Second focus:' or a label.",
     "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
@@ -4955,7 +5145,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, wrong click, correct click, one green keep habit, one red leak, one pink Rep. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, entry legality, value or no value, state flip, first bad next click, correct next click, one green keep habit, one red leak, one pink Rep. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' For objective fights, separate legal first entry from the second fight after value. Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
@@ -5345,6 +5535,7 @@ async function main() {
       const cachedRecording = {
         ...cached,
         ...(cachedRankEstimate ? { rankEstimate: cachedRankEstimate } : {}),
+        ...(cachedRankEstimate ? { performanceRank: performanceRankForRecording(cached, cachedRankEstimate) } : {}),
         ...(cachedCaptureFps ? { captureFps: cachedCaptureFps } : {}),
         ...(matchStats.outcome ? {
           win: matchStats.win,
@@ -5554,7 +5745,10 @@ async function main() {
     repairPublishAuditRequirements(recording, name);
     sanitizeAbstractBranchLanguage(recording);
     const rankEstimate = rankedEquivalentForRecording(recording);
-    if (rankEstimate) recording.rankEstimate = rankEstimate;
+    if (rankEstimate) {
+      recording.rankEstimate = rankEstimate;
+      recording.performanceRank = performanceRankForRecording(recording, rankEstimate);
+    }
     enforceVisibleParagraphStandard(recording, name);
     recordings.push(recording);
     console.log(`${name}: ${recordings.at(-1).reviewPhase} - ${recordings.at(-1).champion} - ${recordings.at(-1).feedbackTitle}`);
@@ -5563,8 +5757,13 @@ async function main() {
   const calibrationContext = rankCalibrationContext(recordings);
   for (const recording of recordings) {
     const rankEstimate = rankedEquivalentForRecording(recording, calibrationContext);
-    if (rankEstimate) recording.rankEstimate = rankEstimate;
-    else delete recording.rankEstimate;
+    if (rankEstimate) {
+      recording.rankEstimate = rankEstimate;
+      recording.performanceRank = performanceRankForRecording(recording, rankEstimate);
+    } else {
+      delete recording.rankEstimate;
+      delete recording.performanceRank;
+    }
   }
 
   const detectedChampions = aggregateChampions(recordings);
