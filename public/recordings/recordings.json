@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T15:30:04.168Z",
+  "generatedAt": "2026-05-25T15:47:49.940Z",
   "source": "League of Legends Highlights folder",
   "match": "42 matches",
   "matches": [
@@ -47,13 +47,13 @@
     "NA1-5567953154"
   ],
   "captured": "May 18, 2026, 5:46 PM to May 25, 2026, 11:12 AM ET",
-  "totalDuration": "654:11",
-  "totalRecordings": 56,
-  "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
+  "totalDuration": "649:32",
+  "totalRecordings": 54,
+  "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 25, 2026, 10:39 AM: newest full-game read Bronze I; current 3-game read Iron I; archive median Bronze III across 40 full games, used only as baseline context. The newest game is above the current three-game read.",
-    "rule": "The newest-game blocker is reset/overstay discipline and side farm over map defense; the current repeat across the latest games is reset/overstay discipline, side farm over map defense, and spacing/entry discipline. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
+    "focus": "Synced through May 25, 2026, 10:39 AM: newest full-game read Bronze I; current 3-game read Iron I; archive median Bronze III across 39 full games, used only as baseline context. The newest game is above the current three-game read.",
+    "rule": "The newest-game blocker is jungle fight exit after first value and side wave to objective conversion; the current repeat across the latest games is ally-front check, jungle fight exit after first value, and side wave to objective conversion. The keep-habit is You kept this game calmer: only 4 deaths and 175 CS means the farming and survival baseline is improving compared with the death-heavy games.",
     "nextRep": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5567953154_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
@@ -69,21 +69,21 @@
     "method": "forensic performance-grade estimate with CS/min, death timing, entry legality, exit quality, conversion, queue, timestamp, and cross-game confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 41,
+    "fullReviewGames": 40,
     "queueCounts": {
       "unknown": 14,
       "bot": 14,
-      "ranked_solo": 13
+      "ranked_solo": 12
     },
-    "rankedFullGames": 13,
-    "pvpFullGames": 13,
+    "rankedFullGames": 12,
+    "pvpFullGames": 12,
     "botFullGames": 14,
-    "anchoredFullGames": 41,
-    "statFullGames": 41,
+    "anchoredFullGames": 40,
+    "statFullGames": 40,
     "rankLabelCounts": {
       "Bronze": 17,
       "Silver": 6,
-      "Iron": 16,
+      "Iron": 15,
       "Gold": 2
     },
     "exactRankScale": [
@@ -167,7 +167,7 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 55,
+      "recordings": 53,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
@@ -204,7 +204,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Cleaner game, one extra side step still leaks tempo",
+      "title": "Jungle fight continued after first value",
       "duration": "30:00",
       "durationSeconds": 1800,
       "gameLength": "31:42",
@@ -223,91 +223,91 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Cleaner game, one extra side step still leaks tempo",
-      "feedback": "The leak is turning a legal defend-or-catch screen into one extra side-wave or low-HP click after the value is already won, so the game gives back tempo through a preventable death.",
-      "gameDetail": "At 16:10, the mid defend is still legal: Samira is under allied mid turret at 42 HP with support nearby and the wave already caught, so the value is survive plus reset; once no free tower, body, or objective is on screen, the wrong click is one more mid or side step and the next click is recall immediately. By 23:37 that delayed reset becomes another isolated death timer. The 1/4/3, 175 CS in 32 minutes says the game is calmer than the older Samira losses. This matters because a calmer game only climbs if the safe screen actually ends before the side wave reopens the map.",
-      "secondaryFocus": "Rep: after any low-HP camp or side wave past 15 minutes, take the first safe exit. If tower, wave, objective, or ally front is not already visible, leave the farm immediately and reset or regroup instead of taking one more side step.",
+      "feedbackTitle": "Jungle fight continued after first value",
+      "feedback": "The leak is that the blue-side jungle fight is playable while allies are in front, but after the first value window you keep chasing the same fight instead of exiting to turret, mid wave, or reset.",
+      "gameDetail": "At 22:51, the fight with allies in front and an enemy already committed, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
+      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
       "mistakeTypes": [
-        "side-wave overstay",
-        "low-HP reset discipline",
-        "mid regroup timing",
-        "isolated death-state exposure",
-        "CS-to-tempo conversion"
+        "jungle fight exit after first value",
+        "side wave to objective conversion",
+        "ally-front check",
+        "low damage pressure",
+        "reset/group timing"
       ],
-      "eventEvidence": "6:59 shows Samira and support collecting the bot wave safely under allied turret; 11:35 shows the same lane state still being played with support and wave cover; 16:10 shows Samira at 42 HP under allied mid turret with the wave already caught; 23:37 shows the next death timer on the lower side of the map; 30:55 shows the later 1/4/3, 175 CS client state while the game is still open.",
-      "failureEvidence": "At 16:10 the visible payout is survive, catch the wave, and reset, but the later map state still turns into a side-lane death by 23:37, which gives back tempo in an otherwise controlled Samira game.",
-      "goodThing": "The strong part is that the early bot states at 6:59 and 11:35 are played with support, wave, and turret protection instead of the blind forward entries that were killing older games.",
-      "whyTrust": "This uses inspected 6:59, 11:35, 16:10, 23:37, and 30:55 frames plus the League Client 1/4/3, 175 CS defeat line.",
-      "focusTag": "cleaner game reset",
-      "evidence": "Manual frame inspection of the safe early bot states, the 16:10 low-HP mid screen, the 23:37 death timer, and the 30:55 client stat line.",
-      "pattern": "This current-form game already has fewer panic entries and better lane control. The remaining leak is the extra side or low-HP click after the map has already asked for reset, regroup, or mid wave.",
-      "diamondRule": "After a low-HP defend or side catch, Samira only clicks forward again if a free tower, allied front, or objective is already visible.",
-      "drill": "after any low-HP defend or side-wave catch past 15 minutes, say value won, reset now, then click base or mid wave unless a free tower, allied front, or objective is already on screen",
+      "eventEvidence": "22:31 shows Samira and an ally under allied mid/base area with the defense stabilized; 22:41 shows Samira entering blue-side jungle behind allies; 22:51 shows the fight with allies in front and an enemy already committed; 22:59 shows Samira still in the jungle fight as another enemy remains visible; 23:39 shows the death timer with 144 CS.",
+      "failureEvidence": "At 22:51 the entry is legal enough because allies are already in front, but by 22:59 the first value window has shifted into an exit check; staying forward turns a playable defense fight into the 23:39 death timer instead of a turret-side exit, mid-wave catch, or reset.",
+      "goodThing": "You kept this game calmer: only 4 deaths and 175 CS means the farming and survival baseline is improving compared with the death-heavy games.",
+      "whyTrust": "This uses inspected 22:31, 22:41, 22:51, 22:59, and 23:39 frames plus the League Client 1/4/3, 175 CS ranked stat line.",
+      "focusTag": "jungle fight exit",
+      "evidence": "Manual frame inspection of the blue-side jungle fight and League Client ranked stats for the same match.",
+      "pattern": "This is not the old perma-feed shape. The new problem is quieter: controlled deaths and better CS are present, but the first playable fight value is not turning into tower damage, objective movement, or a clean reset often enough.",
+      "diamondRule": "After a side or jungle fight starts paying, Samira needs the exit branch before the second chase.",
+      "drill": "after 15 minutes, before extending a side wave or jungle fight, check nearest threatened turret, ally front, and whether first value is already gained. If any fail, leave through turret/mid wave or reset; do not chase the second body.",
       "timeline": [
-        "6:59 - Samira and support collect the bot wave safely under allied outer turret.",
-        "11:35 - Samira and support still play the bot wave with support and wave cover.",
-        "16:10 - Samira is at 42 HP under allied mid turret with the wave already caught.",
-        "23:37 - Samira is dead on the lower side of the map with the respawn timer visible.",
-        "30:55 - The client shows Samira at 1/4/3 with 175 CS late in the game."
+        "22:31 - Samira and an ally are under allied mid/base area after the defense stabilizes.",
+        "22:41 - Samira follows allies into blue-side jungle.",
+        "22:51 - Samira joins a jungle fight with allies already in front and an enemy committed.",
+        "22:59 - Samira stays in the jungle fight as another enemy remains visible and the exit check is due.",
+        "23:39 - Samira is dead with 144 CS."
       ],
       "clockAnchors": [
         {
-          "clock": "6:59",
-          "videoSeconds": 417.538,
-          "description": "Samira and support collect the bot wave safely under allied outer turret."
+          "clock": "22:31",
+          "videoSeconds": 1290,
+          "description": "Samira and an ally are under allied mid/base area after the defense stabilizes."
         },
         {
-          "clock": "11:35",
-          "videoSeconds": 693.231,
-          "description": "Samira and support still play the bot wave with support and wave cover."
+          "clock": "22:41",
+          "videoSeconds": 1360,
+          "description": "Samira follows allies into blue-side jungle."
         },
         {
-          "clock": "16:10",
-          "videoSeconds": 968.923,
-          "description": "Samira is at 42 HP under allied mid turret with the wave already caught."
+          "clock": "22:51",
+          "videoSeconds": 1370,
+          "description": "Samira joins a jungle fight with allies already in front and an enemy committed."
         },
         {
-          "clock": "23:37",
-          "videoSeconds": 1382.462,
-          "description": "Samira is dead on the lower side of the map with the respawn timer visible."
+          "clock": "22:59",
+          "videoSeconds": 1378,
+          "description": "Samira stays in the jungle fight as another enemy remains visible and the exit check is due."
         },
         {
-          "clock": "30:55",
-          "videoSeconds": 1796,
-          "description": "The client shows Samira at 1/4/3 with 175 CS late in the game."
+          "clock": "23:39",
+          "videoSeconds": 1385,
+          "description": "Samira is dead with 144 CS after the jungle fight."
         }
       ],
       "clockMoments": [
         {
-          "clock": "6:59",
-          "videoSeconds": 417.538,
-          "description": "Samira and support collect the bot wave safely under allied outer turret."
+          "clock": "22:31",
+          "videoSeconds": 1290,
+          "description": "shows Samira and an ally under allied mid/base area with the defense stabilized"
         },
         {
-          "clock": "16:10",
-          "videoSeconds": 968.923,
-          "description": "Samira is at 42 HP under allied mid turret with the wave already caught."
+          "clock": "22:41",
+          "videoSeconds": 1360,
+          "description": "shows Samira entering blue-side jungle behind allies"
         },
         {
-          "clock": "23:37",
-          "videoSeconds": 1382.462,
-          "description": "Samira is dead on the lower side of the map with the respawn timer visible."
+          "clock": "22:51",
+          "videoSeconds": 1370,
+          "description": "shows the fight with allies in front and an enemy already committed"
         },
         {
-          "clock": "30:55",
-          "videoSeconds": 1796,
-          "description": "The client shows Samira at 1/4/3 with 175 CS late in the game."
+          "clock": "22:59",
+          "videoSeconds": 1378,
+          "description": "shows Samira still in the jungle fight as another enemy remains visible"
         }
       ],
       "nuance": [
-        "Good: the lane states at 6:59 and 11:35 are being played with support and wave cover.",
-        "Leak: the reset and regroup branch is still being delayed after low-HP or side-wave states.",
-        "Cost: the 23:37 death timer is the one late-game giveaway inside an otherwise controlled game.",
-        "Context: 1/4/3 with 175 CS in 32 minutes is calmer than the older Samira losses, so the fix is narrower now.",
-        "Next check: if the screen only offers side farm or a low-HP hover, take reset, mid wave, or ally line before asking for another fight."
+        "This is a calmer ranked loss, not the same death-heavy pattern.",
+        "The useful part is following allies into a fight where bodies are already committed.",
+        "The mistake starts after the first value window, when the next click stays chase instead of exit.",
+        "The 175 CS is good relative to recent losses, but 1/4/3 and low objective pressure mean the farm did not become enough carry impact.",
+        "The next-game rep is a side/jungle fight exit check, not a generic pressure-mode slogan."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry. The detailed AI pass failed, so this review is a conservative timestamped fallback from verified visible frames.",
-      "analysisSource": "fallback",
+      "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns or all hidden enemy positions, but it can verify the allied-front jungle entry, the state-flip window, the death timer, and the 1/4/3, 175 CS ranked context.",
+      "analysisSource": "manual",
       "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 58084324,
@@ -320,7 +320,7 @@
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "score": 36,
+        "score": 37,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -344,13 +344,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.5 CS/min and 4 deaths pull the game to Bronze I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
+        "reason": "5.5 CS/min and 4 deaths pull the game to Bronze I with objective-entry quality still not fully proven; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "5.5 CS/min and 4 deaths pull the game to Bronze I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
+        "reason": "5.5 CS/min and 4 deaths pull the game to Bronze I with objective-entry quality still not fully proven; the main leak is exit/re-entry after first value."
       }
     },
     {
@@ -390,7 +390,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "implementation",
+      "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Objective entry is improving; the leak is second fight after value",
@@ -496,250 +496,6 @@
       }
     },
     {
-      "file": "auto_NA1-5567787430_02.mp4",
-      "publicFile": "auto_NA1-5567787430_02.mp4",
-      "cacheKey": "4878730:1779690264302",
-      "fingerprint": "087e20a98a23",
-      "matchId": "NA1-5567787430",
-      "score": "auto",
-      "clipNumber": 2,
-      "matchTimeMs": 1779687159589,
-      "gameHappenedAt": "2026-05-25T05:32:39.589Z",
-      "gameHappenedAtLabel": "May 25, 2026, 1:32 AM",
-      "recordedAt": "2026-05-25T06:24:24.385Z",
-      "recordedAtLabel": "May 25, 2026, 2:24 AM",
-      "recordedAtTimeLabel": "2:24 AM",
-      "clipTimestampSeconds": null,
-      "clipTimestamp": "",
-      "clipWindow": "",
-      "timestamp": "",
-      "queueId": 420,
-      "gameType": "Ranked Solo",
-      "gameTypeSource": "LeagueClient log",
-      "title": "Do not turn level 1 into a blind brush test",
-      "duration": "4:08",
-      "durationSeconds": 247.5,
-      "gameLength": "27:59",
-      "gameLengthSeconds": 1679,
-      "kda": "5/9/3",
-      "kills": 5,
-      "deaths": 9,
-      "assists": 3,
-      "cs": 119,
-      "statsSource": "League Client match history",
-      "win": false,
-      "outcome": "defeat",
-      "outcomeLabel": "DEFEAT",
-      "outcomeSource": "League Client match history",
-      "kind": "full review",
-      "reviewPhase": "current form",
-      "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Do not turn level 1 into a blind brush test",
-      "feedback": "The leak is treating an early bot-brush setup as a commit by itself instead of waiting for enemy reveal, wave control, or a free first trade to make the next step legal.",
-      "gameDetail": "At 0:53, Samira and support are holding the bot-side brush before minions meet and no enemy body, wave payout, or forced first trade is visible, so the wrong click is stepping deeper for a blind first contact and the next click is to hold the brush edge, wait for enemy reveal, or walk to lane on time if nothing appears. By 1:21, the first minions are already in lane and the setup only mattered if it created health, summoner, or wave value. The final 5/9/3, 119 CS in 28 minutes says the bigger rank cost is still turning early pressure into stable lane and fight value instead of later death timers.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
-      "mistakeTypes": [
-        "level-1 blind commit",
-        "early lane payout check",
-        "wave-first discipline",
-        "ally-front timing",
-        "death-state exposure later"
-      ],
-      "eventEvidence": "0:53 shows Samira and support sitting in the bot-side brush before minions meet with no enemy body or wave payout visible; 1:21 shows the first lane wave already in front, which means the setup needed to create health, summoner, or wave value immediately to be worth the hold.",
-      "failureEvidence": "At 0:53, Samira and support sitting in the bot-side brush before minions meet with no enemy body or wave payout visible; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.",
-      "goodThing": "You are grouped with support instead of wandering into lane alone, which is the right base shape to keep before the reveal happens.",
-      "whyTrust": "This uses the visible 0:53 brush hold, the 1:21 lane state, and the final 5/9/3, 119 CS ranked stat line to keep the note tied to what the clip actually shows.",
-      "focusTag": "level 1 payout",
-      "evidence": "Manual frame inspection of the 0:53 bot-brush hold, the 1:21 first-wave lane state, and the League Client stats for the same ranked game.",
-      "pattern": "The early setup is only useful when the reveal creates a concrete payout. If nothing appears, lane timing and first-wave control matter more than proving willingness to fight from fog.",
-      "diamondRule": "Level-1 brush pressure is only worth keeping when the next visible step creates a first trade, wave control, or a forced enemy detour.",
-      "drill": "before any level-1 brush hold, ask what the reveal buys right now: first trade, wave control, or leave. If none is visible, walk to lane on time instead of forcing first contact.",
-      "timeline": [
-        "0:53 - Samira and support hold bot-side brush before minions meet.",
-        "1:21 - The first minion wave is already in lane with Samira and support beside it."
-      ],
-      "clockAnchors": [
-        {
-          "clock": "0:53",
-          "videoSeconds": 53,
-          "description": "Samira and support hold bot-side brush before minions meet."
-        },
-        {
-          "clock": "1:21",
-          "videoSeconds": 125,
-          "description": "The first minion wave is already in lane with Samira and support beside it."
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "0:53",
-          "videoSeconds": 53,
-          "description": "shows Samira and support sitting in the bot-side brush before minions meet with no enemy body or wave payout visible"
-        },
-        {
-          "clock": "1:21",
-          "videoSeconds": 125,
-          "description": "shows the first lane wave already in front, which means the setup needed to create health, summoner, or wave value immediately to be worth the hold."
-        }
-      ],
-      "nuance": [
-        "Good: the setup is grouped with support instead of a solo face-check.",
-        "Leak: the brush hold needs a visible payout before it becomes a commit.",
-        "Branch: if no enemy reveal or free trade appears, lane timing and first-wave control are the better conversion.",
-        "Cost: the full ranked line still ends 5/9/3 with 119 CS in 28 minutes, so later deaths and low farm remain the bigger carry leak.",
-        "Limit: sampled frames do not prove the unseen enemy positions inside fog, so the rule stays tied to visible reveal and wave state."
-      ],
-      "reviewLimit": "Manual frame review used sampled 2 FPS replay frames and cannot prove hidden enemy positions or exact pings; the note is limited to the visible brush hold, lane timing, and the synced match stat line.",
-      "analysisSource": "manual",
-      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
-      "sampledFrames": 14,
-      "publicVideoBytes": 4878730,
-      "captureFps": 2,
-      "src": "/recordings/auto_NA1-5567787430_02.mp4",
-      "poster": "/recordings/posters/auto-na1-5567787430-02.jpg",
-      "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v6",
-        "label": "Iron",
-        "range": "Iron IV-Iron II",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "score": 15,
-        "confidence": "high",
-        "rankedTransferConfidence": "high",
-        "evidenceConfidence": "high",
-        "confidenceScore": 84,
-        "queueClass": "ranked_solo",
-        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "new ranked fundamentals",
-        "confidenceSignals": [
-          "K/D/A, CS, and game length are available",
-          "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review",
-          "ranked opponent pressure",
-          "enough ranked full-game samples for calibration"
-        ],
-        "confidenceBlockers": [
-          "recording is not long enough to prove full-game macro"
-        ],
-        "researchBasis": [
-          "riot-ranked-tiers-2026",
-          "riot-apex-tiers-2026",
-          "bennett-poulus-novak-2025",
-          "srl-league-2021",
-          "kpi-objective-vision-2025"
-        ],
-        "reason": "4.3 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
-      },
-      "performanceRank": {
-        "version": "2026-05-25-performance-rank-v2",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "reason": "4.3 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
-      }
-    },
-    {
-      "file": "16-10_NA1-5567787430_01.webm",
-      "publicFile": "16-10_NA1-5567787430_01.webm",
-      "cacheKey": "13939758:1779690076605",
-      "fingerprint": "af4cef967203",
-      "matchId": "NA1-5567787430",
-      "score": "16-10",
-      "clipNumber": 1,
-      "matchTimeMs": 1779687159589,
-      "gameHappenedAt": "2026-05-25T05:32:39.589Z",
-      "gameHappenedAtLabel": "May 25, 2026, 1:32 AM",
-      "recordedAt": "2026-05-25T06:21:16.605Z",
-      "recordedAtLabel": "May 25, 2026, 2:21 AM",
-      "recordedAtTimeLabel": "2:21 AM",
-      "clipTimestampSeconds": 127.129,
-      "clipTimestamp": "2:07",
-      "clipWindow": "2:07-2:38",
-      "timestamp": "2:07",
-      "queueId": 420,
-      "gameType": "Ranked Solo",
-      "gameTypeSource": "LeagueClient log",
-      "title": "Ask for the payout first",
-      "duration": "0:31",
-      "durationSeconds": 30.741,
-      "gameLength": "27:59",
-      "gameLengthSeconds": 1679,
-      "kda": "5/9/3",
-      "kills": 5,
-      "deaths": 9,
-      "assists": 3,
-      "cs": 119,
-      "statsSource": "League Client match history",
-      "win": false,
-      "outcome": "defeat",
-      "outcomeLabel": "DEFEAT",
-      "outcomeSource": "League Client match history",
-      "kind": "highlight",
-      "reviewPhase": "current form",
-      "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Ask for the payout first",
-      "feedback": "Before committing, know what the win buys: crash, plate, tower, dragon move, recall, or end.",
-      "gameDetail": "The useful question in this clip is not whether Samira can win the fight; it is what the fight buys immediately after. Around 1:11, Samira last-hitting a minion (\"+20\" gold floating) in the top lane. The next useful rep is naming the payout before the commit so pressure becomes a wave crash, plate, tower, objective move, recall, or end.",
-      "secondaryFocus": "",
-      "mistakeTypes": [],
-      "eventEvidence": "1:11 Samira last-hitting a minion (\"+20\" gold floating) in the top lane.",
-      "failureEvidence": "",
-      "goodThing": "The useful positive sign is that Samira is creating pressure; the next step is making that pressure safer and more repeatable.",
-      "whyTrust": "Strong ADC games climb by turning pressure into tempo; a kill with no payout is just a higher-risk fight.",
-      "focusTag": "commit timing",
-      "evidence": "1:11 Samira last-hitting a minion (\"+20\" gold floating) in the top lane.",
-      "pattern": "The fight needs a planned map payout before the commit.",
-      "diamondRule": "Commit only when the win has an immediate conversion path.",
-      "drill": "Name the payout before pressing the engage button.",
-      "timeline": [],
-      "clockAnchors": [
-        {
-          "clock": "0:53",
-          "videoSeconds": 1.23,
-          "description": "Two champions standing inside brush near the top lane."
-        },
-        {
-          "clock": "1:00",
-          "videoSeconds": 8.3,
-          "description": "Two champions still near the top-side brush with the minimap visible."
-        },
-        {
-          "clock": "1:05",
-          "videoSeconds": 15.371,
-          "description": "A single champion moving out of the brush toward the lane."
-        },
-        {
-          "clock": "1:11",
-          "videoSeconds": 22.441,
-          "description": "Champion last-hitting a minion (\"+20\" gold floating) in the top lane."
-        },
-        {
-          "clock": "1:18",
-          "videoSeconds": 29.512,
-          "description": "Champion in lane with a nearby minion wave and another champion near the brush."
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "1:11",
-          "videoSeconds": 22.441,
-          "description": "Samira last-hitting a minion (\"+20\" gold floating) in the top lane."
-        }
-      ],
-      "nuance": [
-        "A good-looking kill is still low value if the wave or objective stays unchanged."
-      ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-24-command-lane-rep-v24",
-      "sampledFrames": 5,
-      "publicVideoBytes": 13939758,
-      "captureFps": 2,
-      "src": "/recordings/16-10_NA1-5567787430_01.webm",
-      "poster": "/recordings/posters/16-10-na1-5567787430-01.jpg"
-    },
-    {
       "file": "auto_NA1-5567367431_01.mp4",
       "publicFile": "auto_NA1-5567367431_01.mp4",
       "cacheKey": "28151483:1779658475831",
@@ -776,7 +532,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "implementation",
+      "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Bot-tower dash after lane value ended",
