@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T22:32:09.278Z",
+  "generatedAt": "2026-05-25T22:50:12.899Z",
   "source": "League of Legends Highlights folder",
   "match": "44 matches",
   "matches": [
@@ -55,7 +55,7 @@
   "mainFeedback": {
     "title": "Samira latest synced state",
     "focus": "Synced through May 25, 2026, 6:01 PM: newest full-game read Iron II; current 3-game read Bronze II; archive median Bronze III across 41 full games, used only as baseline context. The newest game is below the current three-game read.",
-    "rule": "The newest-game blocker is reset/overstay discipline and side farm over map defense; the current repeat across the latest games is reset/overstay discipline, side farm over map defense, and spacing/entry discipline. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
+    "rule": "The newest-game blocker is mid wave to river chase and ally-front check; the current repeat across the latest games is ally-front check, exit after first value, and mid wave to river chase. The keep-habit is you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
     "nextRep": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5568185590_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
@@ -205,7 +205,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Pressure mode after payout vanished",
+      "title": "Mid wave turned into a river chase",
       "duration": "25:45",
       "durationSeconds": 1545,
       "gameLength": "27:28",
@@ -223,113 +223,97 @@
       "kind": "full review",
       "reviewPhase": "current form",
       "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Pressure mode after payout vanished",
-      "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      "gameDetail": "At 5:25, Samira attacking enemy turret with minions near tower; clock shows 05:25 at top-right, so the wrong click is stepping forward after the safe payout disappeared and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. by 19:47, Samira recalling under turret with minimap showing team positions; clock shows 19:47 top-right. The 4/6/1, 148 CS in 27 minutes says the biggest cost is death-state exposure: the damage exists, but too many decisions end in timers before the result is locked. The sharper leak is staying in pressure mode after the safe payout is no longer proven; a Samira lead climbs when the next click turns the wave or fight into a stable result before enemies get another collapse window.",
+      "confidence": "high",
+      "feedbackTitle": "Mid wave turned into a river chase",
+      "feedback": "The leak is chasing from mid into river after the wave-and-ally setup stops protecting you, so pressure becomes another death timer instead of wave, recall, or regroup.",
+      "gameDetail": "At 23:05, you leave a safe mid-wave setup with an ally nearby and a target deeper toward river, but no tower hit or guaranteed objective is on screen and the ally line is not clearly between you and the collapse, so the wrong click is the forward river chase and the next click is catch mid wave, step back toward turret, or reset/group. By 23:20 the state flip is visible: multiple enemies are on you and the play becomes a death timer, which matters because 4/6/1 with 148 CS means the farm pace is usable but the fight impact keeps getting paid back through avoidable exits.",
       "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
       "mistakeTypes": [
-        "reset/overstay discipline",
-        "side farm over map defense",
-        "spacing/entry discipline",
-        "wave/objective conversion",
-        "camera/map-state check"
+        "mid wave to river chase",
+        "ally-front check",
+        "exit after first value",
+        "fight-entry discipline",
+        "death-state exposure"
       ],
-      "eventEvidence": "19:47 shows Samira recalling under turret with minimap showing team positions; clock shows 19:47 top-right. 15:50 shows Samira dead and waiting to respawn with minimap visible; in-game clock shows 15:50 top-right. 3:27 shows laned champions and minion wave in bottom lane; in-game clock reads 03:27 top-right. 5:25 shows Samira attacking enemy turret with minions near tower; clock shows 05:25 at top-right.",
-      "failureEvidence": "At 19:47, Samira recalling under turret with minimap showing team positions; clock shows 19:47 top-right; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.",
-      "goodThing": "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-      "whyTrust": "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
-      "focusTag": "overstay control",
-      "evidence": "19:47 shows Samira recalling under turret with minimap showing team positions; clock shows 19:47 top-right. 15:50 shows Samira dead and waiting to respawn with minimap visible; in-game clock shows 15:50 top-right. 3:27 shows laned champions and minion wave in bottom lane; in-game clock reads 03:27 top-right. 5:25 shows Samira attacking enemy turret with minions near tower; clock shows 05:25 at top-right.",
-      "pattern": "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
-      "diamondRule": "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
-      "drill": "after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
-      "timeline": [],
+      "eventEvidence": "22:40 and 23:00 show Samira grouped mid with wave and ally context; 23:05 shows the move from mid toward river; 23:15 shows the collapse beginning; 23:20 shows the death timer.",
+      "failureEvidence": "At 23:05 the visible value is still mid wave, turret safety, or regroup, but the click goes toward river before an ally-front guarantee or free target is proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death timer.",
+      "goodThing": "At 19:47 you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
+      "whyTrust": "This uses the inspected 19:47, 22:40, 23:05, 23:15, and 23:20 frames plus the League Client 4/6/1, 148 CS ranked context.",
+      "focusTag": "mid-to-river exit",
+      "evidence": "Manual frame inspection of the mid-to-river fight window and League Client ranked stats for the same match.",
+      "pattern": "The first mid setup is playable because wave and ally context exist; the mistake starts when the next click leaves that setup for river without a clear front body, tower, wave, objective, or low/CC'd target.",
+      "diamondRule": "After mid pressure, a Samira river chase is legal only when an ally is still in front and the target is already CC'd or low; otherwise the result is mid wave, turret safety, reset, or regroup.",
+      "drill": "before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
+      "timeline": [
+        "19:47 - Samira recalls safely under mid turret after pressure.",
+        "22:40 - Samira is grouped mid with an ally and wave context.",
+        "23:00 - Samira is still mid with wave nearby before leaving the safer lane shape.",
+        "23:05 - Samira moves from mid toward river while the ally line is split.",
+        "23:15 - Multiple enemies collapse around the river edge.",
+        "23:20 - Samira is dead after the river chase."
+      ],
       "clockAnchors": [
-        {
-          "clock": "1:29",
-          "videoSeconds": 122.231,
-          "description": "Bot lane fight with allied champions and enemy minions visible; HUD shows 01:29 at top-right."
-        },
-        {
-          "clock": "3:27",
-          "videoSeconds": 240.462,
-          "description": "Laned champions and minion wave in bottom lane; in-game clock reads 03:27 top-right."
-        },
-        {
-          "clock": "5:25",
-          "videoSeconds": 358.692,
-          "description": "Champion attacking enemy turret with minions near tower; clock shows 05:25 at top-right."
-        },
-        {
-          "clock": "7:57",
-          "videoSeconds": 476.923,
-          "description": "Engagement in bot river with heal numbers visible; in-game clock reads 07:57 top-right."
-        },
-        {
-          "clock": "9:56",
-          "videoSeconds": 595.154,
-          "description": "Two allied champions moving toward bot lane under turret; clock shows 09:56 at top-right."
-        },
-        {
-          "clock": "11:54",
-          "videoSeconds": 713.385,
-          "description": "Scoreboard is open overlaying the screen; in-game clock visible as 11:54 at top-right."
-        },
-        {
-          "clock": "13:52",
-          "videoSeconds": 831.615,
-          "description": "Champion attacking bottom turret with minimap visible; clock reads 13:52 top-right."
-        },
-        {
-          "clock": "15:50",
-          "videoSeconds": 949.846,
-          "description": "Player dead and waiting to respawn with minimap visible; in-game clock shows 15:50 top-right."
-        },
-        {
-          "clock": "17:49",
-          "videoSeconds": 1068.077,
-          "description": "Mid-lane skirmish with multiple champions; clock reads 17:49 at top-right."
-        },
         {
           "clock": "19:47",
           "videoSeconds": 1186.308,
-          "description": "Champion recalling under turret with minimap showing team positions; clock shows 19:47 top-right."
+          "description": "Samira recalls safely under mid turret after pressure."
         },
         {
-          "clock": "21:45",
-          "videoSeconds": 1304.538,
-          "description": "Top lane champion using an ability near enemy structures; in-game clock visible as 21:45 at top-right."
+          "clock": "22:40",
+          "videoSeconds": 1360,
+          "description": "Samira is grouped mid with an ally and wave context."
+        },
+        {
+          "clock": "23:00",
+          "videoSeconds": 1380,
+          "description": "Samira is mid with wave nearby before leaving the safer lane shape."
+        },
+        {
+          "clock": "23:05",
+          "videoSeconds": 1385,
+          "description": "Samira moves from mid toward river while the ally line is split."
+        },
+        {
+          "clock": "23:15",
+          "videoSeconds": 1395,
+          "description": "Multiple enemies collapse around the river edge."
+        },
+        {
+          "clock": "23:20",
+          "videoSeconds": 1400,
+          "description": "Samira is dead after the river chase."
         }
       ],
       "clockMoments": [
         {
           "clock": "19:47",
           "videoSeconds": 1186.308,
-          "description": "Samira recalling under turret with minimap showing team positions; clock shows 19:47 top-right."
+          "description": "Samira recalls safely under mid turret after pressure."
         },
         {
-          "clock": "15:50",
-          "videoSeconds": 949.846,
-          "description": "Samira dead and waiting to respawn with minimap visible; in-game clock shows 15:50 top-right."
+          "clock": "22:40",
+          "videoSeconds": 1360,
+          "description": "and show Samira grouped mid with wave and ally context"
         },
         {
-          "clock": "3:27",
-          "videoSeconds": 240.462,
-          "description": "Laned champions and minion wave in bottom lane; in-game clock reads 03:27 top-right."
+          "clock": "23:00",
+          "videoSeconds": 1380,
+          "description": "and show Samira grouped mid with wave and ally context"
         },
         {
-          "clock": "5:25",
-          "videoSeconds": 358.692,
-          "description": "Samira attacking enemy turret with minions near tower; clock shows 05:25 at top-right."
+          "clock": "23:05",
+          "videoSeconds": 1385,
+          "description": "shows the move from mid toward river"
         }
       ],
       "nuance": [
-        "High kills only matter when the next click creates tower, wave, objective, reset, or base value.",
-        "Low CS makes every unclear forward click more expensive because income is already unstable."
+        "The mid setup itself is not the problem; wave and ally context make it playable.",
+        "The state flips once the click leaves mid wave and turret safety for river without a clear front body.",
+        "The 148 CS is usable for this session, but 4/6/1 means fight impact is not surviving the exit windows.",
+        "The next-game rep is a mid-to-river legality check, not a generic pressure-mode rule."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry. The detailed AI pass failed, so this review is a conservative timestamped fallback from verified visible frames.",
-      "analysisSource": "fallback",
+      "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns or hidden enemies, but it verifies the mid-wave setup, river move, collapse, death timer, and 4/6/1, 148 CS ranked context.",
+      "analysisSource": "manual",
       "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
       "publicVideoBytes": 49372220,
@@ -342,7 +326,7 @@
         "range": "Iron IV-Iron II",
         "exactRank": "Iron II",
         "exactRankValue": 2,
-        "score": 14,
+        "score": 13,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -366,13 +350,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min and 6 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
+        "reason": "5.4 CS/min and 6 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
-        "reason": "5.4 CS/min and 6 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
+        "reason": "5.4 CS/min and 6 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
       }
     },
     {
