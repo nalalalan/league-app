@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T16:17:50.618Z",
+  "generatedAt": "2026-05-25T16:55:15.975Z",
   "source": "League of Legends Highlights folder",
   "match": "42 matches",
   "matches": [
@@ -52,9 +52,9 @@
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 25, 2026, 10:39 AM: newest full-game read Bronze II; current 3-game read Iron II; archive median Bronze III across 39 full games, used only as baseline context. The newest game is above the current three-game read.",
-    "rule": "The newest-game blocker is jungle fight exit after first value and side wave to map-result conversion; the current repeat across the latest games is ally-front check, jungle fight exit after first value, and side wave to map-result conversion. The keep-habit is You kept this game calmer: only 4 deaths and 175 CS means the farming and survival baseline is improving compared with the death-heavy games.",
-    "nextRep": "Rep: after 15 minutes, before extending a side wave or jungle fight, check nearest threatened turret, ally front, and whether first value is already gained. If any fail, leave through turret/mid wave or reset; do not chase the second body.",
+    "focus": "Synced through May 25, 2026, 10:39 AM: newest full-game read Bronze I; current 3-game read Iron I; archive median Bronze III across 39 full games, used only as baseline context. The newest game is above the current three-game read.",
+    "rule": "The newest-game blocker is jungle fight exit after first value and side wave to map-result conversion; the current repeat across the latest games is ally-front check, jungle fight exit after first value, and side wave to map-result conversion. The keep-habit is This game is calmer: 175 CS and only 4 deaths means your farming and survival baseline improved; keep the calmer reset, wave, and ally-line habits.",
+    "nextRep": "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5567953154_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
@@ -224,9 +224,9 @@
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Jungle fight continued after first value",
-      "feedback": "The leak is that the blue-side jungle fight is playable while allies are in front, but after the first value window you keep chasing the same fight instead of exiting to turret, mid wave, or reset.",
-      "gameDetail": "At 22:51, you are in your blue-side jungle with two allies already hitting the enemy, one enemy low or committed, and your inner turret behind the play, so the first entry is legal enough, but the leak is treating the next seconds as another chase after first value and the next click is back toward turret, mid wave, or reset behind allies. Around 22:59 the state has flipped because another enemy is still visible and the next safe result is no longer guaranteed; by 23:39 the cost is visible as a death timer with 144 CS.",
-      "secondaryFocus": "Rep: after 15 minutes, before extending a side wave or jungle fight, check nearest threatened turret, ally front, and whether first value is already gained. If any fail, leave through turret/mid wave or reset; do not chase the second body.",
+      "feedback": "The leak is that after the first jungle value window ends, you keep chasing the same fight through blue-side jungle instead of choosing a stable result.",
+      "gameDetail": "At 22:51, the blue-side jungle fight is playable at first: allies are in front, an enemy is already committed, and Samira can threaten from behind the line, so the first value window is not the issue and the next click is exit to turret, catch mid wave, reset, or regroup after that value is gone. Once no enemy is already CC'd or low, no ally is clearly body-blocking, and no tower, wave, or objective is visible, Samira's next click has to be exit, not another forward chase. By 23:39 the playable entry has turned into enemy tempo and another death timer.",
+      "secondaryFocus": "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.",
       "mistakeTypes": [
         "jungle fight exit after first value",
         "side wave to map-result conversion",
@@ -234,15 +234,15 @@
         "low damage pressure",
         "reset/group timing"
       ],
-      "eventEvidence": "22:31 shows Samira and an ally under allied mid/base area with the defense stabilized; 22:41 shows Samira entering blue-side jungle behind allies; 22:51 shows the fight with allies in front and an enemy already committed; 22:59 shows Samira still in the jungle fight as another enemy remains visible; 23:39 shows the death timer with 144 CS.",
-      "failureEvidence": "At 22:51 the entry is legal enough because allies are already in front, but by 22:59 the first value window has shifted into an exit check; staying forward turns a playable defense fight into the 23:39 death timer instead of a turret-side exit, mid-wave catch, or reset.",
-      "goodThing": "You kept this game calmer: only 4 deaths and 175 CS means the farming and survival baseline is improving compared with the death-heavy games.",
+      "eventEvidence": "22:41 shows Samira entering blue-side jungle behind allies; 22:51 shows the fight is playable at first because allies are in front and an enemy is already committed; 22:59 shows the state flip as the same fight keeps extending through jungle; 23:39 shows the death timer with 144 CS.",
+      "failureEvidence": "At 22:51 the entry is playable; the failure is the next phase, when no enemy is already CC'd or low, no ally is clearly body-blocking, and no tower, wave, or objective is visible, so the correct branch is turret, mid wave, reset, or regroup instead of another jungle chase.",
+      "goodThing": "This game is calmer: 175 CS and only 4 deaths means your farming and survival baseline improved; keep the calmer reset, wave, and ally-line habits.",
       "whyTrust": "This uses inspected 22:31, 22:41, 22:51, 22:59, and 23:39 frames plus the League Client 1/4/3, 175 CS ranked stat line.",
       "focusTag": "jungle fight exit",
       "evidence": "Manual frame inspection of the blue-side jungle fight and League Client ranked stats for the same match.",
-      "pattern": "This is not the old perma-feed shape. The new problem is quieter: controlled deaths and better CS are present, but the first playable fight value is not turning into tower damage, grouped movement, or a clean reset often enough.",
-      "diamondRule": "After a side or jungle fight starts paying, Samira needs the exit branch before the second chase.",
-      "drill": "after 15 minutes, before extending a side wave or jungle fight, check nearest threatened turret, ally front, and whether first value is already gained. If any fail, leave through turret/mid wave or reset; do not chase the second body.",
+      "pattern": "The first value window is not the problem; the problem is staying in the same jungle fight after the stable result disappears.",
+      "diamondRule": "After a jungle fight gives first value, the next Samira click is turret, mid wave, reset, or regroup unless an ally is still in front and the target is already CC'd or low.",
+      "drill": "after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.",
       "timeline": [
         "22:31 - Samira and an ally are under allied mid/base area after the defense stabilizes.",
         "22:41 - Samira follows allies into blue-side jungle.",
@@ -281,7 +281,7 @@
         {
           "clock": "22:31",
           "videoSeconds": 1350,
-          "description": "shows Samira and an ally under allied mid/base area with the defense stabilized"
+          "description": "Samira and an ally are under allied mid/base area after the defense stabilizes."
         },
         {
           "clock": "22:41",
@@ -291,20 +291,20 @@
         {
           "clock": "22:51",
           "videoSeconds": 1370,
-          "description": "shows the fight with allies in front and an enemy already committed"
+          "description": "shows the fight is playable at first because allies are in front and an enemy is already committed"
         },
         {
           "clock": "22:59",
           "videoSeconds": 1378,
-          "description": "shows Samira still in the jungle fight as another enemy remains visible"
+          "description": "shows the state flip as the same fight keeps extending through jungle"
         }
       ],
       "nuance": [
         "This is a calmer ranked loss, not the same death-heavy pattern.",
         "The useful part is following allies into a fight where bodies are already committed.",
-        "The mistake starts after the first value window, when the next click stays chase instead of exit.",
-        "The 175 CS is good relative to recent losses, but 1/4/3 and low map pressure mean the farm did not become enough carry impact.",
-        "The next-game rep is a side/jungle fight exit check, not a generic pressure-mode slogan."
+        "The mistake starts after the first jungle value window, when the next click stays chase instead of exit.",
+        "The 175 CS and 4 deaths show improved farming and survival, but 1/4/3 means the fight value did not become enough map pressure.",
+        "The next-game rep is a jungle-fight exit check, not an objective-fight or pressure-mode slogan."
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns or all hidden enemy positions, but it can verify the allied-front jungle entry, the state-flip window, the death timer, and the 1/4/3, 175 CS ranked context.",
       "analysisSource": "manual",
@@ -318,9 +318,9 @@
         "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze II",
-        "exactRankValue": 6,
-        "score": 32,
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "score": 36,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -344,13 +344,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.5 CS/min with 1/4/3 K/D/A puts the game at Bronze II: the CS/death line is calmer, but the main leak is side-wave or jungle-fight exit into tower, wave, group, or reset."
+        "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Bronze I."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v2",
-        "exactRank": "Bronze II",
-        "exactRankValue": 6,
-        "reason": "5.5 CS/min with 1/4/3 K/D/A puts the game at Bronze II: the CS/death line is calmer, but the main leak is side-wave or jungle-fight exit into tower, wave, group, or reset."
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Bronze I."
       }
     },
     {
@@ -1516,7 +1516,7 @@
       "confidence": "high",
       "feedbackTitle": "Fight wins need exit branch",
       "feedback": "Mistake: the fights kept staying open after the useful damage window, so kills did not reliably become objective, wave, or reset value. Fix: after the first winning exchange, choose objective, safe wave, recall, or back behind ally front before spending another forward click.",
-      "gameDetail": "At 19:12, a bot-side jungle fight with ally front and an enemy angle from lower-left, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. At 5:41 the early safe branch is clearer because you are under allied bot turret with wave and two enemies in front, so the job is wave defense before forward trading. By 22:40 you are grouped around a river camp or objective fight with several allies, which is useful only if it becomes objective control or a reset path. The 25/8/9, 162 CS, 41-minute line says the problem is not damage, it is that eight deaths and low income stability stretch winning fights into more enemy chances. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
+      "gameDetail": "At 19:12, a bot-side jungle fight with ally front and an enemy angle from lower-left, so the wrong click is continuing the same jungle fight after first value and the next click is to exit to turret, catch mid wave, reset, or regroup. At 5:41 the early safe branch is clearer because you are under allied bot turret with wave and two enemies in front, so the job is wave defense before forward trading. By 22:40 you are grouped around a river camp or objective fight with several allies, which is useful only if it becomes objective control or a reset path. The 25/8/9, 162 CS, 41-minute line says the problem is not damage, it is that eight deaths and low income stability stretch winning fights into more enemy chances. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
       "secondaryFocus": "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.",
       "mistakeTypes": [
         "fight exit branch",
@@ -1592,9 +1592,9 @@
         "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze III",
-        "exactRankValue": 5,
-        "score": 31,
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "score": 26,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -1618,13 +1618,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.0 CS/min and 8 deaths put the game at Bronze III because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
+        "reason": "4.0 CS/min and 8 deaths put the game at Bronze IV because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v2",
-        "exactRank": "Bronze III",
-        "exactRankValue": 5,
-        "reason": "4.0 CS/min and 8 deaths put the game at Bronze III because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "reason": "4.0 CS/min and 8 deaths put the game at Bronze IV because fight entry is still catchable; the main leak is exit/re-entry after first value."
       }
     },
     {

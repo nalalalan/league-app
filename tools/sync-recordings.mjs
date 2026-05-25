@@ -28,6 +28,7 @@ const objectiveFightRep = "Rep: after every objective fight, ask: did we already
 const firstWinCashoutRep = "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.";
 const basePushRep = "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.";
 const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
+const jungleFightExitRep = "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.";
 const analysisVersion = "2026-05-25-forensic-performance-rank-v25";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
@@ -1592,6 +1593,12 @@ function reviewRepCategory(recording = {}) {
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) {
     return "laneDeathExit";
   }
+  if (!won &&
+      Number.isFinite(deaths) &&
+      deaths <= 4 &&
+      /\b(blue-side jungle|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(text)) {
+    return "sideFarmDefense";
+  }
   if (/\b(dragon|baron|objective|pit)\b/i.test(text) &&
       /\b(fight|entry|engaged|committed|first value|second fight|value window|state flip|re-entry|reenter|exit)\b/i.test(text)) {
     return "objectiveFight";
@@ -1621,6 +1628,7 @@ function reviewRepCategory(recording = {}) {
 }
 
 function specificRepForRecording(recording = {}) {
+  const text = analysisCoachText(recording);
   switch (reviewRepCategory(recording)) {
     case "basePush":
       return basePushRep;
@@ -1633,6 +1641,9 @@ function specificRepForRecording(recording = {}) {
     case "deathExit":
       return deathExitRep;
     case "sideFarmDefense":
+      if (/\b(blue-side jungle|jungle fight|jungle value|jungle-exit)\b/i.test(text)) {
+        return jungleFightExitRep;
+      }
       return sideFarmDefenseRep;
     case "fightEntry":
       return fightEntryRep;
@@ -1661,7 +1672,7 @@ function repMatchesGameCategory(recording = {}) {
     case "deathExit":
       return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":
-      return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b/i.test(rep);
+      return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b|\bjungle fight gives first value\b|\bexit to turret,\s*catch mid wave,\s*reset,\s*or\s*regroup\b|\bDo not keep chasing through jungle\b/i.test(rep);
     case "fightEntry":
       return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
     case "cleanerWinExit":
@@ -2391,6 +2402,9 @@ function inferredStatsFromAnalysis(analysis = {}) {
 function mistakeCategoryForAnalysis(analysis = {}) {
   const text = analysisCoachText(analysis);
   const deaths = Number(analysis.deaths);
+  if (/\b(blue-side jungle|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(text)) {
+    return "jungle fight exit after first value";
+  }
   if (/\b(side|jungle|camp|farm)\b/i.test(text) && /\b(defend|defense|base|turret|tower|wave)\b/i.test(text)) {
     return "side value over map defense";
   }
@@ -2406,8 +2420,19 @@ function mistakeCategoryForAnalysis(analysis = {}) {
   return "loose forward click after state changed";
 }
 
-function correctNextClickForAnalysis(analysis = {}) {
+function anchorOrAnalysisHasJungleFight(analysis = {}, anchor = null) {
+  const anchorText = clean(anchor?.description || "");
+  if (/\b(blue-side jungle|bot-side jungle fight|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(anchorText)) {
+    return true;
+  }
+  return !anchor && /\b(blue-side jungle|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(analysisCoachText(analysis));
+}
+
+function correctNextClickForAnalysis(analysis = {}, anchor = null) {
   const text = analysisCoachText(analysis);
+  if (anchorOrAnalysisHasJungleFight(analysis, anchor)) {
+    return "exit to turret, catch mid wave, reset, or regroup";
+  }
   if (/\b(tower|turret|structure|inhib|inhibitor|nexus|wave|payout|pressure)\b/i.test(text)) {
     return "take the visible payout now, or click back if none is guaranteed";
   }
@@ -2423,8 +2448,11 @@ function correctNextClickForAnalysis(analysis = {}) {
   return "stop the forward click, check ally front and nearest objective, then choose defend, reset, or hit a free structure";
 }
 
-function wrongDecisionForAnalysis(analysis = {}) {
+function wrongDecisionForAnalysis(analysis = {}, anchor = null) {
   const text = analysisCoachText(analysis);
+  if (anchorOrAnalysisHasJungleFight(analysis, anchor)) {
+    return "continuing the same jungle fight after first value";
+  }
   if (/\b(side|jungle|camp|farm)\b/i.test(text) && /\b(defend|defense|base|turret|tower|wave)\b/i.test(text)) {
     return "staying on farm after the map needed defense";
   }
@@ -2450,8 +2478,8 @@ function keyVisibleStateForAnchor(anchor, champion = "Samira") {
 function keyClickRuleSentence(analysis = {}, anchor = null, champion = "Samira") {
   if (!anchor?.clock) return "";
   const state = keyVisibleStateForAnchor(anchor, champion);
-  const wrong = wrongDecisionForAnalysis(analysis);
-  const click = correctNextClickForAnalysis(analysis);
+  const wrong = wrongDecisionForAnalysis(analysis, anchor);
+  const click = correctNextClickForAnalysis(analysis, anchor);
   return `At ${anchor.clock}, ${state}, so the wrong click is ${wrong} and the next click is to ${click}.`;
 }
 
@@ -3279,6 +3307,15 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
     score -= reviewCategory === "objectiveFight" ? 8 : 5;
     leaks.push("exit or re-entry after value is unstable");
   }
+  if (reviewCategory === "sideFarmDefense" &&
+      Number.isFinite(deaths) &&
+      deaths <= 4 &&
+      Number.isFinite(csPerMinute) &&
+      csPerMinute >= 5.2 &&
+      flags.stateFlipExit) {
+    score += 9;
+    strengths.push("calmer farming and survival baseline");
+  }
   if (flags.syncedTeamplay) {
     score += 5;
     strengths.push("team grouping or sync appears in the review");
@@ -3365,6 +3402,9 @@ function performanceRankReason(recording = {}, context = {}) {
   }
   if (category === "sideFarmDefense") {
     const kdaText = [kills, deaths, assists].every(Number.isFinite) ? `${kills}/${deaths}/${assists} K/D/A` : "the K/D/A line";
+    if (/\b(blue-side jungle|jungle fight|jungle value|jungle-exit)\b/i.test(analysisCoachText(recording))) {
+      return `${csText} and only ${deathText} show calmer farming and survival than the death-heavy games, but ${kdaText} fight impact and the late jungle-fight exit/value leak keep the performance at ${rank}.`;
+    }
     return `${csText} with ${kdaText} puts the game at ${rank}: the CS/death line is calmer, but the main leak is side-wave or jungle-fight exit into tower, wave, group, or reset.`;
   }
   const entryClause = flags.illegalEntry ? "because fight entry is still catchable" : "with mixed fight-entry evidence";
@@ -3424,9 +3464,9 @@ function manualFeedback(file) {
       champion: "Samira",
       confidence: "high",
       feedbackTitle: "Jungle fight continued after first value",
-      feedback: "The leak is that the blue-side jungle fight is playable while allies are in front, but after the first value window you keep chasing the same fight instead of exiting to turret, mid wave, or reset.",
-      gameDetail: "At 22:51, you are in your blue-side jungle with two allies already hitting the enemy, one enemy low or committed, and your inner turret behind the play, so the first entry is legal enough, but the leak is treating the next seconds as another chase after first value and the next click is back toward turret, mid wave, or reset behind allies. Around 22:59 the state has flipped because another enemy is still visible and the next safe result is no longer guaranteed; by 23:39 the cost is visible as a death timer with 144 CS. The final 1/4/3 with 175 CS in 31:42 says this was a lower-death, better-farm game than the feeding losses, but the carry impact stayed too quiet because safe farm and first fight value did not become enough tower, wave, or clean reset pressure.",
-      secondaryFocus: "Rep: after 15 minutes, before extending a side wave or jungle fight, check nearest threatened turret, ally front, and whether first value is already gained. If any fail, leave through turret/mid wave or reset; do not chase the second body.",
+      feedback: "The leak is that after the first jungle value window ends, you keep chasing the same fight through blue-side jungle instead of choosing a stable result.",
+      gameDetail: "At 22:51, the blue-side jungle fight is playable at first: allies are in front, an enemy is already committed, and Samira can threaten from behind the line, so the first value window is not the issue and the next click is exit to turret, catch mid wave, reset, or regroup after that value is gone. Once no enemy is already CC'd or low, no ally is clearly body-blocking, and no tower, wave, or objective is visible, Samira's next click has to be exit, not another forward chase. By 23:39 the playable entry has turned into enemy tempo and another death timer.",
+      secondaryFocus: jungleFightExitRep,
       mistakeTypes: [
         "jungle fight exit after first value",
         "side wave to map-result conversion",
@@ -3434,15 +3474,15 @@ function manualFeedback(file) {
         "low damage pressure",
         "reset/group timing"
       ],
-      eventEvidence: "22:31 shows Samira and an ally under allied mid/base area with the defense stabilized; 22:41 shows Samira entering blue-side jungle behind allies; 22:51 shows the fight with allies in front and an enemy already committed; 22:59 shows Samira still in the jungle fight as another enemy remains visible; 23:39 shows the death timer with 144 CS.",
-      failureEvidence: "At 22:51 the entry is legal enough because allies are already in front, but by 22:59 the first value window has shifted into an exit check; staying forward turns a playable defense fight into the 23:39 death timer instead of a turret-side exit, mid-wave catch, or reset.",
-      goodThing: "You kept this game calmer: only 4 deaths and 175 CS means the farming and survival baseline is improving compared with the death-heavy games.",
+      eventEvidence: "22:41 shows Samira entering blue-side jungle behind allies; 22:51 shows the fight is playable at first because allies are in front and an enemy is already committed; 22:59 shows the state flip as the same fight keeps extending through jungle; 23:39 shows the death timer with 144 CS.",
+      failureEvidence: "At 22:51 the entry is playable; the failure is the next phase, when no enemy is already CC'd or low, no ally is clearly body-blocking, and no tower, wave, or objective is visible, so the correct branch is turret, mid wave, reset, or regroup instead of another jungle chase.",
+      goodThing: "This game is calmer: 175 CS and only 4 deaths means your farming and survival baseline improved; keep the calmer reset, wave, and ally-line habits.",
       whyTrust: "This uses inspected 22:31, 22:41, 22:51, 22:59, and 23:39 frames plus the League Client 1/4/3, 175 CS ranked stat line.",
       focusTag: "jungle fight exit",
       evidence: "Manual frame inspection of the blue-side jungle fight and League Client ranked stats for the same match.",
-      pattern: "This is not the old perma-feed shape. The new problem is quieter: controlled deaths and better CS are present, but the first playable fight value is not turning into tower damage, grouped movement, or a clean reset often enough.",
-      diamondRule: "After a side or jungle fight starts paying, Samira needs the exit branch before the second chase.",
-      drill: "after 15 minutes, before extending a side wave or jungle fight, check nearest threatened turret, ally front, and whether first value is already gained. If any fail, leave through turret/mid wave or reset; do not chase the second body.",
+      pattern: "The first value window is not the problem; the problem is staying in the same jungle fight after the stable result disappears.",
+      diamondRule: "After a jungle fight gives first value, the next Samira click is turret, mid wave, reset, or regroup unless an ally is still in front and the target is already CC'd or low.",
+      drill: "after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.",
       timeline: [
         "22:31 - Samira and an ally are under allied mid/base area after the defense stabilizes.",
         "22:41 - Samira follows allies into blue-side jungle.",
@@ -3460,9 +3500,9 @@ function manualFeedback(file) {
       nuance: [
         "This is a calmer ranked loss, not the same death-heavy pattern.",
         "The useful part is following allies into a fight where bodies are already committed.",
-        "The mistake starts after the first value window, when the next click stays chase instead of exit.",
-        "The 175 CS is good relative to recent losses, but 1/4/3 and low map pressure mean the farm did not become enough carry impact.",
-        "The next-game rep is a side/jungle fight exit check, not a generic pressure-mode slogan."
+        "The mistake starts after the first jungle value window, when the next click stays chase instead of exit.",
+        "The 175 CS and 4 deaths show improved farming and survival, but 1/4/3 means the fight value did not become enough map pressure.",
+        "The next-game rep is a jungle-fight exit check, not an objective-fight or pressure-mode slogan."
       ],
       reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns or all hidden enemy positions, but it can verify the allied-front jungle entry, the state-flip window, the death timer, and the 1/4/3, 175 CS ranked context.",
       outcome: "defeat",
