@@ -23,13 +23,14 @@ const fightEntryRep = "Rep: after 15 minutes, before stepping into a fight, ask:
 const fightEntryDrill = "After 15 minutes, before stepping into a fight: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.";
 const cleanerWinExitRep = "Rep: after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.";
 const deathExitRep = "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.";
-const laneDeathExitRep = "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. Do not E/dash toward an enemy under tower unless support is between you and them and the wave still protects you.";
+const laneDeathExitRep = "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.";
 const firstWinCashoutRep = "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.";
 const basePushRep = "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.";
 const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
-const analysisVersion = "2026-05-24-lane-specific-rep-v23";
+const analysisVersion = "2026-05-24-command-lane-rep-v24";
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-24-lane-specific-rep-v23",
   "2026-05-24-game-specific-rep-v22",
   "2026-05-24-dense-click-review-v21",
   "2026-05-24-tight-click-review-v20",
@@ -1537,11 +1538,13 @@ function reviewRepCategory(recording = {}) {
   const gameLengthSeconds = Number(recording.gameLengthSeconds || recording.durationSeconds || 0);
   const csPerMinute = Number.isFinite(cs) && gameLengthSeconds > 0 ? cs / (gameLengthSeconds / 60) : NaN;
   const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
+  const isSamira = /\bsamira\b/i.test([recording.champion, recording.championSlug, recording.title, text].join(" "));
 
   if (Number.isFinite(kills) && kills >= 18 && /\b(defeat|loss|lost|eight deaths|death|objective|won exchange|first useful damage|reset)\b/i.test(text)) {
     return "firstWinCashout";
   }
-  if (/\b(bot|lane|outer turret|under turret|support|wave is already thin|Samira E|dash\/chase|tower dive)\b/i.test(text) &&
+  if (isSamira &&
+      /\b(bot|lane|outer turret|under turret|support|wave is already thin|samira e|dash\/chase|tower dive)\b/i.test(text) &&
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) {
     return "laneDeathExit";
   }
@@ -1599,7 +1602,7 @@ function repMatchesGameCategory(recording = {}) {
     case "firstWinCashout":
       return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
     case "laneDeathExit":
-      return /\bdeath-heavy lane sequence\b|\bDo not E\/dash\b|\bwave still protects you\b|\bone step behind support\b/i.test(rep);
+      return /\bdeath-heavy lane sequence\b|\bNo E toward\b|\bDo not E\/dash\b|\bwave still protects (?:me|you)\b|\bone step behind support\b/i.test(rep);
     case "deathExit":
       return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":

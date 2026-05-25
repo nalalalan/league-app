@@ -52,7 +52,7 @@
     "title": "Samira latest synced state",
     "focus": "Synced through May 24, 2026, 5:16 PM: newest full-game read Iron II; current 3-game read Bronze IV; archive median Bronze IV across 37 full games, used only as baseline context. The newest game is around the current three-game read.",
     "rule": "The newest-game blocker is lane all-in after setup ends and death-state exposure; the current repeat across the latest games is ally-frontline check, death-state exposure, and lane all-in after setup ends. The keep-habit is At 8:32 and 8:52 you are at least playing through your support and the bot wave, which is the lane shape to keep before the setup expires.",
-    "nextRep": "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. Do not E/dash toward an enemy under tower unless support is between you and them and the wave still protects you.",
+    "nextRep": "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5567367431_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
@@ -224,7 +224,7 @@
       "feedbackTitle": "Bot-tower dash after lane value ended",
       "feedback": "The leak is treating one catchable enemy under turret as a legal Samira entry after the wave/front/body no longer protects you, so lane pressure becomes another death timer instead of a reset or wave result.",
       "gameDetail": "At 9:02, you are 0/2/0 with 44 CS beside enemy bot outer turret, support is near you but not clearly between you and the enemy, the wave is already thin, and the visible enemy is under turret, so the wrong click is the forward dash/chase and the next click is back through your minion wave behind support, or reset if the wave cannot safely be played. By 9:22 you are dead, the score has moved to 0/3/0, and the lane gained no tower or objective from the entry. The final 0/5/0, 57 CS in 16 minutes says the first blocker is death-state exposure: the lane ideas are not useless, but the all-in button is being pressed after the legal setup is gone.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. Do not E/dash toward an enemy under tower unless support is between you and them and the wave still protects you.",
+      "secondaryFocus": "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.",
       "mistakeTypes": [
         "lane all-in after setup ends",
         "death-state exposure",
@@ -240,7 +240,7 @@
       "evidence": "Manual frame inspection of 8:32, 8:52, 9:02, and 9:22 plus League Client stats.",
       "pattern": "This game is a death-state lane-control problem: the first improvement is not a fancy macro branch, it is refusing the dash after the wave and ally-front setup expires.",
       "diamondRule": "Samira E is legal only when wave, ally front, enemy cooldowns, and the exit path still make the target safe enough to cash.",
-      "drill": "after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. Do not E/dash toward an enemy under tower unless support is between you and them and the wave still protects you.",
+      "drill": "after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.",
       "timeline": [
         "8:32 - Samira and support push bot wave together before the tower setup expires.",
         "8:52 - Samira walks near enemy bot outer turret with support nearby.",
@@ -300,7 +300,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs or every cooldown, but it can verify the bot-turret entry window, the death timer, and the 0/5/0, 57 CS defeat context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-24-lane-specific-rep-v23",
+      "analysisVersion": "2026-05-24-command-lane-rep-v24",
       "sampledFrames": 14,
       "publicVideoBytes": 28151483,
       "captureFps": 2,

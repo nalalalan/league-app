@@ -97,8 +97,10 @@ function repCategory(recording = {}) {
   const gameLengthSeconds = Number(recording.gameLengthSeconds || recording.durationSeconds || 0);
   const csPerMinute = Number.isFinite(cs) && gameLengthSeconds > 0 ? cs / (gameLengthSeconds / 60) : NaN;
   const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
+  const isSamira = /\bsamira\b/i.test([recording.champion, recording.championSlug, recording.title, text].join(" "));
   if (Number.isFinite(kills) && kills >= 18 && /\b(defeat|loss|lost|eight deaths|death|objective|won exchange|first useful damage|reset)\b/i.test(text)) return "firstWinCashout";
-  if (/\b(bot|lane|outer turret|under turret|support|wave is already thin|Samira E|dash\/chase|tower dive)\b/i.test(text) &&
+  if (isSamira &&
+      /\b(bot|lane|outer turret|under turret|support|wave is already thin|samira e|dash\/chase|tower dive)\b/i.test(text) &&
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) return "laneDeathExit";
   if (!won && Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) return "deathExit";
   if ((Number.isFinite(deaths) && deaths >= 9) || /\b(low hp|low-health|death-heavy|ten deaths|thirteen deaths|death timer|death-state|catchable death)\b/i.test(text)) return "deathExit";
@@ -118,7 +120,7 @@ function repMatchesGameCategory(recording = {}) {
     case "firstWinCashout":
       return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
     case "laneDeathExit":
-      return /\bdeath-heavy lane sequence\b|\bDo not E\/dash\b|\bwave still protects you\b|\bone step behind support\b/i.test(rep);
+      return /\bdeath-heavy lane sequence\b|\bNo E toward\b|\bDo not E\/dash\b|\bwave still protects (?:me|you)\b|\bone step behind support\b/i.test(rep);
     case "deathExit":
       return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":
@@ -139,6 +141,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-24-command-lane-rep-v24",
     "2026-05-24-lane-specific-rep-v23",
     "2026-05-24-game-specific-rep-v22",
     "2026-05-24-dense-click-review-v21",
