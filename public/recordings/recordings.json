@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T20:13:03.149Z",
+  "generatedAt": "2026-05-25T20:38:25.803Z",
   "source": "League of Legends Highlights folder",
   "match": "43 matches",
   "matches": [
@@ -225,7 +225,7 @@
       "confidence": "high",
       "feedbackTitle": "Cleaner win, one mid re-entry death remains",
       "feedback": "The leak is staying forward for a second mid-fight re-entry after the first value window has already become wave, recall, or regroup.",
-      "gameDetail": "At 21:09, Samira low in mid with wave/ally context and enemy bodies still able to re-engage, so the wrong click is staying on farm after the map needed defense and the next click is to take the visible payout now, or click back if none is guaranteed. The first bad next click is staying forward for another Samira re-entry. At 19:23 you had already shown the keepable habit by recalling after bot-side pressure with about 1687 gold. By 22:02 the re-entry becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one mid-fight exit leak.",
+      "gameDetail": "At 21:09, the first mid fight is legal enough because allies and a wave are near you and value has already happened, but the state flip is exit/value: you are low, enemy bodies can still re-engage, and the next click is one step back through the wave, then recall or group. The first bad next click is staying forward for another Samira re-entry. At 19:23 you had already shown the keepable habit by recalling after bot-side pressure with about 1687 gold. By 22:02 the re-entry becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one mid-fight exit leak.",
       "secondaryFocus": "Rep: after a mid fight gives one kill, assist, wave, or turret pressure, say wave, recall, or regroup. If you are low or no ally is clearly in front, no second forward E; take one step back through the wave first.",
       "mistakeTypes": [
         "mid-fight exit after value",
@@ -344,13 +344,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min and 3 deaths show a cleaner survival baseline, but 7/3/10 K/D/A plus the remaining fight-entry or exit/value leak keep the performance at Silver IV."
+        "reason": "7/3/10 K/D/A and only 3 deaths are positives, while 5.4 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
-        "reason": "5.4 CS/min and 3 deaths show a cleaner survival baseline, but 7/3/10 K/D/A plus the remaining fight-entry or exit/value leak keep the performance at Silver IV."
+        "reason": "7/3/10 K/D/A and only 3 deaths are positives, while 5.4 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
       }
     },
     {
@@ -517,7 +517,7 @@
         "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Bronze I."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
         "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Bronze I."
@@ -659,7 +659,7 @@
         "reason": "4.3 CS/min and 9 deaths pull the game to Iron III even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron III",
         "exactRankValue": 1,
         "reason": "4.3 CS/min and 9 deaths pull the game to Iron III even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
@@ -823,7 +823,7 @@
         "reason": "3.7 CS/min is playable, but 0/5/0 K/D/A with 5 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
         "reason": "3.7 CS/min is playable, but 0/5/0 K/D/A with 5 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
@@ -984,13 +984,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.3 CS/min and 3 deaths show a cleaner survival baseline, but 8/3/6 K/D/A plus the remaining fight-entry or exit/value leak keep the performance at Silver IV."
+        "reason": "8/3/6 K/D/A and only 3 deaths are positives, while 5.3 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
-        "reason": "5.3 CS/min and 3 deaths show a cleaner survival baseline, but 8/3/6 K/D/A plus the remaining fight-entry or exit/value leak keep the performance at Silver IV."
+        "reason": "8/3/6 K/D/A and only 3 deaths are positives, while 5.3 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
       }
     },
     {
@@ -1157,7 +1157,7 @@
         "reason": "3.8 CS/min and 10 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
         "reason": "3.8 CS/min and 10 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
@@ -1321,7 +1321,7 @@
         "reason": "5.4 CS/min and 1 death put the game at Silver I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver I",
         "exactRankValue": 11,
         "reason": "5.4 CS/min and 1 death put the game at Silver I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -1485,7 +1485,7 @@
         "reason": "3.2 CS/min and 3 deaths put the game at Bronze III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
         "reason": "3.2 CS/min and 3 deaths put the game at Bronze III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -1638,7 +1638,7 @@
         "reason": "5.9 CS/min and 6 deaths put the game at Bronze IV because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
         "reason": "5.9 CS/min and 6 deaths put the game at Bronze IV because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
@@ -1791,7 +1791,7 @@
         "reason": "4.0 CS/min with 25/8/9 K/D/A and 8 deaths puts the game at Bronze III: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
         "reason": "4.0 CS/min with 25/8/9 K/D/A and 8 deaths puts the game at Bronze III: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
@@ -1934,7 +1934,7 @@
         "reason": "5.2 CS/min is playable, but 0/5/6 K/D/A with 5 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
         "reason": "5.2 CS/min is playable, but 0/5/6 K/D/A with 5 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
@@ -2077,7 +2077,7 @@
         "reason": "4.1 CS/min and 13 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
         "reason": "4.1 CS/min and 13 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
@@ -2242,7 +2242,7 @@
         "reason": "5.9 CS/min is playable, but 1/6/1 K/D/A with 6 deaths keeps the game at Iron II; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
         "reason": "5.9 CS/min is playable, but 1/6/1 K/D/A with 6 deaths keeps the game at Iron II; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
@@ -2412,7 +2412,7 @@
         "reason": "6.2 CS/min is playable, but 0/7/1 K/D/A with 7 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
         "reason": "6.2 CS/min is playable, but 0/7/1 K/D/A with 7 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
@@ -2593,7 +2593,7 @@
         "reason": "4.8 CS/min and 10 deaths pull the game to Iron I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
         "reason": "4.8 CS/min and 10 deaths pull the game to Iron I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
@@ -2882,7 +2882,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
         "reason": "5.7 CS/min and 7 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -3035,7 +3035,7 @@
         "reason": "5.3 CS/min and 9 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
         "reason": "5.3 CS/min and 9 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
@@ -3214,7 +3214,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
         "reason": "5.7 CS/min is playable, but 1/6/3 K/D/A with 6 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
@@ -3398,7 +3398,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
         "reason": "5.3 CS/min and 13 deaths pull the game to Iron II because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
@@ -3570,7 +3570,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
         "reason": "4.0 CS/min and 1 death put the game at Bronze III with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
@@ -3700,7 +3700,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
         "reason": "5.5 CS/min and 3 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -3830,7 +3830,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
         "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths puts the game at Silver IV: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
@@ -3985,7 +3985,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
         "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths puts the game at Bronze III: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
@@ -4189,7 +4189,7 @@
         "reason": "4.6 CS/min and 6 deaths put the game at Iron I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
         "reason": "4.6 CS/min and 6 deaths put the game at Iron I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -4371,7 +4371,7 @@
         "reason": "5.5 CS/min with 24/5/3 K/D/A and 5 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
         "reason": "5.5 CS/min with 24/5/3 K/D/A and 5 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
@@ -4541,7 +4541,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze II",
         "exactRankValue": 6,
         "reason": "5.4 CS/min and 3 deaths put the game at Bronze II with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
@@ -4748,7 +4748,7 @@
         "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze II",
         "exactRankValue": 6,
         "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -4954,7 +4954,7 @@
         "reason": "7.7 CS/min and 12 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
         "reason": "7.7 CS/min and 12 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
@@ -5121,7 +5121,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
         "reason": "4.7 CS/min and 3 deaths put the game at Iron I with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
@@ -5256,7 +5256,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
         "reason": "5.8 CS/min and 4 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -5426,7 +5426,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
         "reason": "3.9 CS/min and 12 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
@@ -5581,7 +5581,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
         "reason": "7.5 CS/min and 5 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -5756,7 +5756,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
         "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
@@ -5916,7 +5916,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
         "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths puts the game at Iron I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
@@ -6086,7 +6086,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
         "reason": "4.6 CS/min and 6 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -6271,7 +6271,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron III",
         "exactRankValue": 1,
         "reason": "4.6 CS/min and 7 deaths put the game at Iron III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -6426,7 +6426,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
         "reason": "2.7 CS/min and 7 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
@@ -6726,7 +6726,7 @@
         "reason": "2.4 CS/min and 6 deaths put the game at Iron III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron III",
         "exactRankValue": 1,
         "reason": "2.4 CS/min and 6 deaths put the game at Iron III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
@@ -6967,7 +6967,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
         "reason": "4.2 CS/min and 3 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
@@ -7207,7 +7207,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
         "reason": "6.6 CS/min and 4 deaths put the game at Silver IV with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
@@ -7386,7 +7386,7 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v3",
+        "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
         "reason": "7.3 CS/min and 7 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
