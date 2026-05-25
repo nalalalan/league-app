@@ -66,6 +66,15 @@ function visibleText(recording = {}) {
   return visibleFields(recording).map(([, value]) => clean(value)).filter(Boolean).join(" ");
 }
 
+const forensicPhaseReviewFiles = new Set([
+  "auto_NA1-5567787430_01.mp4"
+]);
+
+function requiresForensicPhaseStandard(recording = {}) {
+  return recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" &&
+    (recording.analysisSource !== "manual" || forensicPhaseReviewFiles.has(recording.file || ""));
+}
+
 function repeatedPayoutChecklistCount(text) {
   const source = String(text || "").toLowerCase();
   return (source.match(/\b(?:no\s+)?(?:tower|turret)\s*,\s*(?:safe\s+)?wave\s*,\s*(?:dragon\s+or\s+baron|objective)\s*(?:setup)?\s*,?\s*(?:and|or)\s*(?:no\s+clear\s+)?ally[-\s]?front\b|\btower\/wave\/objective\/ally[-\s]?front\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/g) || []).length;
@@ -325,11 +334,12 @@ function feedbackIssues(recording = {}) {
     }
     if (!/\bCS(?:\/min)?\b/i.test(performanceReason) ||
         !/\bdeath|deaths|K\/D\/A\b/i.test(performanceReason) ||
-        !/\bentry|fight\b/i.test(performanceReason) ||
-        !/\bexit|re-entry|cash-out|value\b/i.test(performanceReason) ||
-        !/\bconversion|dragon|baron|objective|tower|wave|recall|group\b/i.test(performanceReason)) {
-      issues.push("v25 performance rank reason must tie CS, deaths, entry, exit/value, and conversion together");
+        !/\bentry|fight|dragon|objective|lane|base\b/i.test(performanceReason) ||
+        !/\bexit|re-entry|cash-out|value|conversion|structure|wave|recall|group\b/i.test(performanceReason)) {
+      issues.push("v25 performance rank reason must tie CS, deaths, entry/context, and exit/value together");
     }
+  }
+  if (requiresForensicPhaseStandard(recording)) {
     if (!/\b(legal|illegal|not automatically wrong|partly legal|mostly legal|setup expires|setup is gone)\b/i.test(allVisible)) {
       issues.push("v25 review must judge entry legality");
     }

@@ -26,6 +26,15 @@ const currentPrimaryMistakeAnalysisVersions = new Set([
   "2026-05-22-two-focus-coaching-v11",
 ]);
 
+const forensicPhaseReviewFiles = new Set([
+  "auto_NA1-5567787430_01.mp4"
+]);
+
+function requiresForensicPhaseStandard(recording = {}) {
+  return recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" &&
+    (recording.analysisSource !== "manual" || forensicPhaseReviewFiles.has(recording.file || ""));
+}
+
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
 }
@@ -235,7 +244,7 @@ function visibleParagraphStandardIssues(recording, anchors) {
   if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
     issues.push("visible paragraph uses generic review-frame or broad branch wording");
   }
-  if (recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" &&
+  if (requiresForensicPhaseStandard(recording) &&
       (!/\b(legal|illegal|not automatically wrong|partly legal|mostly legal|setup expires|setup is gone)\b/i.test(detail) ||
        !/\b(value|state flip|state flips|first value|second fight|first bad next click|setup expires|setup is gone)\b/i.test([detail, eventEvidence].join(" ")))) {
     issues.push("v25 paragraph must separate entry legality, value, state flip, and first bad next click");

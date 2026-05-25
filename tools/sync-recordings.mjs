@@ -52,8 +52,8 @@ const compatibleAnalysisVersions = new Set([
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
-const rankEstimateVersion = "2026-05-25-performance-rank-v5";
-const performanceRankVersion = "2026-05-25-performance-rank-v1";
+const rankEstimateVersion = "2026-05-25-performance-rank-v6";
+const performanceRankVersion = "2026-05-25-performance-rank-v2";
 const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
@@ -3043,7 +3043,7 @@ function rankCalibrationSummary(recordings = []) {
     context.pvpFullGames >= context.highConfidenceRequirements.pvpFullGames;
   return {
     version: rankEstimateVersion,
-    method: "research-calibrated macro rank estimate with confidence gates",
+    method: "forensic performance-grade estimate with CS/min, death timing, entry legality, exit quality, conversion, queue, timestamp, and cross-game confidence gates",
     highConfidenceReady,
     currentLimitation: context.currentLimitation,
     fullReviewGames: context.fullReviewGames,
@@ -3295,30 +3295,36 @@ function performanceRankReason(recording = {}, context = {}) {
   const deaths = Number(context.deaths);
   const kills = Number(context.kills);
   const assists = Number(context.assists);
-  const kda = [kills, deaths, assists].every(Number.isFinite)
-    ? `${kills}/${deaths}/${assists}`
-    : clean(recording.kda || "");
+  const rank = clean(context.exactRank || recording.performanceRank?.exactRank || recording.rankEstimate?.exactRank || "this rank");
   const csText = Number.isFinite(csPerMinute)
     ? `${csPerMinute.toFixed(1)} CS/min`
     : (Number.isFinite(Number(recording.cs)) ? `${Math.round(Number(recording.cs))} CS` : "CS evidence is limited");
   const deathText = Number.isFinite(deaths)
-    ? `${deaths} deaths`
+    ? `${deaths} ${deaths === 1 ? "death" : "deaths"}`
     : "death evidence is limited";
   const category = context.reviewCategory || reviewRepCategory(recording);
   const flags = context.flags || rankTextFlags(recording);
-  const entryText = category === "objectiveFight"
-    ? (flags.legalEntry ? "the objective entry is partly legal" : "objective fight presence exists but entry quality is not fully proven")
-    : (flags.illegalEntry ? "fight entry is catchable or illegal" : "fight entry quality is mixed");
-  const exitText = flags.stateFlipExit
-    ? "exit/re-entry after first value is the main leak"
-    : (Number.isFinite(deaths) && deaths <= 3 ? "exits are mostly controlled" : "exit discipline is still inconsistent");
-  const conversionText = category === "basePush"
-    ? "conversion depends on structure, blocker, wave, or exit clicks"
-    : (category === "objectiveFight" ? "objective conversion has to become dragon, wave, recall, or group" : "tower/objective conversion is still the deciding branch");
-  const statLead = kda
-    ? `${csText} with a ${kda} K/D/A and ${deathText}`
-    : `${csText} with ${deathText}`;
-  return `${statLead} sets the performance grade; ${entryText}, but ${exitText}, so ${conversionText}.`;
+  if (category === "objectiveFight") {
+    const entryClause = flags.legalEntry
+      ? "even though the dragon entry is partly legal"
+      : "with objective-entry quality still not fully proven";
+    const leakClause = flags.stateFlipExit
+      ? "the main leak is exit/re-entry after first value"
+      : "the main question is whether objective pressure becomes dragon, wave, recall, or group";
+    return `${csText} and ${deathText} pull the game to ${rank} ${entryClause}; ${leakClause}.`;
+  }
+  if (category === "basePush") {
+    const entryClause = flags.illegalEntry ? "because some forward clicks are still catchable" : "while base-entry quality is mixed";
+    return `${csText} and ${deathText} put the game at ${rank} ${entryClause}; the main leak is whether base pressure becomes structure, blocker, wave, or exit.`;
+  }
+  if (category === "laneDeathExit") {
+    return `${csText} and ${deathText} pull the game to ${rank} because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline.`;
+  }
+  const entryClause = flags.illegalEntry ? "because fight entry is still catchable" : "with mixed fight-entry evidence";
+  const leakClause = flags.stateFlipExit
+    ? "the main leak is exit/re-entry after first value"
+    : (Number.isFinite(deaths) && deaths <= 3 ? "the remaining leak is cleaner conversion after pressure" : "the main leak is turning pressure into a safe exit or map result");
+  return `${csText} and ${deathText} put the game at ${rank} ${entryClause}; ${leakClause}.`;
 }
 
 function performanceRankForRecording(recording = {}, rankEstimate = null) {

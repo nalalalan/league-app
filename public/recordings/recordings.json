@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T07:18:04.868Z",
+  "generatedAt": "2026-05-25T13:37:12.568Z",
   "source": "League of Legends Highlights folder",
   "match": "41 matches",
   "matches": [
@@ -64,8 +64,8 @@
     "reviewLimit": "Rank read is a macro-equivalent estimate, not Riot MMR."
   },
   "rankCalibration": {
-    "version": "2026-05-25-performance-rank-v5",
-    "method": "research-calibrated macro rank estimate with confidence gates",
+    "version": "2026-05-25-performance-rank-v6",
+    "method": "forensic performance-grade estimate with CS/min, death timing, entry legality, exit quality, conversion, queue, timestamp, and cross-game confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
     "fullReviewGames": 40,
@@ -286,7 +286,7 @@
       "src": "/recordings/auto_NA1-5567787430_01.mp4",
       "poster": "/recordings/posters/auto-na1-5567787430-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron III",
@@ -315,13 +315,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.3 CS/min with a 5/9/3 K/D/A and 9 deaths sets the performance grade; the objective entry is partly legal, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.3 CS/min and 9 deaths pull the game to Iron III even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron III",
         "exactRankValue": 1,
-        "reason": "4.3 CS/min with a 5/9/3 K/D/A and 9 deaths sets the performance grade; the objective entry is partly legal, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.3 CS/min and 9 deaths pull the game to Iron III even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
       }
     },
     {
@@ -428,7 +428,7 @@
       "src": "/recordings/auto_NA1-5567787430_02.mp4",
       "poster": "/recordings/posters/auto-na1-5567787430-02.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron II",
@@ -458,13 +458,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.3 CS/min with a 5/9/3 K/D/A and 9 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "4.3 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron II",
         "exactRankValue": 2,
-        "reason": "4.3 CS/min with a 5/9/3 K/D/A and 9 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "4.3 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -694,7 +694,7 @@
       "src": "/recordings/auto_NA1-5567367431_01.mp4",
       "poster": "/recordings/posters/auto-na1-5567367431-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron IV",
@@ -723,13 +723,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "3.7 CS/min with a 0/5/0 K/D/A and 5 deaths sets the performance grade; fight entry is catchable or illegal, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+        "reason": "3.7 CS/min and 5 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
-        "reason": "3.7 CS/min with a 0/5/0 K/D/A and 5 deaths sets the performance grade; fight entry is catchable or illegal, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+        "reason": "3.7 CS/min and 5 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       }
     },
     {
@@ -858,7 +858,7 @@
       "src": "/recordings/auto_NA1-5567223507_01.mp4",
       "poster": "/recordings/posters/auto-na1-5567223507-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "exactRank": "Silver II",
@@ -887,13 +887,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.3 CS/min with a 8/3/6 K/D/A and 3 deaths sets the performance grade; the objective entry is partly legal, but exits are mostly controlled, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.3 CS/min and 3 deaths pull the game to Silver II even though the dragon entry is partly legal; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Silver II",
         "exactRankValue": 10,
-        "reason": "5.3 CS/min with a 8/3/6 K/D/A and 3 deaths sets the performance grade; the objective entry is partly legal, but exits are mostly controlled, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.3 CS/min and 3 deaths pull the game to Silver II even though the dragon entry is partly legal; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -1028,7 +1028,7 @@
       "src": "/recordings/auto_NA1-5566943774_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566943774-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron IV",
@@ -1057,13 +1057,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "3.8 CS/min with a 2/10/8 K/D/A and 10 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "3.8 CS/min and 10 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
-        "reason": "3.8 CS/min with a 2/10/8 K/D/A and 10 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "3.8 CS/min and 10 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       }
     },
     {
@@ -1192,7 +1192,7 @@
       "src": "/recordings/auto_NA1-5566860300_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566860300-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Gold",
         "range": "Silver I-Gold II",
         "exactRank": "Gold IV",
@@ -1221,13 +1221,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min with a 5/1/7 K/D/A and 1 deaths sets the performance grade; fight entry is catchable or illegal, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "5.4 CS/min and 1 death put the game at Gold IV because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Gold IV",
         "exactRankValue": 12,
-        "reason": "5.4 CS/min with a 5/1/7 K/D/A and 1 deaths sets the performance grade; fight entry is catchable or illegal, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "5.4 CS/min and 1 death put the game at Gold IV because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
@@ -1356,7 +1356,7 @@
       "src": "/recordings/auto_NA1-5566823161_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566823161-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -1385,13 +1385,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "3.2 CS/min with a 6/3/6 K/D/A and 3 deaths sets the performance grade; fight entry is catchable or illegal, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "3.2 CS/min and 3 deaths put the game at Bronze III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "3.2 CS/min with a 6/3/6 K/D/A and 3 deaths sets the performance grade; fight entry is catchable or illegal, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "3.2 CS/min and 3 deaths put the game at Bronze III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
@@ -1509,7 +1509,7 @@
       "src": "/recordings/auto_NA1-5566786855_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566786855-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron II",
@@ -1538,13 +1538,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.9 CS/min with a 12/6/5 K/D/A and 6 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.9 CS/min and 6 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron II",
         "exactRankValue": 2,
-        "reason": "5.9 CS/min with a 12/6/5 K/D/A and 6 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.9 CS/min and 6 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -1662,7 +1662,7 @@
       "src": "/recordings/auto_NA1-5566726915_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566726915-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -1691,13 +1691,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.0 CS/min with a 25/8/9 K/D/A and 8 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "4.0 CS/min and 8 deaths put the game at Bronze III because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "4.0 CS/min with a 25/8/9 K/D/A and 8 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "4.0 CS/min and 8 deaths put the game at Bronze III because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -1804,7 +1804,7 @@
       "src": "/recordings/auto_NA1-5566620104_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566620104-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "exactRank": "Silver III",
@@ -1834,13 +1834,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.2 CS/min with a 0/5/6 K/D/A and 5 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.2 CS/min and 5 deaths pull the game to Silver III even though the dragon entry is partly legal; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Silver III",
         "exactRankValue": 9,
-        "reason": "5.2 CS/min with a 0/5/6 K/D/A and 5 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.2 CS/min and 5 deaths pull the game to Silver III even though the dragon entry is partly legal; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -1947,7 +1947,7 @@
       "src": "/recordings/auto_NA1-5566563083_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566563083-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -1977,13 +1977,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.1 CS/min with a 9/13/11 K/D/A and 13 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.1 CS/min and 13 deaths pull the game to Bronze III even though the dragon entry is partly legal; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "4.1 CS/min with a 9/13/11 K/D/A and 13 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.1 CS/min and 13 deaths pull the game to Bronze III even though the dragon entry is partly legal; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -2112,7 +2112,7 @@
       "src": "/recordings/auto_NA1-5566120017_01.mp4",
       "poster": "/recordings/posters/auto-na1-5566120017-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron I",
@@ -2142,13 +2142,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.9 CS/min with a 1/6/1 K/D/A and 6 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.9 CS/min and 6 deaths pull the game to Iron I because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "5.9 CS/min with a 1/6/1 K/D/A and 6 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.9 CS/min and 6 deaths pull the game to Iron I because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       }
     },
     {
@@ -2282,7 +2282,7 @@
       "src": "/recordings/auto_NA1-5565964482_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565964482-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron III",
@@ -2312,13 +2312,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.2 CS/min with a 0/7/1 K/D/A and 7 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "6.2 CS/min and 7 deaths pull the game to Iron III because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron III",
         "exactRankValue": 1,
-        "reason": "6.2 CS/min with a 0/7/1 K/D/A and 7 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "6.2 CS/min and 7 deaths pull the game to Iron III because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       }
     },
     {
@@ -2463,7 +2463,7 @@
       "src": "/recordings/auto_NA1-5565911037_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565911037-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -2493,13 +2493,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.8 CS/min with a 3/10/5 K/D/A and 10 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.8 CS/min and 10 deaths pull the game to Bronze III with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "4.8 CS/min with a 3/10/5 K/D/A and 10 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.8 CS/min and 10 deaths pull the game to Bronze III with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -2750,7 +2750,7 @@
       "src": "/recordings/auto_NA1-5565856492_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565856492-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron I",
@@ -2778,17 +2778,17 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.7 CS/min with a 15/7/5 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "5.7 CS/min and 7 deaths put the game at Iron I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "5.7 CS/min with a 15/7/5 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "5.7 CS/min and 7 deaths put the game at Iron I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
@@ -2905,7 +2905,7 @@
       "src": "/recordings/auto_NA1-5565818690_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565818690-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze IV",
@@ -2935,13 +2935,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.3 CS/min with a 7/9/8 K/D/A and 9 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.3 CS/min and 9 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
-        "reason": "5.3 CS/min with a 7/9/8 K/D/A and 9 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.3 CS/min and 9 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -3081,7 +3081,7 @@
       "src": "/recordings/auto_NA1-5565804951_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565804951-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze IV",
@@ -3109,7 +3109,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.7 CS/min with a 1/6/3 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.7 CS/min and 6 deaths pull the game to Bronze IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       },
       "captureFps": 1,
       "win": false,
@@ -3117,10 +3117,10 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
-        "reason": "5.7 CS/min with a 1/6/3 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.7 CS/min and 6 deaths pull the game to Bronze IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       }
     },
     {
@@ -3265,7 +3265,7 @@
       "src": "/recordings/auto_NA1-5565779781_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565779781-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron II",
@@ -3293,7 +3293,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.3 CS/min with a 2/13/4 K/D/A and 13 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.3 CS/min and 13 deaths pull the game to Iron II because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       },
       "captureFps": 1,
       "win": false,
@@ -3301,10 +3301,10 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron II",
         "exactRankValue": 2,
-        "reason": "5.3 CS/min with a 2/13/4 K/D/A and 13 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.3 CS/min and 13 deaths pull the game to Iron II because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       }
     },
     {
@@ -3436,7 +3436,7 @@
       "src": "/recordings/auto_NA1-5565766659_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565766659-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -3465,7 +3465,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.0 CS/min with a 6/1/2 K/D/A and 1 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so tower/objective conversion is still the deciding branch."
+        "reason": "4.0 CS/min and 1 death put the game at Bronze III with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
       },
       "captureFps": 1,
       "win": true,
@@ -3473,10 +3473,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "4.0 CS/min with a 6/1/2 K/D/A and 1 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so tower/objective conversion is still the deciding branch."
+        "reason": "4.0 CS/min and 1 death put the game at Bronze III with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
       }
     },
     {
@@ -3566,7 +3566,7 @@
       "src": "/recordings/auto_NA1-5565758308_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565758308-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "exactRank": "Silver I",
@@ -3595,7 +3595,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.5 CS/min with a 14/3/3 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "5.5 CS/min and 3 deaths put the game at Silver I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "captureFps": 1,
       "win": true,
@@ -3603,10 +3603,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Silver I",
         "exactRankValue": 11,
-        "reason": "5.5 CS/min with a 14/3/3 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "5.5 CS/min and 3 deaths put the game at Silver I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
@@ -3696,7 +3696,7 @@
       "src": "/recordings/auto_NA1-5565578420_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565578420-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Gold",
         "range": "Silver I-Gold II",
         "exactRank": "Gold IV",
@@ -3725,7 +3725,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.5 CS/min with a 19/3/2 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so tower/objective conversion is still the deciding branch."
+        "reason": "6.5 CS/min and 3 deaths put the game at Gold IV with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
       },
       "captureFps": 1,
       "win": true,
@@ -3733,10 +3733,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Gold IV",
         "exactRankValue": 12,
-        "reason": "6.5 CS/min with a 19/3/2 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exits are mostly controlled, so tower/objective conversion is still the deciding branch."
+        "reason": "6.5 CS/min and 3 deaths put the game at Gold IV with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
       }
     },
     {
@@ -3851,7 +3851,7 @@
       "src": "/recordings/auto_NA1-5565518539_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565518539-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -3880,7 +3880,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.8 CS/min with a 29/6/1 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.8 CS/min and 6 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       },
       "captureFps": 2,
       "win": true,
@@ -3888,10 +3888,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "5.8 CS/min with a 29/6/1 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.8 CS/min and 6 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -4059,7 +4059,7 @@
       "src": "/recordings/auto_NA1-5565445744_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565445744-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze IV",
@@ -4089,13 +4089,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.6 CS/min with a 8/6/5 K/D/A and 6 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.6 CS/min and 6 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
-        "reason": "4.6 CS/min with a 8/6/5 K/D/A and 6 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.6 CS/min and 6 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -4241,7 +4241,7 @@
       "src": "/recordings/auto_NA1-5565387627_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565387627-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze I",
@@ -4271,13 +4271,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.5 CS/min with a 24/5/3 K/D/A and 5 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.5 CS/min and 5 deaths put the game at Bronze I because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "5.5 CS/min with a 24/5/3 K/D/A and 5 deaths sets the performance grade; fight entry is catchable or illegal, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "5.5 CS/min and 5 deaths put the game at Bronze I because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -4407,7 +4407,7 @@
       "src": "/recordings/auto_NA1-5565356454_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565356454-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze II",
@@ -4436,7 +4436,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min with a 4/3/7 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+        "reason": "5.4 CS/min and 3 deaths put the game at Bronze II with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       },
       "captureFps": 2,
       "win": true,
@@ -4444,10 +4444,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze II",
         "exactRankValue": 6,
-        "reason": "5.4 CS/min with a 4/3/7 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+        "reason": "5.4 CS/min and 3 deaths put the game at Bronze II with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       }
     },
     {
@@ -4618,7 +4618,7 @@
       "src": "/recordings/auto_NA1-5565308644_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565308644-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "exactRank": "Silver IV",
@@ -4648,13 +4648,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.8 CS/min with a 14/2/2 K/D/A and 2 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.8 CS/min and 2 deaths pull the game to Silver IV with objective-entry quality still not fully proven; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
-        "reason": "5.8 CS/min with a 14/2/2 K/D/A and 2 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.8 CS/min and 2 deaths pull the game to Silver IV with objective-entry quality still not fully proven; the main leak is exit/re-entry after first value."
       }
     },
     {
@@ -4824,7 +4824,7 @@
       "src": "/recordings/auto_NA1-5565242641_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565242641-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron IV",
@@ -4854,13 +4854,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "7.7 CS/min with a 15/12/3 K/D/A and 12 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "7.7 CS/min and 12 deaths pull the game to Iron IV with objective-entry quality still not fully proven; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
-        "reason": "7.7 CS/min with a 15/12/3 K/D/A and 12 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit/re-entry after first value is the main leak, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "7.7 CS/min and 12 deaths pull the game to Iron IV with objective-entry quality still not fully proven; the main leak is exit/re-entry after first value."
       }
     },
     {
@@ -4987,7 +4987,7 @@
       "src": "/recordings/auto_NA1-5565226188_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565226188-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron I",
@@ -5016,7 +5016,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.7 CS/min with a 17/3/4 K/D/A and 3 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exits are mostly controlled, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.7 CS/min and 3 deaths pull the game to Iron I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "captureFps": 4,
       "win": true,
@@ -5024,10 +5024,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "4.7 CS/min with a 17/3/4 K/D/A and 3 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exits are mostly controlled, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "4.7 CS/min and 3 deaths pull the game to Iron I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -5122,7 +5122,7 @@
       "src": "/recordings/auto_NA1-5565193158_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565193158-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "exactRank": "Silver IV",
@@ -5151,7 +5151,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.8 CS/min with a 16/4/4 K/D/A and 4 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.8 CS/min and 4 deaths pull the game to Silver IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "captureFps": 4,
       "win": true,
@@ -5159,10 +5159,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
-        "reason": "5.8 CS/min with a 16/4/4 K/D/A and 4 deaths sets the performance grade; objective fight presence exists but entry quality is not fully proven, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "5.8 CS/min and 4 deaths pull the game to Silver IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -5292,7 +5292,7 @@
       "src": "/recordings/auto_NA1-5565145132_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565145132-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron IV",
@@ -5321,7 +5321,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "3.9 CS/min with a 8/12/2 K/D/A and 12 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "3.9 CS/min and 12 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       },
       "captureFps": 6,
       "win": true,
@@ -5329,10 +5329,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
-        "reason": "3.9 CS/min with a 8/12/2 K/D/A and 12 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "3.9 CS/min and 12 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -5447,7 +5447,7 @@
       "src": "/recordings/auto_NA1-5565058943_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565058943-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze I",
@@ -5476,7 +5476,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "7.5 CS/min with a 22/5/2 K/D/A and 5 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "7.5 CS/min and 5 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "captureFps": 6,
       "win": true,
@@ -5484,10 +5484,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "7.5 CS/min with a 22/5/2 K/D/A and 5 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "7.5 CS/min and 5 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
@@ -5622,7 +5622,7 @@
       "src": "/recordings/auto_NA1-5565048601_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565048601-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze I",
@@ -5651,7 +5651,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.3 CS/min with a 24/5/2 K/D/A and 5 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "6.3 CS/min and 5 deaths put the game at Bronze I with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       },
       "captureFps": 6,
       "win": true,
@@ -5659,10 +5659,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "6.3 CS/min with a 24/5/2 K/D/A and 5 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "6.3 CS/min and 5 deaths put the game at Bronze I with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -5782,7 +5782,7 @@
       "src": "/recordings/auto_NA1-5565044205_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565044205-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron I",
@@ -5811,7 +5811,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.9 CS/min with a 19/6/2 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "6.9 CS/min and 6 deaths put the game at Iron I with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       },
       "captureFps": 6,
       "win": true,
@@ -5819,10 +5819,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "6.9 CS/min with a 19/6/2 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "6.9 CS/min and 6 deaths put the game at Iron I with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -5952,7 +5952,7 @@
       "src": "/recordings/auto_NA1-5565025543_01.mp4",
       "poster": "/recordings/posters/auto-na1-5565025543-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -5981,7 +5981,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.6 CS/min with a 20/6/3 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "4.6 CS/min and 6 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "captureFps": 6,
       "win": true,
@@ -5989,10 +5989,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "4.6 CS/min with a 20/6/3 K/D/A and 6 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "4.6 CS/min and 6 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
@@ -6137,7 +6137,7 @@
       "src": "/recordings/auto_NA1-5564835832_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564835832-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron III",
@@ -6166,7 +6166,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.6 CS/min with a 15/7/0 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "4.6 CS/min and 7 deaths put the game at Iron III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "captureFps": 6,
       "win": true,
@@ -6174,10 +6174,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron III",
         "exactRankValue": 1,
-        "reason": "4.6 CS/min with a 15/7/0 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "4.6 CS/min and 7 deaths put the game at Iron III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
@@ -6292,7 +6292,7 @@
       "src": "/recordings/auto_NA1-5564718141_01.mp4",
       "poster": "/recordings/posters/auto-na1-5564718141-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron IV",
@@ -6321,7 +6321,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "2.7 CS/min with a 4/7/2 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "2.7 CS/min and 7 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       },
       "captureFps": 10,
       "win": true,
@@ -6329,10 +6329,10 @@
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
-        "reason": "2.7 CS/min with a 4/7/2 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so tower/objective conversion is still the deciding branch."
+        "reason": "2.7 CS/min and 7 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
       }
     },
     {
@@ -6596,7 +6596,7 @@
       "src": "/recordings/auto_NA1-5563660362_01.mp4",
       "poster": "/recordings/posters/auto-na1-5563660362-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Iron",
         "range": "Iron IV-Iron II",
         "exactRank": "Iron I",
@@ -6626,13 +6626,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "2.4 CS/min with a 3/6/4 K/D/A and 6 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "2.4 CS/min and 6 deaths pull the game to Iron I even though the dragon entry is partly legal; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       },
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "2.4 CS/min with a 3/6/4 K/D/A and 6 deaths sets the performance grade; the objective entry is partly legal, but exit discipline is still inconsistent, so objective conversion has to become dragon, wave, recall, or group."
+        "reason": "2.4 CS/min and 6 deaths pull the game to Iron I even though the dragon entry is partly legal; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
     {
@@ -6833,7 +6833,7 @@
       "src": "/recordings/16-10_NA1-5563352800_01.mp4",
       "poster": "/recordings/posters/16-10-na1-5563352800-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -6863,17 +6863,17 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.2 CS/min with a 8/3/2 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+        "reason": "4.2 CS/min and 3 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       },
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "4.2 CS/min with a 8/3/2 K/D/A and 3 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+        "reason": "4.2 CS/min and 3 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       }
     },
     {
@@ -7073,7 +7073,7 @@
       "src": "/recordings/16-10_NA1-5563301586_01.mp4",
       "poster": "/recordings/posters/16-10-na1-5563301586-01.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Silver",
         "range": "Bronze I-Silver II",
         "exactRank": "Silver IV",
@@ -7103,17 +7103,17 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.6 CS/min with a 6/4/2 K/D/A and 4 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+        "reason": "6.6 CS/min and 4 deaths put the game at Silver IV with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       },
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
-        "reason": "6.6 CS/min with a 6/4/2 K/D/A and 4 deaths sets the performance grade; fight entry quality is mixed, but exit/re-entry after first value is the main leak, so tower/objective conversion is still the deciding branch."
+        "reason": "6.6 CS/min and 4 deaths put the game at Silver IV with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       }
     },
     {
@@ -7253,7 +7253,7 @@
       "src": "/recordings/16-10_NA1-5563247854_13.mp4",
       "poster": "/recordings/posters/16-10-na1-5563247854-13.jpg",
       "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v5",
+        "version": "2026-05-25-performance-rank-v6",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
         "exactRank": "Bronze III",
@@ -7282,17 +7282,17 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "7.3 CS/min with a 15/7/5 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "7.3 CS/min and 7 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "win": true,
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history",
       "performanceRank": {
-        "version": "2026-05-25-performance-rank-v1",
+        "version": "2026-05-25-performance-rank-v2",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "7.3 CS/min with a 15/7/5 K/D/A and 7 deaths sets the performance grade; fight entry quality is mixed, but exit discipline is still inconsistent, so conversion depends on structure, blocker, wave, or exit clicks."
+        "reason": "7.3 CS/min and 7 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
