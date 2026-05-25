@@ -53,12 +53,13 @@ const compatibleAnalysisVersions = new Set([
   "2026-05-21-specific-decision-chain-v5",
   "2026-05-21-specific-decision-chain-v4"
 ]);
-const rankEstimateVersion = "2026-05-25-performance-rank-v6";
-const performanceRankVersion = "2026-05-25-performance-rank-v2";
+const rankEstimateVersion = "2026-05-25-performance-rank-v7";
+const performanceRankVersion = "2026-05-25-performance-rank-v5";
 const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5568079693_01.mp4",
   "auto_NA1-5567953154_01.mp4",
   "auto_NA1-5567787430_01.mp4",
   "auto_NA1-5567367431_01.mp4",
@@ -70,6 +71,7 @@ const refreshedManualFeedbackFiles = new Set([
   "auto_NA1-5566726915_01.mp4",
   "auto_NA1-5566563083_01.mp4",
   "auto_NA1-5566620104_01.mp4",
+  "auto_NA1-5565387627_01.mp4",
   "auto_NA1-5565911037_01.mp4",
   "auto_NA1-5565964482_01.mp4",
   "auto_NA1-5565818690_01.mp4",
@@ -1397,6 +1399,28 @@ function sanitizeVisibleReviewNames(recording, champion = "Samira") {
   }
 }
 
+function sanitizeTemplateResidue(recording) {
+  const replaceResidue = (value) => coachClean(String(value || "")
+    .replace(/\bstaying on farm after the map needed defense\b/gi, "continuing the old task after the visible state changed")
+    .replace(/\btake the visible payout now, or click back if none is guaranteed\b/gi, "choose the visible result now: structure, wave, recall, group, or one step back if none is safe"));
+  for (const field of visibleReviewStringFields()) {
+    if (recording[field]) recording[field] = replaceResidue(recording[field]);
+  }
+  for (const field of ["mistakeTypes", "timeline", "nuance"]) {
+    if (Array.isArray(recording[field])) {
+      recording[field] = recording[field].map((item) => replaceResidue(item)).filter(Boolean);
+    }
+  }
+  for (const field of ["clockAnchors", "clockMoments"]) {
+    if (Array.isArray(recording[field])) {
+      recording[field] = recording[field].map((item) => ({
+        ...item,
+        description: replaceResidue(item.description || "")
+      }));
+    }
+  }
+}
+
 function firstUsefulReviewAnchor(recording = {}) {
   const anchors = dedupeClockAnchors([
     ...(Array.isArray(recording.clockMoments) ? recording.clockMoments : []),
@@ -1584,9 +1608,18 @@ function reviewRepCategory(recording = {}) {
   const csPerMinute = Number.isFinite(cs) && gameLengthSeconds > 0 ? cs / (gameLengthSeconds / 60) : NaN;
   const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
   const isSamira = /\bsamira\b/i.test([recording.champion, recording.championSlug, recording.title, text].join(" "));
+  const hasSpecificObjectiveFight = /\b(dragon|baron|objective fight|objective entry|objective pit|pit fight)\b/i.test(text);
 
   if (Number.isFinite(kills) && kills >= 18 && /\b(defeat|loss|lost|eight deaths|death|objective|won exchange|first useful damage|reset)\b/i.test(text)) {
     return "firstWinCashout";
+  }
+  if (/\bcleaner win\b/i.test(text) &&
+      won &&
+      Number.isFinite(deaths) &&
+      deaths <= 3 &&
+      Number.isFinite(csPerMinute) &&
+      csPerMinute >= 5) {
+    return "cleanerWinExit";
   }
   if (isSamira &&
       /\b(bot|lane|outer turret|under turret|support|wave is already thin|samira e|dash\/chase|tower dive)\b/i.test(text) &&
@@ -1599,7 +1632,7 @@ function reviewRepCategory(recording = {}) {
       /\b(blue-side jungle|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(text)) {
     return "sideFarmDefense";
   }
-  if (/\b(dragon|baron|objective|pit)\b/i.test(text) &&
+  if (hasSpecificObjectiveFight &&
       /\b(fight|entry|engaged|committed|first value|second fight|value window|state flip|re-entry|reenter|exit)\b/i.test(text)) {
     return "objectiveFight";
   }
@@ -1677,7 +1710,7 @@ function repMatchesGameCategory(recording = {}) {
       return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
     case "cleanerWinExit":
     default:
-      return /\bwave,\s*tower hit,\s*or\s*fight start\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
+      return /\bwave,\s*tower hit,\s*or\s*fight start\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b|\bwave,\s*recall,\s*or\s*regroup\b|\bno second forward E\b|\bmid fight gives one\b/i.test(rep);
   }
 }
 
@@ -2434,7 +2467,7 @@ function correctNextClickForAnalysis(analysis = {}, anchor = null) {
     return "exit to turret, catch mid wave, reset, or regroup";
   }
   if (/\b(tower|turret|structure|inhib|inhibitor|nexus|wave|payout|pressure)\b/i.test(text)) {
-    return "take the visible payout now, or click back if none is guaranteed";
+    return "choose the visible result now: structure, wave, recall, group, or one step back if none is safe";
   }
   if (/\b(side|jungle|camp|farm|defend|defense|turret has fallen|base defense|inhibitor turret)\b/i.test(text)) {
     return "drop the farm click and walk to the threatened wave, ally line, or reset";
@@ -2454,7 +2487,7 @@ function wrongDecisionForAnalysis(analysis = {}, anchor = null) {
     return "continuing the same jungle fight after first value";
   }
   if (/\b(side|jungle|camp|farm)\b/i.test(text) && /\b(defend|defense|base|turret|tower|wave)\b/i.test(text)) {
-    return "staying on farm after the map needed defense";
+    return "continuing the old task after the visible state changed";
   }
   if (/\b(tower|turret|structure|inhib|inhibitor|nexus|wave|payout|pressure)\b/i.test(text)) {
     return "stepping forward after the safe payout disappeared";
@@ -3165,6 +3198,7 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   const reviewCategory = reviewRepCategory(recording);
   const queueClass = rankQueueClass(recording);
   const beginnerBot = queueClass === "bot";
+  const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
   const deaths = Number(recording.deaths);
   const kills = Number(recording.kills);
   const assists = Number(recording.assists);
@@ -3253,9 +3287,30 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   if (Number.isFinite(kills) && kills >= 18) {
     score += 5;
     strengths.push("fight conversion and damage output are clearly above beginner mechanics");
+  } else if (Number.isFinite(kills) &&
+      Number.isFinite(csPerMinute) &&
+      Number.isFinite(deaths) &&
+      kills >= 10 &&
+      csPerMinute >= 5.5 &&
+      deaths <= 7 &&
+      ["ranked_solo", "ranked_flex", "pvp"].includes(queueClass)) {
+    score += 7;
+    strengths.push("real ranked fight impact with playable farm pace");
+  } else if (Number.isFinite(kills) &&
+      Number.isFinite(csPerMinute) &&
+      Number.isFinite(deaths) &&
+      kills >= 14 &&
+      csPerMinute >= 6 &&
+      deaths <= 8) {
+    score += 5;
+    strengths.push("fight impact and farm pace are both visible");
   } else if (Number.isFinite(kills) && kills <= 5 && reviewCategory !== "objectiveFight") {
     score -= 4;
     leaks.push("kill pressure is not yet consistent");
+  }
+  if (Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 1 && deaths >= 5) {
+    score -= 6;
+    leaks.push("low fight impact paired with death pressure");
   }
   if (Number.isFinite(kda)) {
     if (kda >= 5) score += 5;
@@ -3316,6 +3371,37 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
     score += 9;
     strengths.push("calmer farming and survival baseline");
   }
+  if (won &&
+      ["ranked_solo", "ranked_flex", "pvp"].includes(queueClass) &&
+      (reviewCategory === "cleanerWinExit" || /\bcleaner win\b/i.test(analysisCoachText(recording))) &&
+      Number.isFinite(deaths) &&
+      deaths <= 3 &&
+      Number.isFinite(csPerMinute) &&
+      csPerMinute >= 5.2 &&
+      Number.isFinite(kills) &&
+      Number.isFinite(assists) &&
+      kills + assists >= 12) {
+    score = Math.max(score, 40);
+    strengths.push("controlled win baseline with playable fight impact");
+  }
+  if (Number.isFinite(kills) &&
+      Number.isFinite(deaths) &&
+      Number.isFinite(csPerMinute) &&
+      kills >= 12 &&
+      deaths >= 10 &&
+      csPerMinute >= 6.5) {
+    score = Math.max(score, 18);
+    strengths.push("high CS and fight impact keep this above the lowest Iron floor");
+  }
+  if (Number.isFinite(kills) &&
+      Number.isFinite(deaths) &&
+      Number.isFinite(csPerMinute) &&
+      kills >= 20 &&
+      deaths <= 8 &&
+      csPerMinute >= 3.9) {
+    score = Math.max(score, 24);
+    strengths.push("high fight impact prevents the loss from grading as pure Iron mechanics");
+  }
   if (flags.syncedTeamplay) {
     score += 5;
     strengths.push("team grouping or sync appears in the review");
@@ -3325,7 +3411,34 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
     strengths.push("you are already finding fights, waves, towers, or base pressure");
   }
 
-  const cap = beginnerBot ? 68 : (queueClass === "unknown" ? 85 : 100);
+  let cap = beginnerBot ? 43 : (queueClass === "unknown" ? 55 : 100);
+  if (beginnerBot && !(Number.isFinite(csPerMinute) && csPerMinute >= 6.3 && Number.isFinite(deaths) && deaths <= 3 && Number.isFinite(kills) && kills >= 14)) {
+    cap = Math.min(cap, 39);
+  }
+  if (Number.isFinite(deaths) && deaths >= 10) {
+    cap = Math.min(cap, Number.isFinite(kills) && kills >= 18 && Number.isFinite(csPerMinute) && csPerMinute >= 5 ? 27 : 23);
+  } else if (Number.isFinite(deaths) && deaths >= 8) {
+    cap = Math.min(cap, Number.isFinite(kills) && kills >= 18 ? 31 : 27);
+  }
+  if (Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 1 && deaths >= 5) {
+    cap = Math.min(cap, Number.isFinite(csPerMinute) && csPerMinute >= 5.5 ? 27 : 23);
+  }
+  if (Number.isFinite(csPerMinute) &&
+      csPerMinute < 4 &&
+      Number.isFinite(deaths) &&
+      deaths >= 5 &&
+      !(Number.isFinite(kills) && kills >= 20 && deaths <= 8 && csPerMinute >= 3.9)) {
+    cap = Math.min(cap, 23);
+  }
+  if (score >= 56 && (
+      !Number.isFinite(csPerMinute) ||
+      csPerMinute < 6 ||
+      !Number.isFinite(deaths) ||
+      deaths > 4 ||
+      !(flags.positiveConversion || reviewCategory === "cleanerWinExit")
+    )) {
+    cap = Math.min(cap, 55);
+  }
   const cappedScore = Math.max(0, Math.min(cap, Math.round(score)));
   const band = scoreRankBand(cappedScore);
   const exactRank = exactRankForScore(cappedScore);
@@ -3384,6 +3497,10 @@ function performanceRankReason(recording = {}, context = {}) {
     : "death evidence is limited";
   const category = context.reviewCategory || reviewRepCategory(recording);
   const flags = context.flags || rankTextFlags(recording);
+  const kdaText = [kills, deaths, assists].every(Number.isFinite) ? `${kills}/${deaths}/${assists} K/D/A` : "the K/D/A line";
+  if (Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 1 && deaths >= 5) {
+    return `${csText} is playable, but ${kdaText} with ${deathText} keeps the game at ${rank}; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group.`;
+  }
   if (category === "objectiveFight") {
     const entryClause = flags.legalEntry
       ? "even though the dragon entry is partly legal"
@@ -3393,6 +3510,9 @@ function performanceRankReason(recording = {}, context = {}) {
       : "the main question is whether objective pressure becomes dragon, wave, recall, or group";
     return `${csText} and ${deathText} pull the game to ${rank} ${entryClause}; ${leakClause}.`;
   }
+  if (category === "firstWinCashout") {
+    return `${csText} with ${kdaText} and ${deathText} puts the game at ${rank}: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window.`;
+  }
   if (category === "basePush") {
     const entryClause = flags.illegalEntry ? "because some forward clicks are still catchable" : "while base-entry quality is mixed";
     return `${csText} and ${deathText} put the game at ${rank} ${entryClause}; the main leak is whether base pressure becomes structure, blocker, wave, or exit.`;
@@ -3401,11 +3521,13 @@ function performanceRankReason(recording = {}, context = {}) {
     return `${csText} and ${deathText} pull the game to ${rank} because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline.`;
   }
   if (category === "sideFarmDefense") {
-    const kdaText = [kills, deaths, assists].every(Number.isFinite) ? `${kills}/${deaths}/${assists} K/D/A` : "the K/D/A line";
     if (/\b(blue-side jungle|jungle fight|jungle value|jungle-exit)\b/i.test(analysisCoachText(recording))) {
       return `${csText} and only ${deathText} show calmer farming and survival than the death-heavy games, but ${kdaText} fight impact and the late jungle-fight exit/value leak keep the performance at ${rank}.`;
     }
     return `${csText} with ${kdaText} puts the game at ${rank}: the CS/death line is calmer, but the main leak is side-wave or jungle-fight exit into tower, wave, group, or reset.`;
+  }
+  if (category === "cleanerWinExit") {
+    return `${kdaText} and only ${deathText} are positives, while ${csText} plus the remaining fight-entry or exit/value leak keep the performance at ${rank} rather than higher.`;
   }
   const entryClause = flags.illegalEntry ? "because fight entry is still catchable" : "with mixed fight-entry evidence";
   const leakClause = flags.stateFlipExit
@@ -3459,6 +3581,57 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5568079693_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Cleaner win, one mid re-entry death remains",
+      feedback: "The leak is staying forward for a second mid-fight re-entry after the first value window has already become wave, recall, or regroup.",
+      gameDetail: "At 21:09, the first mid fight is legal enough because allies and a wave are near you and value has already happened, but the state flip is exit/value: you are low, enemy bodies can still re-engage, and the next click is one step back through the wave, then recall or group. The first bad next click is staying forward for another Samira re-entry. By 22:02 the re-entry becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one mid-fight exit leak.",
+      secondaryFocus: "Rep: after a mid fight gives one kill, assist, wave, or turret pressure, say wave, recall, or regroup. If you are low or no ally is clearly in front, no second forward E; take one step back through the wave first.",
+      mistakeTypes: [
+        "mid-fight exit after value",
+        "low-HP re-entry discipline",
+        "wave-to-recall conversion",
+        "ally-front check"
+      ],
+      eventEvidence: "19:23 shows Samira recalling after bot-side pressure with about 1687 gold; 21:09 shows Samira low in mid with wave/ally context and enemy bodies still able to re-engage; 22:02 shows the death timer after the re-entry.",
+      failureEvidence: "At 21:09 the first value has already happened and the legal branch is wave, recall, or regroup; staying forward turns the play into the 22:02 death timer instead of a stable result.",
+      goodThing: "At 19:23 you recall after bot-side tower pressure with about 1687 gold; keep that exit instinct.",
+      whyTrust: "This uses inspected 19:23, 21:09, and 22:02 frames plus the League Client 7/3/10, 139 CS ranked victory context.",
+      focusTag: "mid-fight exit",
+      evidence: "Manual frame inspection of the mid re-entry window and League Client ranked stats for the same match.",
+      pattern: "This is a cleaner win with one remaining mid-fight exit leak, not the old chain-feeding pattern.",
+      diamondRule: "After mid value, no second forward Samira click while low unless ally front is clear and the target is already CC'd or low.",
+      drill: "after a mid fight gives one kill, assist, wave, or turret pressure, say wave, recall, or regroup. If you are low or no ally is clearly in front, no second forward E; take one step back through the wave first.",
+      timeline: [
+        "19:23 - Samira recalls after bot-side pressure with about 1687 gold.",
+        "20:42 - Samira is low near mid with an ally nearby and enemy bodies in front.",
+        "20:57 - Samira is still low with mid wave visible and exit available.",
+        "21:09 - Samira stays forward for another mid re-entry after first value.",
+        "22:02 - Samira is dead with BACK IN 38 visible."
+      ],
+      clockAnchors: [
+        { clock: "19:23", videoSeconds: 1070.923, description: "Samira recalls after bot-side pressure with about 1687 gold." },
+        { clock: "20:42", videoSeconds: 1150, description: "Samira is low near mid with an ally nearby and enemy bodies in front." },
+        { clock: "20:57", videoSeconds: 1165, description: "Samira is still low with mid wave visible and exit available." },
+        { clock: "21:09", videoSeconds: 1177.615, description: "Samira stays forward for another mid re-entry after first value." },
+        { clock: "22:02", videoSeconds: 1230, description: "Samira is dead with BACK IN 38 visible." }
+      ],
+      nuance: [
+        "This is a cleaner ranked victory, not the same death-heavy collapse pattern.",
+        "The useful part is that farming, fighting, and deaths are more controlled.",
+        "The mistake starts after the first mid value window, when the next click stays re-entry instead of exit.",
+        "The 139 CS and 3 deaths show Silver-level survival for this session, but the remaining re-entry death keeps it from a cleaner grade.",
+        "The next-game rep is a mid-fight exit check, not a generic pressure-mode slogan."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns or hidden enemy positions, but it verifies the 19:23 recall, 21:09 re-entry state, 22:02 death, and 7/3/10, 139 CS ranked victory context.",
+      outcome: "victory",
+      outcomeLabel: "VICTORY",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5567953154_01.mp4") {
     return {
       champion: "Samira",
@@ -4211,7 +4384,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Turn the shutdown into a grouped push",
       feedback: "Mistake: after spending a huge lead, you let side fights test your shutdown before your team was set up to take tower or base. Fix: choose the safest visible payout first: group with the wave and allies, hit free structure, or reset if teammates cannot follow.",
-      gameDetail: "At 09:11 you are in base/shop after a strong 4/0/2 start, and that part is good because you spend instead of dragging raw gold around. At 10:25 you are 6/0/2 with 1285 gold in a bot-side lane fight right after a shutdown, so the leak is testing the fed Samira shutdown in a side lane before the team is organized around a guaranteed tower, objective setup, or reset. At 11:12 the better shape appears: you are grouped mid behind allies with enemies in front; mid is better here because allies are already there, the lane points to towers/base, and enemies must defend structure instead of collapsing from fog. At 12:42 you are 8/0/2 mid while several allies are dead or on timers, so the next check is wait, reset, or hold the wave until the next push is together, because one more solo wave does not matter if it gives away your shutdown. By 13:10 and 13:24 you do enter base with the team, which proves the ending instinct is there; make the earlier 10:25 and 12:42 windows look like that team-linked ending sooner.",
+      gameDetail: "At 09:11 you are in base/shop after a strong 4/0/2 start, and that part is good because you spend instead of dragging raw gold around. At 10:25 you are 6/0/2 with 1285 gold in a bot-side lane fight right after a shutdown, so the leak is testing the fed Samira shutdown before the team is organized around tower, objective setup, or reset. At 11:12 the better shape appears: you are grouped mid behind allies with enemies in front because allies protect the entry and mid points the lead toward towers/base instead of fog collapse. At 12:42 you are 8/0/2 mid while several allies are dead or on timers, so the next check is wait, reset, or hold the wave until the next push is together. By 13:10 and 13:24 you enter base with the team; make the earlier 10:25 and 12:42 windows look like that team-linked ending sooner.",
       whyTrust: "The frames show both the good habit and the leak: you bought at 09:11 and ended with the team at 13:24, but the risky windows were the side-fight exposure at 10:25 and the alone-before-team state at 12:42.",
       eventEvidence: "09:11 shows Samira in shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold. 10:25 shows Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present. 11:12 shows Samira grouped mid behind allies while enemies are in front. 12:42 shows Samira 8/0/2 mid while multiple allies are dead or on timers. 13:10 to 13:24 shows the team turning the lead into enemy-base damage.",
       goodThing: "You did spend, you did group with allies, and you did end through the base. The improvement is protecting the shutdown lead between those good moments.",
@@ -5649,7 +5822,7 @@ async function main() {
     const { name, sourcePath, stat } = entry;
     const parts = recordingParts(name);
     const replayMeta = recordingMetadata.replayTimes.get(parts.matchId) || {};
-    const queueMeta = recordingMetadata.queues.get(parts.matchId) || {
+    const detectedQueueMeta = recordingMetadata.queues.get(parts.matchId) || {
       gameType: "Unverified",
       gameTypeSource: "No queue id found in local logs"
     };
@@ -5665,6 +5838,16 @@ async function main() {
     const cacheKey = cacheKeyFor(stat);
     const previousAnalysis = existingRecording(existing, name, cacheKey);
     const cached = entry.cachedTrusted ? entry.existingEntry : cachedRecording(existing, name, cacheKey);
+    const previousQueueMeta = Number.isFinite(Number(previousAnalysis?.queueId))
+      ? {
+          queueId: Number(previousAnalysis.queueId),
+          gameType: previousAnalysis.gameType || queueLabel(previousAnalysis.queueId),
+          gameTypeSource: previousAnalysis.gameTypeSource || "Previous manifest"
+        }
+      : null;
+    const queueMeta = Number.isFinite(Number(detectedQueueMeta.queueId))
+      ? detectedQueueMeta
+      : (previousQueueMeta || detectedQueueMeta);
 
     const publicVideoBytes = await ensurePublicVideo(sourcePath, destPath, stat);
     const duration = Number(cached?.durationSeconds) || Number(entry.health?.duration) || await probeDuration(sourcePath);
@@ -5891,18 +6074,21 @@ async function main() {
     repairVisibleReviewForStandard(recording, name);
     repairPublishAuditRequirements(recording, name);
     sanitizeAbstractBranchLanguage(recording);
+    sanitizeTemplateResidue(recording);
     const rankEstimate = rankedEquivalentForRecording(recording);
     if (rankEstimate) {
       recording.rankEstimate = rankEstimate;
       recording.performanceRank = performanceRankForRecording(recording, rankEstimate);
     }
     enforceVisibleParagraphStandard(recording, name);
+    sanitizeTemplateResidue(recording);
     recordings.push(recording);
     console.log(`${name}: ${recordings.at(-1).reviewPhase} - ${recordings.at(-1).champion} - ${recordings.at(-1).feedbackTitle}`);
   }
 
   const calibrationContext = rankCalibrationContext(recordings);
   for (const recording of recordings) {
+    sanitizeTemplateResidue(recording);
     const rankEstimate = rankedEquivalentForRecording(recording, calibrationContext);
     if (rankEstimate) {
       recording.rankEstimate = rankEstimate;

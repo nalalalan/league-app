@@ -67,6 +67,7 @@ function visibleText(recording = {}) {
 }
 
 const forensicPhaseReviewFiles = new Set([
+  "auto_NA1-5568079693_01.mp4",
   "auto_NA1-5567787430_01.mp4"
 ]);
 
@@ -142,7 +143,7 @@ function repMatchesGameCategory(recording = {}) {
       return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
     case "cleanerWinExit":
     default:
-      return /\bwave,\s*tower hit,\s*or\s*fight start\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
+      return /\bwave,\s*tower hit,\s*or\s*fight start\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b|\bwave,\s*recall,\s*or\s*regroup\b|\bno second forward E\b|\bmid fight gives one\b/i.test(rep);
   }
 }
 

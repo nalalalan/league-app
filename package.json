@@ -13,7 +13,8 @@
     "install:league-automation": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/install-league-automation.ps1",
     "verify:league-automation": "node tools/verify-league-automation.mjs",
     "audit:timestamps": "node tools/audit-recording-timestamps.mjs",
-    "audit:feedback": "node tools/audit-feedback-quality.mjs"
+    "audit:feedback": "node tools/audit-feedback-quality.mjs",
+    "audit:ranks": "node tools/audit-ranks.mjs"
   },
   "dependencies": {}
 }
