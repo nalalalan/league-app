@@ -58,6 +58,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5567953154_01.mp4",
   "auto_NA1-5567787430_01.mp4",
   "auto_NA1-5567367431_01.mp4",
   "auto_NA1-5567223507_01.mp4",
@@ -630,6 +631,45 @@ function autoCaptureRejectReason(name, health, sidecar, visual) {
     return `${Math.round(pauseSeconds)}s foreground pause during ${Math.round(sourceSeconds)}s game`;
   }
   return "";
+}
+
+function sourceEntryDuration(entry = {}) {
+  return Number(entry.health?.duration) ||
+    Number(entry.existingEntry?.durationSeconds) ||
+    Number(entry.sidecar?.durationSeconds) ||
+    Number(entry.sidecar?.sourceDurationSeconds) ||
+    0;
+}
+
+function compareSameMatchAutoKeeper(a, b) {
+  const durationDelta = sourceEntryDuration(a) - sourceEntryDuration(b);
+  if (Math.abs(durationDelta) > 1) return durationDelta;
+  const aClip = recordingParts(a.name).clipNumber || Number.MAX_SAFE_INTEGER;
+  const bClip = recordingParts(b.name).clipNumber || Number.MAX_SAFE_INTEGER;
+  if (aClip !== bClip) return bClip - aClip;
+  if (a.stat?.mtimeMs !== b.stat?.mtimeMs) return Number(a.stat?.mtimeMs || 0) - Number(b.stat?.mtimeMs || 0);
+  return a.name.localeCompare(b.name) <= 0 ? 1 : -1;
+}
+
+function collapseSameMatchDuplicateSources(entries) {
+  const autoKeeperByMatch = new Map();
+  for (const entry of entries) {
+    const parts = recordingParts(entry.name);
+    if (!parts.matchId || !/^auto_/i.test(entry.name)) continue;
+    if (sourceEntryDuration(entry) < minSanitizedAutoSeconds) continue;
+    const current = autoKeeperByMatch.get(parts.matchId);
+    if (!current || compareSameMatchAutoKeeper(entry, current) > 0) {
+      autoKeeperByMatch.set(parts.matchId, entry);
+    }
+  }
+  if (!autoKeeperByMatch.size) return entries;
+  return entries.filter((entry) => {
+    const parts = recordingParts(entry.name);
+    const keeper = parts.matchId ? autoKeeperByMatch.get(parts.matchId) : null;
+    if (!keeper || keeper.name === entry.name) return true;
+    console.log(`Skipping duplicate same-match recording ${entry.name}: keeping ${keeper.name} for ${parts.matchId}.`);
+    return false;
+  });
 }
 
 async function extractFrame(input, output, second, width = 640) {
@@ -1558,6 +1598,9 @@ function reviewRepCategory(recording = {}) {
   }
   if (!won && Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) {
     return "deathExit";
+  }
+  if (!won && Number.isFinite(deaths) && deaths <= 4 && /\b(side wave|side-wave|blue-side jungle|jungle fight|side\/jungle|nearest threatened turret)\b/i.test(text)) {
+    return "sideFarmDefense";
   }
   if ((Number.isFinite(deaths) && deaths >= 9) || /\b(low hp|low-health|death-heavy|ten deaths|thirteen deaths|death timer|death-state|catchable death)\b/i.test(text)) {
     return "deathExit";
@@ -3320,6 +3363,10 @@ function performanceRankReason(recording = {}, context = {}) {
   if (category === "laneDeathExit") {
     return `${csText} and ${deathText} pull the game to ${rank} because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline.`;
   }
+  if (category === "sideFarmDefense") {
+    const kdaText = [kills, deaths, assists].every(Number.isFinite) ? `${kills}/${deaths}/${assists} K/D/A` : "the K/D/A line";
+    return `${csText} with ${kdaText} puts the game at ${rank}: the CS/death line is calmer, but the main leak is side-wave or jungle-fight exit into tower, wave, group, or reset.`;
+  }
   const entryClause = flags.illegalEntry ? "because fight entry is still catchable" : "with mixed fight-entry evidence";
   const leakClause = flags.stateFlipExit
     ? "the main leak is exit/re-entry after first value"
@@ -3372,6 +3419,58 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5567953154_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Jungle fight continued after first value",
+      feedback: "The leak is that the blue-side jungle fight is playable while allies are in front, but after the first value window you keep chasing the same fight instead of exiting to turret, mid wave, or reset.",
+      gameDetail: "At 22:51, you are in your blue-side jungle with two allies already hitting the enemy, one enemy low or committed, and your inner turret behind the play, so the first entry is legal enough, but the leak is treating the next seconds as another chase after first value and the next click is back toward turret, mid wave, or reset behind allies. Around 22:59 the state has flipped because another enemy is still visible and the next safe result is no longer guaranteed; by 23:39 the cost is visible as a death timer with 144 CS. The final 1/4/3 with 175 CS in 31:42 says this was a lower-death, better-farm game than the feeding losses, but the carry impact stayed too quiet because safe farm and first fight value did not become enough tower, wave, or clean reset pressure.",
+      secondaryFocus: "Rep: after 15 minutes, before extending a side wave or jungle fight, check nearest threatened turret, ally front, and whether first value is already gained. If any fail, leave through turret/mid wave or reset; do not chase the second body.",
+      mistakeTypes: [
+        "jungle fight exit after first value",
+        "side wave to map-result conversion",
+        "ally-front check",
+        "low damage pressure",
+        "reset/group timing"
+      ],
+      eventEvidence: "22:31 shows Samira and an ally under allied mid/base area with the defense stabilized; 22:41 shows Samira entering blue-side jungle behind allies; 22:51 shows the fight with allies in front and an enemy already committed; 22:59 shows Samira still in the jungle fight as another enemy remains visible; 23:39 shows the death timer with 144 CS.",
+      failureEvidence: "At 22:51 the entry is legal enough because allies are already in front, but by 22:59 the first value window has shifted into an exit check; staying forward turns a playable defense fight into the 23:39 death timer instead of a turret-side exit, mid-wave catch, or reset.",
+      goodThing: "You kept this game calmer: only 4 deaths and 175 CS means the farming and survival baseline is improving compared with the death-heavy games.",
+      whyTrust: "This uses inspected 22:31, 22:41, 22:51, 22:59, and 23:39 frames plus the League Client 1/4/3, 175 CS ranked stat line.",
+      focusTag: "jungle fight exit",
+      evidence: "Manual frame inspection of the blue-side jungle fight and League Client ranked stats for the same match.",
+      pattern: "This is not the old perma-feed shape. The new problem is quieter: controlled deaths and better CS are present, but the first playable fight value is not turning into tower damage, grouped movement, or a clean reset often enough.",
+      diamondRule: "After a side or jungle fight starts paying, Samira needs the exit branch before the second chase.",
+      drill: "after 15 minutes, before extending a side wave or jungle fight, check nearest threatened turret, ally front, and whether first value is already gained. If any fail, leave through turret/mid wave or reset; do not chase the second body.",
+      timeline: [
+        "22:31 - Samira and an ally are under allied mid/base area after the defense stabilizes.",
+        "22:41 - Samira follows allies into blue-side jungle.",
+        "22:51 - Samira joins a jungle fight with allies already in front and an enemy committed.",
+        "22:59 - Samira stays in the jungle fight as another enemy remains visible and the exit check is due.",
+        "23:39 - Samira is dead with 144 CS."
+      ],
+      clockAnchors: [
+        { clock: "22:31", videoSeconds: 1350, description: "Samira and an ally are under allied mid/base area after the defense stabilizes." },
+        { clock: "22:41", videoSeconds: 1360, description: "Samira follows allies into blue-side jungle." },
+        { clock: "22:51", videoSeconds: 1370, description: "Samira joins a jungle fight with allies already in front and an enemy committed." },
+        { clock: "22:59", videoSeconds: 1378, description: "Samira stays in the jungle fight as another enemy remains visible and the exit check is due." },
+        { clock: "23:39", videoSeconds: 1385, description: "Samira is dead with 144 CS after the jungle fight." }
+      ],
+      nuance: [
+        "This is a calmer ranked loss, not the same death-heavy pattern.",
+        "The useful part is following allies into a fight where bodies are already committed.",
+        "The mistake starts after the first value window, when the next click stays chase instead of exit.",
+        "The 175 CS is good relative to recent losses, but 1/4/3 and low map pressure mean the farm did not become enough carry impact.",
+        "The next-game rep is a side/jungle fight exit check, not a generic pressure-mode slogan."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns or all hidden enemy positions, but it can verify the allied-front jungle entry, the state-flip window, the death timer, and the 1/4/3, 175 CS ranked context.",
+      outcome: "defeat",
+      outcomeLabel: "DEFEAT",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5567787430_02.mp4") {
     return {
       champion: "Samira",
@@ -5485,15 +5584,17 @@ async function main() {
       existingEntry
     });
   }
-  const sourceEntries = discoveredEntries
-    .filter((entry) => {
-      if (entry.cachedTrusted) return true;
-      const rejectReason = autoCaptureRejectReason(entry.name, entry.health, entry.sidecar, entry.visual);
-      if (!rejectReason) return true;
-      console.log(`Skipping invalid auto capture ${entry.name}: ${rejectReason}.`);
-      return false;
-    })
-    .sort((a, b) => a.stat.mtimeMs - b.stat.mtimeMs || a.name.localeCompare(b.name));
+  const sourceEntries = collapseSameMatchDuplicateSources(
+    discoveredEntries
+      .filter((entry) => {
+        if (entry.cachedTrusted) return true;
+        const rejectReason = autoCaptureRejectReason(entry.name, entry.health, entry.sidecar, entry.visual);
+        if (!rejectReason) return true;
+        console.log(`Skipping invalid auto capture ${entry.name}: ${rejectReason}.`);
+        return false;
+      })
+      .sort((a, b) => a.stat.mtimeMs - b.stat.mtimeMs || a.name.localeCompare(b.name))
+  );
   const sourceMatchIds = [...new Set(sourceEntries.map((entry) => recordingParts(entry.name).matchId).filter(Boolean))];
   const recordingMetadata = await loadRecordingMetadata(sourceMatchIds);
 
@@ -5789,7 +5890,7 @@ async function main() {
     captured: capturedRange(sourceStats),
     totalDuration: mmss(totalSeconds),
     totalRecordings: recordings.length,
-    reviewBasis: "Newest match first; recordings inside a match are sorted by length.",
+    reviewBasis: "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
     mainFeedback,
     rankCalibration: rankCalibrationSummary(recordings),
     detectedChampions,
