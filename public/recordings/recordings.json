@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-25T13:37:12.568Z",
+  "generatedAt": "2026-05-25T15:30:04.168Z",
   "source": "League of Legends Highlights folder",
-  "match": "41 matches",
+  "match": "42 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -43,19 +43,20 @@
     "NA1-5566943774",
     "NA1-5567223507",
     "NA1-5567367431",
-    "NA1-5567787430"
+    "NA1-5567787430",
+    "NA1-5567953154"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 25, 2026, 2:24 AM ET",
-  "totalDuration": "624:11",
-  "totalRecordings": 55,
+  "captured": "May 18, 2026, 5:46 PM to May 25, 2026, 11:12 AM ET",
+  "totalDuration": "654:11",
+  "totalRecordings": 56,
   "reviewBasis": "Newest match first; recordings inside a match are sorted by length.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 25, 2026, 1:32 AM: newest full-game read Iron III; current 3-game read Iron III; archive median Bronze III across 39 full games, used only as baseline context. The newest game is around the current three-game read.",
-    "rule": "The newest-game blocker is objective-fight state flip and second fight after value; the current repeat across the latest games is exit/re-entry discipline, objective-fight state flip, and second fight after value. The keep-habit is you are starting to recognize real objective fight windows with allies already committed; keep entering when bodies are engaged and the fight.",
+    "focus": "Synced through May 25, 2026, 10:39 AM: newest full-game read Bronze I; current 3-game read Iron I; archive median Bronze III across 40 full games, used only as baseline context. The newest game is above the current three-game read.",
+    "rule": "The newest-game blocker is reset/overstay discipline and side farm over map defense; the current repeat across the latest games is reset/overstay discipline, side farm over map defense, and spacing/entry discipline. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
     "nextRep": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
-    "pattern": "Latest file auto_NA1-5567787430_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
+    "pattern": "Latest file auto_NA1-5567953154_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
       "Read the newest-game point.",
       "Use the latest-game next action.",
@@ -68,19 +69,19 @@
     "method": "forensic performance-grade estimate with CS/min, death timing, entry legality, exit quality, conversion, queue, timestamp, and cross-game confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 40,
+    "fullReviewGames": 41,
     "queueCounts": {
       "unknown": 14,
       "bot": 14,
-      "ranked_solo": 12
+      "ranked_solo": 13
     },
-    "rankedFullGames": 12,
-    "pvpFullGames": 12,
+    "rankedFullGames": 13,
+    "pvpFullGames": 13,
     "botFullGames": 14,
-    "anchoredFullGames": 40,
-    "statFullGames": 40,
+    "anchoredFullGames": 41,
+    "statFullGames": 41,
     "rankLabelCounts": {
-      "Bronze": 16,
+      "Bronze": 17,
       "Silver": 6,
       "Iron": 16,
       "Gold": 2
@@ -166,7 +167,7 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 54,
+      "recordings": 55,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
@@ -182,6 +183,176 @@
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5567953154_01.mp4",
+      "publicFile": "auto_NA1-5567953154_01.mp4",
+      "cacheKey": "58084324:1779721974996",
+      "fingerprint": "cca4b688572a",
+      "matchId": "NA1-5567953154",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779719963585,
+      "gameHappenedAt": "2026-05-25T14:39:23.585Z",
+      "gameHappenedAtLabel": "May 25, 2026, 10:39 AM",
+      "recordedAt": "2026-05-25T15:12:55.066Z",
+      "recordedAtLabel": "May 25, 2026, 11:12 AM",
+      "recordedAtTimeLabel": "11:12 AM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Cleaner game, one extra side step still leaks tempo",
+      "duration": "30:00",
+      "durationSeconds": 1800,
+      "gameLength": "31:42",
+      "gameLengthSeconds": 1902,
+      "kda": "1/4/3",
+      "kills": 1,
+      "deaths": 4,
+      "assists": 3,
+      "cs": 175,
+      "statsSource": "League Client match history",
+      "win": false,
+      "outcome": "defeat",
+      "outcomeLabel": "DEFEAT",
+      "outcomeSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Cleaner game, one extra side step still leaks tempo",
+      "feedback": "The leak is turning a legal defend-or-catch screen into one extra side-wave or low-HP click after the value is already won, so the game gives back tempo through a preventable death.",
+      "gameDetail": "At 16:10, the mid defend is still legal: Samira is under allied mid turret at 42 HP with support nearby and the wave already caught, so the value is survive plus reset; once no free tower, body, or objective is on screen, the wrong click is one more mid or side step and the next click is recall immediately. By 23:37 that delayed reset becomes another isolated death timer. The 1/4/3, 175 CS in 32 minutes says the game is calmer than the older Samira losses. This matters because a calmer game only climbs if the safe screen actually ends before the side wave reopens the map.",
+      "secondaryFocus": "Rep: after any low-HP camp or side wave past 15 minutes, take the first safe exit. If tower, wave, objective, or ally front is not already visible, leave the farm immediately and reset or regroup instead of taking one more side step.",
+      "mistakeTypes": [
+        "side-wave overstay",
+        "low-HP reset discipline",
+        "mid regroup timing",
+        "isolated death-state exposure",
+        "CS-to-tempo conversion"
+      ],
+      "eventEvidence": "6:59 shows Samira and support collecting the bot wave safely under allied turret; 11:35 shows the same lane state still being played with support and wave cover; 16:10 shows Samira at 42 HP under allied mid turret with the wave already caught; 23:37 shows the next death timer on the lower side of the map; 30:55 shows the later 1/4/3, 175 CS client state while the game is still open.",
+      "failureEvidence": "At 16:10 the visible payout is survive, catch the wave, and reset, but the later map state still turns into a side-lane death by 23:37, which gives back tempo in an otherwise controlled Samira game.",
+      "goodThing": "The strong part is that the early bot states at 6:59 and 11:35 are played with support, wave, and turret protection instead of the blind forward entries that were killing older games.",
+      "whyTrust": "This uses inspected 6:59, 11:35, 16:10, 23:37, and 30:55 frames plus the League Client 1/4/3, 175 CS defeat line.",
+      "focusTag": "cleaner game reset",
+      "evidence": "Manual frame inspection of the safe early bot states, the 16:10 low-HP mid screen, the 23:37 death timer, and the 30:55 client stat line.",
+      "pattern": "This current-form game already has fewer panic entries and better lane control. The remaining leak is the extra side or low-HP click after the map has already asked for reset, regroup, or mid wave.",
+      "diamondRule": "After a low-HP defend or side catch, Samira only clicks forward again if a free tower, allied front, or objective is already visible.",
+      "drill": "after any low-HP defend or side-wave catch past 15 minutes, say value won, reset now, then click base or mid wave unless a free tower, allied front, or objective is already on screen",
+      "timeline": [
+        "6:59 - Samira and support collect the bot wave safely under allied outer turret.",
+        "11:35 - Samira and support still play the bot wave with support and wave cover.",
+        "16:10 - Samira is at 42 HP under allied mid turret with the wave already caught.",
+        "23:37 - Samira is dead on the lower side of the map with the respawn timer visible.",
+        "30:55 - The client shows Samira at 1/4/3 with 175 CS late in the game."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "6:59",
+          "videoSeconds": 417.538,
+          "description": "Samira and support collect the bot wave safely under allied outer turret."
+        },
+        {
+          "clock": "11:35",
+          "videoSeconds": 693.231,
+          "description": "Samira and support still play the bot wave with support and wave cover."
+        },
+        {
+          "clock": "16:10",
+          "videoSeconds": 968.923,
+          "description": "Samira is at 42 HP under allied mid turret with the wave already caught."
+        },
+        {
+          "clock": "23:37",
+          "videoSeconds": 1382.462,
+          "description": "Samira is dead on the lower side of the map with the respawn timer visible."
+        },
+        {
+          "clock": "30:55",
+          "videoSeconds": 1796,
+          "description": "The client shows Samira at 1/4/3 with 175 CS late in the game."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "6:59",
+          "videoSeconds": 417.538,
+          "description": "Samira and support collect the bot wave safely under allied outer turret."
+        },
+        {
+          "clock": "16:10",
+          "videoSeconds": 968.923,
+          "description": "Samira is at 42 HP under allied mid turret with the wave already caught."
+        },
+        {
+          "clock": "23:37",
+          "videoSeconds": 1382.462,
+          "description": "Samira is dead on the lower side of the map with the respawn timer visible."
+        },
+        {
+          "clock": "30:55",
+          "videoSeconds": 1796,
+          "description": "The client shows Samira at 1/4/3 with 175 CS late in the game."
+        }
+      ],
+      "nuance": [
+        "Good: the lane states at 6:59 and 11:35 are being played with support and wave cover.",
+        "Leak: the reset and regroup branch is still being delayed after low-HP or side-wave states.",
+        "Cost: the 23:37 death timer is the one late-game giveaway inside an otherwise controlled game.",
+        "Context: 1/4/3 with 175 CS in 32 minutes is calmer than the older Samira losses, so the fix is narrower now.",
+        "Next check: if the screen only offers side farm or a low-HP hover, take reset, mid wave, or ally line before asking for another fight."
+      ],
+      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry. The detailed AI pass failed, so this review is a conservative timestamped fallback from verified visible frames.",
+      "analysisSource": "fallback",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
+      "sampledFrames": 14,
+      "publicVideoBytes": 58084324,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5567953154_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5567953154-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-25-performance-rank-v6",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "score": 36,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 98,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "developing",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "5.5 CS/min and 4 deaths pull the game to Bronze I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v2",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "reason": "5.5 CS/min and 4 deaths pull the game to Bronze I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
+      }
+    },
     {
       "file": "auto_NA1-5567787430_01.mp4",
       "publicFile": "auto_NA1-5567787430_01.mp4",
@@ -219,7 +390,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Objective entry is improving; the leak is second fight after value",
