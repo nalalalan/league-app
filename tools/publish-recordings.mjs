@@ -35,6 +35,7 @@ const codePublishPaths = [
   "public/league-practice-room.pdf",
   "public/league-practice-room.tex",
   "server.js",
+  "tools/audit-feedback-quality.mjs",
   "tools/sync-recordings.mjs",
   "tools/league-live-recorder.mjs",
   "tools/local-status-guard.mjs",

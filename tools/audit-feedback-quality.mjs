@@ -112,6 +112,9 @@ function repCategory(recording = {}) {
   if (isSamira &&
       /\b(bot|lane|outer turret|under turret|support|wave is already thin|samira e|dash\/chase|tower dive)\b/i.test(text) &&
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) return "laneDeathExit";
+  if (/\bmid[-\s]?wave\b/i.test(text) &&
+      /\briver\b/i.test(text) &&
+      /\b(chase|entry|front|collapse|ally[-\s]?front)\b/i.test(text)) return "fightEntry";
   if (/\b(dragon|baron|objective|pit)\b/i.test(text) &&
       /\b(fight|entry|engaged|committed|first value|second fight|value window|state flip|re-entry|reenter|exit)\b/i.test(text)) return "objectiveFight";
   if (!won && Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) return "deathExit";

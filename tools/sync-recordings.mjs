@@ -59,6 +59,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5568185590_01.mp4",
   "auto_NA1-5568079693_01.mp4",
   "auto_NA1-5567953154_01.mp4",
   "auto_NA1-5567787430_01.mp4",
@@ -1625,6 +1626,11 @@ function reviewRepCategory(recording = {}) {
       /\b(bot|lane|outer turret|under turret|support|wave is already thin|samira e|dash\/chase|tower dive)\b/i.test(text) &&
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) {
     return "laneDeathExit";
+  }
+  if (/\bmid[-\s]?wave\b/i.test(text) &&
+      /\briver\b/i.test(text) &&
+      /\b(chase|entry|front|collapse|ally[-\s]?front)\b/i.test(text)) {
+    return "fightEntry";
   }
   if (!won &&
       Number.isFinite(deaths) &&
@@ -3581,6 +3587,59 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5568185590_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Mid wave turned into a river chase",
+      feedback: "The leak is chasing from mid into river after the wave-and-ally setup stops protecting you, so pressure becomes another death instead of wave, recall, or regroup.",
+      gameDetail: "At 23:05, you leave a safe mid-wave setup with an ally nearby and a target deeper toward river, but no tower hit or guaranteed objective is on screen and the ally line is not clearly between you and the collapse, so the wrong click is the forward river chase and the next click is catch mid wave, step back toward turret, or reset/group. By 23:20 the state flip is visible: multiple enemies are on you and the play becomes a death, which matters because 4/6/1 with 148 CS means the farm pace is usable but the fight impact keeps getting paid back through avoidable exits.",
+      secondaryFocus: "Rep: before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
+      mistakeTypes: [
+        "mid wave to river chase",
+        "ally-front check",
+        "exit after first value",
+        "fight-entry discipline",
+        "avoidable river death"
+      ],
+      eventEvidence: "22:40 and 23:00 show Samira grouped mid with wave and ally context; 23:05 shows the move from mid toward river; 23:15 shows the collapse beginning; 23:20 shows the death.",
+      failureEvidence: "At 23:05 the visible value is still mid wave, turret safety, or regroup, but the click goes toward river before an ally-front guarantee or free target is proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death.",
+      goodThing: "At 19:47 you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
+      whyTrust: "This uses the inspected 19:47, 22:40, 23:05, 23:15, and 23:20 frames plus the League Client 4/6/1, 148 CS ranked context.",
+      focusTag: "mid-to-river exit",
+      evidence: "Manual frame inspection of the mid-to-river fight window and League Client ranked stats for the same match.",
+      pattern: "The first mid setup is playable because wave and ally context exist; the mistake starts when the next click leaves that setup for river without a clear front body, tower, wave, objective, or low/CC'd target.",
+      diamondRule: "After mid pressure, a Samira river chase is legal only when an ally is still in front and the target is already CC'd or low; otherwise the result is mid wave, turret safety, reset, or regroup.",
+      drill: "before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
+      timeline: [
+        "19:47 - Samira recalls safely under mid turret after pressure.",
+        "22:40 - Samira is grouped mid with an ally and wave context.",
+        "23:00 - Samira is still mid with wave nearby before leaving the safer lane shape.",
+        "23:05 - Samira moves from mid toward river while the ally line is split.",
+        "23:15 - Multiple enemies collapse around the river edge.",
+        "23:20 - Samira is dead after the river chase."
+      ],
+      clockAnchors: [
+        { clock: "19:47", videoSeconds: 1186.308, description: "Samira recalls safely under mid turret after pressure." },
+        { clock: "22:40", videoSeconds: 1360, description: "Samira is grouped mid with an ally and wave context." },
+        { clock: "23:00", videoSeconds: 1380, description: "Samira is mid with wave nearby before leaving the safer lane shape." },
+        { clock: "23:05", videoSeconds: 1385, description: "Samira moves from mid toward river while the ally line is split." },
+        { clock: "23:15", videoSeconds: 1395, description: "Multiple enemies collapse around the river edge." },
+        { clock: "23:20", videoSeconds: 1400, description: "Samira is dead after the river chase." }
+      ],
+      nuance: [
+        "The mid setup itself is not the problem; wave and ally context make it playable.",
+        "The state flips once the click leaves mid wave and turret safety for river without a clear front body.",
+        "The 148 CS is usable for this session, but 4/6/1 means fight impact is not surviving the exit windows.",
+        "The next-game rep is a mid-to-river legality check, not a generic pressure-mode rule."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns or hidden enemies, but it verifies the mid-wave setup, river move, collapse, death, and 4/6/1, 148 CS ranked context.",
+      outcome: "defeat",
+      outcomeLabel: "DEFEAT",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5568079693_01.mp4") {
     return {
       champion: "Samira",

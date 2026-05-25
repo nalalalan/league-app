@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-25T22:55:00.749Z",
+  "generatedAt": "2026-05-25T23:01:12.137Z",
   "source": "League of Legends Highlights folder",
   "match": "44 matches",
   "matches": [
@@ -54,9 +54,9 @@
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 25, 2026, 6:01 PM: newest full-game read Iron II; current 3-game read Bronze II; archive median Bronze III across 41 full games, used only as baseline context. The newest game is below the current three-game read.",
+    "focus": "Synced through May 25, 2026, 6:01 PM: newest full-game read Iron I; current 3-game read Bronze II; archive median Bronze III across 41 full games, used only as baseline context. The newest game is below the current three-game read.",
     "rule": "The newest-game blocker is mid wave to river chase and ally-front check; the current repeat across the latest games is ally-front check, exit after first value, and mid wave to river chase. The keep-habit is you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
-    "nextRep": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+    "nextRep": "Rep: before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5568185590_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
@@ -227,7 +227,7 @@
       "feedbackTitle": "Mid wave turned into a river chase",
       "feedback": "The leak is chasing from mid into river after the wave-and-ally setup stops protecting you, so pressure becomes another death instead of wave, recall, or regroup.",
       "gameDetail": "At 23:05, you leave a safe mid-wave setup with an ally nearby and a target deeper toward river, but no tower hit or guaranteed objective is on screen and the ally line is not clearly between you and the collapse, so the wrong click is the forward river chase and the next click is catch mid wave, step back toward turret, or reset/group. By 23:20 the state flip is visible: multiple enemies are on you and the play becomes a death, which matters because 4/6/1 with 148 CS means the farm pace is usable but the fight impact keeps getting paid back through avoidable exits.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "secondaryFocus": "Rep: before chasing from mid into river, ask: tower, wave, objective, or ally front? If none is visible, click back to mid wave or reset. No forward E unless an ally is in front and the target is already CC'd or low.",
       "mistakeTypes": [
         "mid wave to river chase",
         "ally-front check",
@@ -235,7 +235,7 @@
         "fight-entry discipline",
         "avoidable river death"
       ],
-      "eventEvidence": "22:40 and 23:00 show Samira grouped mid with wave and ally context; 23:05 shows the move from mid toward river; 23:15 shows the collapse beginning; 23:20 shows the death timer.",
+      "eventEvidence": "22:40 and 23:00 show Samira grouped mid with wave and ally context; 23:05 shows the move from mid toward river; 23:15 shows the collapse beginning; 23:20 shows the death.",
       "failureEvidence": "At 23:05 the visible value is still mid wave, turret safety, or regroup, but the click goes toward river before an ally-front guarantee or free target is proven, so the 23:15 collapse turns the playable mid setup into the 23:20 death.",
       "goodThing": "At 19:47 you recall safely under turret after pressure; keep that exit instinct when the next result is no longer clear.",
       "whyTrust": "This uses the inspected 19:47, 22:40, 23:05, 23:15, and 23:20 frames plus the League Client 4/6/1, 148 CS ranked context.",
@@ -312,7 +312,7 @@
         "The 148 CS is usable for this session, but 4/6/1 means fight impact is not surviving the exit windows.",
         "The next-game rep is a mid-to-river legality check, not a generic pressure-mode rule."
       ],
-      "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns or hidden enemies, but it verifies the mid-wave setup, river move, collapse, death timer, and 4/6/1, 148 CS ranked context.",
+      "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns or hidden enemies, but it verifies the mid-wave setup, river move, collapse, death, and 4/6/1, 148 CS ranked context.",
       "analysisSource": "manual",
       "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
@@ -324,9 +324,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "score": 13,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 21,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -350,13 +350,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min and 6 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
+        "reason": "5.4 CS/min and 6 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "reason": "5.4 CS/min and 6 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "reason": "5.4 CS/min and 6 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
       }
     },
     {
