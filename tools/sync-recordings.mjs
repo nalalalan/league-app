@@ -616,6 +616,14 @@ function trustedAutoSidecar(sidecar, health) {
 function autoCaptureRejectReason(name, health, sidecar, visual) {
   if (!/^auto_/i.test(name)) return "";
   if (visual && visual.visible === false) return "sampled frames are black";
+  const namedMatchId = recordingParts(name).matchId;
+  const sidecarMatchId = clean(sidecar?.matchId || "");
+  if (!sidecarMatchId || !/^NA1-\d+$/.test(sidecarMatchId)) {
+    return "sidecar missing real match id";
+  }
+  if (namedMatchId && sidecarMatchId && namedMatchId !== sidecarMatchId) {
+    return `sidecar match mismatch ${sidecarMatchId}`;
+  }
   const hasTrustedSidecar = trustedAutoSidecar(sidecar, health);
   if (!hasTrustedSidecar && health?.duration > 300 && health.bytesPerSecond > 0 && health.bytesPerSecond < minAutoBytesPerSecond) {
     return `${Math.round(health.duration)}s but only ${Math.round(health.bytesPerSecond)} bytes/s`;
@@ -3599,6 +3607,57 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5568447928_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Bot siege became a jungle chase",
+      feedback: "The leak is that a winning bot siege keeps turning into one more chase off the tower line, so free structure tempo becomes low-value jungle fighting and another avoidable death window.",
+      gameDetail: "At 9:58, you have bot wave under enemy tower with an ally beside you and the defender already backing off, so the wrong click is following the retreat path into red-side jungle and the next click is hit the free tower, clear the wave, or reset behind ally cover. By 10:34 you are low in enemy jungle instead of spending the bot-side value cleanly. The game still finishes as a 20/4/3, 117 CS win, but the four deaths and sub-6 CS/min leak still come from these extra chase windows after lane pressure already paid.",
+      secondaryFocus: "Rep: after bot tower pressure gives value, ask tower, wave, or base before chase. If the target has already left tower range and no ally is front-lining the next screen, stop the chase and spend the wave or reset.",
+      mistakeTypes: [
+        "bot siege exit after value",
+        "tower-to-jungle chase drift",
+        "death-state exposure",
+        "wave and structure conversion",
+        "low-value pursuit after win"
+      ],
+      eventEvidence: "9:34 shows Samira winning the bot-side fight at tower; 9:58 shows the wave still at tower with an ally nearby; 10:10 shows the chase continuing away from the structure; 10:34 shows Samira low in red-side jungle instead of finishing the tower or cashing out.",
+      failureEvidence: "At 9:58 the permanent value is still the bot tower and wave with ally cover, so chasing off that line into red-side jungle turns a winning siege into a thin, low-HP fight path that leaves Samira low by 10:34 instead of spending the lane win safely.",
+      goodThing: "You do create the winning bot-side state first: the 9:34 fight is aggressive in a way that earns tower pressure, and the later game shows cleaner grouped mid pressure off your lead; keep that first-win confidence.",
+      whyTrust: "This uses inspected 9:34, 9:58, 10:10, 10:34, and 18:58 frames plus the League Client 20/4/3, 117 CS ranked context.",
+      focusTag: "bot siege exit",
+      evidence: "Manual frame inspection of the bot-tower siege, chase continuation, and later ranked-stat context from the same match.",
+      pattern: "This is a better game than the recent losses because the first engage wins real map space, but the remaining leak is still spending that pressure on a chase after tower value is already available.",
+      diamondRule: "When bot pressure reaches tower with wave and ally cover, Samira spends that state on structure, wave, or reset first; chasing into jungle is illegal unless an ally still fronts the next screen and the target is already trapped.",
+      drill: "after bot siege wins space, say tower, wave, or base before you click at the runner. If the runner is outside tower line and no ally is front, drop it.",
+      timeline: [
+        "9:34 - Samira wins the bot-side fight near enemy tower.",
+        "9:58 - Samira has bot wave at tower with ally cover and the defender backing off.",
+        "10:10 - Samira keeps moving past the tower line toward red-side jungle.",
+        "10:34 - Samira is low in enemy jungle after the extra chase.",
+        "18:58 - Scoreboard context shows Samira at 20/4/3 with 117 CS in the winning game."
+      ],
+      clockAnchors: [
+        { clock: "9:34", videoSeconds: 570, description: "Samira wins the bot-side fight near enemy tower." },
+        { clock: "9:58", videoSeconds: 594, description: "Samira has bot wave at tower with ally cover and the defender backing off." },
+        { clock: "10:10", videoSeconds: 606, description: "Samira keeps moving past the tower line toward red-side jungle." },
+        { clock: "10:34", videoSeconds: 630, description: "Samira is low in enemy jungle after the extra chase." },
+        { clock: "18:58", videoSeconds: 1170, description: "Scoreboard context shows Samira at 20/4/3 with 117 CS in the winning game." }
+      ],
+      nuance: [
+        "The opening bot-side fight is good enough to earn real tower pressure.",
+        "The leak starts only after the structure line is won and the click keeps following the retreat path.",
+        "Because the game is already winning, the remaining coaching point should stay narrow: spend siege value before chasing.",
+        "The 20/4/3 line shows real carry pressure; the remaining rank cleaner is cutting the four extra death windows and turning them into farm or resets."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns, unseen flank positions, or every hidden enemy, but it verifies the bot-tower fight win, the 9:58 tower-value state, the chase continuation, the low-health jungle exit, and the 20/4/3, 117 CS ranked context.",
+      outcome: "victory",
+      outcomeLabel: "VICTORY",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5568316539_01.mp4") {
     return {
       champion: "Samira",
@@ -6118,6 +6177,7 @@ async function main() {
       : `highlight ${String(++highlightCount).padStart(2, "0")}`;
     const fingerprint = crypto.createHash("sha1").update(`${name}:${cacheKey}`).digest("hex").slice(0, 12);
     const inferredStats = inferredStatsFromAnalysis(analysis);
+    const previousRecording = previousAnalysis || entry.existingEntry || {};
     const sidecarRecordedMs = Date.parse(entry.sidecar?.createdAt || entry.sidecar?.endedAt || "");
     const recordedDate = new Date(Number.isFinite(sidecarRecordedMs) ? sidecarRecordedMs : stat.mtimeMs);
     sourceStats.push({ mtimeMs: recordedDate.getTime() });
@@ -6134,34 +6194,34 @@ async function main() {
       matchId: parts.matchId,
       score: parts.score,
       clipNumber: parts.clipNumber,
-      matchTimeMs,
-      gameHappenedAt: matchStats.gameHappenedAt || replayMeta.gameHappenedAt || recordedDate.toISOString(),
-      gameHappenedAtLabel: matchStats.gameHappenedAtLabel || replayMeta.gameHappenedAtLabel || shortDateTime(recordedDate),
-      recordedAt: recordedDate.toISOString(),
-      recordedAtLabel: shortDateTime(recordedDate),
-      recordedAtTimeLabel: shortTime(recordedDate),
+      matchTimeMs: matchTimeMs || Number(previousRecording.matchTimeMs) || recordedDate.getTime(),
+      gameHappenedAt: matchStats.gameHappenedAt || replayMeta.gameHappenedAt || previousRecording.gameHappenedAt || recordedDate.toISOString(),
+      gameHappenedAtLabel: matchStats.gameHappenedAtLabel || replayMeta.gameHappenedAtLabel || previousRecording.gameHappenedAtLabel || shortDateTime(recordedDate),
+      recordedAt: previousRecording.recordedAt || recordedDate.toISOString(),
+      recordedAtLabel: previousRecording.recordedAtLabel || shortDateTime(recordedDate),
+      recordedAtTimeLabel: previousRecording.recordedAtTimeLabel || shortTime(recordedDate),
       clipTimestampSeconds: Number.isFinite(clipStart) ? Math.round(clipStart * 1000) / 1000 : null,
       clipTimestamp: captureMeta.clipTimestamp || "",
       clipWindow,
       timestamp: captureMeta.clipTimestamp || "",
-      queueId: queueMeta.queueId || null,
-      gameType: queueMeta.gameType,
-      gameTypeSource: queueMeta.gameTypeSource,
+      queueId: queueMeta.queueId || previousRecording.queueId || null,
+      gameType: queueMeta.gameType || previousRecording.gameType || "Unverified",
+      gameTypeSource: queueMeta.gameTypeSource || previousRecording.gameTypeSource || "No queue id found in local logs",
       title: clean(analysis.feedbackTitle, shortTitle),
       duration: mmss(duration),
       durationSeconds: Math.round(duration * 1000) / 1000,
-      gameLength: matchStats.gameLength || inferredStats.gameLength || "",
-      gameLengthSeconds: matchStats.gameLengthSeconds || inferredStats.gameLengthSeconds || null,
-      kda: matchStats.kda || inferredStats.kda || "",
-      kills: Number.isFinite(matchStats.kills) ? matchStats.kills : inferredStats.kills,
-      deaths: Number.isFinite(matchStats.deaths) ? matchStats.deaths : inferredStats.deaths,
-      assists: Number.isFinite(matchStats.assists) ? matchStats.assists : inferredStats.assists,
-      cs: Number.isFinite(matchStats.cs) ? matchStats.cs : inferredStats.cs,
-      statsSource: matchStats.statsSource || inferredStats.statsSource || "",
-      win: typeof matchStats.win === "boolean" ? matchStats.win : (typeof analysis.win === "boolean" ? analysis.win : null),
-      outcome: matchStats.outcome || analysis.outcome || "",
-      outcomeLabel: matchStats.outcomeLabel || analysis.outcomeLabel || "",
-      outcomeSource: matchStats.outcomeSource || analysis.outcomeSource || "",
+      gameLength: matchStats.gameLength || previousRecording.gameLength || inferredStats.gameLength || "",
+      gameLengthSeconds: matchStats.gameLengthSeconds || previousRecording.gameLengthSeconds || inferredStats.gameLengthSeconds || null,
+      kda: matchStats.kda || previousRecording.kda || inferredStats.kda || "",
+      kills: Number.isFinite(matchStats.kills) ? matchStats.kills : (Number.isFinite(previousRecording.kills) ? previousRecording.kills : inferredStats.kills),
+      deaths: Number.isFinite(matchStats.deaths) ? matchStats.deaths : (Number.isFinite(previousRecording.deaths) ? previousRecording.deaths : inferredStats.deaths),
+      assists: Number.isFinite(matchStats.assists) ? matchStats.assists : (Number.isFinite(previousRecording.assists) ? previousRecording.assists : inferredStats.assists),
+      cs: Number.isFinite(matchStats.cs) ? matchStats.cs : (Number.isFinite(previousRecording.cs) ? previousRecording.cs : inferredStats.cs),
+      statsSource: matchStats.statsSource || previousRecording.statsSource || inferredStats.statsSource || "",
+      win: typeof matchStats.win === "boolean" ? matchStats.win : (typeof previousRecording.win === "boolean" ? previousRecording.win : (typeof analysis.win === "boolean" ? analysis.win : null)),
+      outcome: matchStats.outcome || previousRecording.outcome || analysis.outcome || "",
+      outcomeLabel: matchStats.outcomeLabel || previousRecording.outcomeLabel || analysis.outcomeLabel || "",
+      outcomeSource: matchStats.outcomeSource || previousRecording.outcomeSource || analysis.outcomeSource || "",
       kind: isFullReview ? "full review" : "highlight",
       reviewPhase: phase,
       champion: championName,
