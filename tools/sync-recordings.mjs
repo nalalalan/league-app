@@ -60,6 +60,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5568775454_01.mp4",
   "auto_NA1-5568519322_01.mp4",
   "auto_NA1-5568447928_01.mp4",
   "auto_NA1-5568316539_01.mp4",
@@ -3665,6 +3666,52 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5568775454_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Late drake walk became a solo death window",
+      feedback: "The leak is arriving late from bot reset and still walking into the river fight alone, so a stable wave-and-recall state becomes one more death and hands Ocean Drake over instead of keeping bot wave, turret cover, or a numbers-safe regroup.",
+      gameDetail: "At 15:40, both you and your support have already taken the safe bot reset after the tower-defense wave, so the next job is spend, catch the next bot wave, or only move to river if allies are already fronting the objective. By 16:10, an ally is already dead and you are entering the Ocean Drake river alone from bot side with no ally screen in front of you, so the wrong click is continuing into fog and the next click is hold bot wave and turret, wait for numbers, or regroup from a safer angle. At 16:20, that late river entry becomes the death timer while the enemy secures Ocean Drake.",
+      secondaryFocus: "Rep: after bot reset, if dragon fight is already live and you do not have ally front, do not walk in alone. Catch the wave, hold tower line, or regroup before you cross river.",
+      mistakeTypes: [
+        "late objective entry",
+        "solo river walk after reset",
+        "numbers check failure",
+        "death-state exposure",
+        "drake handback"
+      ],
+      eventEvidence: "15:20 shows Samira and support stabilizing the bot wave under tower; 15:40 shows the safe shared recall; 16:10 shows Samira walking alone from bot side toward the Ocean Drake river after an ally is already down; 16:20 shows the death timer as the enemy secures Ocean Drake.",
+      failureEvidence: "At 16:10 the fight is already late, one ally is down, and there is no allied front between Samira and river fog, so crossing in alone turns a safe reset state into the 16:20 death while Ocean Drake is lost.",
+      goodThing: "The 15:40 shared recall is the right stabilization: you and support both leave the risky low-health bot state instead of forcing one more lane fight. Keep that reset discipline.",
+      whyTrust: "This uses inspected 15:20, 15:40, 16:10, and 16:20 frames from the same recorded match, so the coaching is tied to one visible late-entry objective mistake rather than a generic dragon rule.",
+      focusTag: "late drake entry",
+      evidence: "Manual frame inspection of the bot stabilization, shared recall, solo river path, and Ocean Drake death-timer window from the same match.",
+      pattern: "The lane state is not the main problem here. You do stabilize bot and take the reset, but then re-enter the map at dragon too late and without an allied front, so the reset never converts into a safe next state.",
+      diamondRule: "If dragon fight is already live after your bot reset and you do not have ally front or numbers, Samira does not cross river alone; she catches wave, holds tower line, or regroups first.",
+      drill: "after bot reset, if dragon fight is already live and you do not have ally front, do not walk in alone. Catch the wave, hold tower line, or regroup before you cross river.",
+      timeline: [
+        "15:20 - Samira and support stabilize the bot wave under tower.",
+        "15:40 - Samira and support take the safe shared recall from bot lane.",
+        "16:10 - Samira walks alone from bot side toward the Ocean Drake river after an ally is already down.",
+        "16:20 - Samira is dead as the enemy secures Ocean Drake."
+      ],
+      clockAnchors: [
+        { clock: "15:20", videoSeconds: 920, description: "Samira and support stabilize the bot wave under tower." },
+        { clock: "15:40", videoSeconds: 940, description: "Samira and support take the safe shared recall from bot lane." },
+        { clock: "16:10", videoSeconds: 970, description: "Samira walks alone from bot side toward the Ocean Drake river after an ally is already down." },
+        { clock: "16:20", videoSeconds: 980, description: "Samira is dead as the enemy secures Ocean Drake." }
+      ],
+      nuance: [
+        "The reset itself is good and should stay.",
+        "The leak starts after the reset, when the re-entry path ignores numbers and ally-front requirements.",
+        "This is a late-arrival problem, not a generic anti-fight rule.",
+        "The next-game cleaner is checking whether the objective fight is still legal before crossing river from lane."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove every cooldown, ward, or fogged flank, but it verifies the stable bot wave, the shared recall, the solo river walk after an ally death, and the death/Ocean Drake loss window.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5568519322_01.mp4") {
     return {
       champion: "Samira",
