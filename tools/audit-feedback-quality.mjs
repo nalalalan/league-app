@@ -137,7 +137,7 @@ function repMatchesGameCategory(recording = {}) {
     case "laneDeathExit":
       return /\bdeath-heavy lane sequence\b|\bNo E toward\b|\bDo not E\/dash\b|\bwave still protects (?:me|you)\b|\bone step behind support\b/i.test(rep);
     case "objectiveFight":
-      return /\bdid we already get the value\b|\bdragon,\s*wave,\s*recall,\s*or\s*group\b|\bsecond fight\b[\s\S]{0,100}\blow or unsupported\b/i.test(rep);
+      return /\bdid we already get the value\b|\bobjective done\s*-\s*exit or next map result\b|\bwalk out with allies,\s*mid wave,\s*reset\/spend,\s*or\s*Baron setup\b|\bdragon,\s*wave,\s*recall,\s*or\s*group\b|\bsecond fight\b[\s\S]{0,100}\blow or unsupported\b/i.test(rep);
     case "deathExit":
       return /\blow[-\s]?HP\b|\bdeath-heavy\b|\bfirst safe exit\b|\bdo not re-enter while you are catchable\b|\bbefore Samira E\b|\bforward lane click\b|\bclick back behind support\b/i.test(rep);
     case "sideFarmDefense":
@@ -343,6 +343,17 @@ function feedbackIssues(recording = {}) {
         !/\bentry|fight|dragon|objective|lane|base\b/i.test(performanceReason) ||
         !/\bexit|re-entry|cash-out|value|conversion|structure|wave|recall|group\b/i.test(performanceReason)) {
       issues.push("v25 performance rank reason must tie CS, deaths, entry/context, and exit/value together");
+    }
+  }
+  if ((recording.file || "") === "auto_NA1-5568519322_01.mp4") {
+    if (!/\bobjective done\s*-\s*exit or next map result\b/i.test(secondaryFocus)) {
+      issues.push("Drake secure review must use the post-objective exit rep");
+    }
+    if (/\bdid we already get the value\b/i.test(secondaryFocus)) {
+      issues.push("Drake secure review regressed to the generic objective-fight rep");
+    }
+    if (!/\bobjective entry never existed\b|\bfirst value window is done\b/i.test(allVisible)) {
+      issues.push("Drake secure review must separate objective entry from post-secure exit");
     }
   }
   if (requiresForensicPhaseStandard(recording)) {

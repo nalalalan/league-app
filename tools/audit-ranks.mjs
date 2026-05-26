@@ -102,6 +102,10 @@ for (const recording of rankRows) {
   if (recording.gameType === "Co-op vs AI Beginner" && /\bputs the game at\b/i.test(reason)) {
     fail(recording, "beginner bot game uses normal ranked-performance wording");
   }
+  if (file === "auto_NA1-5568519322_01.mp4" &&
+      !/\bfirst objective setup is grouped\b[\s\S]{0,160}\bsecured objective value\b/i.test(reason)) {
+    fail(recording, "Drake review rank reason must separate grouped objective setup from post-secure re-fight");
+  }
   if (queue === "unknown" && value >= minGoldValue) {
     fail(recording, `unverified queue cannot carry ${rank}`);
   }
