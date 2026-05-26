@@ -1683,7 +1683,7 @@ function reviewRepCategory(recording = {}) {
 
 function specificRepForRecording(recording = {}) {
   if ((recording.file || "") === "auto_NA1-5568519322_01.mp4") {
-    return "Rep: after any objective is secured, say: objective done - exit or next map result. Choose walk out with allies, mid wave, reset/spend, or Baron setup. No E/dash into brush unless an ally is still in front and the target is already trapped, CC'd, or low.";
+    return "Rep: after objective is secured, say objective done. Choose exit with allies, mid wave, reset/spend, or Baron setup. No E into brush unless ally is in front and target is trapped, CC'd, or low.";
   }
   const text = analysisCoachText(recording);
   switch (reviewRepCategory(recording)) {
@@ -3672,7 +3672,7 @@ function manualFeedback(file) {
       feedbackTitle: "Drake secure became one more death window",
       feedback: "The leak is the post-secure re-fight: after Drake is taken, you dash deeper into the brush fight instead of locking the objective value, so secured dragon tempo becomes another death timer and hands back map control that should become reset, mid wave, or Baron setup.",
       gameDetail: "At 24:50, Hextech Drake is already secured and your team is grouped near the bot-river exit, so the wrong click is dashing deeper into the brush fight and the next click is walk out with allies, catch mid/next wave, reset/spend, or posture for Baron. The first value window is done; by the death screen, the problem is not that the objective entry never existed, it is that the exit check after the objective was not respected.",
-      secondaryFocus: "Rep: after any objective is secured, say: objective done - exit or next map result. Choose walk out with allies, mid wave, reset/spend, or Baron setup. No E/dash into brush unless an ally is still in front and the target is already trapped, CC'd, or low.",
+      secondaryFocus: "Rep: after objective is secured, say objective done. Choose exit with allies, mid wave, reset/spend, or Baron setup. No E into brush unless ally is in front and target is trapped, CC'd, or low.",
       mistakeTypes: [
         "post-objective re-fight",
         "death-state exposure after value",
@@ -3688,7 +3688,7 @@ function manualFeedback(file) {
       evidence: "Manual frame inspection of the grouped objective setup, drake secure, extra river fight, and death-screen consequence from the same match.",
       pattern: "The game is not failing on the first setup. The legal group entry is there, but once the objective is already secured the click stays in fight mode too long, so won value keeps getting converted back into risk instead of tempo.",
       diamondRule: "After dragon is secured, Samira's next click is walk out with allies, catch mid or next wave, reset/spend, or posture for Baron; a forward brush re-entry is illegal unless an ally still fronts the screen and the target is already trapped, CC'd, or low.",
-      drill: "after any objective is secured, say: objective done - exit or next map result. Choose walk out with allies, mid wave, reset/spend, or Baron setup. No E/dash into brush unless an ally is still in front and the target is already trapped, CC'd, or low.",
+      drill: "after objective is secured, say objective done. Choose exit with allies, mid wave, reset/spend, or Baron setup. No E into brush unless ally is in front and target is trapped, CC'd, or low.",
       timeline: [
         "10:15 - Samira and support have a calm bot-lane wave state with room to reset or hold.",
         "22:50 - Samira is grouped with allies on a legal Baron setup.",
