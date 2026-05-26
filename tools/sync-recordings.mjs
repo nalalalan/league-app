@@ -3595,6 +3595,57 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5568316539_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Bot pressure kept turning into death timers",
+      feedback: "The leak is that bot-side pressure keeps becoming one more fight after the first wave or tower value, so real damage gets paid back as death timers instead of reset, group, or structure.",
+      gameDetail: "At 24:21, you are in the bot-side enemy-lane fight after earlier structure pressure, one ally has just died, enemies are in front, and no free tower, safe wave-only reset, or objective is guaranteed on screen, so the wrong click is staying available for the same fight and the next click is back through the wave to reset or group unless an ally is clearly in front and the target is already CC'd or low. By 26:39 that extra fight has become another death timer. The 10/9/2, 151 CS line says the damage is real, but nine deaths and 4.9 CS/min keep paying the lead back.",
+      secondaryFocus: "Rep: after bot wave or tower pressure gives value, take the first safe exit: structure if free, wave then reset/group, or one step behind ally front. Do not re-enter while you are catchable; no second forward E unless an ally is in front and the target is already CC'd or low.",
+      mistakeTypes: [
+        "bot pressure exit after value",
+        "second fight after structure pressure",
+        "death-state exposure",
+        "ally-front check",
+        "CS lost to death timers"
+      ],
+      eventEvidence: "9:56 shows a low-health recall under bot-side safety; 22:04 shows Samira pressuring enemy bot structure with allies and wave; 24:21 shows the same bot-side pressure becoming another fight after an ally dies; 26:39 shows the death timer.",
+      failureEvidence: "At 24:21 the first bot-side value has already shifted into an exit check: one ally is dead, enemies are in front, and no free structure or objective is guaranteed, so staying available turns pressure into the 26:39 death timer instead of reset, group, or wave control.",
+      goodThing: "At 9:56 you recall from low health instead of forcing another bot fight, and at 22:04 you pressure bot structure with allies and wave; keep those exit and structure-pressure shapes.",
+      whyTrust: "This uses inspected 9:56, 22:04, 24:21, 26:39, and 31:15 frames plus the League Client 10/9/2, 151 CS ranked context.",
+      focusTag: "bot pressure exit",
+      evidence: "Manual frame inspection of the bot pressure, exit, and death-timer windows plus League Client ranked stats for the same match.",
+      pattern: "The game shows real fighting pressure and some correct exits, but the repeat blocker is letting a good bot-side pressure window stay open after the safe result is gone.",
+      diamondRule: "After bot pressure gets value, Samira's next click is structure, wave into reset, group, or one step behind ally front; no second fight while catchable.",
+      drill: "after bot wave or tower pressure gives value, take the first safe exit: structure if free, wave then reset/group, or one step behind ally front. No second forward E while catchable.",
+      timeline: [
+        "9:56 - Samira recalls from low health under bot-side safety.",
+        "22:04 - Samira pressures enemy bot structure with allies and wave.",
+        "24:21 - Samira stays available in the same bot-side fight after an ally dies.",
+        "26:39 - Samira is dead after the extra bot-side fight.",
+        "31:15 - Final scoreboard context shows 10/9/2 with 151 CS."
+      ],
+      clockAnchors: [
+        { clock: "9:56", videoSeconds: 555.385, description: "Samira recalls from low health under bot-side safety." },
+        { clock: "22:04", videoSeconds: 1244.615, description: "Samira pressures enemy bot structure with allies and wave." },
+        { clock: "24:21", videoSeconds: 1382.462, description: "Samira stays available in the same bot-side fight after an ally dies." },
+        { clock: "26:39", videoSeconds: 1520.308, description: "Samira is dead after the extra bot-side fight." },
+        { clock: "31:15", videoSeconds: 1796, description: "The scoreboard context shows Samira at 10/9/2 with 151 CS." }
+      ],
+      nuance: [
+        "The damage is real: 10 kills and bot-side pressure show you can create fights.",
+        "The leak is the second bot-side fight after the first value window, not the first structure-pressure idea.",
+        "Nine deaths are the main rank blocker because they turn damage windows into dead time and lower CS/min.",
+        "The next-game rep is bot-pressure exit discipline: structure, wave reset, group, or behind ally front."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact inputs, cooldowns, or every hidden enemy, but it verifies the low-health recall, bot-structure pressure, 24:21 re-fight window, 26:39 death timer, and 10/9/2, 151 CS ranked context.",
+      outcome: "defeat",
+      outcomeLabel: "DEFEAT",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5568185590_01.mp4") {
     return {
       champion: "Samira",

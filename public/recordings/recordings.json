@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-25T23:26:08.701Z",
+  "generatedAt": "2026-05-26T01:52:00.750Z",
   "source": "League of Legends Highlights folder",
-  "match": "44 matches",
+  "match": "45 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -46,19 +46,20 @@
     "NA1-5567787430",
     "NA1-5567953154",
     "NA1-5568079693",
-    "NA1-5568185590"
+    "NA1-5568185590",
+    "NA1-5568316539"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 25, 2026, 6:31 PM ET",
-  "totalDuration": "698:32",
-  "totalRecordings": 56,
+  "captured": "May 18, 2026, 5:46 PM to May 25, 2026, 9:22 PM ET",
+  "totalDuration": "728:32",
+  "totalRecordings": 57,
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 25, 2026, 6:01 PM: newest full-game read Iron I; current 3-game read Bronze II; archive median Bronze III across 41 full games, used only as baseline context. The newest game is below the current three-game read.",
-    "rule": "The newest-game blocker is mid wave to river chase and ally-front check; the current repeat across the latest games is ally-front check, exit after first value, and mid wave to river chase. The keep-habit is you recall safely under turret after pressure, and earlier you play near wave plus ally context; keep that exit/setup habit.",
-    "nextRep": "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.",
+    "focus": "Synced through May 25, 2026, 8:45 PM: newest full-game read Iron II; current 3-game read Bronze IV; archive median Bronze IV across 42 full games, used only as baseline context. The newest game is below the current three-game read.",
+    "rule": "The newest-game blocker is bot pressure exit after value and second fight after structure pressure; the current repeat across the latest games is bot pressure exit after value, death-state exposure, and second fight after structure pressure. The keep-habit is you recall from low health instead of forcing another bot fight, and at 22:04 you pressure bot structure with allies and wave; keep those.",
+    "nextRep": "Rep: after bot wave or tower pressure gives value, take the first safe exit: structure if free, wave then reset/group, or one step behind ally front. Do not re-enter while you are catchable; no second forward E unless an ally is in front and the target is already CC'd or low.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
-    "pattern": "Latest file auto_NA1-5568185590_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
+    "pattern": "Latest file auto_NA1-5568316539_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
       "Read the newest-game point.",
       "Use the latest-game next action.",
@@ -71,21 +72,21 @@
     "method": "forensic performance-grade estimate with CS/min, death timing, entry legality, exit quality, conversion, queue, timestamp, and cross-game confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 42,
+    "fullReviewGames": 43,
     "queueCounts": {
       "unknown": 14,
       "bot": 14,
-      "ranked_solo": 14
+      "ranked_solo": 15
     },
-    "rankedFullGames": 14,
-    "pvpFullGames": 14,
+    "rankedFullGames": 15,
+    "pvpFullGames": 15,
     "botFullGames": 14,
-    "anchoredFullGames": 42,
-    "statFullGames": 42,
+    "anchoredFullGames": 43,
+    "statFullGames": 43,
     "rankLabelCounts": {
       "Bronze": 18,
       "Silver": 5,
-      "Iron": 19
+      "Iron": 20
     },
     "exactRankScale": [
       "Iron IV",
@@ -168,7 +169,7 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 55,
+      "recordings": 56,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
@@ -184,6 +185,175 @@
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5568316539_01.mp4",
+      "publicFile": "auto_NA1-5568316539_01.mp4",
+      "cacheKey": "56697089:1779758529156",
+      "fingerprint": "e06d0a883f3a",
+      "matchId": "NA1-5568316539",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779756318651,
+      "gameHappenedAt": "2026-05-26T00:45:18.651Z",
+      "gameHappenedAtLabel": "May 25, 2026, 8:45 PM",
+      "recordedAt": "2026-05-26T01:22:09.285Z",
+      "recordedAtLabel": "May 25, 2026, 9:22 PM",
+      "recordedAtTimeLabel": "9:22 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Bot pressure kept turning into death timers",
+      "duration": "30:00",
+      "durationSeconds": 1800,
+      "gameLength": "31:53",
+      "gameLengthSeconds": 1913,
+      "kda": "10/9/2",
+      "kills": 10,
+      "deaths": 9,
+      "assists": 2,
+      "cs": 151,
+      "statsSource": "League Client match history",
+      "win": false,
+      "outcome": "defeat",
+      "outcomeLabel": "DEFEAT",
+      "outcomeSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Bot pressure kept turning into death timers",
+      "feedback": "The leak is that bot-side pressure keeps becoming one more fight after the first wave or tower value, so real damage gets paid back as death timers instead of reset, group, or structure.",
+      "gameDetail": "At 24:21, you are in the bot-side enemy-lane fight after earlier structure pressure, one ally has just died, enemies are in front, and no free tower, safe wave-only reset, or objective is guaranteed on screen, so the wrong click is staying available for the same fight and the next click is back through the wave to reset or group unless an ally is clearly in front and the target is already CC'd or low. By 26:39 that extra fight has become another death timer. The 10/9/2, 151 CS line says the damage is real, but nine deaths and 4. 9 CS/min keep paying the lead back.",
+      "secondaryFocus": "Rep: after bot wave or tower pressure gives value, take the first safe exit: structure if free, wave then reset/group, or one step behind ally front. Do not re-enter while you are catchable; no second forward E unless an ally is in front and the target is already CC'd or low.",
+      "mistakeTypes": [
+        "bot pressure exit after value",
+        "second fight after structure pressure",
+        "death-state exposure",
+        "ally-front check",
+        "CS lost to death timers"
+      ],
+      "eventEvidence": "9:56 shows a low-health recall under bot-side safety; 22:04 shows Samira pressuring enemy bot structure with allies and wave; 24:21 shows the same bot-side pressure becoming another fight after an ally dies; 26:39 shows the death timer.",
+      "failureEvidence": "At 24:21 the first bot-side value has already shifted into an exit check: one ally is dead, enemies are in front, and no free structure or objective is guaranteed, so staying available turns pressure into the 26:39 death timer instead of reset, group, or wave control.",
+      "goodThing": "At 9:56 you recall from low health instead of forcing another bot fight, and at 22:04 you pressure bot structure with allies and wave; keep those exit and structure-pressure shapes.",
+      "whyTrust": "This uses inspected 9:56, 22:04, 24:21, 26:39, and 31:15 frames plus the League Client 10/9/2, 151 CS ranked context.",
+      "focusTag": "bot pressure exit",
+      "evidence": "Manual frame inspection of the bot pressure, exit, and death-timer windows plus League Client ranked stats for the same match.",
+      "pattern": "The game shows real fighting pressure and some correct exits, but the repeat blocker is letting a good bot-side pressure window stay open after the safe result is gone.",
+      "diamondRule": "After bot pressure gets value, Samira's next click is structure, wave into reset, group, or one step behind ally front; no second fight while catchable.",
+      "drill": "after bot wave or tower pressure gives value, take the first safe exit: structure if free, wave then reset/group, or one step behind ally front. No second forward E while catchable.",
+      "timeline": [
+        "9:56 - Samira recalls from low health under bot-side safety.",
+        "22:04 - Samira pressures enemy bot structure with allies and wave.",
+        "24:21 - Samira stays available in the same bot-side fight after an ally dies.",
+        "26:39 - Samira is dead after the extra bot-side fight.",
+        "31:15 - Final scoreboard context shows 10/9/2 with 151 CS."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "9:56",
+          "videoSeconds": 555.385,
+          "description": "Samira recalls from low health under bot-side safety."
+        },
+        {
+          "clock": "22:04",
+          "videoSeconds": 1244.615,
+          "description": "Samira pressures enemy bot structure with allies and wave."
+        },
+        {
+          "clock": "24:21",
+          "videoSeconds": 1382.462,
+          "description": "Samira stays available in the same bot-side fight after an ally dies."
+        },
+        {
+          "clock": "26:39",
+          "videoSeconds": 1520.308,
+          "description": "Samira is dead after the extra bot-side fight."
+        },
+        {
+          "clock": "31:15",
+          "videoSeconds": 1796,
+          "description": "The scoreboard context shows Samira at 10/9/2 with 151 CS."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "9:56",
+          "videoSeconds": 555.385,
+          "description": "shows a low-health recall under bot-side safety"
+        },
+        {
+          "clock": "22:04",
+          "videoSeconds": 1244.615,
+          "description": "shows Samira pressuring enemy bot structure with allies and wave"
+        },
+        {
+          "clock": "24:21",
+          "videoSeconds": 1382.462,
+          "description": "shows the same bot-side pressure becoming another fight after an ally dies"
+        },
+        {
+          "clock": "26:39",
+          "videoSeconds": 1520.308,
+          "description": "shows the death timer."
+        }
+      ],
+      "nuance": [
+        "The damage is real: 10 kills and bot-side pressure show you can create fights.",
+        "The leak is the second bot-side fight after the first value window, not the first structure-pressure idea.",
+        "Nine deaths are the main rank blocker because they turn damage windows into dead time and lower CS/min.",
+        "The next-game rep is bot-pressure exit discipline: structure, wave reset, group, or behind ally front."
+      ],
+      "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs, cooldowns, or every hidden enemy, but it verifies the low-health recall, bot-structure pressure, 24:21 re-fight window, 26:39 death timer, and 10/9/2, 151 CS ranked context.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
+      "sampledFrames": 14,
+      "publicVideoBytes": 56697089,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5568316539_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5568316539-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-25-performance-rank-v7",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "score": 13,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 98,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "4.7 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v5",
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "reason": "4.7 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
+      }
+    },
     {
       "file": "auto_NA1-5568185590_01.mp4",
       "publicFile": "auto_NA1-5568185590_01.mp4",
@@ -566,7 +736,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Jungle fight continued after first value",
