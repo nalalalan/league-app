@@ -60,6 +60,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5568519322_01.mp4",
   "auto_NA1-5568316539_01.mp4",
   "auto_NA1-5568185590_01.mp4",
   "auto_NA1-5568079693_01.mp4",
@@ -1602,6 +1603,9 @@ function kdaParts(recording = {}) {
 }
 
 function reviewRepCategory(recording = {}) {
+  if ((recording.file || "") === "auto_NA1-5568519322_01.mp4") {
+    return "objectiveFight";
+  }
   const text = [
     recording.feedbackTitle,
     recording.feedback,
@@ -3607,6 +3611,52 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5568519322_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Drake secure became one more death window",
+      feedback: "The leak is turning a finished dragon win into one more brush fight, so secured objective value becomes dead time instead of reset, mid wave, or Baron setup.",
+      gameDetail: "At 24:50, Hextech Drake is already secured, your team is grouped on the bot-river exit, and the legal value left is leave through river, catch the next wave, or reset, so the wrong click is dashing deeper into the brush fight and the next click is walk out with allies, spend mid, or base for the next setup. By 26:51 you are on death screen, which matters because the extra fight deletes the dragon payout and hands back tempo that should have become map control.",
+      secondaryFocus: "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already trapped or low.",
+      mistakeTypes: [
+        "post-objective re-fight",
+        "death-state exposure after value",
+        "river and brush chase drift",
+        "exit discipline after secure",
+        "map tempo handback"
+      ],
+      eventEvidence: "10:15 shows a stable bot reset state with wave and support; 22:50 shows a legal Baron setup with allies grouped; 24:50 shows Hextech Drake already secured while Samira is still fighting in the river choke; 26:51 shows the death screen after the extra re-fight.",
+      failureEvidence: "At 24:50 the objective is already won and allies are positioned to leave with the dragon payout, but staying in the river brush fight turns a finished secure into the 26:51 death timer instead of wave, reset, or the next neutral setup.",
+      goodThing: "The setup before the throw is real: the 22:50 Baron posture is patient and grouped, and the 24:50 drake secure shows you can arrive to an objective with allies instead of face-checking alone; keep that first entry shape.",
+      whyTrust: "This uses inspected 10:15, 22:50, 24:50, and 26:51 frames from the same recorded match, so the coaching is tied to one visible post-objective re-entry mistake rather than a generic Samira rule.",
+      focusTag: "post-objective exit",
+      evidence: "Manual frame inspection of the grouped objective setup, drake secure, extra river fight, and death-screen consequence from the same match.",
+      pattern: "The game is not failing on the first setup. The legal group entry is there, but once the objective is already secured the click stays in fight mode too long, so won value keeps getting converted back into risk instead of tempo.",
+      diamondRule: "After dragon is secured, Samira's next click is leave with allies, catch wave, or reset; a forward brush re-entry is illegal unless an ally still fronts the screen and the target is already trapped or low.",
+      drill: "after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already trapped or low.",
+      timeline: [
+        "10:15 - Samira and support have a calm bot-lane wave state with room to reset or hold.",
+        "22:50 - Samira is grouped with allies on a legal Baron setup.",
+        "24:50 - Your team has slain the Hextech Drake while Samira is still in the river choke fight.",
+        "26:51 - Samira is on death screen after the extra post-dragon re-fight."
+      ],
+      clockAnchors: [
+        { clock: "10:15", videoSeconds: 615, description: "Samira and support have a calm bot-lane wave state with room to reset or hold." },
+        { clock: "22:50", videoSeconds: 1370, description: "Samira is grouped with allies on a legal Baron setup." },
+        { clock: "24:50", videoSeconds: 1490, description: "Your team has already secured Hextech Drake while Samira is still fighting in the river choke." },
+        { clock: "26:51", videoSeconds: 1611, description: "Samira is on death screen after the extra post-dragon re-fight." }
+      ],
+      nuance: [
+        "The grouped Baron and dragon setups are good enough to show improving objective arrival.",
+        "The leak starts after the objective is already won, not at the first engage.",
+        "The punish is tempo handback: the extra river fight creates dead time instead of map control.",
+        "The next-game cleaner is a post-objective exit script, not a generic aggression nerf."
+      ],
+      reviewLimit: "Manual 2 FPS frame review cannot prove every cooldown, fogged flank, or exact click sequence, but it verifies the grouped Baron setup, the secured Hextech Drake state, the continued river fight, and the later death-screen consequence.",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5568447928_01.mp4") {
     return {
       champion: "Samira",
