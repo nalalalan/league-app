@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T06:03:35.038Z",
+  "generatedAt": "2026-05-26T06:08:30.026Z",
   "source": "League of Legends Highlights folder",
   "match": "47 matches",
   "matches": [
@@ -57,7 +57,7 @@
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 26, 2026, 12:19 AM: newest full-game read Iron IV; current 3-game read Iron I; archive median Bronze IV across 44 full games, used only as baseline context. The newest game is below the current three-game read.",
+    "focus": "Synced through May 26, 2026, 12:19 AM: newest full-game read Iron II; current 3-game read Bronze IV; archive median Bronze IV across 44 full games, used only as baseline context. The newest game is around the current three-game read.",
     "rule": "The newest-game blocker is post-objective re-fight and death-state exposure after value; the current repeat across the latest games is death-state exposure, death-state exposure after value, and post-objective re-fight. The keep-habit is The setup before the death is real: the 22:50 Baron posture is patient and grouped, and the Drake secure shows you can arrive to objectives with.",
     "nextRep": "Rep: after any objective is secured, say: objective done - exit or next map result. Choose walk out with allies, mid wave, reset/spend, or Baron setup. No E/dash into brush unless an ally is still in front and the target is already trapped, CC'd, or low.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
@@ -229,7 +229,7 @@
       "confidence": "high",
       "feedbackTitle": "Drake secure became one more death window",
       "feedback": "The leak is the post-secure re-fight: after Drake is taken, you dash deeper into the brush fight instead of locking the objective value, so secured dragon tempo becomes another death timer and hands back map control that should become reset, mid wave, or Baron setup.",
-      "gameDetail": "At 24:50, hextech Drake already secured while Samira is still fighting in the river choke, so the wrong click is stepping forward after the safe payout disappeared and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. By the death screen, the problem is not that the objective entry never existed; it is that the exit check after the objective was not respected.",
+      "gameDetail": "At 24:50, Hextech Drake is already secured and your team is grouped near the bot-river exit, so the wrong click is dashing deeper into the brush fight and the next click is walk out with allies, catch mid/next wave, reset/spend, or posture for Baron. The first value window is done; by the death screen, the problem is not that the objective entry never existed, it is that the exit check after the objective was not respected.",
       "secondaryFocus": "Rep: after any objective is secured, say: objective done - exit or next map result. Choose walk out with allies, mid wave, reset/spend, or Baron setup. No E/dash into brush unless an ally is still in front and the target is already trapped, CC'd, or low.",
       "mistakeTypes": [
         "post-objective re-fight",
@@ -304,9 +304,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron IV",
-        "exactRankValue": 0,
-        "score": 5,
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
+        "score": 14,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -330,17 +330,17 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.1 CS/min and 9 deaths keep the game at Iron IV even though the first objective setup is grouped; the main leak is turning secured objective value into another brush fight instead of exit, wave, reset, or Baron setup."
+        "reason": "4.1 CS/min and 9 deaths keep the game at Iron II even though the first objective setup is grouped; the main leak is turning secured objective value into another brush fight instead of exit, wave, reset, or Baron setup."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron IV",
-        "exactRankValue": 0,
+        "exactRank": "Iron II",
+        "exactRankValue": 2,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "4.1 CS/min and 9 deaths keep the game at Iron IV even though the first objective setup is grouped; the main leak is turning secured objective value into another brush fight instead of exit, wave, reset, or Baron setup."
+        "reason": "4.1 CS/min and 9 deaths keep the game at Iron II even though the first objective setup is grouped; the main leak is turning secured objective value into another brush fight instead of exit, wave, reset, or Baron setup."
       }
     },
     {

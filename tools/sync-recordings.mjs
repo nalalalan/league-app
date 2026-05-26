@@ -3671,7 +3671,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Drake secure became one more death window",
       feedback: "The leak is the post-secure re-fight: after Drake is taken, you dash deeper into the brush fight instead of locking the objective value, so secured dragon tempo becomes another death timer and hands back map control that should become reset, mid wave, or Baron setup.",
-      gameDetail: "At 24:50, Hextech Drake is already secured and your team is grouped near the bot-river exit, so the first value window is done: the correct next click is walk out with allies, catch mid/next wave, reset/spend, or posture for Baron. By the death screen, the problem is not that the objective entry never existed; it is that the exit check after the objective was not respected.",
+      gameDetail: "At 24:50, Hextech Drake is already secured and your team is grouped near the bot-river exit, so the wrong click is dashing deeper into the brush fight and the next click is walk out with allies, catch mid/next wave, reset/spend, or posture for Baron. The first value window is done; by the death screen, the problem is not that the objective entry never existed, it is that the exit check after the objective was not respected.",
       secondaryFocus: "Rep: after any objective is secured, say: objective done - exit or next map result. Choose walk out with allies, mid wave, reset/spend, or Baron setup. No E/dash into brush unless an ally is still in front and the target is already trapped, CC'd, or low.",
       mistakeTypes: [
         "post-objective re-fight",
