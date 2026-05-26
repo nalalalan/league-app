@@ -181,7 +181,11 @@ async function queueStatusFields() {
           basis: activeQueueEta.etaBasis || "live stage estimate"
         }
       : await estimateQueuedReviewSeconds(item);
-    const startEtaSeconds = cumulativeSeconds;
+    const retryAfterMs = Date.parse(item.retryAfter || "");
+    const retryWaitSeconds = !isActive && Number.isFinite(retryAfterMs) && retryAfterMs > now
+      ? Math.max(0, Math.round((retryAfterMs - now) / 1000))
+      : 0;
+    const startEtaSeconds = Math.max(cumulativeSeconds, retryWaitSeconds);
     const stageEtaSeconds = estimate.seconds;
     const etaSeconds = startEtaSeconds + stageEtaSeconds;
     const estimatedStartAt = new Date(now + startEtaSeconds * 1000).toISOString();
@@ -189,11 +193,15 @@ async function queueStatusFields() {
     items.push({
       label: `review ${index + 1}`,
       status: isActive ? "processing" : "queued",
-      stage: isActive ? activeQueueStage || "processing" : "queued",
-      stageLabel: isActive ? activeQueueStageLabel || "processing review" : (index === 0 ? "next to process" : "waiting behind earlier review"),
+      stage: isActive ? activeQueueStage || "processing" : (retryWaitSeconds ? "retry-wait" : "queued"),
+      stageLabel: isActive
+        ? activeQueueStageLabel || "processing review"
+        : (retryWaitSeconds ? "waiting for feedback retry" : (index === 0 ? "next to process" : "waiting behind earlier review")),
       startedAt: clean(item.startedAt, ""),
       endedAt: clean(item.endedAt, ""),
       queuedAt: clean(item.queuedAt, ""),
+      retryAfter: clean(item.retryAfter, ""),
+      retryCount: Number.isFinite(Number(item.retryCount)) ? Number(item.retryCount) : 0,
       estimatedStartAt,
       estimatedReadyAt,
       startEtaSeconds,
@@ -1497,7 +1505,10 @@ async function finalizeSession(session) {
         await log(`Review generation failed after clip creation; keeping status retrying instead of blocked: ${error.message}`);
         await publishRecorderStatus("processing", retryFields, { force: true });
         holdIdleStatus("processing", retryFields);
-        return;
+        const retryError = new Error("Review generation retry needed after clip creation.");
+        retryError.retryableReview = true;
+        retryError.outputFile = outputFile;
+        throw retryError;
       }
       const blockedLine = combinedOutput.match(/Publish blocked[^\r\n]*/i)?.[0];
       const detail = blockedLine || "Review clip created, but the site publish failed. Check publisher log.";
@@ -1531,6 +1542,24 @@ async function processPostGameQueue() {
   try {
     while (postGameQueue.length) {
       const item = postGameQueue[0];
+      const retryAfterMs = Date.parse(item.retryAfter || "");
+      if (Number.isFinite(retryAfterMs) && retryAfterMs > Date.now()) {
+        const retryDelayMs = Math.max(1000, retryAfterMs - Date.now());
+        await publishRecorderStatus("processing", {
+          label: "review retrying",
+          detail: "Review clip saved; feedback generation is waiting to retry.",
+          progress: 86,
+          etaSeconds: Math.round(retryDelayMs / 1000),
+          estimatedReadyAt: new Date(retryAfterMs).toISOString(),
+          etaBasis: "waiting for feedback retry"
+        }, { force: true });
+        setTimeout(() => {
+          processPostGameQueue().catch((retryError) => {
+            log(`Post-game retry worker failed: ${retryError.stack || retryError.message}`).catch(() => {});
+          });
+        }, retryDelayMs).unref?.();
+        break;
+      }
       const session = deserializeSession(item);
       await log(`Processing queued review ${session.sessionRoot}.`);
       activeQueueSessionRoot = session.sessionRoot;
@@ -1550,16 +1579,43 @@ async function processPostGameQueue() {
       try {
         await finalizeSession(session);
         await log(`Queued review finished ${session.sessionRoot}.`);
+        postGameQueue.shift();
+        await savePostGameQueue();
       } catch (error) {
+        if (error?.retryableReview) {
+          const retryCount = Number(item.retryCount || 0) + 1;
+          const retryDelayMs = Math.min(15 * 60 * 1000, Math.max(2 * 60 * 1000, retryCount * 2 * 60 * 1000));
+          item.retryCount = retryCount;
+          item.retryAfter = new Date(Date.now() + retryDelayMs).toISOString();
+          item.lastError = clean(error.message || "review generation retry needed");
+          if (error.outputFile) item.outputFile = error.outputFile;
+          await savePostGameQueue();
+          await log(`Queued review kept for retry ${retryCount} after publish/analyze failure: ${error.message}`);
+          await publishRecorderStatus("processing", {
+            ...sessionStatusFields(session, "Review clip saved; feedback generation will retry."),
+            label: "review retrying",
+            progress: 86,
+            outputFile: error.outputFile || "",
+            etaSeconds: Math.round(retryDelayMs / 1000),
+            estimatedReadyAt: item.retryAfter,
+            etaBasis: "retrying after feedback generation rate limit or quality-gate failure"
+          }, { force: true });
+          setTimeout(() => {
+            processPostGameQueue().catch((retryError) => {
+              log(`Post-game retry worker failed: ${retryError.stack || retryError.message}`).catch(() => {});
+            });
+          }, retryDelayMs).unref?.();
+          break;
+        }
         await log(`Queued review failed and will not block later reviews: ${error.stack || error.message}`);
         await publishRecorderStatus("blocked", {
           ...sessionStatusFields(session, "Queued review failed while building the clip; the next queued review will continue."),
           progress: 100,
           ...clearEtaFields()
         }, { force: true });
-      } finally {
         postGameQueue.shift();
         await savePostGameQueue();
+      } finally {
         activeQueueSessionRoot = "";
         activeQueueStage = "";
         activeQueueStageLabel = "";

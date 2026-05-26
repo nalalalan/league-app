@@ -60,6 +60,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5568316539_01.mp4",
   "auto_NA1-5568185590_01.mp4",
   "auto_NA1-5568079693_01.mp4",
   "auto_NA1-5567953154_01.mp4",
@@ -3543,6 +3544,9 @@ function performanceRankReason(recording = {}, context = {}) {
   if (category === "cleanerWinExit") {
     return `${kdaText} and only ${deathText} are positives, while ${csText} plus the remaining fight-entry or exit/value leak keep the performance at ${rank} rather than higher.`;
   }
+  if (category === "deathExit" && Number.isFinite(kills) && kills >= 8 && Number.isFinite(deaths) && deaths >= 5) {
+    return `${csText} with ${kdaText} puts the game at ${rank}: damage pressure exists, but ${deathText} and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group.`;
+  }
   const entryClause = flags.illegalEntry ? "because fight entry is still catchable" : "with mixed fight-entry evidence";
   const leakClause = flags.stateFlipExit
     ? "the main leak is exit/re-entry after first value"
@@ -3601,7 +3605,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Bot pressure kept turning into death timers",
       feedback: "The leak is that bot-side pressure keeps becoming one more fight after the first wave or tower value, so real damage gets paid back as death timers instead of reset, group, or structure.",
-      gameDetail: "At 24:21, you are in the bot-side enemy-lane fight after earlier structure pressure, one ally has just died, enemies are in front, and no free tower, safe wave-only reset, or objective is guaranteed on screen, so the wrong click is staying available for the same fight and the next click is back through the wave to reset or group unless an ally is clearly in front and the target is already CC'd or low. By 26:39 that extra fight has become another death timer. The 10/9/2, 151 CS line says the damage is real, but nine deaths and 4.9 CS/min keep paying the lead back.",
+      gameDetail: "At 24:21, you are in the bot-side enemy-lane fight after earlier structure pressure, one ally has just died, enemies are in front, and no free tower, safe wave-only reset, or objective is guaranteed on screen, so the wrong click is staying available for the same fight and the next click is back through the wave to reset or group unless an ally is clearly in front and the target is already CC'd or low. By 26:39 that extra fight has become another death timer. The 10/9/2, 151 CS line says the damage is real, but nine deaths and under 5 CS/min keep paying the lead back.",
       secondaryFocus: "Rep: after bot wave or tower pressure gives value, take the first safe exit: structure if free, wave then reset/group, or one step behind ally front. Do not re-enter while you are catchable; no second forward E unless an ally is in front and the target is already CC'd or low.",
       mistakeTypes: [
         "bot pressure exit after value",

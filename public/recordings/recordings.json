@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T01:52:00.750Z",
+  "generatedAt": "2026-05-26T02:05:46.780Z",
   "source": "League of Legends Highlights folder",
   "match": "45 matches",
   "matches": [
@@ -227,7 +227,7 @@
       "confidence": "high",
       "feedbackTitle": "Bot pressure kept turning into death timers",
       "feedback": "The leak is that bot-side pressure keeps becoming one more fight after the first wave or tower value, so real damage gets paid back as death timers instead of reset, group, or structure.",
-      "gameDetail": "At 24:21, you are in the bot-side enemy-lane fight after earlier structure pressure, one ally has just died, enemies are in front, and no free tower, safe wave-only reset, or objective is guaranteed on screen, so the wrong click is staying available for the same fight and the next click is back through the wave to reset or group unless an ally is clearly in front and the target is already CC'd or low. By 26:39 that extra fight has become another death timer. The 10/9/2, 151 CS line says the damage is real, but nine deaths and 4. 9 CS/min keep paying the lead back.",
+      "gameDetail": "At 24:21, you are in the bot-side enemy-lane fight after earlier structure pressure, one ally has just died, enemies are in front, and no free tower, safe wave-only reset, or objective is guaranteed on screen, so the wrong click is staying available for the same fight and the next click is back through the wave to reset or group unless an ally is clearly in front and the target is already CC'd or low. By 26:39 that extra fight has become another death timer. The 10/9/2, 151 CS line says the damage is real, but nine deaths and under 5 CS/min keep paying the lead back.",
       "secondaryFocus": "Rep: after bot wave or tower pressure gives value, take the first safe exit: structure if free, wave then reset/group, or one step behind ally front. Do not re-enter while you are catchable; no second forward E unless an ally is in front and the target is already CC'd or low.",
       "mistakeTypes": [
         "bot pressure exit after value",
@@ -345,13 +345,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.7 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
+        "reason": "4.7 CS/min with 10/9/2 K/D/A puts the game at Iron II: damage pressure exists, but 9 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
-        "reason": "4.7 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
+        "reason": "4.7 CS/min with 10/9/2 K/D/A puts the game at Iron II: damage pressure exists, but 9 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
     {
@@ -1981,13 +1981,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.9 CS/min and 6 deaths put the game at Bronze IV because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
+        "reason": "5.9 CS/min with 12/6/5 K/D/A puts the game at Bronze IV: damage pressure exists, but 6 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
-        "reason": "5.9 CS/min and 6 deaths put the game at Bronze IV because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
+        "reason": "5.9 CS/min with 12/6/5 K/D/A puts the game at Bronze IV: damage pressure exists, but 6 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
     {
@@ -2420,13 +2420,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.1 CS/min and 13 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
+        "reason": "4.1 CS/min with 9/13/11 K/D/A puts the game at Iron II: damage pressure exists, but 13 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
-        "reason": "4.1 CS/min and 13 deaths put the game at Iron II because fight entry is still catchable; the main leak is turning pressure into a safe exit or map result."
+        "reason": "4.1 CS/min with 9/13/11 K/D/A puts the game at Iron II: damage pressure exists, but 13 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
     {
@@ -5297,13 +5297,13 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "7.7 CS/min and 12 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
+        "reason": "7.7 CS/min with 15/12/3 K/D/A puts the game at Iron I: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "7.7 CS/min and 12 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
+        "reason": "7.7 CS/min with 15/12/3 K/D/A puts the game at Iron I: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
     {
@@ -5764,7 +5764,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "3.9 CS/min and 12 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
+        "reason": "3.9 CS/min with 8/12/2 K/D/A puts the game at Iron IV: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       },
       "captureFps": 6,
       "win": true,
@@ -5775,7 +5775,7 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
-        "reason": "3.9 CS/min and 12 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
+        "reason": "3.9 CS/min with 8/12/2 K/D/A puts the game at Iron IV: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
     {
