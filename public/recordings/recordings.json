@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T05:09:30.642Z",
+  "generatedAt": "2026-05-26T05:17:26.462Z",
   "source": "League of Legends Highlights folder",
   "match": "47 matches",
   "matches": [
@@ -347,6 +347,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "4.1 CS/min and 9 deaths pull the game to Iron II with objective-entry quality still not fully proven; the main leak is exit/re-entry after first value."
       }
     },
@@ -392,7 +396,7 @@
       "confidence": "high",
       "feedbackTitle": "Bot siege became a jungle chase",
       "feedback": "The leak is that a winning bot siege keeps turning into one more chase off the tower line, so free structure tempo becomes low-value jungle fighting and another avoidable death window.",
-      "gameDetail": "At 9:58, you have bot wave under enemy tower with an ally beside you and the defender already backing off, so the wrong click is following the retreat path into red-side jungle and the next click is hit the free tower, clear the wave, or reset behind ally cover. By 10:34 you are low in enemy jungle instead of spending the bot-side value cleanly. The game still finishes as a 20/4/3, 117 CS win, but the four deaths and sub-6 CS/min leak still come from these extra chase windows after lane pressure already paid.",
+      "gameDetail": "At 9:58, you have bot wave under enemy tower with an ally beside you and the defender already backing off, so the wrong click is following the retreat path into red-side jungle and the next click is hit the free tower, clear the wave, or reset behind ally cover. By 10:34 you are low in enemy jungle instead of spending the bot-side value cleanly. The Co-op AI clip still finishes as a 20/4/3, 117 CS win, about 5. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
       "secondaryFocus": "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.",
       "mistakeTypes": [
         "bot siege exit after value",
@@ -404,9 +408,9 @@
       "eventEvidence": "9:34 shows Samira winning the bot-side fight at tower; 9:58 shows the wave still at tower with an ally nearby; 10:10 shows the chase continuing away from the structure; 10:34 shows Samira low in red-side jungle instead of finishing the tower or cashing out.",
       "failureEvidence": "At 9:58, the wave still at tower with an ally nearby; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.",
       "goodThing": "You do create the winning bot-side state first: the 9:34 fight is aggressive in a way that earns tower pressure, and the later game shows cleaner grouped mid pressure off your lead; keep that first-win confidence.",
-      "whyTrust": "This uses inspected 9:34, 9:58, 10:10, 10:34, and 18:58 frames plus the League Client 20/4/3, 117 CS ranked context.",
+      "whyTrust": "This uses inspected 9:34, 9:58, 10:10, 10:34, and 18:58 frames plus the League Client 20/4/3, 117 CS Co-op AI context.",
       "focusTag": "bot siege exit",
-      "evidence": "Manual frame inspection of the bot-tower siege, chase continuation, and later ranked-stat context from the same match.",
+      "evidence": "Manual frame inspection of the bot-tower siege, chase continuation, and later Co-op AI stat context from the same match.",
       "pattern": "This is a better game than the recent losses because the first engage wins real map space, but the remaining leak is still spending that pressure on a chase after tower value is already available.",
       "diamondRule": "When bot pressure reaches tower with wave and ally cover, Samira spends that state on structure, wave, or reset first; chasing into jungle is illegal unless an ally still fronts the next screen and the target is already trapped.",
       "drill": "after bot siege wins space, say tower, wave, or base before you click at the runner. If the runner is outside tower line and no ally is front, drop it.",
@@ -470,9 +474,9 @@
         "The opening bot-side fight is good enough to earn real tower pressure.",
         "The leak starts only after the structure line is won and the click keeps following the retreat path.",
         "Because the game is already winning, the remaining coaching point should stay narrow: spend siege value before chasing.",
-        "The 20/4/3 line shows real carry pressure; the remaining rank cleaner is cutting the four extra death windows and turning them into farm or resets."
+        "The 20/4/3 line shows real carry pressure; the ranked-habit cleaner is cutting the four extra death windows and turning them into farm or resets."
       ],
-      "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns, unseen flank positions, or every hidden enemy, but it verifies the bot-tower fight win, the 9:58 tower-value state, the chase continuation, the low-health jungle exit, and the 20/4/3, 117 CS ranked context.",
+      "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns, unseen flank positions, every hidden enemy, or a clean PvP rank translation, but it verifies the bot-tower fight win, the 9:58 tower-value state, the chase continuation, the low-health jungle exit, and the 20/4/3, 117 CS Co-op AI context.",
       "analysisSource": "manual",
       "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
       "sampledFrames": 14,
@@ -496,7 +500,7 @@
         "percentile": "developing",
         "confidenceSignals": [
           "near-full macro recording",
-          "K/D/A, CS, and game length are available",
+          "K/D/A, CS, and clip duration are available",
           "visible timestamp anchors exist",
           "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
@@ -511,13 +515,17 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "0.0 CS/min with 20/4/3 K/D/A and 4 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "5.8 CS/min with 20/4/3 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "0.0 CS/min with 20/4/3 K/D/A and 4 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "5.8 CS/min with 20/4/3 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       }
     },
     {
@@ -686,6 +694,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "4.7 CS/min with 10/9/2 K/D/A puts the game at Iron II: damage pressure exists, but 9 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
@@ -861,6 +873,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "5.4 CS/min is usable, but 4/6/1 K/D/A, 6 deaths, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at Iron I."
       }
     },
@@ -1031,6 +1047,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "7/3/10 K/D/A and only 3 deaths are positives, while 5.4 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
       }
     },
@@ -1201,6 +1221,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Bronze I."
       }
     },
@@ -1343,6 +1367,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron III",
         "exactRankValue": 1,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "4.3 CS/min and 9 deaths pull the game to Iron III even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
       }
     },
@@ -1507,6 +1535,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "3.7 CS/min is playable, but 0/5/0 K/D/A with 5 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       }
     },
@@ -1671,6 +1703,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "8/3/6 K/D/A and only 3 deaths are positives, while 5.3 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
       }
     },
@@ -1841,6 +1877,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "3.8 CS/min and 10 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       }
     },
@@ -2005,6 +2045,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver I",
         "exactRankValue": 11,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "5.4 CS/min and 1 death put the game at Silver I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
@@ -2169,6 +2213,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "3.2 CS/min and 3 deaths put the game at Bronze III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
@@ -2322,6 +2370,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "5.9 CS/min with 12/6/5 K/D/A puts the game at Bronze IV: damage pressure exists, but 6 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
@@ -2475,6 +2527,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "4.0 CS/min with 25/8/9 K/D/A and 8 deaths puts the game at Bronze III: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       }
     },
@@ -2618,6 +2674,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "5.2 CS/min is playable, but 0/5/6 K/D/A with 5 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       }
     },
@@ -2761,6 +2821,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "4.1 CS/min with 9/13/11 K/D/A puts the game at Iron II: damage pressure exists, but 13 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
@@ -2926,6 +2990,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "5.9 CS/min is playable, but 1/6/1 K/D/A with 6 deaths keeps the game at Iron II; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       }
     },
@@ -3096,6 +3164,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "6.2 CS/min is playable, but 0/7/1 K/D/A with 7 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       }
     },
@@ -3277,6 +3349,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "4.8 CS/min and 10 deaths pull the game to Iron I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
@@ -3566,6 +3642,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "5.7 CS/min and 7 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
@@ -3719,6 +3799,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze IV",
         "exactRankValue": 4,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "5.3 CS/min and 9 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
       }
     },
@@ -3898,6 +3982,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "5.7 CS/min is playable, but 1/6/3 K/D/A with 6 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       }
     },
@@ -4082,6 +4170,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron II",
         "exactRankValue": 2,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
         "reason": "5.3 CS/min and 13 deaths pull the game to Iron II because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
       }
     },
@@ -4243,7 +4335,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.0 CS/min and 1 death put the game at Bronze III with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
+        "reason": "4.0 CS/min with 6/1/2 K/D/A and 1 death is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 1,
       "win": true,
@@ -4254,7 +4346,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "4.0 CS/min and 1 death put the game at Bronze III with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "4.0 CS/min with 6/1/2 K/D/A and 1 death is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -4373,7 +4469,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.5 CS/min and 3 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "5.5 CS/min with 14/3/3 K/D/A and 3 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 1,
       "win": true,
@@ -4384,7 +4480,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "5.5 CS/min and 3 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "5.5 CS/min with 14/3/3 K/D/A and 3 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -4503,7 +4603,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths puts the game at Silver IV: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths is a low-confidence ranked-habit read near Silver IV: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       },
       "captureFps": 1,
       "win": true,
@@ -4514,7 +4614,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
-        "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths puts the game at Silver IV: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths is a low-confidence ranked-habit read near Silver IV: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       }
     },
     {
@@ -4658,7 +4762,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths puts the game at Bronze III: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       },
       "captureFps": 2,
       "win": true,
@@ -4669,7 +4773,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths puts the game at Bronze III: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       }
     },
     {
@@ -4873,6 +4981,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "4.6 CS/min and 6 deaths put the game at Iron I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
@@ -5055,6 +5167,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "5.5 CS/min with 24/5/3 K/D/A and 5 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       }
     },
@@ -5214,7 +5330,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min and 3 deaths put the game at Bronze II with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
+        "reason": "5.4 CS/min with 4/3/7 K/D/A and 3 deaths is a low-confidence ranked-habit read near Bronze II: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 2,
       "win": true,
@@ -5225,7 +5341,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze II",
         "exactRankValue": 6,
-        "reason": "5.4 CS/min and 3 deaths put the game at Bronze II with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "reason": "5.4 CS/min with 4/3/7 K/D/A and 3 deaths is a low-confidence ranked-habit read near Bronze II: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -5432,6 +5552,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze II",
         "exactRankValue": 6,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
@@ -5638,6 +5762,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "7.7 CS/min with 15/12/3 K/D/A puts the game at Iron I: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
       }
     },
@@ -5794,7 +5922,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.7 CS/min and 3 deaths put the game at Iron I with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
+        "reason": "4.7 CS/min with 17/3/4 K/D/A and 3 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 4,
       "win": true,
@@ -5805,7 +5933,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "4.7 CS/min and 3 deaths put the game at Iron I with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "4.7 CS/min with 17/3/4 K/D/A and 3 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -5929,7 +6061,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.8 CS/min and 4 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "5.8 CS/min with 16/4/4 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 4,
       "win": true,
@@ -5940,7 +6072,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "5.8 CS/min and 4 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "5.8 CS/min with 16/4/4 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -6099,7 +6235,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "3.9 CS/min with 8/12/2 K/D/A puts the game at Iron IV: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
+        "reason": "3.9 CS/min with 8/12/2 K/D/A and 12 deaths is a low-confidence ranked-habit read near Iron IV: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 6,
       "win": true,
@@ -6110,7 +6246,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
-        "reason": "3.9 CS/min with 8/12/2 K/D/A puts the game at Iron IV: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "3.9 CS/min with 8/12/2 K/D/A and 12 deaths is a low-confidence ranked-habit read near Iron IV: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -6254,7 +6394,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "7.5 CS/min and 5 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "7.5 CS/min with 22/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 6,
       "win": true,
@@ -6265,7 +6405,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "7.5 CS/min and 5 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "7.5 CS/min with 22/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -6429,7 +6573,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       },
       "captureFps": 6,
       "win": true,
@@ -6440,7 +6584,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
-        "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       }
     },
     {
@@ -6589,7 +6737,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths puts the game at Iron I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       },
       "captureFps": 6,
       "win": true,
@@ -6600,7 +6748,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron I",
         "exactRankValue": 3,
-        "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths puts the game at Iron I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
       }
     },
     {
@@ -6759,7 +6911,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.6 CS/min and 6 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "4.6 CS/min with 20/6/3 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 6,
       "win": true,
@@ -6770,7 +6922,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
-        "reason": "4.6 CS/min and 6 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "4.6 CS/min with 20/6/3 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -6944,7 +7100,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.6 CS/min and 7 deaths put the game at Iron III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "4.6 CS/min with 15/7/0 K/D/A and 7 deaths is a low-confidence ranked-habit read near Iron III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 6,
       "win": true,
@@ -6955,7 +7111,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron III",
         "exactRankValue": 1,
-        "reason": "4.6 CS/min and 7 deaths put the game at Iron III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "reason": "4.6 CS/min with 15/7/0 K/D/A and 7 deaths is a low-confidence ranked-habit read near Iron III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -7099,7 +7259,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "2.7 CS/min and 7 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
+        "reason": "2.7 CS/min with 4/7/2 K/D/A and 7 deaths is a low-confidence ranked-habit read near Iron IV: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 10,
       "win": true,
@@ -7110,7 +7270,11 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron IV",
         "exactRankValue": 0,
-        "reason": "2.7 CS/min and 7 deaths put the game at Iron IV with mixed fight-entry evidence; the main leak is turning pressure into a safe exit or map result."
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
+        "reason": "2.7 CS/min with 4/7/2 K/D/A and 7 deaths is a low-confidence ranked-habit read near Iron IV: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
@@ -7414,6 +7578,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Iron III",
         "exactRankValue": 1,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "2.4 CS/min and 6 deaths put the game at Iron III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
@@ -7678,6 +7846,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze III",
         "exactRankValue": 5,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "4.2 CS/min and 3 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       }
     },
@@ -7942,6 +8114,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Silver IV",
         "exactRankValue": 8,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
         "reason": "6.6 CS/min and 4 deaths put the game at Silver IV with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       }
     },
@@ -8336,6 +8512,10 @@
         "version": "2026-05-25-performance-rank-v5",
         "exactRank": "Bronze I",
         "exactRankValue": 7,
+        "queueClass": "unknown",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "medium",
         "reason": "7.3 CS/min and 7 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
