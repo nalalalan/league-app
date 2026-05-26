@@ -43,6 +43,14 @@ async function readJson(filePath) {
   return JSON.parse(await fs.readFile(filePath, "utf8"));
 }
 
+async function readJsonOrNull(filePath) {
+  try {
+    return await readJson(filePath);
+  } catch {
+    return null;
+  }
+}
+
 async function shellJson(command) {
   const { stdout } = await execFileAsync("powershell.exe", ["-NoProfile", "-Command", command], {
     cwd: appRoot,
@@ -71,10 +79,48 @@ async function latestSourceVideo() {
     if (!entry.isFile() || !sourceVideoPattern.test(entry.name) || ignoredSourceVideoPattern.test(entry.name)) continue;
     const filePath = path.join(sourceDir, entry.name);
     const stat = await fs.stat(filePath);
+    const sidecar = await readJsonOrNull(`${filePath}.json`);
+    if (/^auto_/i.test(entry.name)) {
+      if (sidecar?.validForPublish === false) continue;
+      if (!sidecar?.matchId || !/^NA1-\d+$/.test(sidecar.matchId)) continue;
+    }
     videos.push({ name: entry.name, size: stat.size, mtimeMs: stat.mtimeMs });
   }
   videos.sort((a, b) => b.mtimeMs - a.mtimeMs || a.name.localeCompare(b.name));
   return videos[0] || null;
+}
+
+function nearEqualSeconds(a, b, tolerance = 2) {
+  const left = Number(a);
+  const right = Number(b);
+  return Number.isFinite(left) && Number.isFinite(right) && Math.abs(left - right) <= tolerance;
+}
+
+function sameCaptureWindow(a = {}, b = {}) {
+  if (!a.startedAt || !b.startedAt || Date.parse(a.startedAt) !== Date.parse(b.startedAt)) return false;
+  if (!a.endedAt || !b.endedAt || Date.parse(a.endedAt) !== Date.parse(b.endedAt)) return false;
+  return nearEqualSeconds(a.durationSeconds, b.durationSeconds) ||
+    nearEqualSeconds(a.sourceDurationSeconds, b.sourceDurationSeconds);
+}
+
+async function collapsedSourceCandidates(latest) {
+  const candidates = [latest.name];
+  const latestSidecar = await readJsonOrNull(path.join(sourceDir, `${latest.name}.json`));
+  if (latestSidecar?.matchId) candidates.push(`match:${latestSidecar.matchId}`);
+  if (!latestSidecar) return candidates;
+
+  const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isFile() || entry.name === latest.name || !sourceVideoPattern.test(entry.name) || ignoredSourceVideoPattern.test(entry.name)) continue;
+    const filePath = path.join(sourceDir, entry.name);
+    const stat = await fs.stat(filePath).catch(() => null);
+    if (!stat || Number(stat.size) !== Number(latest.size)) continue;
+    const sidecar = await readJsonOrNull(`${filePath}.json`);
+    if (!sidecar || !sameCaptureWindow(latestSidecar, sidecar)) continue;
+    candidates.push(entry.name);
+    if (sidecar.matchId) candidates.push(`match:${sidecar.matchId}`);
+  }
+  return [...new Set(candidates)];
 }
 
 async function recorderProcessCheck() {
@@ -147,11 +193,19 @@ async function manifestCheck() {
   if (!requireLatestLive) {
     return ok("live manifest", `${recordings.length} recordings live; latest-source check skipped for setup-only verification`);
   }
-  const found = recordings.find((item) => item.file === latest.name || item.publicFile === latest.name || String(item.src || "").endsWith(`/${latest.name}`));
+  const candidates = await collapsedSourceCandidates(latest);
+  const found = recordings.find((item) => candidates.some((candidate) => (
+    candidate.startsWith("match:")
+      ? item.matchId === candidate.slice("match:".length)
+      : item.file === candidate || item.publicFile === candidate || String(item.src || "").endsWith(`/${candidate}`)
+  )));
   if (!found) return fail("live manifest", `latest source ${latest.name} is not visible live`);
   const videoUrl = new URL(found.src, liveBase).toString();
   if (!(await headOk(videoUrl))) return fail("latest video", `${found.src} is not reachable`);
-  return ok("live manifest", `${recordings.length} recordings; latest ${latest.name}`);
+  const direct = found.file === latest.name || found.publicFile === latest.name || String(found.src || "").endsWith(`/${latest.name}`);
+  return ok("live manifest", direct
+    ? `${recordings.length} recordings; latest ${latest.name}`
+    : `${recordings.length} recordings; latest duplicate ${latest.name} collapsed to ${found.file || found.publicFile || found.src}`);
 }
 
 async function main() {

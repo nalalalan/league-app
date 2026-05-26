@@ -1720,9 +1720,9 @@ function ensureMistakeTypes(recording) {
 function kdaParts(recording = {}) {
   const parsed = String(recording.kda || "").match(/(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)/);
   return {
-    kills: Number.isFinite(Number(recording.kills)) ? Number(recording.kills) : (parsed ? Number(parsed[1]) : NaN),
-    deaths: Number.isFinite(Number(recording.deaths)) ? Number(recording.deaths) : (parsed ? Number(parsed[2]) : NaN),
-    assists: Number.isFinite(Number(recording.assists)) ? Number(recording.assists) : (parsed ? Number(parsed[3]) : NaN)
+    kills: Number.isFinite(finiteStatNumber(recording.kills)) ? finiteStatNumber(recording.kills) : (parsed ? Number(parsed[1]) : NaN),
+    deaths: Number.isFinite(finiteStatNumber(recording.deaths)) ? finiteStatNumber(recording.deaths) : (parsed ? Number(parsed[2]) : NaN),
+    assists: Number.isFinite(finiteStatNumber(recording.assists)) ? finiteStatNumber(recording.assists) : (parsed ? Number(parsed[3]) : NaN)
   };
 }
 
@@ -1742,7 +1742,7 @@ function reviewRepCategory(recording = {}) {
     recording.evidence
   ].join(" ").toLowerCase();
   const { kills, deaths } = kdaParts(recording);
-  const cs = Number(recording.cs);
+  const cs = finiteStatNumber(recording.cs);
   const gameLengthSeconds = rankReviewSeconds(recording);
   const csPerMinute = rankCsPerMinute(recording);
   const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
@@ -2523,11 +2523,11 @@ function shorthandTeachingSentence(analysis, champion = "Samira") {
 }
 
 function statContextSentence(recording = {}, champion = "Samira") {
-  const kills = Number(recording.kills);
-  const deaths = Number(recording.deaths);
-  const assists = Number(recording.assists);
-  const cs = Number(recording.cs);
-  const gameLengthSeconds = Number(recording.gameLengthSeconds);
+  const kills = finiteStatNumber(recording.kills);
+  const deaths = finiteStatNumber(recording.deaths);
+  const assists = finiteStatNumber(recording.assists);
+  const cs = finiteStatNumber(recording.cs);
+  const gameLengthSeconds = positiveNumber(recording.gameLengthSeconds);
   if (![kills, deaths, assists, cs, gameLengthSeconds].every(Number.isFinite) || gameLengthSeconds <= 0) return "";
   const minutes = Math.max(1, gameLengthSeconds / 60);
   const csPerMinute = cs / minutes;
@@ -2946,10 +2946,10 @@ function visibleParagraphStandardIssues(recording = {}) {
   const needsEvidenceLanes = recording.analysisVersion === analysisVersion || !recording.analysisVersion;
   const failureEvidence = coachClean(recording.failureEvidence, "");
   const mistakeTypes = Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.filter(Boolean) : [];
-  const hasStats = Number.isFinite(Number(recording.kills)) &&
-    Number.isFinite(Number(recording.deaths)) &&
-    Number.isFinite(Number(recording.assists)) &&
-    Number.isFinite(Number(recording.cs));
+  const hasStats = Number.isFinite(finiteStatNumber(recording.kills)) &&
+    Number.isFinite(finiteStatNumber(recording.deaths)) &&
+    Number.isFinite(finiteStatNumber(recording.assists)) &&
+    Number.isFinite(finiteStatNumber(recording.cs));
   if (detail.length < 240) {
     issues.push("visible paragraph is too short");
   }
@@ -3252,6 +3252,12 @@ function positiveNumber(value) {
   return Number.isFinite(number) && number > 0 ? number : NaN;
 }
 
+function finiteStatNumber(value) {
+  if (value === null || value === undefined || value === "") return NaN;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : NaN;
+}
+
 function rankReviewSeconds(recording = {}) {
   const gameLengthSeconds = positiveNumber(recording.gameLengthSeconds);
   if (Number.isFinite(gameLengthSeconds)) return gameLengthSeconds;
@@ -3262,7 +3268,7 @@ function rankReviewSeconds(recording = {}) {
 }
 
 function rankCsPerMinute(recording = {}) {
-  const cs = Number(recording.cs);
+  const cs = finiteStatNumber(recording.cs);
   const seconds = rankReviewSeconds(recording);
   return Number.isFinite(cs) && Number.isFinite(seconds) && seconds > 0
     ? cs / (seconds / 60)
@@ -3283,10 +3289,10 @@ function rankCalibrationContext(recordings = []) {
   const pvpFullGames = full.filter((recording) => ["ranked_solo", "ranked_flex", "pvp"].includes(rankQueueClass(recording))).length;
   const anchoredFullGames = full.filter((recording) => Array.isArray(recording.clockAnchors) && recording.clockAnchors.length > 0).length;
   const statFullGames = full.filter((recording) => (
-    Number.isFinite(Number(recording.kills)) &&
-    Number.isFinite(Number(recording.deaths)) &&
-    Number.isFinite(Number(recording.assists)) &&
-    Number.isFinite(Number(recording.cs)) &&
+    Number.isFinite(finiteStatNumber(recording.kills)) &&
+    Number.isFinite(finiteStatNumber(recording.deaths)) &&
+    Number.isFinite(finiteStatNumber(recording.assists)) &&
+    Number.isFinite(finiteStatNumber(recording.cs)) &&
     Number.isFinite(rankReviewSeconds(recording))
   )).length;
   return {
@@ -3379,10 +3385,10 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   const queueClass = rankQueueClass(recording);
   const beginnerBot = queueClass === "bot";
   const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
-  const deaths = Number(recording.deaths);
-  const kills = Number(recording.kills);
-  const assists = Number(recording.assists);
-  const cs = Number(recording.cs);
+  const deaths = finiteStatNumber(recording.deaths);
+  const kills = finiteStatNumber(recording.kills);
+  const assists = finiteStatNumber(recording.assists);
+  const cs = finiteStatNumber(recording.cs);
   const explicitGameLengthSeconds = positiveNumber(recording.gameLengthSeconds);
   const gameLengthSeconds = rankReviewSeconds(recording);
   const csPerMinute = rankCsPerMinute(recording);
@@ -3678,18 +3684,22 @@ function performanceRankReason(recording = {}, context = {}) {
   const rank = clean(context.exactRank || recording.performanceRank?.exactRank || recording.rankEstimate?.exactRank || "this rank");
   const csText = Number.isFinite(csPerMinute)
     ? `${csPerMinute.toFixed(1)} CS/min`
-    : (Number.isFinite(Number(recording.cs)) ? `${Math.round(Number(recording.cs))} CS` : "CS evidence is limited");
+    : (Number.isFinite(finiteStatNumber(recording.cs)) ? `${Math.round(finiteStatNumber(recording.cs))} CS` : "CS evidence is limited");
   const deathText = Number.isFinite(deaths)
     ? `${deaths} ${deaths === 1 ? "death" : "deaths"}`
     : "death evidence is limited";
   const category = context.reviewCategory || reviewRepCategory(recording);
   const flags = context.flags || rankTextFlags(recording);
   const kdaText = [kills, deaths, assists].every(Number.isFinite) ? `${kills}/${deaths}/${assists} K/D/A` : "the K/D/A line";
+  const statsLimited = !Number.isFinite(csPerMinute) || !Number.isFinite(deaths);
   if (context.beginnerBot) {
     if (category === "firstWinCashout") {
       return `${csText} with ${kdaText} and ${deathText} is a low-confidence ranked-habit read near ${rank}: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window.`;
     }
     return `${csText} with ${kdaText} and ${deathText} is a low-confidence ranked-habit read near ${rank}: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase.`;
+  }
+  if (statsLimited) {
+    return `CS/min or death evidence is limited, so the ${rank} read is lower-confidence; the visible fight-entry context is judged from timestamps, and the main leak is whether value becomes exit, wave, recall, group, or another death window.`;
   }
   if (Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 1 && deaths >= 5) {
     return `${csText} is playable, but ${kdaText} with ${deathText} keeps the game at ${rank}; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group.`;
@@ -3755,9 +3765,9 @@ function performanceRankForRecording(recording = {}, rankEstimate = null) {
       flags: rankTextFlags(recording),
       reviewCategory: reviewRepCategory(recording),
       csPerMinute: rankCsPerMinute(recording),
-      kills: Number(recording.kills),
-      deaths: Number(recording.deaths),
-      assists: Number(recording.assists),
+      kills: finiteStatNumber(recording.kills),
+      deaths: finiteStatNumber(recording.deaths),
+      assists: finiteStatNumber(recording.assists),
       queueClass,
       beginnerBot: queueClass === "bot"
     })
@@ -6140,7 +6150,7 @@ function recordingStrengthPhrase(recording = {}) {
   const flags = rankTextFlags(recording);
   if (flags.syncedTeamplay) return "grouping with allies when the play is clear";
   if (flags.positiveConversion) return "finding fights, waves, towers, or base pressure";
-  if (Number(recording.kills) >= 12) return "enough damage to win bot-game fights";
+  if (finiteStatNumber(recording.kills) >= 12) return "enough damage to win bot-game fights";
   return "";
 }
 

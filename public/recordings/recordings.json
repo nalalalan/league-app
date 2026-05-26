@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T20:34:37.108Z",
+  "generatedAt": "2026-05-26T21:31:04.683Z",
   "source": "League of Legends Highlights folder",
   "match": "48 matches",
   "matches": [
@@ -58,7 +58,7 @@
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 26, 2026, 2:49 PM: newest full-game read Iron I; current 3-game read Bronze IV; archive median Bronze IV across 45 full games, used only as baseline context. The newest game is around the current three-game read.",
+    "focus": "Synced through May 26, 2026, 2:49 PM: newest full-game read Bronze III; current 3-game read Bronze III; archive median Bronze III across 45 full games, used only as baseline context. The newest game is around the current three-game read.",
     "rule": "The newest-game blocker is late objective entry and solo river walk after reset; the current repeat across the latest games is late objective entry, numbers check failure, and solo river walk after reset. The keep-habit is The 15:40 shared recall is the right stabilization: you and support both leave the risky low-health bot state instead of forcing one more lane fight.",
     "nextRep": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
@@ -85,11 +85,11 @@
     "pvpFullGames": 17,
     "botFullGames": 15,
     "anchoredFullGames": 46,
-    "statFullGames": 46,
+    "statFullGames": 45,
     "rankLabelCounts": {
-      "Bronze": 19,
+      "Bronze": 20,
       "Silver": 5,
-      "Iron": 22
+      "Iron": 21
     },
     "exactRankScale": [
       "Iron IV",
@@ -314,27 +314,28 @@
       "poster": "/recordings/posters/auto-na1-5568775454-01.jpg",
       "rankEstimate": {
         "version": "2026-05-25-performance-rank-v7",
-        "label": "Iron",
-        "range": "Iron IV-Iron II",
-        "exactRank": "Iron I",
-        "exactRankValue": 3,
-        "score": 22,
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "score": 29,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 98,
+        "confidenceScore": 78,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "new ranked fundamentals",
+        "percentile": "developing",
         "confidenceSignals": [
           "near-full macro recording",
-          "K/D/A, CS, and clip duration are available",
           "visible timestamp anchors exist",
           "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
-        "confidenceBlockers": [],
+        "confidenceBlockers": [
+          "missing one or more client stats: K/D/A, CS, game length"
+        ],
         "researchBasis": [
           "riot-ranked-tiers-2026",
           "riot-apex-tiers-2026",
@@ -342,17 +343,17 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "0.0 CS/min and 0 deaths pull the game to Iron I even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
+        "reason": "CS/min or death evidence is limited, so the Bronze III read is lower-confidence; the visible fight-entry context is judged from timestamps, and the main leak is whether value becomes exit, wave, recall, group, or another death window."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron I",
-        "exactRankValue": 3,
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "0.0 CS/min and 0 deaths pull the game to Iron I even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
+        "reason": "CS/min or death evidence is limited, so the Bronze III read is lower-confidence; the visible fight-entry context is judged from timestamps, and the main leak is whether value becomes exit, wave, recall, group, or another death window."
       }
     },
     {
