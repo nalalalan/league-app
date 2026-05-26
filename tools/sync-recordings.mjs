@@ -3241,6 +3241,12 @@ function rankTextFlags(recording) {
   };
 }
 
+function hasSecuredGroupedObjectiveText(text = "") {
+  return /\b(drake|dragon|objective|hextech)\b/i.test(text) &&
+    /\b(secured|already secured|already won|taken|finished dragon|drake secure|dragon win)\b/i.test(text) &&
+    /\b(grouped|with allies|allies|team)\b/i.test(text);
+}
+
 function rankedEquivalentForRecording(recording = {}, calibrationContext = null) {
   const duration = Number(recording.durationSeconds || 0);
   if (!isFullReviewRecording(recording)) return null;
@@ -3406,6 +3412,10 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
     score += flags.legalEntry ? 8 : 4;
     strengths.push(flags.legalEntry ? "objective entry is at least partly legal" : "objective fight presence exists");
   }
+  if (reviewCategory === "objectiveFight" && hasSecuredGroupedObjectiveText(flags.text || "")) {
+    score = Math.max(score, 12);
+    strengths.push("grouped objective setup created real first value");
+  }
   if (flags.illegalEntry && reviewCategory !== "objectiveFight") {
     score -= 6;
     leaks.push("illegal or catchable entry shape");
@@ -3562,11 +3572,7 @@ function performanceRankReason(recording = {}, context = {}) {
     return `${csText} is playable, but ${kdaText} with ${deathText} keeps the game at ${rank}; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group.`;
   }
   if (category === "objectiveFight") {
-    const text = flags.text || "";
-    const securedGroupedObjective = /\b(drake|dragon|objective|hextech)\b/i.test(text) &&
-      /\b(secured|already secured|already won|taken|finished dragon|drake secure|dragon win)\b/i.test(text) &&
-      /\b(grouped|with allies|allies|team)\b/i.test(text);
-    if (securedGroupedObjective) {
+    if (hasSecuredGroupedObjectiveText(flags.text || "")) {
       return `${csText} and ${deathText} keep the game at ${rank} even though the first objective setup is grouped; the main leak is turning secured objective value into another brush fight instead of exit, wave, reset, or Baron setup.`;
     }
     const entryClause = flags.legalEntry
