@@ -24,8 +24,14 @@ const minCaptureCoverage = Number(process.env.LEAGUE_LIVE_MIN_CAPTURE_COVERAGE |
 const maxCaptureRestarts = Number(process.env.LEAGUE_LIVE_MAX_CAPTURE_RESTARTS || 20);
 const captureStallMs = Number(process.env.LEAGUE_LIVE_CAPTURE_STALL_MS || 45000);
 const minCaptureGrowthBytes = Number(process.env.LEAGUE_LIVE_MIN_GROWTH_BYTES || 8 * 1024);
-// Defaults favor in-game FPS over review smoothness. Two FPS improves camera, spacing, and entry reads while staying low-impact.
-const fps = String(process.env.LEAGUE_LIVE_FPS || 2);
+// Defaults favor in-game FPS over review smoothness. Macro review stays low-FPS; the early lane
+// window can briefly use more frames so trade/all-in reviews have enough mechanical evidence.
+const macroFps = Math.max(1, Number(process.env.LEAGUE_LIVE_FPS || 2));
+const earlyMicroFps = Math.max(1, Number(process.env.LEAGUE_EARLY_MICRO_FPS || 8));
+const earlyMicroSeconds = Math.max(0, Number(process.env.LEAGUE_EARLY_MICRO_SECONDS || 12 * 60));
+const earlyMicroCaptureEnabled = process.env.LEAGUE_EARLY_MICRO_CAPTURE !== "0" &&
+  earlyMicroFps > macroFps &&
+  earlyMicroSeconds > 0;
 const encoderPreference = String(process.env.LEAGUE_LIVE_ENCODER || "auto").toLowerCase();
 const liveCq = String(process.env.LEAGUE_LIVE_CQ || 20);
 const liveCaptureCq = String(process.env.LEAGUE_LIVE_CAPTURE_CQ || 30);
@@ -34,7 +40,6 @@ const x264CaptureCrf = String(process.env.LEAGUE_LIVE_CAPTURE_CRF || 36);
 const captureBitrate = String(process.env.LEAGUE_LIVE_CAPTURE_BITRATE || "2500k");
 const captureMaxrate = String(process.env.LEAGUE_LIVE_CAPTURE_MAXRATE || "3500k");
 const captureBufsize = String(process.env.LEAGUE_LIVE_CAPTURE_BUFSIZE || "4500k");
-const captureGop = String(Math.max(1, Math.round((Number(fps) || 4) * (Number(segmentSeconds) || 10))));
 const captureScale = String(process.env.LEAGUE_LIVE_CAPTURE_SCALE || "960:-2").trim();
 const capturePriority = String(process.env.LEAGUE_LIVE_PRIORITY || "Idle").trim();
 const captureApiPreference = String(process.env.LEAGUE_LIVE_CAPTURE_API || "dda").trim().toLowerCase();
@@ -77,6 +82,60 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function captureGopForFps(value) {
+  const rate = Math.max(1, Number(value) || macroFps || 2);
+  return String(Math.max(1, Math.round(rate * (Number(segmentSeconds) || 10))));
+}
+
+function captureFpsForElapsedSeconds(elapsedSeconds) {
+  return earlyMicroCaptureEnabled && Number(elapsedSeconds) < earlyMicroSeconds
+    ? earlyMicroFps
+    : macroFps;
+}
+
+function targetCaptureFpsForSession(session) {
+  const startedMs = Number(session?.startedMs || Date.now());
+  const elapsedSeconds = Math.max(0, (Date.now() - startedMs) / 1000);
+  return captureFpsForElapsedSeconds(elapsedSeconds);
+}
+
+function captureFpsNeedsSwitch(session, targetFps) {
+  const current = Number(session?.captureFps || 0);
+  const target = Number(targetFps || 0);
+  return Number.isFinite(current) && Number.isFinite(target) && current > 0 && target > 0 && Math.abs(current - target) >= 0.1;
+}
+
+function captureFpsForSegmentIndex(index, captureRuns = [], fallback = macroFps) {
+  const sorted = (Array.isArray(captureRuns) ? captureRuns : [])
+    .map((run) => ({
+      startSegmentIndex: Math.max(0, Number(run?.startSegmentIndex) || 0),
+      captureFps: Number(run?.captureFps)
+    }))
+    .filter((run) => Number.isFinite(run.captureFps) && run.captureFps > 0)
+    .sort((a, b) => a.startSegmentIndex - b.startSegmentIndex);
+  let current = Number(fallback) || macroFps || 2;
+  for (const run of sorted) {
+    if (Number(index) >= run.startSegmentIndex) current = run.captureFps;
+  }
+  return current;
+}
+
+function cleanCaptureRuns(captureRuns = []) {
+  return (Array.isArray(captureRuns) ? captureRuns : [])
+    .map((run) => ({
+      startSegmentIndex: Math.max(0, Number(run?.startSegmentIndex) || 0),
+      captureFps: Math.round((Number(run?.captureFps) || 0) * 1000) / 1000,
+      startedAt: clean(run?.startedAt),
+      reason: clean(run?.reason)
+    }))
+    .filter((run) => run.captureFps > 0)
+    .filter((run, index, array) => (
+      index === 0 ||
+      run.startSegmentIndex !== array[index - 1].startSegmentIndex ||
+      run.captureFps !== array[index - 1].captureFps
+    ));
+}
+
 function serializeSession(session) {
   return {
     sessionRoot: session.sessionRoot,
@@ -90,6 +149,8 @@ function serializeSession(session) {
     endedMs: Number(session.endedMs || Date.parse(session.endedAt || "")),
     foregroundPauseMs: Number(session.foregroundPauseMs || 0),
     taintedSegmentIndexes: [...(session.taintedSegmentIndexes instanceof Set ? session.taintedSegmentIndexes : new Set(session.taintedSegmentIndexes || []))],
+    captureFps: Number(session.captureFps || macroFps),
+    captureRuns: cleanCaptureRuns(session.captureRuns),
     queuedAt: new Date().toISOString()
   };
 }
@@ -110,6 +171,8 @@ function deserializeSession(item) {
     foregroundPauseMs: Number(item.foregroundPauseMs || 0),
     foregroundPauseStartedMs: null,
     pausedForForeground: false,
+    captureFps: Number(item.captureFps || macroFps),
+    captureRuns: cleanCaptureRuns(item.captureRuns),
     taintedSegmentIndexes: new Set(Array.isArray(item.taintedSegmentIndexes) ? item.taintedSegmentIndexes : [])
   };
 }
@@ -418,8 +481,9 @@ async function ffmpegEncoders() {
   }
 }
 
-function encoderArgs(profile, purpose = "review") {
+function encoderArgs(profile, purpose = "review", options = {}) {
   const isCapture = purpose === "capture";
+  const captureGop = captureGopForFps(options.captureFps || macroFps);
   if (profile.name === "h264_nvenc") {
     return [
       "-c:v", "h264_nvenc",
@@ -922,12 +986,13 @@ async function segmentFootprint(sessionRoot) {
   return { bytes, count };
 }
 
-async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop") {
+async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop", captureFps = macroFps) {
   const outputPattern = path.join(sessionRoot, "segment-%04d.mkv");
   let encoder = await encoderProfile();
+  const currentFps = String(Math.max(1, Number(captureFps) || macroFps || 2));
   const filters = [];
   const useDda = /^(dda|ddagrab|desktop-duplication|desktop_duplication)$/i.test(captureApiPreference) && mode !== "title";
-  let inputPrefixArgs = ["-f", "gdigrab", "-framerate", fps, "-rtbufsize", "64M", "-draw_mouse", "1"];
+  let inputPrefixArgs = ["-f", "gdigrab", "-framerate", currentFps, "-rtbufsize", "64M", "-draw_mouse", "1"];
   let inputTarget = "desktop";
   let inputArgs = ["-i", inputTarget];
   let captureMode = mode;
@@ -954,7 +1019,7 @@ async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop")
   }
   if (useDda) {
     const ddaOptions = [
-      `framerate=${fps}`,
+      `framerate=${currentFps}`,
       "draw_mouse=1",
       "output_fmt=8bit"
     ];
@@ -985,7 +1050,7 @@ async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop")
     ...inputArgs,
     "-an",
     ...(filters.length ? ["-vf", filters.join(",")] : []),
-    ...encoderArgs(encoder, "capture"),
+    ...encoderArgs(encoder, "capture", { captureFps: currentFps }),
     "-force_key_frames", `expr:gte(t,n_forced*${segmentSeconds})`,
     "-f", "segment",
     "-segment_time", String(segmentSeconds),
@@ -1014,15 +1079,16 @@ async function startCaptureChild(sessionRoot, startNumber = 0, mode = "desktop")
   const rectNote = captureRect
     ? `, rect ${captureRect.width}x${captureRect.height}, screen ${captureRect.logicalScreen}/${captureRect.physicalScreen}, dpi ${captureRect.dpiScale}`
     : "";
-  await log(`Started low-impact League capture in ${sessionRoot} using ${encoder.label} at ${fps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, mode ${captureMode}, input ${inputTarget}${rectNote}, segment ${startNumber}.`);
-  return { child, encoder: encoder.name, inputTarget, captureMode, captureRect };
+  await log(`Started low-impact League capture in ${sessionRoot} using ${encoder.label} at ${currentFps} fps, ${captureScale || "source"} scale, ${capturePriority} priority, mode ${captureMode}, input ${inputTarget}${rectNote}, segment ${startNumber}.`);
+  return { child, encoder: encoder.name, inputTarget, captureMode, captureRect, captureFps: Number(currentFps) };
 }
 
 async function startSession() {
   const startedAt = new Date();
   const sessionRoot = path.join(captureRoot, stamp(startedAt));
   const modes = captureModes();
-  const capture = await startCaptureChild(sessionRoot, 0, modes[0]);
+  const initialCaptureFps = captureFpsForElapsedSeconds(0);
+  const capture = await startCaptureChild(sessionRoot, 0, modes[0], initialCaptureFps);
   const session = {
     sessionRoot,
     child: capture.child,
@@ -1030,6 +1096,13 @@ async function startSession() {
     inputTarget: capture.inputTarget,
     captureMode: capture.captureMode,
     captureRect: capture.captureRect,
+    captureFps: capture.captureFps,
+    captureRuns: [{
+      startSegmentIndex: 0,
+      captureFps: capture.captureFps,
+      startedAt: startedAt.toISOString(),
+      reason: earlyMicroCaptureEnabled && capture.captureFps > macroFps ? "early-lane micro" : "macro"
+    }],
     captureModes: modes,
     startedAt,
     startedMs: startedAt.getTime(),
@@ -1109,28 +1182,39 @@ async function restartCaptureIfNeeded(session) {
     ]);
     session.child.exited = true;
   }
+  const targetFps = targetCaptureFpsForSession(session);
+  if (!session.child?.exited && captureFpsNeedsSwitch(session, targetFps)) {
+    await log(`Early lane micro capture window ended; switching League capture from ${session.captureFps} fps to ${targetFps} fps for macro review.`);
+    await stopCaptureChild(session.child);
+    session.child.exited = true;
+    session.captureFpsSwitchPending = true;
+  }
   if (!session?.child?.exited) return;
   const resumeAfterForegroundPause = Boolean(session.resumeAfterForegroundPause);
+  const fpsSwitchPending = Boolean(session.captureFpsSwitchPending);
   session.resumeAfterForegroundPause = false;
-  if (!resumeAfterForegroundPause && session.captureRestarts >= maxCaptureRestarts) {
+  session.captureFpsSwitchPending = false;
+  if (!resumeAfterForegroundPause && !fpsSwitchPending && session.captureRestarts >= maxCaptureRestarts) {
     await log("League capture stopped too many times during the same game; keeping existing segments and waiting for game end.");
     return;
   }
-  if (!resumeAfterForegroundPause) {
+  if (!resumeAfterForegroundPause && !fpsSwitchPending) {
     session.captureRestarts += 1;
   }
   const startNumber = await nextSegmentIndex(session.sessionRoot);
   const modes = session.captureModes?.length ? session.captureModes : captureModes();
-  const mode = resumeAfterForegroundPause
+  const mode = (resumeAfterForegroundPause || fpsSwitchPending)
     ? session.captureMode || modes[0] || "desktop"
     : modes[Math.min(session.captureRestarts, modes.length - 1)] || modes[0] || "desktop";
-  const restartReason = resumeAfterForegroundPause
+  const restartReason = fpsSwitchPending
+    ? `League early micro window is complete; capture is switching to ${targetFps} fps`
+    : resumeAfterForegroundPause
     ? "League window is foreground again; capture is resuming"
     : "League window capture stopped while game is still running; restarting capture";
   await log(`${restartReason} at segment ${startNumber} with ${mode} mode.`);
   let capture;
   try {
-    capture = await startCaptureChild(session.sessionRoot, startNumber, mode);
+    capture = await startCaptureChild(session.sessionRoot, startNumber, mode, targetFps);
   } catch (error) {
     if (mode === "region" && /League window/i.test(error.message || "")) {
       session.pausedForForeground = true;
@@ -1147,6 +1231,14 @@ async function restartCaptureIfNeeded(session) {
   session.inputTarget = capture.inputTarget;
   session.captureMode = capture.captureMode;
   session.captureRect = capture.captureRect;
+  session.captureFps = capture.captureFps;
+  session.captureRuns = Array.isArray(session.captureRuns) ? session.captureRuns : [];
+  session.captureRuns.push({
+    startSegmentIndex: startNumber,
+    captureFps: capture.captureFps,
+    startedAt: new Date().toISOString(),
+    reason: capture.captureFps > macroFps ? "early-lane micro" : "macro"
+  });
   session.lastSegmentBytes = footprint.bytes;
   session.lastSegmentGrowthMs = Date.now();
   await publishRecorderStatus("recording", sessionStatusFields(session, session.captureMode === "desktop" ? "Full desktop capture active for this League game." : "League window capture active."), { force: true });
@@ -1201,6 +1293,7 @@ async function processSegment(segment, importantIndexes, sessionRoot, previousSe
   const inputArgs = [];
   const filterParts = [];
   const duration = Number(segment.duration) || segmentSeconds;
+  const segmentFps = Math.max(1, Number(segment.captureFps) || macroFps || 2);
   if (previousSegment?.filePath) {
     const preRollDuration = Number(previousSegment.duration) || segmentSeconds;
     const preRollListPath = path.join(sessionRoot, `preroll-${String(segment.index).padStart(4, "0")}.txt`);
@@ -1212,7 +1305,7 @@ async function processSegment(segment, importantIndexes, sessionRoot, previousSe
     inputArgs.push("-i", segment.filePath);
   }
   filterParts.push(`setpts=PTS/${speed}`);
-  filterParts.push(`fps=${fps}`);
+  filterParts.push(`fps=${segmentFps}`);
   await run("ffmpeg", [
     "-y",
     "-hide_banner",
@@ -1227,6 +1320,7 @@ async function processSegment(segment, importantIndexes, sessionRoot, previousSe
   return {
     ...segment,
     outputPath,
+    captureFps: segmentFps,
     speed,
     important: isImportant
   };
@@ -1290,7 +1384,8 @@ async function finalizeSession(session) {
     const stat = await fs.stat(filePath);
     const index = Number(entry.name.match(/segment-(\d+)/i)?.[1]) || 0;
     const duration = await probeDuration(filePath).catch(() => 0);
-    segments.push({ filePath, size: stat.size, duration, index, tainted: taintedSegmentIndexes.has(index) });
+    const segmentCaptureFps = captureFpsForSegmentIndex(index, session.captureRuns, session.captureFps || macroFps);
+    segments.push({ filePath, size: stat.size, duration, index, captureFps: segmentCaptureFps, tainted: taintedSegmentIndexes.has(index) });
   }
   segments.sort((a, b) => a.index - b.index);
   if (!segments.length) {
@@ -1318,7 +1413,10 @@ async function finalizeSession(session) {
   let processed = [];
   let reviewBuild = "stream-copy";
   let reviewEncoderName = session.encoder || "capture";
-  let reviewVideoQuality = `capture ${fps} fps, stream-copied review`;
+  const captureProfileText = earlyMicroCaptureEnabled
+    ? `capture ${macroFps} fps macro with ${earlyMicroFps} fps first ${Math.round(earlyMicroSeconds / 60)}m micro`
+    : `capture ${macroFps} fps`;
+  let reviewVideoQuality = `${captureProfileText}, stream-copied review`;
   if (/^(copy|stream|stream-copy|concat)$/i.test(reviewBuildMode)) {
     try {
       processed = await copySegmentsToReviewClip(usableSegments, outputPath, session.sessionRoot);
@@ -1403,7 +1501,15 @@ async function finalizeSession(session) {
     reviewBuildMode: reviewBuild,
     segmentSeconds,
     fastForwardSpeed,
-    captureFps: Number(fps),
+    captureFps: Number(macroFps),
+    macroCaptureFps: Number(macroFps),
+    microCaptureFps: earlyMicroCaptureEnabled ? Number(earlyMicroFps) : null,
+    earlyMicroCapture: {
+      enabled: Boolean(earlyMicroCaptureEnabled),
+      fps: earlyMicroCaptureEnabled ? Number(earlyMicroFps) : null,
+      seconds: earlyMicroCaptureEnabled ? Number(earlyMicroSeconds) : 0
+    },
+    captureRuns: cleanCaptureRuns(session.captureRuns),
     captureScale,
     capturePriority,
     captureInput: session.inputTarget,
@@ -1427,6 +1533,7 @@ async function finalizeSession(session) {
       size: item.size,
       durationSeconds: Math.round(Number(item.duration || 0) * 1000) / 1000,
       speed: item.speed,
+      captureFps: Math.round((Number(item.captureFps || macroFps) || macroFps) * 1000) / 1000,
       important: item.important,
       streamCopied: Boolean(item.streamCopied)
     })),

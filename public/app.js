@@ -1711,6 +1711,19 @@ function displaySecondaryFocus(item) {
   return normalizeActionInstruction(text);
 }
 
+function displayMicroReview(item) {
+  const micro = item?.microReview;
+  const raw = typeof micro === "string" ? micro : micro?.summary;
+  if (micro && typeof micro === "object" && micro.available === false) return "";
+  let text = stripVisibleCoachLabel(stripCoachPrefix(raw || ""));
+  if (!hasText(text)) return "";
+  text = text
+    .replace(/^Early micro\s*[-:]\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return `Early micro: ${sentenceCase(text)}`;
+}
+
 function recordingOutcomeLabel(item) {
   const explicit = String(item?.outcomeLabel || item?.outcome || "").trim();
   if (/^(victory|win|won)$/i.test(explicit)) return "VICTORY";
@@ -1720,7 +1733,7 @@ function recordingOutcomeLabel(item) {
 }
 
 function isTightClickReview(item) {
-  return /(?:2026-05-25-forensic-performance-rank-v25|2026-05-24-(?:command-lane-rep-v24|lane-specific-rep-v23|game-specific-rep-v22|dense-click-review-v21|tight-click-review-v20))/.test(String(item?.analysisVersion || ""));
+  return /(?:2026-05-26-early-micro-pass-v26|2026-05-25-forensic-performance-rank-v25|2026-05-24-(?:command-lane-rep-v24|lane-specific-rep-v23|game-specific-rep-v22|dense-click-review-v21|tight-click-review-v20))/.test(String(item?.analysisVersion || ""));
 }
 
 function displayFailureEvidence(item) {
@@ -2127,6 +2140,7 @@ function recordingStoryParagraph(item) {
     .filter((sentence) => !isRedundantStorySentence(sentence, item, critique));
   const praise = displayPraise(item);
   const secondaryFocus = displaySecondaryFocus(item);
+  const microReview = displayMicroReview(item);
   const failureEvidence = displayFailureEvidence(item);
   const mistakeTypes = displayMistakeTypes(item);
   const critiqueIndex = critiqueInsertIndex(sentences);
@@ -2143,6 +2157,7 @@ function recordingStoryParagraph(item) {
   }
   appendStorySpan(paragraph, failureEvidence, "recording-story-evidence", timestampOptions);
   appendStorySpan(paragraph, mistakeTypes, "recording-story-types", timestampOptions);
+  appendStorySpan(paragraph, microReview, "recording-story-micro", timestampOptions);
   appendStorySpan(paragraph, secondaryFocus, "recording-story-secondary", timestampOptions);
   return paragraph;
 }

@@ -30,9 +30,13 @@ const basePushRep = "Rep: in every base push, say structure, blocker, wave, or e
 const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
 const jungleFightExitRep = "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.";
 const midRiverChaseRep = "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.";
-const analysisVersion = "2026-05-25-forensic-performance-rank-v25";
+const analysisVersion = "2026-05-26-early-micro-pass-v26";
+const earlyMicroAnalysisVersion = "2026-05-26-early-lane-micro-v1";
+const earlyMicroMinFps = Number(process.env.LEAGUE_EARLY_MICRO_MIN_FPS || 6);
+const earlyMicroMaxFrames = Number(process.env.LEAGUE_EARLY_MICRO_MAX_FRAMES || 24);
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-25-forensic-performance-rank-v25",
   "2026-05-24-command-lane-rep-v24",
   "2026-05-24-lane-specific-rep-v23",
   "2026-05-24-game-specific-rep-v22",
@@ -915,6 +919,102 @@ function importantSegmentGroups(sidecar) {
   return groups;
 }
 
+function segmentOutputSpans(sidecar) {
+  const segments = Array.isArray(sidecar?.segments) ? sidecar.segments : [];
+  const spans = [];
+  let sourceTime = 0;
+  let outputTime = 0;
+  for (const segment of segments) {
+    const sourceDuration = Number(segment.durationSeconds) || Number(sidecar?.segmentSeconds) || 0;
+    const speed = Math.max(1, Number(segment.speed) || 1);
+    const outputDuration = sourceDuration > 0 ? sourceDuration / speed : 0;
+    const span = {
+      index: Number(segment.index),
+      start: outputTime,
+      end: outputTime + outputDuration,
+      sourceStart: sourceTime,
+      sourceEnd: sourceTime + sourceDuration,
+      durationSeconds: sourceDuration,
+      outputDurationSeconds: outputDuration,
+      speed,
+      captureFps: Number(segment.captureFps || sidecar?.microCaptureFps || sidecar?.captureFps || 0),
+      size: Number(segment.size || 0),
+      important: segment.important === true || speed <= 1.05
+    };
+    spans.push(span);
+    sourceTime += sourceDuration;
+    outputTime += outputDuration;
+  }
+  return spans;
+}
+
+function earlyMicroCaptureInfo(sidecar) {
+  const spans = segmentOutputSpans(sidecar);
+  const maxSegmentFps = Math.max(0, ...spans.map((span) => Number(span.captureFps) || 0));
+  const declaredFps = Number(sidecar?.earlyMicroCapture?.fps || sidecar?.microCaptureFps || 0);
+  const fps = Math.max(maxSegmentFps, Number.isFinite(declaredFps) ? declaredFps : 0);
+  const macroFps = Number(sidecar?.macroCaptureFps || sidecar?.captureFps || process.env.LEAGUE_LIVE_FPS || 2);
+  const seconds = Number(sidecar?.earlyMicroCapture?.seconds || process.env.LEAGUE_EARLY_MICRO_SECONDS || 12 * 60);
+  const available = fps >= earlyMicroMinFps && fps > Math.max(0, macroFps) && spans.some((span) => (
+    Number(span.captureFps) >= earlyMicroMinFps &&
+    span.sourceStart < Math.max(1, seconds || 12 * 60)
+  ));
+  return {
+    available,
+    fps: available ? fps : null,
+    seconds: Number.isFinite(seconds) && seconds > 0 ? seconds : 12 * 60,
+    reason: available
+      ? `early lane captured at up to ${fps} FPS`
+      : "no high-FPS early lane capture is present in this recording sidecar"
+  };
+}
+
+function earlyMicroSampleTimes(duration, sidecar) {
+  const info = earlyMicroCaptureInfo(sidecar);
+  if (!info.available) return [];
+  const earlyLimit = Math.max(1, Number(info.seconds) || 12 * 60);
+  const spans = segmentOutputSpans(sidecar)
+    .filter((span) => (
+      Number(span.captureFps) >= earlyMicroMinFps &&
+      span.sourceStart < earlyLimit &&
+      span.outputDurationSeconds > 0 &&
+      span.start <= Math.max(0.2, duration - 0.2)
+    ));
+  if (!spans.length) return [];
+  const candidates = [];
+  const laneBaseline = [45, 75, 105, 150, 210, 270, 330, 420, 540, 660]
+    .filter((sourceSecond) => sourceSecond < earlyLimit)
+    .map((sourceSecond) => {
+      const span = spans.find((item) => sourceSecond >= item.sourceStart && sourceSecond <= item.sourceEnd);
+      if (!span) return null;
+      return span.start + ((sourceSecond - span.sourceStart) / Math.max(1, span.speed));
+    })
+    .filter((time) => Number.isFinite(time));
+  candidates.push(...laneBaseline);
+  const rankedSpans = [...spans]
+    .sort((a, b) => {
+      const aRate = a.durationSeconds > 0 ? a.size / a.durationSeconds : 0;
+      const bRate = b.durationSeconds > 0 ? b.size / b.durationSeconds : 0;
+      return bRate - aRate || b.size - a.size || a.start - b.start;
+    })
+    .slice(0, 5);
+  for (const span of rankedSpans) {
+    const spanDuration = Math.max(0.1, span.end - span.start);
+    const center = span.start + spanDuration / 2;
+    const offset = Math.min(2.25, Math.max(0.5, spanDuration / 4));
+    candidates.push(
+      span.start + Math.min(0.6, spanDuration * 0.2),
+      center - offset,
+      center,
+      center + offset,
+      span.end - Math.min(0.6, spanDuration * 0.2)
+    );
+  }
+  const kept = dedupeTimes(candidates, 0.45)
+    .filter((time) => time >= 0.2 && time <= Math.max(0.2, duration - 0.2));
+  return kept.slice(0, Math.max(4, earlyMicroMaxFrames)).sort((a, b) => a - b);
+}
+
 function importantSegmentTimes(sidecar, duration) {
   const groups = importantSegmentGroups(sidecar);
   if (!groups.length) return [];
@@ -1042,6 +1142,28 @@ function captureFpsForEntry(entry, fallback = null) {
   const fallbackFps = Number(fallback);
   if (Number.isFinite(fallbackFps) && fallbackFps > 0) return fallbackFps;
   return null;
+}
+
+function microCaptureFpsForEntry(entry) {
+  const info = earlyMicroCaptureInfo(entry?.sidecar);
+  return info.available ? info.fps : null;
+}
+
+function sanitizeMicroReview(microReview, anchors = [], champion = "Unknown") {
+  if (!microReview || microReview.available === false) return microReview || null;
+  const summary = normalizeVisibleCoachText(
+    stripUnmatchedClockTokens(
+      stripUnverifiedClockReferences(coachClean(microReview.summary || ""), anchors),
+      anchors
+    ),
+    champion
+  );
+  if (!summary) return null;
+  return {
+    ...microReview,
+    summary: /^Early micro:/i.test(summary) ? summary : `Early micro: ${summary}`,
+    clockAnchors: cleanClockAnchors(microReview.clockAnchors)
+  };
 }
 
 function nearestClockReadTime(videoSeconds, readTimes) {
@@ -5841,6 +5963,70 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
   }
 }
 
+async function analyzeEarlyMicroPass({ file, duration, framePaths, frameTimes, captureFps, champion = "Unknown", previousMicroReview = null }) {
+  if (!framePaths.length || Number(captureFps) < earlyMicroMinFps) return previousMicroReview || null;
+  if (!process.env.OPENAI_API_KEY) return previousMicroReview || null;
+  const images = [];
+  for (let index = 0; index < framePaths.length; index += 1) {
+    const framePath = framePaths[index];
+    const videoSeconds = Math.round(Number(frameTimes[index] || 0) * 1000) / 1000;
+    images.push({
+      type: "input_text",
+      text: `Early micro frame ${index + 1}: review-video time ${mmss(videoSeconds)} (${videoSeconds}s). If the in-game clock is visible and useful, include it in clockAnchors with this videoSeconds value.`
+    });
+    images.push({
+      type: "input_image",
+      image_url: `data:image/jpeg;base64,${(await fs.readFile(framePath)).toString("base64")}`,
+      detail: "high"
+    });
+  }
+  const frameList = frameTimes.map((time, index) => `${index + 1}:${mmss(time)}`).join(", ");
+  const prompt = [
+    "This is a separate early-game micro pass for Alan's League review. Keep the normal macro review separate; only judge early lane trades, deaths, all-ins, and short lane-fight mechanics that are visible in these higher-FPS frames.",
+    `The early-lane sample is about ${captureFps} FPS evidence, not the 2 FPS macro pass. Duration: ${mmss(duration)}. Sampled frame times: ${frameList}.`,
+    `Likely player champion: ${champion}. If the champion is not visually clear, say the limit and use 'the followed champion'.`,
+    "Look specifically for spacing relative to support and minion wave, enemy CC threat if visible, whether support is close enough to follow, auto/Q usage while backing up, W timing only if the projectile/spell is visible, and whether E/dash/all-in is legal.",
+    "Do not claim frame-perfect mechanics, exact cooldown timers, exact reaction time, animation cancels, or orbwalking unless the frames visibly support it. If the micro evidence is not enough, return available=false and a reviewLimit.",
+    "The visible summary must start with 'Early micro:' and should be one compact coaching sentence or two short sentences. It must include one timestamp when visible, the exact lane state, legal/illegal judgment, and the correct next click. Examples of acceptable action language: stand one step behind support here; enemy CC is still up so no trade; auto/Q while backing up; this E is illegal; support engaged close enough, follow now.",
+    "Do not recycle the macro review language about payout, map cash-out, objective conversion, or pressure mode unless that exact lane frame actually shows it. This pass is for lane mechanics and short-trade decisions.",
+    "Return only JSON with this shape:",
+    '{"available":true,"summary":"Early micro: At MM:SS, exact lane state; legal/illegal trade judgment; correct next click.","focusTag":"lane micro","clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"reviewLimit":"short evidence limit"}',
+    `Recording file: ${file}.`
+  ].join("\n");
+  try {
+    const parsed = await requestOpenAiJson(prompt, images, 900);
+    const summary = coachClean(parsed.summary, "");
+    const available = parsed.available !== false && summary.length > 0;
+    if (!available) {
+      return {
+        available: false,
+        summary: "",
+        focusTag: coachClean(parsed.focusTag, "lane micro"),
+        clockAnchors: [],
+        reviewLimit: coachClean(parsed.reviewLimit, "The higher-FPS early lane frames did not show a clear trade, death, or all-in to judge."),
+        captureFps: Number(captureFps),
+        sampledFrames: framePaths.length,
+        analysisVersion: earlyMicroAnalysisVersion,
+        analysisSource: "openai"
+      };
+    }
+    return {
+      available: true,
+      summary: /^Early micro:/i.test(summary) ? summary : `Early micro: ${summary}`,
+      focusTag: coachClean(parsed.focusTag, "lane micro"),
+      clockAnchors: cleanClockAnchors(parsed.clockAnchors),
+      reviewLimit: coachClean(parsed.reviewLimit, "This micro pass is based on higher-FPS sampled frames, not full input logs."),
+      captureFps: Number(captureFps),
+      sampledFrames: framePaths.length,
+      analysisVersion: earlyMicroAnalysisVersion,
+      analysisSource: "openai"
+    };
+  } catch (error) {
+    console.warn(`Early micro fallback for ${file}: ${error.message}`);
+    return previousMicroReview || null;
+  }
+}
+
 async function summarizeRecordings(recordings, detectedChampions) {
   const fallback = dynamicOverallFeedback(recordings, detectedChampions);
   if (!recordings.length || process.env.LEAGUE_AI_MAIN_FEEDBACK !== "1") return fallback;
@@ -6192,11 +6378,13 @@ async function main() {
       else highlightCount += 1;
       const cachedRankEstimate = rankedEquivalentForRecording(cached);
       const cachedCaptureFps = captureFpsForEntry(entry, cached.captureFps);
+      const cachedMicroFps = microCaptureFpsForEntry(entry) || Number(cached.microCaptureFps || 0) || null;
       const cachedRecording = {
         ...cached,
         ...(cachedRankEstimate ? { rankEstimate: cachedRankEstimate } : {}),
         ...(cachedRankEstimate ? { performanceRank: performanceRankForRecording(cached, cachedRankEstimate) } : {}),
         ...(cachedCaptureFps ? { captureFps: cachedCaptureFps } : {}),
+        ...(cachedMicroFps ? { microCaptureFps: cachedMicroFps } : {}),
         ...(matchStats.outcome ? {
           win: matchStats.win,
           outcome: matchStats.outcome,
@@ -6226,6 +6414,29 @@ async function main() {
         framePaths.push(framePath);
       }
       analysis = await analyzeRecording({ file: name, duration, framePaths, frameTimes: sampleTimes, sequenceLabel, reviewPhase: phase, previousAnalysis });
+    }
+    const microInfo = earlyMicroCaptureInfo(entry.sidecar);
+    if (microInfo.available && !analysis.microReview && duration > 90) {
+      await fs.mkdir(path.join(frameDir, "micro"), { recursive: true });
+      const microTimes = earlyMicroSampleTimes(duration, entry.sidecar);
+      const microFramePaths = [];
+      for (let sampleIndex = 0; sampleIndex < microTimes.length; sampleIndex += 1) {
+        const framePath = path.join(frameDir, "micro", `frame-${sampleIndex + 1}.jpg`);
+        if (process.env.LEAGUE_FORCE_ANALYSIS === "1" || (forceAnalysisFile && name === forceAnalysisFile) || !(await exists(framePath))) {
+          await extractFrame(sourcePath, framePath, microTimes[sampleIndex], 1280);
+        }
+        microFramePaths.push(framePath);
+      }
+      const microReview = await analyzeEarlyMicroPass({
+        file: name,
+        duration,
+        framePaths: microFramePaths,
+        frameTimes: microTimes,
+        captureFps: microInfo.fps,
+        champion: clean(matchStats.championName || analysis.champion, "Unknown"),
+        previousMicroReview: previousAnalysis?.microReview || null
+      });
+      if (microReview) analysis = { ...analysis, microReview };
     }
     const matchTimeMs = matchStats.matchTimeMs || replayMeta.matchTimeMs || stat.mtimeMs;
     const isManualAnalysis = analysis.analysisSource === "manual";
@@ -6274,8 +6485,10 @@ async function main() {
       cacheKey
     });
     const annotatedClockAnchors = annotateClockAnchorsWithMoments(clockAnchors, clockMoments);
+    const combinedClockAnchors = dedupeClockAnchors(annotatedClockAnchors, analysis.microReview?.clockAnchors || []);
     const narrativeClockAnchors = isManualAnalysis ? clockAnchors : clockMoments;
     const championName = clean(matchStats.championName || analysis.champion, "Unknown");
+    const cleanedMicroReview = sanitizeMicroReview(analysis.microReview, combinedClockAnchors, championName);
     const clockMomentEvidence = isManualAnalysis ? "" : evidenceTextFromMoments(clockMoments);
     const isFullReview = duration > 90;
     const rawGameDetail = coachClean(analysis.gameDetail, `${coachClean(analysis.pattern, "The recording points to one repeatable decision pattern.")} ${coachClean(analysis.feedback, "Choose one safer next action.")} ${coachClean(analysis.whyTrust, "The feedback is tied to visible replay evidence.")}`);
@@ -6390,13 +6603,18 @@ async function main() {
       diamondRule: normalizeVisibleCoachText(analysis.diamondRule || "Convert the first winning moment before taking the next fight.", championName),
       drill: normalizeVisibleCoachText(analysis.drill || "Name the payout before committing.", championName),
       timeline: stripUnverifiedTimelineItems(analysis.timeline, narrativeClockAnchors),
-      clockAnchors: annotatedClockAnchors,
+      clockAnchors: combinedClockAnchors,
       clockMoments,
       nuance: cleanList(analysis.nuance, 5).map((item) => normalizeVisibleCoachText(item, championName)),
       reviewLimit: normalizeVisibleCoachText(stripDetailRefreshFailureNotes(analysis.reviewLimit) || "The review is based on sampled frames, not full input/cooldown telemetry.", championName),
       analysisSource: analysis.analysisSource || "cache",
       analysisVersion: analysis.analysisVersion || analysisVersion,
       sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : analysisSampleTimes(duration, entry.sidecar).length),
+      ...(cleanedMicroReview ? {
+        microReview: cleanedMicroReview,
+        microReviewAvailable: cleanedMicroReview.available !== false,
+        microCaptureFps: Number(cleanedMicroReview.captureFps || microInfo.fps)
+      } : (microInfo.available ? { microCaptureFps: Number(microInfo.fps) } : {})),
       publicVideoBytes,
       ...(entryCaptureFps ? { captureFps: entryCaptureFps } : {}),
       src: publicPath(destPath),

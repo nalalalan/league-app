@@ -2466,6 +2466,7 @@ h1 {
 .recording-story-critique,
 .recording-story-praise,
 .recording-story-action,
+.recording-story-micro,
 .recording-story-secondary {
   font-weight: inherit;
 }
@@ -2499,6 +2500,10 @@ h1 {
   color: #443b35;
 }
 
+.recording-story-micro {
+  color: inherit;
+}
+
 .recording-time-link {
   display: inline;
   border: 0;
@@ -2528,6 +2533,11 @@ h1 {
 .recording-story-praise .recording-time-link:hover,
 .recording-story-praise .recording-time-link:focus-visible {
   color: #1f6133;
+}
+
+.recording-story-micro .recording-time-link:hover,
+.recording-story-micro .recording-time-link:focus-visible {
+  color: inherit;
 }
 
 .recording-story-action .recording-time-link:hover,

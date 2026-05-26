@@ -56,6 +56,7 @@ function visibleFields(recording = {}) {
     ["secondaryFocus", recording.secondaryFocus || recording.secondaryImprovement],
     ["failureEvidence", recording.failureEvidence],
     ["mistakeTypes", Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.join("; ") : ""],
+    ["microReview", typeof recording.microReview === "string" ? recording.microReview : recording.microReview?.summary],
     ["eventEvidence", recording.eventEvidence || recording.evidence],
     ["goodThing", recording.goodThing],
     ["whyTrust", recording.whyTrust]
@@ -72,7 +73,8 @@ const forensicPhaseReviewFiles = new Set([
 ]);
 
 function requiresForensicPhaseStandard(recording = {}) {
-  return recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" &&
+  return (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+    recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25") &&
     (recording.analysisSource !== "manual" || forensicPhaseReviewFiles.has(recording.file || ""));
 }
 
@@ -160,6 +162,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    "2026-05-26-early-micro-pass-v26",
     "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-command-lane-rep-v24",
     "2026-05-24-lane-specific-rep-v23",
@@ -178,6 +181,7 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
   const actionScriptVersions = new Set([
+    "2026-05-26-early-micro-pass-v26",
     "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-game-specific-rep-v22",
     "2026-05-24-dense-click-review-v21",
@@ -191,6 +195,7 @@ function feedbackIssues(recording = {}) {
     "2026-05-22-action-script-coaching-v13"
   ]);
   const evidenceLaneVersions = new Set([
+    "2026-05-26-early-micro-pass-v26",
     "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-game-specific-rep-v22",
     "2026-05-24-dense-click-review-v21",
@@ -204,30 +209,35 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
   const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
-  const needsDecisionBranch = recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+  const needsDecisionBranch = recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+    recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18" ||
     recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
-  const needsKeyClickRule = recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+  const needsKeyClickRule = recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+    recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18";
-  const needsExampleReview = recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+  const needsExampleReview = recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+    recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19";
-  const needsTightReview = (recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+  const needsTightReview = (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+    recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20") &&
     (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
-  const needsDenseReview = (recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
+  const needsDenseReview = (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+    recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21") &&
     (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
@@ -332,7 +342,8 @@ function feedbackIssues(recording = {}) {
   if (!recording.rankEstimate?.exactRank) {
     issues.push("full review missing exact rank read");
   }
-  if (recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25") {
+  if (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+      recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25") {
     const performanceRank = clean(recording.performanceRank?.exactRank || recording.rankEstimate?.exactRank);
     const performanceReason = clean(recording.performanceRank?.reason || recording.rankEstimate?.reason);
     if (!performanceRank) {
@@ -342,7 +353,25 @@ function feedbackIssues(recording = {}) {
         !/\bdeath|deaths|K\/D\/A\b/i.test(performanceReason) ||
         !/\bentry|fight|dragon|objective|lane|base\b/i.test(performanceReason) ||
         !/\bexit|re-entry|cash-out|value|conversion|structure|wave|recall|group\b/i.test(performanceReason)) {
-      issues.push("v25 performance rank reason must tie CS, deaths, entry/context, and exit/value together");
+      issues.push("current performance rank reason must tie CS, deaths, entry/context, and exit/value together");
+    }
+  }
+  const micro = typeof recording.microReview === "string"
+    ? clean(recording.microReview)
+    : clean(recording.microReview?.summary);
+  if (micro) {
+    const microFps = Number(recording.microReview?.captureFps || recording.microCaptureFps || 0);
+    if (microFps < 6) {
+      issues.push("early micro review requires higher-FPS capture evidence");
+    }
+    if (!/^Early micro:/i.test(micro)) {
+      issues.push("early micro review must be clearly separate from the macro review");
+    }
+    if (!/\b(spacing|support|cc|crowd control|auto|q|w|e|dash|trade|all[-\s]?in|stand|back|behind|legal|illegal|follow|kite|wave|minion|tower|turret)\b/i.test(micro)) {
+      issues.push("early micro review must judge lane mechanics, spacing, or short-trade legality");
+    }
+    if (/\b(frame[-\s]?perfect|animation cancel|exact combo|reaction time|orbwalk)\b/i.test(micro) && microFps < 10) {
+      issues.push("early micro review overclaims exact mechanics below 10 FPS");
     }
   }
   if ((recording.file || "") === "auto_NA1-5568519322_01.mp4") {

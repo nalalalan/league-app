@@ -13,6 +13,7 @@ const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
 const fallbackModel = process.env.LEAGUE_TIMESTAMP_AUDIT_FALLBACK_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
 const currentPrimaryMistakeAnalysisVersions = new Set([
+  "2026-05-26-early-micro-pass-v26",
   "2026-05-25-forensic-performance-rank-v25",
   "2026-05-24-command-lane-rep-v24",
   "2026-05-24-dense-click-review-v21",
@@ -32,7 +33,8 @@ const forensicPhaseReviewFiles = new Set([
 ]);
 
 function requiresForensicPhaseStandard(recording = {}) {
-  return recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" &&
+  return (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+    recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25") &&
     (recording.analysisSource !== "manual" || forensicPhaseReviewFiles.has(recording.file || ""));
 }
 
@@ -211,13 +213,13 @@ function visibleParagraphStandardIssues(recording, anchors) {
   if (currentPrimaryMistakeAnalysisVersions.has(recording.analysisVersion) && !hasTimestampedActionScript(detail)) {
     issues.push("visible paragraph must include a timestamped replacement action script");
   }
-  if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && !hasKeyTimestampClickRule(detail)) {
+  if ((recording.analysisVersion === "2026-05-26-early-micro-pass-v26" || recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && !hasKeyTimestampClickRule(detail)) {
     issues.push("visible paragraph must include one key timestamp with visible state and exact next click");
   }
-  if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
+  if ((recording.analysisVersion === "2026-05-26-early-micro-pass-v26" || recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && /\b(?:mistake category|correct next click)\s*:/i.test(detail)) {
     issues.push("visible paragraph uses field labels instead of natural key timestamp prose");
   }
-  if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && !/^Rep\s*:/i.test(clean(recording.secondaryFocus || recording.drill))) {
+  if ((recording.analysisVersion === "2026-05-26-early-micro-pass-v26" || recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19") && !/^Rep\s*:/i.test(clean(recording.secondaryFocus || recording.drill))) {
     issues.push("pink next-game instruction must be one Rep sentence");
   }
   const needsTightReview = (recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
@@ -242,7 +244,7 @@ function visibleParagraphStandardIssues(recording, anchors) {
   if (needsDenseReview && /\bfight|entry|front\b/i.test([detail, recording.feedback, recording.secondaryFocus].join(" ")) && !/\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(clean(recording.secondaryFocus || recording.drill))) {
     issues.push("pink Rep must use the literal fight-entry checklist");
   }
-  if ((recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
+  if ((recording.analysisVersion === "2026-05-26-early-micro-pass-v26" || recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" || recording.analysisVersion === "2026-05-24-command-lane-rep-v24" || recording.analysisVersion === "2026-05-24-dense-click-review-v21" || recording.analysisVersion === "2026-05-24-tight-click-review-v20" || recording.analysisVersion === "2026-05-24-example-review-v19" || recording.analysisVersion === "2026-05-24-key-click-rule-v18") && /\bcurrent-match\b|\breview frame\b|\bbranch before any forward click\b/i.test([detail, eventEvidence].join(" "))) {
     issues.push("visible paragraph uses generic review-frame or broad branch wording");
   }
   if (requiresForensicPhaseStandard(recording) &&
@@ -386,7 +388,11 @@ async function verifyAnchorsWithVision(recording, anchors, videoPath) {
     return await requestAudit(model);
   } catch (error) {
     if (fallbackModel && fallbackModel !== model) {
-      return await requestAudit(fallbackModel);
+      try {
+        return await requestAudit(fallbackModel);
+      } catch (fallbackError) {
+        error = fallbackError;
+      }
     }
     return anchors.map((anchor, index) => ({
       index: index + 1,
