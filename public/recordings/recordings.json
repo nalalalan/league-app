@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-26T04:14:50.747Z",
+  "generatedAt": "2026-05-26T04:59:13.046Z",
   "source": "League of Legends Highlights folder",
-  "match": "46 matches",
+  "match": "47 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -48,19 +48,20 @@
     "NA1-5568079693",
     "NA1-5568185590",
     "NA1-5568316539",
-    "NA1-5568447928"
+    "NA1-5568447928",
+    "NA1-5568519322"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 25, 2026, 11:22 PM ET",
-  "totalDuration": "748:47",
-  "totalRecordings": 58,
+  "captured": "May 18, 2026, 5:46 PM to May 26, 2026, 12:47 AM ET",
+  "totalDuration": "775:02",
+  "totalRecordings": 59,
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 25, 2026, 11:22 PM: newest full-game read Bronze I; current 3-game read Bronze IV; archive median Bronze III across 43 full games, used only as baseline context. The newest game is above the current three-game read.",
-    "rule": "The newest-game blocker is bot siege exit after value and tower-to-jungle chase drift; the current repeat across the latest games is death-state exposure, bot siege exit after value, and tower-to-jungle chase drift. The keep-habit is You do create the winning bot-side state first: the 9:34 fight is aggressive in a way that earns tower pressure, and the later game shows cleaner.",
-    "nextRep": "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.",
+    "focus": "Synced through May 26, 2026, 12:19 AM: newest full-game read Iron IV; current 3-game read Iron I; archive median Bronze IV across 44 full games, used only as baseline context. The newest game is below the current three-game read.",
+    "rule": "The newest-game blocker is post-objective re-fight and death-state exposure after value; the current repeat across the latest games is death-state exposure, death-state exposure after value, and post-objective re-fight. The keep-habit is The setup before the throw is real: the 22:50 Baron posture is patient and grouped, and the 24:50 drake secure shows you can arrive to an objective.",
+    "nextRep": "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
-    "pattern": "Latest file auto_NA1-5568447928_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
+    "pattern": "Latest file auto_NA1-5568519322_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
       "Read the newest-game point.",
       "Use the latest-game next action.",
@@ -73,21 +74,21 @@
     "method": "forensic performance-grade estimate with CS/min, death timing, entry legality, exit quality, conversion, queue, timestamp, and cross-game confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 44,
+    "fullReviewGames": 45,
     "queueCounts": {
       "unknown": 14,
       "bot": 15,
-      "ranked_solo": 15
+      "ranked_solo": 16
     },
-    "rankedFullGames": 15,
-    "pvpFullGames": 15,
+    "rankedFullGames": 16,
+    "pvpFullGames": 16,
     "botFullGames": 15,
-    "anchoredFullGames": 44,
-    "statFullGames": 44,
+    "anchoredFullGames": 45,
+    "statFullGames": 45,
     "rankLabelCounts": {
       "Bronze": 19,
       "Silver": 5,
-      "Iron": 20
+      "Iron": 21
     },
     "exactRankScale": [
       "Iron IV",
@@ -170,7 +171,7 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 57,
+      "recordings": 58,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
@@ -186,6 +187,169 @@
     }
   ],
   "recordings": [
+    {
+      "file": "auto_NA1-5568519322_01.mp4",
+      "publicFile": "auto_NA1-5568519322_01.mp4",
+      "cacheKey": "49314085:1779770865860",
+      "fingerprint": "19b620a8acfa",
+      "matchId": "NA1-5568519322",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779769153184,
+      "gameHappenedAt": "2026-05-26T04:19:13.184Z",
+      "gameHappenedAtLabel": "May 26, 2026, 12:19 AM",
+      "recordedAt": "2026-05-26T04:47:45.965Z",
+      "recordedAtLabel": "May 26, 2026, 12:47 AM",
+      "recordedAtTimeLabel": "12:47 AM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Drake secure became one more death window",
+      "duration": "26:15",
+      "durationSeconds": 1575,
+      "gameLength": "27:13",
+      "gameLengthSeconds": 1633,
+      "kda": "3/9/1",
+      "kills": 3,
+      "deaths": 9,
+      "assists": 1,
+      "cs": 112,
+      "statsSource": "League Client match history",
+      "win": false,
+      "outcome": "defeat",
+      "outcomeLabel": "DEFEAT",
+      "outcomeSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Drake secure became one more death window",
+      "feedback": "The leak is turning a finished dragon win into one more brush fight, so secured objective value becomes dead time instead of reset, mid wave, or Baron setup.",
+      "gameDetail": "At 24:50, Hextech Drake is already secured, your team is grouped on the bot-river exit, and the legal value left is leave through river, catch the next wave, or reset, so the wrong click is dashing deeper into the brush fight and the next click is walk out with allies, spend mid, or base for the next setup. By 26:51 you are on death screen, which matters because the extra fight deletes the dragon payout and hands back tempo that should have become map control.",
+      "secondaryFocus": "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.",
+      "mistakeTypes": [
+        "post-objective re-fight",
+        "death-state exposure after value",
+        "river and brush chase drift",
+        "exit discipline after secure",
+        "map tempo handback"
+      ],
+      "eventEvidence": "10:15 shows a stable bot reset state with wave and support; 22:50 shows a legal Baron setup with allies grouped; 24:50 shows Hextech Drake already secured while Samira is still fighting in the river choke; 26:51 shows the death screen after the extra re-fight.",
+      "failureEvidence": "At 24:50 the objective is already won and allies are positioned to leave with the dragon payout, but staying in the river brush fight turns a finished secure into the 26:51 death timer instead of wave, reset, or the next neutral setup.",
+      "goodThing": "The setup before the throw is real: the 22:50 Baron posture is patient and grouped, and the 24:50 drake secure shows you can arrive to an objective with allies instead of face-checking alone; keep that first entry shape.",
+      "whyTrust": "This uses inspected 10:15, 22:50, 24:50, and 26:51 frames from the same recorded match, so the coaching is tied to one visible post-objective re-entry mistake rather than a generic Samira rule.",
+      "focusTag": "post-objective exit",
+      "evidence": "Manual frame inspection of the grouped objective setup, drake secure, extra river fight, and death-screen consequence from the same match.",
+      "pattern": "The game is not failing on the first setup. The legal group entry is there, but once the objective is already secured the click stays in fight mode too long, so won value keeps getting converted back into risk instead of tempo.",
+      "diamondRule": "After dragon is secured, Samira's next click is leave with allies, catch wave, or reset; a forward brush re-entry is illegal unless an ally still fronts the screen and the target is already trapped or low.",
+      "drill": "after objective secure, say leave, wave, or reset before any forward dash. If the fight is no longer buying dragon or a guaranteed kill, back out.",
+      "timeline": [
+        "10:15 - Samira and support have a calm bot-lane wave state with room to reset or hold.",
+        "22:50 - Samira is grouped with allies on a legal Baron setup.",
+        "24:50 - Your team has slain the Hextech Drake while Samira is still in the river choke fight.",
+        "26:51 - Samira is on death screen after the extra post-dragon re-fight."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "10:15",
+          "videoSeconds": 615,
+          "description": "Samira and support have a calm bot-lane wave state with room to reset or hold."
+        },
+        {
+          "clock": "22:50",
+          "videoSeconds": 1370,
+          "description": "Samira is grouped with allies on a legal Baron setup."
+        },
+        {
+          "clock": "24:50",
+          "videoSeconds": 1490,
+          "description": "Your team has already secured Hextech Drake while Samira is still fighting in the river choke."
+        },
+        {
+          "clock": "26:51",
+          "videoSeconds": 1611,
+          "description": "Samira is on death screen after the extra post-dragon re-fight."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "10:15",
+          "videoSeconds": 615,
+          "description": "shows a stable bot reset state with wave and support"
+        },
+        {
+          "clock": "22:50",
+          "videoSeconds": 1370,
+          "description": "shows a legal Baron setup with allies grouped"
+        },
+        {
+          "clock": "24:50",
+          "videoSeconds": 1490,
+          "description": "shows Hextech Drake already secured while Samira is still fighting in the river choke"
+        },
+        {
+          "clock": "26:51",
+          "videoSeconds": 1611,
+          "description": "shows the death screen after the extra re-fight."
+        }
+      ],
+      "nuance": [
+        "The grouped Baron and dragon setups are good enough to show improving objective arrival.",
+        "The leak starts after the objective is already won, not at the first engage.",
+        "The punish is tempo handback: the extra river fight creates dead time instead of map control.",
+        "The next-game cleaner is a post-objective exit script, not a generic aggression nerf."
+      ],
+      "reviewLimit": "Manual 2 FPS frame review cannot prove every cooldown, fogged flank, or exact click sequence, but it verifies the grouped Baron setup, the secured Hextech Drake state, the continued river fight, and the later death-screen consequence.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-25-forensic-performance-rank-v25",
+      "sampledFrames": 14,
+      "publicVideoBytes": 49314085,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5568519322_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5568519322-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-25-performance-rank-v7",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "score": 2,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 98,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "4.1 CS/min is usable, but 3/9/1 K/D/A, 9 deaths, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at Iron IV."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v5",
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "reason": "4.1 CS/min is usable, but 3/9/1 K/D/A, 9 deaths, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at Iron IV."
+      }
+    },
     {
       "file": "auto_NA1-5568447928_01.mp4",
       "publicFile": "auto_NA1-5568447928_01.mp4",
@@ -562,7 +726,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Mid wave became an illegal river chase",
