@@ -2070,14 +2070,26 @@ function recordingPerformanceRank(item) {
   if (!rank) return null;
   return {
     rank,
+    queueClass: String(performance.queueClass || item?.rankEstimate?.queueClass || "").trim().toLowerCase(),
+    confidence: String(performance.rankedTransferConfidence || performance.confidence || item?.rankEstimate?.rankedTransferConfidence || item?.rankEstimate?.confidence || "").trim().toLowerCase(),
     reason: String(performance.reason || "").replace(/\s+/g, " ").trim()
   };
+}
+
+function lowConfidenceRankedHabitRead(item, performance = null) {
+  const queue = String(performance?.queueClass || item?.performanceRank?.queueClass || item?.rankEstimate?.queueClass || "").toLowerCase();
+  const confidence = String(performance?.confidence || item?.performanceRank?.rankedTransferConfidence || item?.performanceRank?.confidence || item?.rankEstimate?.rankedTransferConfidence || item?.rankEstimate?.confidence || "").toLowerCase();
+  const gameType = String(item?.gameType || item?.queueType || item?.kind || "").toLowerCase();
+  return queue === "bot" || (confidence === "low" && /\b(co-?op|ai|beginner|intro|intermediate|bot)\b/i.test(gameType));
 }
 
 function recordingRankSentence(item) {
   const performance = recordingPerformanceRank(item);
   if (performance) {
-    return `Approx performance rank: ${performance.rank}.${performance.reason ? ` Reason: ${performance.reason}` : ""}`;
+    const label = lowConfidenceRankedHabitRead(item, performance)
+      ? "Low-confidence ranked-habit read"
+      : "Approx performance rank";
+    return `${label}: ${performance.rank}.${performance.reason ? ` Reason: ${performance.reason}` : ""}`;
   }
   const estimate = item?.rankEstimate || {};
   const exact = recordingExactRank(item);

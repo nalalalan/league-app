@@ -61,6 +61,7 @@ const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
   "auto_NA1-5568519322_01.mp4",
+  "auto_NA1-5568447928_01.mp4",
   "auto_NA1-5568316539_01.mp4",
   "auto_NA1-5568185590_01.mp4",
   "auto_NA1-5568079693_01.mp4",
@@ -1128,7 +1129,7 @@ function stripUnverifiedClockReferences(value, clockAnchors) {
   const text = String(value || "");
   if (!text) return "";
   const verified = cleanClockAnchors(clockAnchors);
-  const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+  const sentences = sentenceParts(text);
   const kept = sentences.filter((sentence) => {
     const clocks = String(sentence).match(/\b\d{1,2}:[0-5]\d\b/g) || [];
     return clocks.every((clock) => anchorMatchesClock(clock, verified));
@@ -1619,8 +1620,8 @@ function reviewRepCategory(recording = {}) {
   ].join(" ").toLowerCase();
   const { kills, deaths } = kdaParts(recording);
   const cs = Number(recording.cs);
-  const gameLengthSeconds = Number(recording.gameLengthSeconds || recording.durationSeconds || 0);
-  const csPerMinute = Number.isFinite(cs) && gameLengthSeconds > 0 ? cs / (gameLengthSeconds / 60) : NaN;
+  const gameLengthSeconds = rankReviewSeconds(recording);
+  const csPerMinute = rankCsPerMinute(recording);
   const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
   const isSamira = /\bsamira\b/i.test([recording.champion, recording.championSlug, recording.title, text].join(" "));
   const hasSpecificObjectiveFight = /\b(dragon|baron|objective fight|objective entry|objective pit|pit fight)\b/i.test(text);
@@ -2298,10 +2299,13 @@ function evidenceMomentsFromText(analysis, anchors, maxItems = 4) {
 }
 
 function sentenceParts(text) {
-  return String(text || "")
+  const decimalDot = "__DECIMAL_DOT__";
+  const normalized = String(text || "")
     .replace(/\s+/g, " ")
     .trim()
-    .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g) || [];
+    .replace(/(\d)\.(\d)/g, `$1${decimalDot}$2`);
+  return (normalized.match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g) || [])
+    .map((part) => part.replaceAll(decimalDot, "."));
 }
 
 function clockSetInText(text) {
@@ -2963,12 +2967,10 @@ function secondaryFocusStandardIssues(recording = {}) {
 }
 
 function timestampedActionScriptSentences(text) {
-  return String(text || "")
-    .replace(/\s+/g, " ")
-    .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g)?.filter((sentence) => (
+  return sentenceParts(text).filter((sentence) => (
       /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
       /\b(?:next\s+(?:click|move|job|decision|check)|job\s+is|is\s+to|should|do|walk|path|move|stand|hold|wait|recall|reset|base|leave|back|kite|hit|clear|catch|push|defend|hover|group|stop|stay|enter|save|let|keep)\b/i.test(sentence)
-    )) || [];
+    ));
 }
 
 function hasTimestampedActionScript(text) {
@@ -3119,6 +3121,28 @@ function rankQueueClass(recording = {}) {
   return "unknown";
 }
 
+function positiveNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : NaN;
+}
+
+function rankReviewSeconds(recording = {}) {
+  const gameLengthSeconds = positiveNumber(recording.gameLengthSeconds);
+  if (Number.isFinite(gameLengthSeconds)) return gameLengthSeconds;
+  const durationSeconds = positiveNumber(recording.durationSeconds);
+  if (Number.isFinite(durationSeconds)) return durationSeconds;
+  const sourceDurationSeconds = positiveNumber(recording.sourceDurationSeconds);
+  return Number.isFinite(sourceDurationSeconds) ? sourceDurationSeconds : NaN;
+}
+
+function rankCsPerMinute(recording = {}) {
+  const cs = Number(recording.cs);
+  const seconds = rankReviewSeconds(recording);
+  return Number.isFinite(cs) && Number.isFinite(seconds) && seconds > 0
+    ? cs / (seconds / 60)
+    : NaN;
+}
+
 function rankCalibrationContext(recordings = []) {
   const full = recordings.filter(isFullReviewRecording);
   const queueCounts = {};
@@ -3137,7 +3161,7 @@ function rankCalibrationContext(recordings = []) {
     Number.isFinite(Number(recording.deaths)) &&
     Number.isFinite(Number(recording.assists)) &&
     Number.isFinite(Number(recording.cs)) &&
-    Number.isFinite(Number(recording.gameLengthSeconds))
+    Number.isFinite(rankReviewSeconds(recording))
   )).length;
   return {
     version: rankEstimateVersion,
@@ -3227,10 +3251,9 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   const kills = Number(recording.kills);
   const assists = Number(recording.assists);
   const cs = Number(recording.cs);
-  const gameLengthSeconds = Number(recording.gameLengthSeconds);
-  const csPerMinute = Number.isFinite(cs) && Number.isFinite(gameLengthSeconds) && gameLengthSeconds > 0
-    ? cs / (gameLengthSeconds / 60)
-    : null;
+  const explicitGameLengthSeconds = positiveNumber(recording.gameLengthSeconds);
+  const gameLengthSeconds = rankReviewSeconds(recording);
+  const csPerMinute = rankCsPerMinute(recording);
   const kda = Number.isFinite(kills) || Number.isFinite(assists) || Number.isFinite(deaths)
     ? (Math.max(0, kills || 0) + Math.max(0, assists || 0)) / Math.max(1, deaths || 0)
     : null;
@@ -3255,7 +3278,9 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
   }
   if (hasClientStats) {
     confidenceScore += 20;
-    confidenceSignals.push("K/D/A, CS, and game length are available");
+    confidenceSignals.push(Number.isFinite(explicitGameLengthSeconds)
+      ? "K/D/A, CS, and game length are available"
+      : "K/D/A, CS, and clip duration are available");
   } else {
     confidenceBlockers.push("missing one or more client stats: K/D/A, CS, game length");
   }
@@ -3508,7 +3533,9 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
 }
 
 function performanceRankReason(recording = {}, context = {}) {
-  const csPerMinute = Number(context.csPerMinute);
+  const csPerMinute = context.csPerMinute === null || context.csPerMinute === undefined
+    ? NaN
+    : Number(context.csPerMinute);
   const deaths = Number(context.deaths);
   const kills = Number(context.kills);
   const assists = Number(context.assists);
@@ -3522,6 +3549,12 @@ function performanceRankReason(recording = {}, context = {}) {
   const category = context.reviewCategory || reviewRepCategory(recording);
   const flags = context.flags || rankTextFlags(recording);
   const kdaText = [kills, deaths, assists].every(Number.isFinite) ? `${kills}/${deaths}/${assists} K/D/A` : "the K/D/A line";
+  if (context.beginnerBot) {
+    if (category === "firstWinCashout") {
+      return `${csText} with ${kdaText} and ${deathText} is a low-confidence ranked-habit read near ${rank}: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window.`;
+    }
+    return `${csText} with ${kdaText} and ${deathText} is a low-confidence ranked-habit read near ${rank}: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase.`;
+  }
   if (Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 1 && deaths >= 5) {
     return `${csText} is playable, but ${kdaText} with ${deathText} keeps the game at ${rank}; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group.`;
   }
@@ -3569,20 +3602,25 @@ function performanceRankReason(recording = {}, context = {}) {
 function performanceRankForRecording(recording = {}, rankEstimate = null) {
   const estimate = rankEstimate || recording.rankEstimate;
   if (!estimate?.exactRank) return null;
+  const queueClass = estimate.queueClass || rankQueueClass(recording);
   return {
     version: performanceRankVersion,
     exactRank: estimate.exactRank,
     exactRankValue: estimate.exactRankValue,
+    queueClass,
+    confidence: estimate.rankedTransferConfidence || estimate.confidence || "",
+    rankedTransferConfidence: estimate.rankedTransferConfidence || "",
+    evidenceConfidence: estimate.evidenceConfidence || "",
     reason: performanceRankReason(recording, {
       exactRank: estimate.exactRank,
       flags: rankTextFlags(recording),
       reviewCategory: reviewRepCategory(recording),
-      csPerMinute: Number.isFinite(Number(recording.cs)) && Number.isFinite(Number(recording.gameLengthSeconds)) && Number(recording.gameLengthSeconds) > 0
-        ? Number(recording.cs) / (Number(recording.gameLengthSeconds) / 60)
-        : null,
+      csPerMinute: rankCsPerMinute(recording),
       kills: Number(recording.kills),
       deaths: Number(recording.deaths),
-      assists: Number(recording.assists)
+      assists: Number(recording.assists),
+      queueClass,
+      beginnerBot: queueClass === "bot"
     })
   };
 }
@@ -3617,7 +3655,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Drake secure became one more death window",
       feedback: "The leak is turning a finished dragon win into one more brush fight, so secured objective value becomes dead time instead of reset, mid wave, or Baron setup.",
-      gameDetail: "At 24:50, Hextech Drake is already secured, your team is grouped on the bot-river exit, and the legal value left is leave through river, catch the next wave, or reset, so the wrong click is dashing deeper into the brush fight and the next click is walk out with allies, spend mid, or base for the next setup. By 26:51 you are on death screen, which matters because the extra fight deletes the dragon payout and hands back tempo that should have become map control.",
+      gameDetail: "At 24:50, Hextech Drake is already secured, your team is grouped on the bot-river exit, and the legal value left is leave through river, catch the next wave, or reset, so the wrong click is dashing deeper into the brush fight and the next click is walk out with allies, spend mid, or base for the next setup. The later death screen matters because the extra fight deletes the dragon payout and hands back tempo that should have become map control.",
       secondaryFocus: "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already trapped or low.",
       mistakeTypes: [
         "post-objective re-fight",
@@ -3626,10 +3664,10 @@ function manualFeedback(file) {
         "exit discipline after secure",
         "map tempo handback"
       ],
-      eventEvidence: "10:15 shows a stable bot reset state with wave and support; 22:50 shows a legal Baron setup with allies grouped; 24:50 shows Hextech Drake already secured while Samira is still fighting in the river choke; 26:51 shows the death screen after the extra re-fight.",
-      failureEvidence: "At 24:50 the objective is already won and allies are positioned to leave with the dragon payout, but staying in the river brush fight turns a finished secure into the 26:51 death timer instead of wave, reset, or the next neutral setup.",
+      eventEvidence: "10:15 shows a stable bot reset state with wave and support; 22:50 shows a legal Baron setup with allies grouped; 24:50 shows Hextech Drake already secured while Samira is still fighting in the river choke.",
+      failureEvidence: "At 24:50 the objective is already won and allies are positioned to leave with the dragon payout, but staying in the river brush fight turns a finished secure into a death timer instead of wave, reset, or the next neutral setup.",
       goodThing: "The setup before the throw is real: the 22:50 Baron posture is patient and grouped, and the 24:50 drake secure shows you can arrive to an objective with allies instead of face-checking alone; keep that first entry shape.",
-      whyTrust: "This uses inspected 10:15, 22:50, 24:50, and 26:51 frames from the same recorded match, so the coaching is tied to one visible post-objective re-entry mistake rather than a generic Samira rule.",
+      whyTrust: "This uses inspected 10:15, 22:50, and 24:50 frames from the same recorded match, so the coaching is tied to one visible post-objective re-entry mistake rather than a generic Samira rule.",
       focusTag: "post-objective exit",
       evidence: "Manual frame inspection of the grouped objective setup, drake secure, extra river fight, and death-screen consequence from the same match.",
       pattern: "The game is not failing on the first setup. The legal group entry is there, but once the objective is already secured the click stays in fight mode too long, so won value keeps getting converted back into risk instead of tempo.",
@@ -3638,14 +3676,12 @@ function manualFeedback(file) {
       timeline: [
         "10:15 - Samira and support have a calm bot-lane wave state with room to reset or hold.",
         "22:50 - Samira is grouped with allies on a legal Baron setup.",
-        "24:50 - Your team has slain the Hextech Drake while Samira is still in the river choke fight.",
-        "26:51 - Samira is on death screen after the extra post-dragon re-fight."
+        "24:50 - Your team has slain the Hextech Drake while Samira is still in the river choke fight."
       ],
       clockAnchors: [
         { clock: "10:15", videoSeconds: 615, description: "Samira and support have a calm bot-lane wave state with room to reset or hold." },
         { clock: "22:50", videoSeconds: 1370, description: "Samira is grouped with allies on a legal Baron setup." },
-        { clock: "24:50", videoSeconds: 1490, description: "Your team has already secured Hextech Drake while Samira is still fighting in the river choke." },
-        { clock: "26:51", videoSeconds: 1611, description: "Samira is on death screen after the extra post-dragon re-fight." }
+        { clock: "24:50", videoSeconds: 1490, description: "Your team has already secured Hextech Drake while Samira is still fighting in the river choke." }
       ],
       nuance: [
         "The grouped Baron and dragon setups are good enough to show improving objective arrival.",
@@ -3663,7 +3699,7 @@ function manualFeedback(file) {
       confidence: "high",
       feedbackTitle: "Bot siege became a jungle chase",
       feedback: "The leak is that a winning bot siege keeps turning into one more chase off the tower line, so free structure tempo becomes low-value jungle fighting and another avoidable death window.",
-      gameDetail: "At 9:58, you have bot wave under enemy tower with an ally beside you and the defender already backing off, so the wrong click is following the retreat path into red-side jungle and the next click is hit the free tower, clear the wave, or reset behind ally cover. By 10:34 you are low in enemy jungle instead of spending the bot-side value cleanly. The game still finishes as a 20/4/3, 117 CS win, but the four deaths and sub-6 CS/min leak still come from these extra chase windows after lane pressure already paid.",
+      gameDetail: "At 9:58, you have bot wave under enemy tower with an ally beside you and the defender already backing off, so the wrong click is following the retreat path into red-side jungle and the next click is hit the free tower, clear the wave, or reset behind ally cover. By 10:34 you are low in enemy jungle instead of spending the bot-side value cleanly. The Co-op AI clip still finishes as a 20/4/3, 117 CS win, about 5.8 CS/min over 20:15, but the four deaths still come from extra chase windows after lane pressure already paid.",
       secondaryFocus: "Rep: after bot tower pressure gives value, ask tower, wave, or base before chase. If the target has already left tower range and no ally is front-lining the next screen, stop the chase and spend the wave or reset.",
       mistakeTypes: [
         "bot siege exit after value",
@@ -3675,9 +3711,9 @@ function manualFeedback(file) {
       eventEvidence: "9:34 shows Samira winning the bot-side fight at tower; 9:58 shows the wave still at tower with an ally nearby; 10:10 shows the chase continuing away from the structure; 10:34 shows Samira low in red-side jungle instead of finishing the tower or cashing out.",
       failureEvidence: "At 9:58 the permanent value is still the bot tower and wave with ally cover, so chasing off that line into red-side jungle turns a winning siege into a thin, low-HP fight path that leaves Samira low by 10:34 instead of spending the lane win safely.",
       goodThing: "You do create the winning bot-side state first: the 9:34 fight is aggressive in a way that earns tower pressure, and the later game shows cleaner grouped mid pressure off your lead; keep that first-win confidence.",
-      whyTrust: "This uses inspected 9:34, 9:58, 10:10, 10:34, and 18:58 frames plus the League Client 20/4/3, 117 CS ranked context.",
+      whyTrust: "This uses inspected 9:34, 9:58, 10:10, 10:34, and 18:58 frames plus the League Client 20/4/3, 117 CS Co-op AI context.",
       focusTag: "bot siege exit",
-      evidence: "Manual frame inspection of the bot-tower siege, chase continuation, and later ranked-stat context from the same match.",
+      evidence: "Manual frame inspection of the bot-tower siege, chase continuation, and later Co-op AI stat context from the same match.",
       pattern: "This is a better game than the recent losses because the first engage wins real map space, but the remaining leak is still spending that pressure on a chase after tower value is already available.",
       diamondRule: "When bot pressure reaches tower with wave and ally cover, Samira spends that state on structure, wave, or reset first; chasing into jungle is illegal unless an ally still fronts the next screen and the target is already trapped.",
       drill: "after bot siege wins space, say tower, wave, or base before you click at the runner. If the runner is outside tower line and no ally is front, drop it.",
@@ -3699,12 +3735,12 @@ function manualFeedback(file) {
         "The opening bot-side fight is good enough to earn real tower pressure.",
         "The leak starts only after the structure line is won and the click keeps following the retreat path.",
         "Because the game is already winning, the remaining coaching point should stay narrow: spend siege value before chasing.",
-        "The 20/4/3 line shows real carry pressure; the remaining rank cleaner is cutting the four extra death windows and turning them into farm or resets."
+        "The 20/4/3 line shows real carry pressure; the ranked-habit cleaner is cutting the four extra death windows and turning them into farm or resets."
       ],
-      reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns, unseen flank positions, or every hidden enemy, but it verifies the bot-tower fight win, the 9:58 tower-value state, the chase continuation, the low-health jungle exit, and the 20/4/3, 117 CS ranked context.",
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns, unseen flank positions, every hidden enemy, or a clean PvP rank translation, but it verifies the bot-tower fight win, the 9:58 tower-value state, the chase continuation, the low-health jungle exit, and the 20/4/3, 117 CS Co-op AI context.",
       outcome: "victory",
       outcomeLabel: "VICTORY",
-      outcomeSource: "Manual review and League Client stat context",
+      outcomeSource: "Manual review and League Client Co-op AI stat context",
       analysisSource: "manual"
     };
   }

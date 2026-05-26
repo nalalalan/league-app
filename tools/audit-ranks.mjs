@@ -37,7 +37,9 @@ function fail(recording, message) {
 
 function csPerMinute(recording) {
   const cs = Number(recording.cs);
-  const seconds = Number(recording.gameLengthSeconds);
+  const seconds = [recording.gameLengthSeconds, recording.durationSeconds, recording.sourceDurationSeconds]
+    .map((value) => Number(value))
+    .find((value) => Number.isFinite(value) && value > 0);
   return Number.isFinite(cs) && Number.isFinite(seconds) && seconds > 0
     ? cs / (seconds / 60)
     : NaN;
@@ -93,6 +95,12 @@ for (const recording of rankRows) {
   }
   if (recording.gameType === "Co-op vs AI Beginner" && value > maxBotValue) {
     fail(recording, `beginner bot game is over-ranked at ${rank}`);
+  }
+  if (recording.gameType === "Co-op vs AI Beginner" && !/\blow-confidence ranked-habit read\b/i.test(reason)) {
+    fail(recording, "beginner bot game is missing low-confidence ranked-habit wording");
+  }
+  if (recording.gameType === "Co-op vs AI Beginner" && /\bputs the game at\b/i.test(reason)) {
+    fail(recording, "beginner bot game uses normal ranked-performance wording");
   }
   if (queue === "unknown" && value >= minGoldValue) {
     fail(recording, `unverified queue cannot carry ${rank}`);
