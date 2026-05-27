@@ -31,7 +31,7 @@ const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, c
 const jungleFightExitRep = "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.";
 const midRiverChaseRep = "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.";
 const earlyLaneBackclickRep = "Rep: first 10 minutes, every trade is auto/Q - back click - re-check. After the back click, E forward only if support or wave still protects you and the target is already CC'd or low; otherwise farm the wave.";
-const midFightValueExitRep = "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.";
+const midFightValueExitRep = "Rep: after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.";
 const analysisVersion = "2026-05-26-early-micro-pass-v26";
 const earlyMicroAnalysisVersion = "2026-05-26-early-lane-micro-v1";
 const earlyMicroMinFps = Number(process.env.LEAGUE_EARLY_MICRO_MIN_FPS || 6);
@@ -66,6 +66,8 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5569169922_01.mp4",
+  "auto_NA1-5569137549_01.mp4",
   "auto_NA1-5568876241_01.mp4",
   "auto_NA1-5568775454_01.mp4",
   "auto_NA1-5568519322_01.mp4",
@@ -1194,6 +1196,46 @@ function earlyMicroSpecificityIssues(microReview, champion = "Unknown") {
   return issues;
 }
 
+function samiraFightMicroSpecificityIssues(parsed, context = {}) {
+  const champion = clean(parsed?.champion || context.champion || "");
+  const combined = [
+    parsed?.feedbackTitle,
+    parsed?.feedback,
+    parsed?.gameDetail,
+    parsed?.secondaryFocus || parsed?.secondaryImprovement,
+    parsed?.failureEvidence,
+    parsed?.goodThing,
+    parsed?.pattern,
+    parsed?.eventEvidence,
+    Array.isArray(parsed?.mistakeTypes) ? parsed.mistakeTypes.join(" ") : ""
+  ].join(" ");
+  const isSamira = /\bsamira\b/i.test([champion, combined].join(" "));
+  if (!isSamira) return [];
+  const needsInputMicro = /\b(mid[-\s]?fight|lane trade|trade|first burst|first damage window|damage window|auto\/Q|auto\s*\/\s*Q|second body|second forward|E\/click|forward input|forward click)\b/i.test(combined);
+  if (!needsInputMicro) return [];
+
+  const issues = [];
+  if (!/\b(playable|legal|illegal|not the issue|not automatically wrong|entry\/value window|first window)\b/i.test(combined)) {
+    issues.push("Samira fight review must say whether the first entry/damage window is legal or playable");
+  }
+  if (!/\b(auto\/Q|auto\s*\/\s*Q|first burst|first damage window|damage window|hit\s*-\s*back[-\s]?click|one window)\b/i.test(combined)) {
+    issues.push("Samira fight review must name the first auto/Q or first-burst damage window");
+  }
+  if (!/\b(back[-\s]?click|click back|one step back|reset spacing|back through|toward base|hit\s*-\s*back[-\s]?click\s*-\s*re[-\s]?check)\b/i.test(combined)) {
+    issues.push("Samira fight review must name the exact back-click or reset-spacing input");
+  }
+  if (!/\bre[-\s]?check\b/i.test(combined)) {
+    issues.push("Samira fight review must include the re-check after the first burst/back-click");
+  }
+  if (!/\b(E|dash|forward input|forward click|E\/click|second forward)\b/i.test(combined)) {
+    issues.push("Samira fight review must say whether E/dash/forward click is legal or just a chase/re-entry");
+  }
+  if (!/\b(low|unsupported|ally[-\s]?front|ally is still in front|support|wave still protects|enemy CC|CC'd|target HP|target is .*low)\b/i.test(combined)) {
+    issues.push("Samira fight review must name the re-entry check: ally front, enemy CC, target HP, or low/unsupported state");
+  }
+  return issues;
+}
+
 function nearestClockReadTime(videoSeconds, readTimes) {
   const target = Number(videoSeconds);
   if (!Number.isFinite(target)) return null;
@@ -1656,6 +1698,9 @@ function actionScriptForAnchor(recording = {}, anchor = null) {
     anchor.description
   ].join(" ").toLowerCase();
   const anchorText = String(anchor.description || "").toLowerCase();
+  if (/\b(mid fight|mid-fight|first burst|first damage window|auto\/q|back[-\s]?click|second body|second forward)\b/i.test(text)) {
+    return `At ${anchor.clock}, your next input is hit, back-click through the wave or toward base, and re-check ally front, enemy CC, and target HP before any second E or forward click.`;
+  }
   if (/\b(tower|turret|structure|inhib|inhibitor|nexus|wave|minion)\b/i.test(text)) {
     return `At ${anchor.clock}, run the branch before any forward click: check closest threatened turret, ally deaths, and who can stand in front; if enemy tower is free, hit it; if one enemy body blocks it and an ally can front, hit that body safely; if only the wave is guaranteed, push or clear it then recall; if none of those are true, leave.`;
   }
@@ -1804,25 +1849,26 @@ function reviewRepCategory(recording = {}) {
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) {
     return "laneDeathExit";
   }
-  if (isSamira &&
-      /\b(early lane|first 15 minutes|first 10 minutes|one-window Samira|auto\/q from behind|auto\/q\s*-\s*back click|no e to start|no e under tower|one damage window, then back\s*click|reset spacing)\b/i.test(text) &&
-      /\b(wave|support|ally|turret|tower|trade|damage window|setup expires|cover thins|back\s*click|re-check|spacing)\b/i.test(text)) {
-    return "earlyLaneBackclick";
-  }
   if (/\bmid[-\s]?wave\b/i.test(text) &&
       /\briver\b/i.test(text) &&
       /\b(chase|entry|front|collapse|ally[-\s]?front)\b/i.test(text)) {
     return "midRiverChase";
-  }
-  if (/\b(mid fight|mid-fight|mid wave|mid-lane)\b/i.test(text) &&
-      /\b(first value|first burst|second body|second forward|re-entry|reentry|low enough|low health|low[-\s]?hp)\b/i.test(text)) {
-    return "midFightValueExit";
   }
   if (!won &&
       Number.isFinite(deaths) &&
       deaths <= 4 &&
       /\b(blue-side jungle|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(text)) {
     return "sideFarmDefense";
+  }
+  if (!/\b(blue-side jungle|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(text) &&
+      /\b(mid fight|mid-fight|mid-lane)\b/i.test(text) &&
+      /\b(first value|first burst|second body|second forward|re-entry|reentry|low enough|low health|low[-\s]?hp)\b/i.test(text)) {
+    return "midFightValueExit";
+  }
+  if (isSamira &&
+      /\b(early lane|first 15 minutes|first 10 minutes|one-window Samira|auto\/q from behind|no e to start|no e under tower|one damage window, then back\s*click|reset spacing)\b/i.test(text) &&
+      /\b(wave|support|ally|turret|tower|trade|damage window|setup expires|cover thins|back\s*click|re-check|spacing)\b/i.test(text)) {
+    return "earlyLaneBackclick";
   }
   if (hasSpecificObjectiveFight &&
       /\b(fight|entry|engaged|committed|first value|second fight|value window|state flip|re-entry|reenter|exit)\b/i.test(text)) {
@@ -1912,7 +1958,8 @@ function repMatchesGameCategory(recording = {}) {
     case "midRiverChase":
       return /\bafter mid wave gives value\b|\bwave,\s*turret,\s*reset,\s*or\s*river\b|\bRiver is legal only if\b|\bcatch the wave and take one step back\b/i.test(rep);
     case "midFightValueExit":
-      return /\brecall setup\b|\bfirst mid[-\s]?fight value\b|\bfinish recall\/spend\b|\bNo forward E\/click\b|\bfirst burst\b/i.test(rep);
+      return /\bone window\b|\bauto\/Q\b|\bfirst burst\b|\bback[-\s]?click\b|\bre[-\s]?check\b|\bOnly E forward\b|\bNo forward E\/click\b/i.test(rep) &&
+        /\bally front|ally is still in front|enemy CC|target HP|CC'd|low\b/i.test(rep);
     case "fightEntry":
       return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
     case "cleanerWinExit":
@@ -2676,6 +2723,9 @@ function correctNextClickForAnalysis(analysis = {}, anchor = null) {
   if (anchorOrAnalysisHasJungleFight(analysis, anchor)) {
     return "exit to turret, catch mid wave, reset, or regroup";
   }
+  if (/\b(mid fight|mid-fight|first burst|first damage window|auto\/q|back[-\s]?click|second body|second forward)\b/i.test(text)) {
+    return "back-click through the wave or toward base, then re-check ally front, enemy CC, and target HP";
+  }
   if (/\b(tower|turret|structure|inhib|inhibitor|nexus|wave|payout|pressure)\b/i.test(text)) {
     return "choose the visible result now: structure, wave, recall, group, or one step back if none is safe";
   }
@@ -2695,6 +2745,9 @@ function wrongDecisionForAnalysis(analysis = {}, anchor = null) {
   const text = analysisCoachText(analysis);
   if (anchorOrAnalysisHasJungleFight(analysis, anchor)) {
     return "continuing the same jungle fight after first value";
+  }
+  if (/\b(mid fight|mid-fight|first burst|first damage window|auto\/q|back[-\s]?click|second body|second forward)\b/i.test(text)) {
+    return "staying forward after the first burst";
   }
   if (/\b(side|jungle|camp|farm)\b/i.test(text) && /\b(defend|defense|base|turret|tower|wave)\b/i.test(text)) {
     return "continuing the old task after the visible state changed";
@@ -2777,6 +2830,14 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
   const legalityBridge = /\b(legal|illegal|not automatically wrong|partly legal|mostly legal|setup expires|setup is gone)\b/i.test(clauses.join(" "))
     ? ""
     : `The first value window may be playable, but the state flip is where the next click becomes illegal if no ally front, wave, tower, or objective is still visible.`;
+  if (analysis?.analysisSource === "fallback") {
+    return coachClean([
+      clauses.join(" "),
+      rest[0] ? `By ${rest[0].clock}, ${clauseDescription(rest[0].description, champion)}.` : "",
+      shorthand,
+      why
+    ].filter(Boolean).join(" "));
+  }
   return coachClean([
     clauses.join(" "),
     hasTimestampedActionScript(clauses.join(" ")) ? "" : branchActionSentence(primary.clock) || advice,
@@ -3184,13 +3245,13 @@ function secondaryFocusStandardIssues(recording = {}) {
 function timestampedActionScriptSentences(text) {
   return sentenceParts(text).filter((sentence) => (
       /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
-      /\b(?:next\s+(?:click|move|job|decision|check)|job\s+is|is\s+to|should|do|walk|path|move|stand|hold|wait|recall|reset|base|leave|back|kite|hit|clear|catch|push|defend|hover|group|stop|stay|enter|save|let|keep)\b/i.test(sentence)
+      /\b(?:next\s+(?:click|input|move|job|decision|check)|job\s+is|is\s+to|should|do|walk|path|move|stand|hold|wait|recall|reset|base|leave|back|kite|hit|clear|catch|push|defend|hover|group|stop|stay|enter|save|let|keep)\b/i.test(sentence)
     ));
 }
 
 function hasTimestampedActionScript(text) {
   return timestampedActionScriptSentences(text).some((sentence) => (
-    /\b(?:instead|rather than|not|never|should|job\s+is|is\s+to|next\s+(?:click|move|job|decision|check)|do|walk|stand|hold|wait|recall|reset|leave|back|kite|hit|clear|catch|push|defend|stop|stay|save|let|keep)\b/i.test(sentence)
+    /\b(?:instead|rather than|not|never|should|job\s+is|is\s+to|next\s+(?:click|input|move|job|decision|check)|do|walk|stand|hold|wait|recall|reset|leave|back|kite|hit|clear|catch|push|defend|stop|stay|save|let|keep)\b/i.test(sentence)
   ));
 }
 
@@ -3205,7 +3266,7 @@ function hasKeyTimestampClickRule(text) {
     /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
     (
       (/\bmistake category\s*:/i.test(sentence) && /\bcorrect next click\s*:/i.test(sentence)) ||
-      /\bso\s+(?:the\s+)?next\s+click\s+is\b|\bthe\s+next\s+click\s+is\b|\bclick\s+(?:back|out|away|toward|only)\b/i.test(sentence)
+      /\bso\s+(?:the\s+)?next\s+(?:click|input)\s+is\b|\bthe\s+next\s+(?:click|input)\s+is\b|\b(?:back[-\s]?click|click\s+(?:back|out|away|toward|only))\b/i.test(sentence)
     ) &&
     /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free)\b/i.test(sentence) &&
     /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back)\b/i.test(sentence)
@@ -3650,6 +3711,22 @@ function rankedEquivalentForRecording(recording = {}, calibrationContext = null)
       flags.stateFlipExit) {
     score += 9;
     strengths.push("calmer farming and survival baseline");
+    if (/\b(blue-side jungle|jungle fight|jungle value|jungle-exit)\b/i.test(flags.text || "")) {
+      score = Math.max(score, 36);
+      strengths.push("jungle-fight loss is closer to Bronze than death-heavy Iron because farm and deaths are calmer");
+    }
+  }
+  if (reviewCategory === "midFightValueExit" &&
+      ["ranked_solo", "ranked_flex", "pvp"].includes(queueClass) &&
+      Number.isFinite(kills) &&
+      Number.isFinite(assists) &&
+      Number.isFinite(deaths) &&
+      Number.isFinite(csPerMinute) &&
+      kills + assists >= 15 &&
+      deaths <= 8 &&
+      csPerMinute >= 4.4) {
+    score = Math.max(score, 12);
+    strengths.push("real fight participation keeps the game above pure no-impact Iron");
   }
   if (won &&
       ["ranked_solo", "ranked_flex", "pvp"].includes(queueClass) &&
@@ -3822,7 +3899,7 @@ function performanceRankReason(recording = {}, context = {}) {
     return `${csText} is usable, but ${kdaText}, ${deathText}, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at ${rank}.`;
   }
   if (category === "midFightValueExit") {
-    return `${csText} and ${deathText} put the game at ${rank}: the mid-fight entry creates value, but exit/re-entry after first value still turns pressure into dead time instead of wave, recall, or group.`;
+    return `${csText} and ${deathText} keep the game around ${rank} even though ${kdaText} shows real fight participation; the main leak is failing the exit/back-click after first mid-fight value, so pressure turns into dead time instead of wave, recall, or group.`;
   }
   if (category === "sideFarmDefense") {
     if (/\b(blue-side jungle|jungle fight|jungle value|jungle-exit)\b/i.test(analysisCoachText(recording))) {
@@ -3893,50 +3970,144 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5569169922_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Bot tower value became another death timer",
+      feedback: "The leak is that bot-side wave and tower pressure keeps turning into one more tower-line fight while you are catchable, so the value you created becomes another death timer instead of back-click, wave, recall, or group.",
+      gameDetail: "At 17:47, you are fighting bot side with an ally nearby, wave close, and a tower value about to be won, so the first damage window is playable, but the wrong click is staying forward after that value and the next click is back-click through the wave or toward base while the ally finishes. By 17:57 the turret is down but you are dead, which means the first pressure window worked and the failure was the extra tower-line re-entry while catchable.",
+      secondaryFocus: "Rep: after bot wave or tower pressure gives value, take the first safe exit: back-click through wave, recall/spend, or one step behind ally front. No second E or forward click under tower unless ally front and wave still protect you and the target is CC'd or low.",
+      mistakeTypes: [
+        "tower-line re-entry after value",
+        "low-HP or catchable forward input",
+        "wave-to-recall conversion",
+        "ally-front re-check",
+        "death-state exposure"
+      ],
+      eventEvidence: "10:32 shows a safe bot-lane recall with 1255 gold; 15:47 shows bot wave and ally context before the later death pattern; 17:47 shows the bot-side fight while tower value is about to pay; 17:57 shows the turret destroyed and Samira dead.",
+      failureEvidence: "At 17:47 the first bot pressure window is playable and about to create structure value, but the next legal branch is back-click, wave, recall, or group; staying forward turns the tower value into the 17:57 death timer.",
+      goodThing: "At 10:32 you take a safe bot-lane recall with 1255 gold, and at 17:47 you are not starting alone; keep the recall habit and the ally/wave setup before fights.",
+      whyTrust: "This uses inspected 10:32, 15:47, 17:47, and 17:57 frames plus the League Client 4/12/3, 188 CS ranked defeat context; the review does not claim exact cooldowns beyond the visible tower-line forward pressure.",
+      focusTag: "bot tower exit after value",
+      evidence: "Manual frame inspection of the safe recall, bot wave setup, bot tower fight, turret-destroyed state, and death-timer consequence from the same match.",
+      pattern: "The CS line is usable, but twelve deaths mean too many pressure windows keep getting paid back after the first value.",
+      diamondRule: "After bot pressure wins tower or wave value, Samira back-clicks through wave and re-checks; no second forward input under tower while catchable.",
+      drill: "after bot wave or tower pressure gives value, take the first safe exit: back-click through wave, recall/spend, or one step behind ally front. No second E or forward click under tower unless ally front and wave still protect you and the target is CC'd or low.",
+      timeline: [
+        "10:32 - Samira recalls safely in bot lane with 1255 gold.",
+        "15:47 - Samira has bot wave and ally context before the later death pattern.",
+        "17:47 - Samira fights bot side while tower value is about to pay.",
+        "17:57 - The enemy turret is destroyed, but Samira is dead after the extra tower-line fight."
+      ],
+      clockAnchors: [
+        { clock: "10:32", videoSeconds: 551.308, description: "Samira recalls safely in bot lane with 1255 gold." },
+        { clock: "15:47", videoSeconds: 824.962, description: "Samira has bot wave and ally context before the later death pattern." },
+        { clock: "17:47", videoSeconds: 945, description: "Samira fights bot side while tower value is about to pay." },
+        { clock: "17:57", videoSeconds: 955, description: "The enemy turret is destroyed, but Samira is dead after the extra tower-line fight." }
+      ],
+      nuance: [
+        "The first pressure window is not the issue; bot wave and ally context make it playable.",
+        "The mistake starts after tower value is already about to pay, when the next input remains forward.",
+        "The 188 CS is usable, but 12 deaths are the rank blocker because dead time keeps erasing the pressure.",
+        "The next-game rep is bot-pressure exit discipline, not a generic anti-fight rule."
+      ],
+      reviewLimit: "Manual 2 FPS macro frames cannot prove the exact E keypress, every cooldown, or hidden flanks, but they verify the recall, bot wave setup, tower fight, turret-destroyed state, and death-timer consequence.",
+      outcome: "defeat",
+      outcomeLabel: "DEFEAT",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
+  if (file === "auto_NA1-5569137549_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Mid fight gave value, then needed back-click",
+      feedback: "The leak is that after the first mid-fight burst creates value, your next input stays forward toward the second body, so a playable ally-front fight becomes another death timer instead of back-click, wave, recall, or group.",
+      gameDetail: "At 23:58, you are behind two allies in mid while enemies are already knocked up or near-sighted and one target is in range, so the first burst is legal, but the wrong click is staying forward after that value and the next click is back-click through mid wave or toward base while allies finish. By 24:35 you are dead, which means the fight was not a no-damage problem; the state flipped after the first burst and the next input needed to be hit - back-click - re-check.",
+      secondaryFocus: midFightValueExitRep,
+      mistakeTypes: [
+        "first-burst back-click timing",
+        "second forward input after value",
+        "E/click legality after ally-front fight",
+        "death-state exposure",
+        "wave or recall conversion after fight"
+      ],
+      eventEvidence: "17:53 shows Samira mid with wave and allies nearby; 23:58 shows Samira behind two allies as enemies are knocked up or near-sighted in the mid fight; 24:35 shows the death timer after the extra forward pressure.",
+      failureEvidence: "At 23:58 the first mid-fight entry is playable because allies are already in front and enemies are controlled, but once the first burst/value has happened the next legal branch is hit - back-click - re-check; staying forward turns the window into the 24:35 death instead of wave, recall, or regroup.",
+      goodThing: "At 23:58 you enter from behind allies instead of being first body, and you are close enough to add damage while enemies are already controlled. Keep that first-entry shape.",
+      whyTrust: "This uses inspected 17:53, 23:58, and 24:35 frames plus the League Client 9/5/3, 193 CS ranked defeat context; the review does not claim exact keypress certainty beyond visible forward pressure after the first burst.",
+      focusTag: "mid fight back-click after value",
+      evidence: "Manual frame inspection of the mid-wave setup, ally-front mid fight, controlled target state, and death-timer consequence from the same match.",
+      pattern: "This is a better farm-and-fight baseline than the death-heavy games, but the rank leak is still the second input after a playable fight starts.",
+      diamondRule: "After one Samira damage window, hit, back-click, and re-check; re-enter only if an ally is still in front and the target is CC'd, low, or trapped.",
+      drill: midFightValueExitRep.replace(/^Rep:\s*/i, ""),
+      timeline: [
+        "17:53 - Samira is mid with wave and allies nearby.",
+        "23:58 - Samira enters a mid fight from behind allies while enemies are knocked up or near-sighted.",
+        "24:35 - Samira is dead after the extra forward pressure."
+      ],
+      clockAnchors: [
+        { clock: "17:53", videoSeconds: 780.615, description: "Samira is mid with wave and allies nearby." },
+        { clock: "23:58", videoSeconds: 1071.846, description: "Samira enters a mid fight from behind allies while enemies are knocked up or near-sighted." },
+        { clock: "24:35", videoSeconds: 1078, description: "Samira is dead after the extra forward pressure." }
+      ],
+      nuance: [
+        "The first mid-fight window is legal because allies are in front and enemies are controlled.",
+        "The mistake is the next input staying forward after that burst instead of back-clicking.",
+        "The 9/5/3 and 193 CS line shows real farming and fight participation, but five deaths still pay back too much value.",
+        "The next-game rep is hit, back-click, re-check before any second E/click."
+      ],
+      reviewLimit: "Manual 2 FPS macro frames cannot prove the exact E keypress, cooldowns, or every hidden enemy, so the claim is about visible forward pressure and spacing after the first burst; the frames verify ally-front entry, controlled targets, and the death-timer consequence.",
+      outcome: "defeat",
+      outcomeLabel: "DEFEAT",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5568876241_01.mp4") {
     return {
       champion: "Samira",
       confidence: "high",
-      feedbackTitle: "Mid fight needed one value, then exit",
-      feedback: "The leak is the second mid-fight re-entry after the first value: once you are low and an ally can keep the play alive, staying forward turns a won pressure window into a death timer instead of recall, mid wave, or group.",
-      gameDetail: "At 18:40, the mid fight has already created value: an enemy is low, an ally is on the target, and Samira is low enough to be punished, so the wrong click is staying in for the second body and the next click is back toward mid wave or base while the ally finishes. At 16:10 you show the right habit by recalling safely under friendly turret with about 1088 gold. By 18:59 the cost is visible as a death timer even though the team gets turret value, and the 5/7/12, 159 CS line says damage and assists exist but the extra re-entry keeps paying value back.",
-      secondaryFocus: "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
+      feedbackTitle: "Mid fight needed one value, then back-click",
+      feedback: "The leak is that after the first mid-fight auto/Q or burst window, your next input stays forward while low, so one playable damage window becomes a second Samira re-entry death instead of hit - back-click - re-check.",
+      gameDetail: "At 18:40, the mid fight has already created value: an enemy is low, an ally is on the target, and you are low, so the entry/value window is playable but the first bad next input is staying forward for a second body; the next input is back-click through mid wave or toward base while the ally finishes. By 18:59 the cost is visible as another death timer even though the team still gets turret value, which means the mechanical error is not no damage; it is auto/Q or E pressure while your movement stays toward enemy reach instead of hit - back-click - re-check.",
+      secondaryFocus: "Rep: after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.",
       mistakeTypes: [
-        "second mid-fight re-entry after value",
-        "low-health exit discipline",
-        "recall-to-next-play discipline",
-        "ally-front check",
+        "first-burst back-click timing",
+        "second forward input while low",
+        "E/click legality after value",
+        "ally-front and target-HP re-check",
         "death-state exposure"
       ],
-      eventEvidence: "16:10 shows Samira safely recalling under friendly turret with about 1088 gold; 18:34 shows Samira returning to mid wave with an ally nearby; 18:40 shows the low-health mid-fight re-entry; 18:59 shows the death timer.",
-      failureEvidence: "At 18:40 the first mid-fight value is already real, but Samira stays forward while low for the second body; by 18:59 that extra re-entry becomes a death timer instead of a clean reset, wave, or group.",
-      goodThing: "At 16:10 you do the keepable part: finish a safe recall under friendly turret with spendable gold instead of forcing another bot-lane screen. Keep that reset discipline.",
-      whyTrust: "This uses inspected 16:10, 18:34, 18:40, and 18:59 frames from the same ranked match, so the review does not treat the safe recall or shop menu as the mistake.",
-      focusTag: "mid fight exit after value",
-      evidence: "Manual frame inspection of the safe recall, mid wave return, low-health mid fight, and death-timer consequence from the same match.",
-      pattern: "The first setup is not always wrong: wave, support, and ally-front context often make the first damage window playable. The blocker is the second forward click after that window has already paid.",
-      diamondRule: "After a fight gives one value, Samira exits to wave, recall, or group unless an ally is still in front and the next target is already CC'd, low, or trapped.",
-      drill: "after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
+      eventEvidence: "18:34 shows Samira back near mid wave with an ally nearby; 18:40 shows the playable first value already created while Samira is low; 18:59 shows the death timer after the extra forward re-entry.",
+      failureEvidence: "At 18:40 the first mid-fight value is already real, but Samira keeps the next input forward while low for a second body; by 18:59 that extra re-entry becomes a death timer instead of wave, recall, or group.",
+      goodThing: "At 18:40 you do the keepable part first: you are close enough to contribute damage after an ally is already on the target, which is a playable first window. Keep that first burst, then reset spacing.",
+      whyTrust: "This uses inspected 18:34, 18:40, and 18:59 frames from the same ranked match; at 2 FPS it does not claim the exact keypress, but it does verify the low-health forward-pressure shape and death-timer cost.",
+      focusTag: "mid fight back-click after value",
+      evidence: "Manual frame inspection of the mid wave return, first playable damage window, low-health forward pressure, and death-timer consequence from the same match.",
+      pattern: "The first setup is not always wrong: wave, support, and ally-front context can make the first burst playable. The blocker is the next forward input after that window has already paid.",
+      diamondRule: "After one Samira damage window, hit, back-click, and re-check; re-enter only if an ally is still in front and the target is CC'd, low, or trapped.",
+      drill: "after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.",
       timeline: [
-        "16:10 - Samira recalls safely under friendly turret with about 1088 gold.",
         "18:34 - Samira returns to mid wave with an ally nearby and an enemy in front.",
-        "18:40 - Samira is low in the mid fight while an ally is still on the target.",
-        "18:59 - Samira is on a death timer after the extra mid-fight re-entry."
+        "18:40 - Samira has one playable damage window but is low enough that the next input should be a back-click.",
+        "18:59 - Samira is on a death timer after the extra forward re-entry."
       ],
       clockAnchors: [
-        { clock: "16:10", videoSeconds: 870.769, description: "Samira recalls safely under friendly turret with about 1088 gold." },
         { clock: "18:34", videoSeconds: 990, description: "Samira returns to mid wave with an ally nearby and an enemy in front." },
-        { clock: "18:40", videoSeconds: 996, description: "Samira is low in the mid fight while an ally is still on the target." },
-        { clock: "18:59", videoSeconds: 1015.231, description: "Samira is on a death timer after the extra mid-fight re-entry." }
+        { clock: "18:40", videoSeconds: 996, description: "Samira has one playable damage window but is low enough that the next input should be a back-click." },
+        { clock: "18:59", videoSeconds: 1015.231, description: "Samira is on a death timer after the extra forward re-entry." }
       ],
       nuance: [
-        "The safe 16:10 recall is a concrete improvement and should stay.",
-        "The mistake is not the recall; it is the later re-entry after the first fight value.",
-        "The 18:40 frame shows the state flip: low health plus an ally already on the target means the next value is exit, not another body.",
+        "The first damage window is playable because an ally is already on the target.",
+        "The mistake is the next input after that burst staying forward while you are low.",
+        "The 18:40 frame shows the state flip: low health plus an ally already on the target means the next input is back-click and re-check, not another body.",
         "The 5/7/12 line shows you are participating in fights, but seven deaths keep handing back tempo.",
-        "The next-game rep is recall/spend, wave, or group after first value."
+        "The next-game rep is hit, back-click, re-check before any second E/click."
       ],
-      reviewLimit: "Manual 2 FPS macro frames cannot prove every cooldown, input, or fogged enemy, but they verify the safe recall, the low-health mid-fight state, and the death-timer consequence.",
+      reviewLimit: "Manual 2 FPS macro frames cannot prove the exact E keypress, cooldown, or fogged enemy, so the claim is about visible forward pressure and spacing after the first burst; the frames verify the low-health mid-fight state, ally-on-target context, and death-timer consequence.",
       outcome: "defeat",
       outcomeLabel: "DEFEAT",
       outcomeSource: "Manual review and League Client stat context",
@@ -4192,47 +4363,48 @@ function manualFeedback(file) {
     return {
       champion: "Samira",
       confidence: "high",
-      feedbackTitle: "Cleaner win, one mid re-entry death remains",
-      feedback: "The leak is staying forward for a second mid-fight re-entry after the first value window has already become wave, recall, or regroup.",
-      gameDetail: "At 21:09, the first mid fight is legal enough because allies and a wave are near you and value has already happened, but the state flip is exit/value: you are low, enemy bodies can still re-engage, and the next click is one step back through the wave, then recall or group. The first bad next click is staying forward for another Samira re-entry. By 22:02 the re-entry becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one mid-fight exit leak.",
-      secondaryFocus: "Rep: after a mid fight gives one kill, assist, wave, or turret pressure, say wave, recall, or regroup. If you are low or no ally is clearly in front, no second forward E; take one step back through the wave first.",
+      feedbackTitle: "Cleaner win, one mid-fight back-click leak remains",
+      feedback: "The leak is that after the first mid-fight damage window, your next input stays forward while low, so one useful Samira burst becomes a second re-entry death instead of hit - back-click - re-check.",
+      gameDetail: "At 21:09, the mid fight is playable at first because allies and a wave are near you and value has already happened; the first damage window is legal enough, but once you are low and enemy bodies can still re-engage, the correct next input is back-click one step through the wave, re-check ally front, enemy CC, and target HP, then recall or group if the target is no longer trapped. By 22:02 the second forward input becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one remaining mid-fight micro-exit leak.",
+      secondaryFocus: "Rep: after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.",
       mistakeTypes: [
-        "mid-fight exit after value",
-        "low-HP re-entry discipline",
-        "wave-to-recall conversion",
-        "ally-front check"
+        "first-burst back-click timing",
+        "second forward input while low",
+        "E/click legality after value",
+        "ally-front and target-HP re-check",
+        "wave-to-recall conversion"
       ],
-      eventEvidence: "19:23 shows Samira recalling after bot-side pressure with about 1687 gold; 21:09 shows Samira low in mid with wave/ally context and enemy bodies still able to re-engage; 22:02 shows the death timer after the re-entry.",
-      failureEvidence: "At 21:09 the first value has already happened and the legal branch is wave, recall, or regroup; staying forward turns the play into the 22:02 death timer instead of a stable result.",
-      goodThing: "At 19:23 you recall after bot-side tower pressure with about 1687 gold; keep that exit instinct.",
-      whyTrust: "This uses inspected 19:23, 21:09, and 22:02 frames plus the League Client 7/3/10, 139 CS ranked victory context.",
-      focusTag: "mid-fight exit",
+      eventEvidence: "19:23 shows the earlier safe recall after bot-side pressure; 21:09 shows Samira low in mid with wave/ally context and enemy bodies still able to re-engage; 22:02 shows the death timer after the second forward input.",
+      failureEvidence: "At 21:09 the first damage/value window has already paid and the legal branch is hit - back-click - re-check, then wave, recall, or regroup; staying forward turns the play into the 22:02 death timer instead of a stable result.",
+      goodThing: "At 21:09 the first mid-fight window is not random: you are playing near allies and wave before the state flips; keep starting fights from that cover instead of being first body.",
+      whyTrust: "This uses inspected 19:23, 21:09, and 22:02 frames plus the League Client 7/3/10, 139 CS ranked victory context; the review does not claim exact E keypress certainty beyond visible forward pressure.",
+      focusTag: "mid-fight micro exit",
       evidence: "Manual frame inspection of the mid re-entry window and League Client ranked stats for the same match.",
-      pattern: "This is a cleaner win with one remaining mid-fight exit leak, not the old chain-feeding pattern.",
-      diamondRule: "After mid value, no second forward Samira click while low unless ally front is clear and the target is already CC'd or low.",
-      drill: "after a mid fight gives one kill, assist, wave, or turret pressure, say wave, recall, or regroup. If you are low or no ally is clearly in front, no second forward E; take one step back through the wave first.",
+      pattern: "This is a cleaner win with one remaining mid-fight input leak, not the old chain-feeding pattern.",
+      diamondRule: "After the first Samira burst, back-click once and re-check before any second E or forward click.",
+      drill: "after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.",
       timeline: [
         "19:23 - Samira recalls after bot-side pressure with about 1687 gold.",
         "20:42 - Samira is low near mid with an ally nearby and enemy bodies in front.",
         "20:57 - Samira is still low with mid wave visible and exit available.",
-        "21:09 - Samira stays forward for another mid re-entry after first value.",
+        "21:09 - Samira stays forward for another mid-fight input after first value instead of back-clicking through wave.",
         "22:02 - Samira is dead with BACK IN 38 visible."
       ],
       clockAnchors: [
         { clock: "19:23", videoSeconds: 1070.923, description: "Samira recalls after bot-side pressure with about 1687 gold." },
         { clock: "20:42", videoSeconds: 1150, description: "Samira is low near mid with an ally nearby and enemy bodies in front." },
         { clock: "20:57", videoSeconds: 1165, description: "Samira is still low with mid wave visible and exit available." },
-        { clock: "21:09", videoSeconds: 1177.615, description: "Samira stays forward for another mid re-entry after first value." },
+        { clock: "21:09", videoSeconds: 1177.615, description: "Samira stays forward for another mid-fight input after first value instead of back-clicking through wave." },
         { clock: "22:02", videoSeconds: 1230, description: "Samira is dead with BACK IN 38 visible." }
       ],
       nuance: [
         "This is a cleaner ranked victory, not the same death-heavy collapse pattern.",
         "The useful part is that farming, fighting, and deaths are more controlled.",
-        "The mistake starts after the first mid value window, when the next click stays re-entry instead of exit.",
+        "The mistake starts after the first mid value window, when the next input stays forward instead of hit - back-click - re-check.",
         "The 139 CS and 3 deaths show Silver-level survival for this session, but the remaining re-entry death keeps it from a cleaner grade.",
-        "The next-game rep is a mid-fight exit check, not a generic pressure-mode slogan."
+        "The next-game rep is a mid-fight input check, not a generic pressure-mode slogan."
       ],
-      reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns or hidden enemy positions, but it verifies the 19:23 recall, 21:09 re-entry state, 22:02 death, and 7/3/10, 139 CS ranked victory context.",
+      reviewLimit: "Manual 2 FPS frame review cannot prove exact cooldowns, hidden enemy positions, or exact E keypress timing, but it verifies the 19:23 recall, 21:09 low mid-fight forward-pressure state, 22:02 death, and 7/3/10, 139 CS ranked victory context.",
       outcome: "victory",
       outcomeLabel: "VICTORY",
       outcomeSource: "Manual review and League Client stat context",
@@ -5715,6 +5887,9 @@ function analysisSpecificityIssues(parsed, context = {}) {
     issues.push("the beginning of the main mistake window must have a visible game-clock timestamp");
   }
   if (isAutoFullReview) {
+    issues.push(...samiraFightMicroSpecificityIssues(parsed, context));
+  }
+  if (isAutoFullReview) {
     issues.push(...secondaryFocusStandardIssues({
       secondaryFocus,
       captureFps: Number(process.env.LEAGUE_LIVE_FPS || 2)
@@ -6037,7 +6212,8 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like one smooth, short replay-review paragraph, not a stat audit and not a field list: include the main visible mistake window, what happened next or almost happened, and the K/D/A-CS blocker if available. The red feedback field names the leak, the green goodThing names the keep habit, and the pink secondaryFocus names the drill, so do not repeat those claims in gameDetail unless the timestamp evidence needs one short bridge. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must include the exact visible state, the wrong click, and the correct next click. Extra timestamps are optional and should appear only when they make the critique clearer. Current-standard gameDetail should usually stay under 650 characters.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
-    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: early-lane Samira micro = auto/Q - back click - re-check, with E forward only after the re-check proves support/wave still protects you and the target is CC'd or low; lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after first won fight; grouped base push = structure, blocker, wave, or exit; mid-wave river chase = after mid wave gives value, ask wave, turret, reset, or river. Do not start with 'Second focus:' or a label.",
+    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: early-lane or mid-fight Samira micro = auto/Q or first burst - back-click - re-check, with E forward only after the re-check proves ally front or wave still protects you and the target is CC'd or low; lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after the first won fight; grouped base push = structure, blocker, wave, or exit; mid-wave river chase = after mid wave gives value, ask wave, turret, reset, or river. Do not start with 'Second focus:' or a label.",
+    "For Samira fight micro, do not stop at 'first value then exit.' Translate the moment into inputs: was the entry/damage window legal, what was the first auto/Q or burst window, where did the window end, what exact forward input made it illegal or catchable, and what should the next input have been. If the sampled FPS cannot prove a literal E keypress, say forward E/click or forward pressure rather than pretending exact input certainty.",
     "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
@@ -6070,7 +6246,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, entry legality, value or no value, state flip, first bad next click, correct next click, one green keep habit, one red leak, one pink Rep. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' For objective fights, separate legal first entry from the second fight after value. For early-lane Samira trades, name the legal trade start, the first auto/Q damage window, the exact back-click point, and whether E is legal or only a chase; the Rep should use 'auto/Q - back click - re-check' when that is the actual drill. Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, entry legality, value or no value, state flip, first bad next click, correct next click, one green keep habit, one red leak, one pink Rep. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' For objective fights, separate legal first entry from the second fight after value. For Samira lane or mid-fight trades, name the legal trade/start, the first auto/Q or burst damage window, the exact back-click point, and whether E/forward click is legal or only a chase/re-entry; the Rep should use hit/auto/Q - back-click - re-check when that is the actual drill. Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }

@@ -20,13 +20,13 @@ function timestampedActionScriptSentences(text) {
     .replace(/\s+/g, " ")
     .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g)?.filter((sentence) => (
       /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
-      /\b(?:next\s+(?:click|move|job|decision|check)|job\s+is|is\s+to|should|do|walk|path|move|stand|hold|wait|recall|reset|base|leave|back|kite|hit|clear|catch|push|defend|hover|group|stop|stay|enter|save|let|keep)\b/i.test(sentence)
+      /\b(?:next\s+(?:click|input|move|job|decision|check)|job\s+is|is\s+to|should|do|walk|path|move|stand|hold|wait|recall|reset|base|leave|back|kite|hit|clear|catch|push|defend|hover|group|stop|stay|enter|save|let|keep)\b/i.test(sentence)
     )) || [];
 }
 
 function hasTimestampedActionScript(text) {
   return timestampedActionScriptSentences(text).some((sentence) => (
-    /\b(?:instead|rather than|not|never|should|job\s+is|is\s+to|next\s+(?:click|move|job|decision|check)|do|walk|stand|hold|wait|recall|reset|leave|back|kite|hit|clear|catch|push|defend|stop|stay|save|let|keep)\b/i.test(sentence)
+    /\b(?:instead|rather than|not|never|should|job\s+is|is\s+to|next\s+(?:click|input|move|job|decision|check)|do|walk|stand|hold|wait|recall|reset|leave|back|kite|hit|clear|catch|push|defend|stop|stay|save|let|keep)\b/i.test(sentence)
   ));
 }
 
@@ -37,7 +37,7 @@ function hasKeyTimestampClickRule(text) {
       /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
       (
         (/\bmistake category\s*:/i.test(sentence) && /\bcorrect next click\s*:/i.test(sentence)) ||
-        /\bso\s+(?:the\s+)?next\s+click\s+is\b|\bthe\s+next\s+click\s+is\b|\bclick\s+(?:back|out|away|toward|only)\b/i.test(sentence)
+        /\bso\s+(?:the\s+)?next\s+(?:click|input)\s+is\b|\bthe\s+next\s+(?:click|input)\s+is\b|\b(?:back[-\s]?click|click\s+(?:back|out|away|toward|only))\b/i.test(sentence)
       ) &&
       /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free)\b/i.test(sentence) &&
       /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back)\b/i.test(sentence)
@@ -117,6 +117,15 @@ function repCategory(recording = {}) {
   if (/\bmid[-\s]?wave\b/i.test(text) &&
       /\briver\b/i.test(text) &&
       /\b(chase|entry|front|collapse|ally[-\s]?front)\b/i.test(text)) return "midRiverChase";
+  if (!won && Number.isFinite(deaths) && deaths <= 4 &&
+      /\b(blue-side jungle|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(text)) return "sideFarmDefense";
+  if (isSamira &&
+      !/\b(blue-side jungle|jungle fight|jungle value|jungle-exit|first jungle value)\b/i.test(text) &&
+      /\b(mid fight|mid-fight|mid-lane)\b/i.test(text) &&
+      /\b(first value|first burst|second body|second forward|re-entry|reentry|low enough|low health|low[-\s]?hp|back[-\s]?click)\b/i.test(text)) return "midFightValueExit";
+  if (isSamira &&
+      /\b(early lane|first 15 minutes|first 10 minutes|one-window Samira|auto\/q from behind|no e to start|no e under tower|one damage window, then back\s*click|reset spacing)\b/i.test(text) &&
+      /\b(wave|support|ally|turret|tower|trade|damage window|setup expires|cover thins|back\s*click|re-check|spacing)\b/i.test(text)) return "earlyLaneBackclick";
   if (/\b(dragon|baron|objective|pit)\b/i.test(text) &&
       /\b(fight|entry|engaged|committed|first value|second fight|value window|state flip|re-entry|reenter|exit)\b/i.test(text)) return "objectiveFight";
   if (!won && Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) return "deathExit";
@@ -138,6 +147,8 @@ function repMatchesGameCategory(recording = {}) {
       return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
     case "laneDeathExit":
       return /\bdeath-heavy lane sequence\b|\bNo E toward\b|\bDo not E\/dash\b|\bwave still protects (?:me|you)\b|\bone step behind support\b/i.test(rep);
+    case "earlyLaneBackclick":
+      return /\bone-window Samira\b|\bauto\/Q\s*-\s*back click\s*-\s*re-check\b|\bone back\s*click\b|\bNo E to start\b|\bNo E under tower\b|\bwave or support cover thins\b/i.test(rep);
     case "objectiveFight":
       return /\bdid we already get the value\b|\bsay objective done\b|\bobjective done\s*-\s*exit or next map result\b|\bexit with allies,\s*mid wave,\s*reset\/spend,\s*or\s*Baron setup\b|\bwalk out with allies,\s*mid wave,\s*reset\/spend,\s*or\s*Baron setup\b|\bdragon,\s*wave,\s*recall,\s*or\s*group\b|\bsecond fight\b[\s\S]{0,100}\blow or unsupported\b/i.test(rep);
     case "deathExit":
@@ -146,12 +157,45 @@ function repMatchesGameCategory(recording = {}) {
       return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b/i.test(rep);
     case "midRiverChase":
       return /\bafter mid wave gives value\b|\bwave,\s*turret,\s*reset,\s*or\s*river\b|\bRiver is legal only if\b|\bcatch the wave and take one step back\b/i.test(rep);
+    case "midFightValueExit":
+      return /\bone window\b|\bauto\/Q\b|\bfirst burst\b|\bback[-\s]?click\b|\bre[-\s]?check\b|\bOnly E forward\b|\bNo forward E\/click\b/i.test(rep) &&
+        /\bally front|ally is still in front|enemy CC|target HP|CC'd|low\b/i.test(rep);
     case "fightEntry":
       return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
     case "cleanerWinExit":
     default:
       return /\bwave,\s*tower hit,\s*or\s*fight start\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b|\bwave,\s*recall,\s*or\s*regroup\b|\bno second forward E\b|\bmid fight gives one\b/i.test(rep);
   }
+}
+
+function samiraFightMicroStandardIssues(recording = {}) {
+  const allVisible = visibleText(recording);
+  const isSamira = /\bsamira\b/i.test([recording.champion, recording.championSlug, recording.title, allVisible].join(" "));
+  if (!isSamira) return [];
+  const category = repCategory(recording);
+  const needsInputMicro = (category === "midFightValueExit" || category === "earlyLaneBackclick") &&
+    /\b(mid[-\s]?fight|lane trade|trade|first burst|first damage window|damage window|auto\/Q|auto\s*\/\s*Q|second body|second forward|E\/click|forward input|forward click)\b/i.test(allVisible);
+  if (!needsInputMicro) return [];
+  const issues = [];
+  if (!/\b(playable|legal|illegal|not the issue|not automatically wrong|entry\/value window|first window)\b/i.test(allVisible)) {
+    issues.push("Samira fight review must judge whether the first entry/damage window is legal or playable");
+  }
+  if (!/\b(auto\/Q|auto\s*\/\s*Q|first burst|first damage window|damage window|hit\s*-\s*back[-\s]?click|one window)\b/i.test(allVisible)) {
+    issues.push("Samira fight review must name the first auto/Q or first-burst damage window");
+  }
+  if (!/\b(back[-\s]?click|click back|one step back|reset spacing|back through|toward base|hit\s*-\s*back[-\s]?click\s*-\s*re[-\s]?check)\b/i.test(allVisible)) {
+    issues.push("Samira fight review must name the exact back-click or reset-spacing input");
+  }
+  if (!/\bre[-\s]?check\b/i.test(allVisible)) {
+    issues.push("Samira fight review must include re-check after the first burst/back-click");
+  }
+  if (!/\b(E|dash|forward input|forward click|E\/click|second forward)\b/i.test(allVisible)) {
+    issues.push("Samira fight review must say whether E/dash/forward click is legal or just chase/re-entry");
+  }
+  if (!/\b(low|unsupported|ally[-\s]?front|ally is still in front|support|wave still protects|enemy CC|CC'd|target HP|target is .*low)\b/i.test(allVisible)) {
+    issues.push("Samira fight review must name the re-entry check: ally front, enemy CC, target HP, or low/unsupported state");
+  }
+  return issues;
 }
 
 function feedbackIssues(recording = {}) {
@@ -392,6 +436,10 @@ function feedbackIssues(recording = {}) {
     if (!/\b(value|state flip|state flips|first value|second fight|first bad next click|setup expires|setup is gone)\b/i.test(allVisible)) {
       issues.push("v25 review must separate value, state flip, and first bad next click");
     }
+  }
+  if (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+      recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25") {
+    issues.push(...samiraFightMicroStandardIssues(recording));
   }
   if (needsSecondaryFocus) {
     if (!secondaryFocus) {
