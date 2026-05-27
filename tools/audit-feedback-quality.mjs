@@ -6,6 +6,7 @@ import { hasExactJungleBuffName, unverifiedChampionNames } from "./review-text-g
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, "..");
 const manifestPath = path.join(appRoot, "public", "recordings", "recordings.json");
+const samiraGreenLightAnalysisVersion = "2026-05-27-samira-green-light-v28";
 
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -37,10 +38,10 @@ function hasKeyTimestampClickRule(text) {
       /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
       (
         (/\bmistake category\s*:/i.test(sentence) && /\bcorrect next click\s*:/i.test(sentence)) ||
-        /\bso\s+(?:the\s+)?next\s+(?:click|input)\s+is\b|\bthe\s+next\s+(?:click|input)\s+is\b|\b(?:back[-\s]?click|click\s+(?:back|out|away|toward|only))\b/i.test(sentence)
+        /\bso\s+(?:the\s+)?next\s+(?:click|input)\s+is\b|\bthe\s+next\s+(?:click|input)\s+is\b|\bcorrect\s+input\s+is\b|\b(?:back[-\s]?click|click\s+(?:back|out|away|toward|only))\b|\b(?:red[-\s]?light|green[-\s]?light)\b[\s\S]{0,140}\b(?:E|input|Q\/auto|auto\/Q|back|kite|farm|wait)\b/i.test(sentence)
       ) &&
-      /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free)\b/i.test(sentence) &&
-      /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back)\b/i.test(sentence)
+      /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free|W|HP|ally|red[-\s]?light|green[-\s]?light)\b/i.test(sentence) &&
+      /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back|Q\/auto|auto\/Q|E)\b/i.test(sentence)
     )) || false;
 }
 
@@ -78,6 +79,19 @@ function requiresForensicPhaseStandard(recording = {}) {
     (recording.analysisSource !== "manual" || forensicPhaseReviewFiles.has(recording.file || ""));
 }
 
+function isSamiraRecording(recording = {}) {
+  return /\bsamira\b/i.test([
+    recording.champion,
+    recording.championSlug,
+    recording.title,
+    visibleText(recording)
+  ].join(" "));
+}
+
+function requiresSamiraGreenLightAudit(recording = {}) {
+  return recording.analysisVersion === samiraGreenLightAnalysisVersion && isSamiraRecording(recording);
+}
+
 function repeatedPayoutChecklistCount(text) {
   const source = String(text || "").toLowerCase();
   return (source.match(/\b(?:no\s+)?(?:tower|turret)\s*,\s*(?:safe\s+)?wave\s*,\s*(?:dragon\s+or\s+baron|objective)\s*(?:setup)?\s*,?\s*(?:and|or)\s*(?:no\s+clear\s+)?ally[-\s]?front\b|\btower\/wave\/objective\/ally[-\s]?front\b|\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/g) || []).length;
@@ -110,6 +124,7 @@ function repCategory(recording = {}) {
   const csPerMinute = Number.isFinite(cs) && gameLengthSeconds > 0 ? cs / (gameLengthSeconds / 60) : NaN;
   const won = recording.outcome === "victory" || recording.outcomeLabel === "VICTORY" || recording.win === true;
   const isSamira = /\bsamira\b/i.test([recording.champion, recording.championSlug, recording.title, text].join(" "));
+  if (requiresSamiraGreenLightAudit(recording)) return "samiraGreenLight";
   if (Number.isFinite(kills) && kills >= 18 && /\b(defeat|loss|lost|eight deaths|death|objective|won exchange|first useful damage|reset)\b/i.test(text)) return "firstWinCashout";
   if (isSamira &&
       /\b(bot|lane|outer turret|under turret|support|wave is already thin|samira e|dash\/chase|tower dive)\b/i.test(text) &&
@@ -141,6 +156,10 @@ function repMatchesGameCategory(recording = {}) {
   const rep = clean(recording.secondaryFocus || recording.secondaryImprovement || recording.drill || "");
   if (!rep) return false;
   switch (repCategory(recording)) {
+    case "samiraGreenLight":
+      return /\bW\b[\s\S]{0,80}\bHP\b[\s\S]{0,80}\bally\b/i.test(rep) &&
+        /\b(E key is dead|no E|E forward|E toward|green[-\s]?light E|red[-\s]?light)\b/i.test(rep) &&
+        /\b(gray|ready|under half|above half|on screen|close enough|kite|farm|wait|Q\/auto|auto)\b/i.test(rep);
     case "basePush":
       return /\bstructure,\s*blocker,\s*wave,\s*or\s*exit\b/i.test(rep);
     case "firstWinCashout":
@@ -198,6 +217,39 @@ function samiraFightMicroStandardIssues(recording = {}) {
   return issues;
 }
 
+function samiraGreenLightStandardIssues(recording = {}) {
+  if (!requiresSamiraGreenLightAudit(recording)) return [];
+  const allVisible = visibleText(recording);
+  const detail = clean(recording.gameDetail);
+  const secondaryFocus = clean(recording.secondaryFocus || recording.secondaryImprovement || recording.drill);
+  const issues = [];
+  if (!/\b(red[-\s]?light|green[-\s]?light)\b/i.test(allVisible)) {
+    issues.push("Samira review must use green-light/red-light language as the main lens");
+  }
+  if (!/\b(?:W\s*(?:is\s*)?(?:gray|grey|down|ready|not ready|not visibly ready|unavailable|on cooldown)|W readiness|W condition|W\s*,\s*HP\s*,\s*ally)\b/i.test(allVisible)) {
+    issues.push("Samira green-light review must name W readiness or W gray/down as a condition");
+  }
+  if (!/\b(?:above|over|below|under)\s+half\s+HP\b|\bhalf health\b|\blow[-\s]?HP\b/i.test(allVisible)) {
+    issues.push("Samira green-light review must name above/below-half HP as a condition");
+  }
+  if (!/\bally\b[\s\S]{0,80}\b(?:screen|close|near|nearby|front|fight with|on target|between|missing|not visible|not close)\b/i.test(allVisible)) {
+    issues.push("Samira green-light review must name ally-on-screen or ally-close-enough as a condition");
+  }
+  if (!/\b(?:E\s*(?:toward|forward|key|is locked|is dead|legal|illegal)|forward\s+(?:E|click|input|pressure)|dash)\b/i.test(allVisible)) {
+    issues.push("Samira green-light review must name the wrong E/forward/dash input");
+  }
+  if (!/\b(?:Q\/auto|auto\/Q|auto|Q)\b[\s\S]{0,100}\b(?:back|backing|kite|farm|wait|reset spacing)\b|\b(?:back[-\s]?click|click back|reset spacing|kite|farm|wait)\b/i.test(allVisible)) {
+    issues.push("Samira green-light review must name the correct input: Q/auto while backing up, kite, farm, wait, or reset spacing");
+  }
+  if (!/^Rep\s*:/i.test(secondaryFocus) || !/\b(?:W\s*,\s*HP\s*,\s*ally|W gray|E key is dead|no E|red[-\s]?light|green[-\s]?light)\b/i.test(secondaryFocus)) {
+    issues.push("Samira green-light Rep must be the next-game W/HP/ally E-lock drill");
+  }
+  if (!timestampedActionScriptSentences(detail).some((sentence) => /\b(red[-\s]?light|green[-\s]?light|W|half HP|ally|E|forward|correct input)\b/i.test(sentence))) {
+    issues.push("Samira green-light review must put the red/green-light audit at the key timestamp");
+  }
+  return issues;
+}
+
 function feedbackIssues(recording = {}) {
   const issues = [];
   const title = clean(recording.feedbackTitle);
@@ -206,6 +258,7 @@ function feedbackIssues(recording = {}) {
   const evidence = clean(recording.eventEvidence || recording.evidence);
   const allVisible = visibleText(recording);
   const strictTwoFocusVersions = new Set([
+    samiraGreenLightAnalysisVersion,
     "2026-05-26-early-micro-pass-v26",
     "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-command-lane-rep-v24",
@@ -225,6 +278,7 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsSecondaryFocus = strictTwoFocusVersions.has(recording.analysisVersion);
   const actionScriptVersions = new Set([
+    samiraGreenLightAnalysisVersion,
     "2026-05-26-early-micro-pass-v26",
     "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-game-specific-rep-v22",
@@ -239,6 +293,7 @@ function feedbackIssues(recording = {}) {
     "2026-05-22-action-script-coaching-v13"
   ]);
   const evidenceLaneVersions = new Set([
+    samiraGreenLightAnalysisVersion,
     "2026-05-26-early-micro-pass-v26",
     "2026-05-25-forensic-performance-rank-v25",
     "2026-05-24-game-specific-rep-v22",
@@ -253,7 +308,8 @@ function feedbackIssues(recording = {}) {
   ]);
   const needsActionScript = actionScriptVersions.has(recording.analysisVersion);
   const needsEvidenceLanes = evidenceLaneVersions.has(recording.analysisVersion);
-  const needsDecisionBranch = recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+  const needsDecisionBranch = recording.analysisVersion === samiraGreenLightAnalysisVersion ||
+    recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
     recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
@@ -261,26 +317,30 @@ function feedbackIssues(recording = {}) {
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18" ||
     recording.analysisVersion === "2026-05-23-decision-branch-coaching-v17";
-  const needsKeyClickRule = recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+  const needsKeyClickRule = recording.analysisVersion === samiraGreenLightAnalysisVersion ||
+    recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
     recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19" ||
     recording.analysisVersion === "2026-05-24-key-click-rule-v18";
-  const needsExampleReview = recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+  const needsExampleReview = recording.analysisVersion === samiraGreenLightAnalysisVersion ||
+    recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
     recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20" ||
     recording.analysisVersion === "2026-05-24-example-review-v19";
-  const needsTightReview = (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+  const needsTightReview = (recording.analysisVersion === samiraGreenLightAnalysisVersion ||
+    recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
     recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21" ||
     recording.analysisVersion === "2026-05-24-tight-click-review-v20") &&
     (recording.analysisSource !== "manual" || recording.file === "auto_NA1-5566943774_01.mp4");
-  const needsDenseReview = (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+  const needsDenseReview = (recording.analysisVersion === samiraGreenLightAnalysisVersion ||
+    recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
     recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25" ||
     recording.analysisVersion === "2026-05-24-game-specific-rep-v22" ||
     recording.analysisVersion === "2026-05-24-dense-click-review-v21") &&
@@ -353,7 +413,7 @@ function feedbackIssues(recording = {}) {
   if (needsDecisionBranch && /\b(?:map cash[-\s]?outs?|cash(?:ing)? (?:those )?(?:wins|moments|it)? ?out(?:s)? cleaner|cash[-\s]?out timing|cleaner map|wrong task after the map state changes|call free structure, blocked structure, or reset)\b/i.test(allVisible)) {
     issues.push("full review uses abstract cash-out wording instead of exact branch rules");
   }
-  if (needsDecisionBranch && recording.analysisSource !== "manual" && /\b(tower|turret|structure|wave|inhib|inhibitor|nexus|payout|pressure)\b/i.test(allVisible) && !/\b(?:free tower|tower is free|hit tower|body blocks|blocker|push or clear|clear the wave|wave then recall|leave if none|closest threatened turret|who can stand in front)\b/i.test(allVisible)) {
+  if (needsDecisionBranch && !requiresSamiraGreenLightAudit(recording) && recording.analysisSource !== "manual" && /\b(tower|turret|structure|wave|inhib|inhibitor|nexus|payout|pressure)\b/i.test(allVisible) && !/\b(?:free tower|tower is free|hit tower|body blocks|blocker|push or clear|clear the wave|wave then recall|leave if none|closest threatened turret|who can stand in front)\b/i.test(allVisible)) {
     issues.push("full review must separate concrete branch options");
   }
   if (needsDecisionBranch && recording.analysisSource !== "manual" && hasStats && !/\b\d+\s*\/\s*\d+\s*\/\s*\d+\b[\s\S]{0,120}\bCS\b|\bCS\b[\s\S]{0,120}\b\d+\s*\/\s*\d+\s*\/\s*\d+\b/i.test(allVisible)) {
@@ -386,12 +446,13 @@ function feedbackIssues(recording = {}) {
   if (!recording.rankEstimate?.exactRank) {
     issues.push("full review missing exact rank read");
   }
-  if (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+  if (recording.analysisVersion === samiraGreenLightAnalysisVersion ||
+      recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
       recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25") {
     const performanceRank = clean(recording.performanceRank?.exactRank || recording.rankEstimate?.exactRank);
     const performanceReason = clean(recording.performanceRank?.reason || recording.rankEstimate?.reason);
     if (!performanceRank) {
-      issues.push("v25 review missing exact performance rank");
+      issues.push("current review missing exact performance rank");
     }
     if (!/\bCS(?:\/min)?\b/i.test(performanceReason) ||
         !/\bdeath|deaths|K\/D\/A\b/i.test(performanceReason) ||
@@ -437,9 +498,13 @@ function feedbackIssues(recording = {}) {
       issues.push("v25 review must separate value, state flip, and first bad next click");
     }
   }
-  if (recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
+  if (recording.analysisVersion === samiraGreenLightAnalysisVersion ||
+      recording.analysisVersion === "2026-05-26-early-micro-pass-v26" ||
       recording.analysisVersion === "2026-05-25-forensic-performance-rank-v25") {
     issues.push(...samiraFightMicroStandardIssues(recording));
+  }
+  if (requiresSamiraGreenLightAudit(recording)) {
+    issues.push(...samiraGreenLightStandardIssues(recording));
   }
   if (needsSecondaryFocus) {
     if (!secondaryFocus) {

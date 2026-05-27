@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T09:59:15.761Z",
+  "generatedAt": "2026-05-27T10:19:30.878Z",
   "source": "League of Legends Highlights folder",
   "match": "53 matches",
   "matches": [
@@ -235,7 +235,7 @@
       "confidence": "medium",
       "feedbackTitle": "Red-light E discipline first",
       "feedback": "The leak is using E or forward Samira pressure before W, HP, and ally state are all proved, so Samira becomes catchable instead of farming, kiting, or waiting.",
-      "gameDetail": "At 1:31, Samira Samira running along top-base platform toward the fountain, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. The 18/7/4, 139 CS line stays a conservative fallback read, so this review audits W/HP/ally E discipline instead of broad macro. This matters because red-light Samira farms/kites/waits; green-light Samira can fight.",
+      "gameDetail": "At 1:31, Samira running along top-base platform toward the fountain, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. The 18/7/4, 139 CS line stays a conservative fallback read, so this review audits W/HP/ally E discipline instead of broad macro. This matters because red-light Samira farms/kites/waits; green-light Samira can fight.",
       "secondaryFocus": "Rep: before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
       "mistakeTypes": [
         "W/HP/ally green-light check",
@@ -244,12 +244,12 @@
         "ally-on-screen re-check",
         "farm, kite, or wait discipline"
       ],
-      "eventEvidence": "7:52 shows enemy minions attacking a turret in bottom lane; Samira nearby and minimap visible. 14:43 shows Samira standing in the jungle near a ward/brush with the minimap and enemy indicators visible. 3:06 shows Samira moving along lane near brush with minimap showing allied/enemy positions. 4:42 shows 'You have slain an enemy!' banner at top center; Samira near minions by the top lane.",
+      "eventEvidence": "1:31 Samira running along top-base platform toward the fountain; 7:52 Enemy minions attacking a turret in bottom lane; 14:43 Samira standing in the jungle near a ward/brush with the minimap and enemy indicators visible.",
       "failureEvidence": "Fallback review could not recover a full model JSON, so the safe Samira standard is conservative: if W readiness, above-half HP, and ally presence are not all visible at the Samira-pressure timestamp, the moment is red light and E is locked.",
       "goodThing": "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
       "whyTrust": "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
       "focusTag": "samira green-light discipline",
-      "evidence": "1:31 Samira Samira running along top-base platform toward the fountain; 7:52 Enemy minions attacking a turret in bottom lane; Samira nearby and minimap visible. 14:43 Samira standing in the jungle near a ward/brush with the minimap and enemy indicators visible.",
+      "evidence": "1:31 Samira running along top-base platform toward the fountain; 7:52 Enemy minions attacking a turret in bottom lane; 14:43 Samira standing in the jungle near a ward/brush with the minimap and enemy indicators visible.",
       "pattern": "Samira climbs faster when red-light moments become farm, kite, wait, or back-click instead of another forward E.",
       "diamondRule": "No E toward a Samira unless W, HP, and ally are all green.",
       "drill": "before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
@@ -300,12 +300,12 @@
         {
           "clock": "1:31",
           "videoSeconds": 99.385,
-          "description": "Samira Samira running along top-base platform toward the fountain"
+          "description": "Samira running along top-base platform toward the fountain"
         },
         {
           "clock": "7:52",
           "videoSeconds": 480.923,
-          "description": "Enemy minions attacking a turret in bottom lane; Samira nearby and minimap visible."
+          "description": "Enemy minions attacking a turret in bottom lane"
         },
         {
           "clock": "14:43",
@@ -421,12 +421,12 @@
         "ally-on-screen re-check",
         "farm, kite, or wait discipline"
       ],
-      "eventEvidence": "8:20 shows Samira and ally attacking an enemy turret with minions. 2:03 shows Samira attacking a cannon/minion wave in bottom lane. 5:50 shows Samira last-hitting minions near bottom turret. 10:50 shows two allied champions with a large ally shield effect in bottom lane; minions present.",
+      "eventEvidence": "2:03 shows Samira attacking a cannon/minion wave in bottom lane.; 5:50 shows Samira last-hitting minions near bottom turret.; 8:20 shows Samira and ally attacking an enemy turret with minions.",
       "failureEvidence": "Fallback review could not recover a full model JSON, so the safe Samira standard is conservative: if W readiness, above-half HP, and ally presence are not all visible at the Samira-pressure timestamp, the moment is red light and E is locked.",
       "goodThing": "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
       "whyTrust": "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
       "focusTag": "samira green-light discipline",
-      "evidence": "2:03 shows Samira attacking a cannon/minion wave in bottom lane. 5:50 shows Samira last-hitting minions near bottom turret. 8:20 shows Samira and ally attacking an enemy turret with minions.",
+      "evidence": "2:03 shows Samira attacking a cannon/minion wave in bottom lane.; 5:50 shows Samira last-hitting minions near bottom turret.; 8:20 shows Samira and ally attacking an enemy turret with minions.",
       "pattern": "Samira climbs faster when red-light moments become farm, kite, wait, or back-click instead of another forward E.",
       "diamondRule": "No E toward a Samira unless W, HP, and ally are all green.",
       "drill": "before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",

@@ -32,12 +32,15 @@ const jungleFightExitRep = "Rep: after a jungle fight gives first value, ask: ex
 const midRiverChaseRep = "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.";
 const earlyLaneBackclickRep = "Rep: first 10 minutes, every trade is auto/Q - back click - re-check. After the back click, E forward only if support or wave still protects you and the target is already CC'd or low; otherwise farm the wave.";
 const midFightValueExitRep = "Rep: after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.";
-const analysisVersion = "2026-05-26-early-micro-pass-v26";
+const samiraGreenLightRep = "Rep: before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.";
+const analysisVersion = "2026-05-27-samira-green-light-v28";
 const earlyMicroAnalysisVersion = "2026-05-26-early-lane-micro-v1";
 const earlyMicroMinFps = Number(process.env.LEAGUE_EARLY_MICRO_MIN_FPS || 6);
 const earlyMicroMaxFrames = Number(process.env.LEAGUE_EARLY_MICRO_MAX_FRAMES || 24);
 const compatibleAnalysisVersions = new Set([
   analysisVersion,
+  "2026-05-27-samira-green-light-v27",
+  "2026-05-26-early-micro-pass-v26",
   "2026-05-25-forensic-performance-rank-v25",
   "2026-05-24-command-lane-rep-v24",
   "2026-05-24-lane-specific-rep-v23",
@@ -1193,6 +1196,15 @@ function earlyMicroSpecificityIssues(microReview, champion = "Unknown") {
   if (laneTradeLike && !/\b(E|dash)\b/i.test(summary)) {
     issues.push("must say whether E/dash is legal, illegal, chase, or not visible");
   }
+  if (laneTradeLike && !/\b(red[-\s]?light|green[-\s]?light|W\s*(?:is\s*)?(?:gray|grey|down|ready|not ready|not visibly ready)|W readiness|W\s*,\s*HP\s*,\s*ally)\b/i.test(summary)) {
+    issues.push("must apply Samira W/HP/ally green-light check");
+  }
+  if (laneTradeLike && !/\b(?:above|over|below|under)\s+half\s+HP\b|\blow[-\s]?HP\b|\bhealth\b/i.test(summary)) {
+    issues.push("must name Samira HP state for E legality");
+  }
+  if (laneTradeLike && !/\bally\b[\s\S]{0,80}\b(?:screen|close|near|nearby|front|fight with|between|not visible|not close)\b/i.test(summary)) {
+    issues.push("must name ally-on-screen or ally-close state for E legality");
+  }
   return issues;
 }
 
@@ -1232,6 +1244,53 @@ function samiraFightMicroSpecificityIssues(parsed, context = {}) {
   }
   if (!/\b(low|unsupported|ally[-\s]?front|ally is still in front|support|wave still protects|enemy CC|CC'd|target HP|target is .*low)\b/i.test(combined)) {
     issues.push("Samira fight review must name the re-entry check: ally front, enemy CC, target HP, or low/unsupported state");
+  }
+  return issues;
+}
+
+function samiraGreenLightSpecificityIssues(parsed, context = {}) {
+  const champion = clean(context.champion || parsed?.champion || "");
+  const secondaryFocus = clean(parsed?.secondaryFocus || parsed?.secondaryImprovement || parsed?.drill || "");
+  const gameDetail = clean(parsed?.gameDetail || "");
+  const combined = [
+    parsed?.feedbackTitle,
+    parsed?.feedback,
+    gameDetail,
+    secondaryFocus,
+    parsed?.failureEvidence,
+    parsed?.eventEvidence,
+    parsed?.goodThing,
+    parsed?.pattern,
+    Array.isArray(parsed?.mistakeTypes) ? parsed.mistakeTypes.join(" ") : "",
+    Array.isArray(parsed?.nuance) ? parsed.nuance.join(" ") : ""
+  ].join(" ");
+  const isSamira = /\bsamira\b/i.test([champion, combined].join(" "));
+  if (!isSamira) return [];
+
+  const issues = [];
+  if (!/\b(red[-\s]?light|green[-\s]?light)\b/i.test(combined)) {
+    issues.push("Samira review must use green-light/red-light language as the main lens");
+  }
+  if (!/\b(?:W\s*(?:is\s*)?(?:gray|grey|down|ready|not ready|not visibly ready|unavailable|on cooldown)|W readiness|W condition|W\s*,\s*HP\s*,\s*ally)\b/i.test(combined)) {
+    issues.push("Samira green-light review must name W readiness or W gray/down as a condition");
+  }
+  if (!/\b(?:above|over|below|under)\s+half\s+HP\b|\bhalf health\b|\blow[-\s]?HP\b/i.test(combined)) {
+    issues.push("Samira green-light review must name above/below-half HP as a condition");
+  }
+  if (!/\bally\b[\s\S]{0,80}\b(?:screen|close|near|nearby|front|fight with|on target|between|missing|not visible|not close)\b/i.test(combined)) {
+    issues.push("Samira green-light review must name ally-on-screen or ally-close-enough as a condition");
+  }
+  if (!/\b(?:E\s*(?:toward|forward|key|is locked|is dead|legal|illegal)|forward\s+(?:E|click|input|pressure)|dash)\b/i.test(combined)) {
+    issues.push("Samira green-light review must name the wrong E/forward/dash input");
+  }
+  if (!/\b(?:Q\/auto|auto\/Q|auto|Q)\b[\s\S]{0,100}\b(?:back|backing|kite|farm|wait|reset spacing)\b|\b(?:back[-\s]?click|click back|reset spacing|kite|farm|wait)\b/i.test(combined)) {
+    issues.push("Samira green-light review must name the correct input: Q/auto while backing up, kite, farm, wait, or reset spacing");
+  }
+  if (!/\bRep\s*:/i.test(secondaryFocus) || !/\b(?:W\s*,\s*HP\s*,\s*ally|W gray|E key is dead|no E|red[-\s]?light|green[-\s]?light)\b/i.test(secondaryFocus)) {
+    issues.push("Samira green-light Rep must be the next-game W/HP/ally E-lock drill");
+  }
+  if (!sentenceParts(gameDetail).some((sentence) => /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) && /\b(red[-\s]?light|green[-\s]?light|W|half HP|ally|E|forward)\b/i.test(sentence))) {
+    issues.push("Samira green-light review must put the red/green-light audit at the key timestamp");
   }
   return issues;
 }
@@ -1810,6 +1869,28 @@ function kdaParts(recording = {}) {
   };
 }
 
+function isSamiraRecording(recording = {}) {
+  const text = [
+    recording.champion,
+    recording.championSlug,
+    recording.title,
+    recording.feedbackTitle,
+    recording.feedback,
+    recording.gameDetail,
+    recording.goodThing,
+    recording.failureEvidence,
+    recording.pattern,
+    Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.join(" ") : "",
+    recording.eventEvidence,
+    recording.evidence
+  ].join(" ");
+  return /\bsamira\b/i.test(text);
+}
+
+function requiresSamiraGreenLightAudit(recording = {}) {
+  return recording.analysisVersion === analysisVersion && isSamiraRecording(recording);
+}
+
 function reviewRepCategory(recording = {}) {
   if ((recording.file || "") === "auto_NA1-5568519322_01.mp4") {
     return "objectiveFight";
@@ -1833,6 +1914,9 @@ function reviewRepCategory(recording = {}) {
   const isSamira = /\bsamira\b/i.test([recording.champion, recording.championSlug, recording.title, text].join(" "));
   const hasSpecificObjectiveFight = /\b(dragon|baron|objective fight|objective entry|objective pit|pit fight)\b/i.test(text);
 
+  if (requiresSamiraGreenLightAudit(recording)) {
+    return "samiraGreenLight";
+  }
   if (Number.isFinite(kills) && kills >= 18 && /\b(defeat|loss|lost|eight deaths|death|objective|won exchange|first useful damage|reset)\b/i.test(text)) {
     return "firstWinCashout";
   }
@@ -1904,6 +1988,8 @@ function specificRepForRecording(recording = {}) {
   }
   const text = analysisCoachText(recording);
   switch (reviewRepCategory(recording)) {
+    case "samiraGreenLight":
+      return samiraGreenLightRep;
     case "basePush":
       return basePushRep;
     case "firstWinCashout":
@@ -1941,6 +2027,10 @@ function repMatchesGameCategory(recording = {}) {
   const rep = coachClean(recording.secondaryFocus || recording.secondaryImprovement || recording.drill || "");
   if (!rep) return false;
   switch (reviewRepCategory(recording)) {
+    case "samiraGreenLight":
+      return /\bW\b[\s\S]{0,80}\bHP\b[\s\S]{0,80}\bally\b/i.test(rep) &&
+        /\b(E key is dead|no E|E forward|E toward|green[-\s]?light E|red[-\s]?light)\b/i.test(rep) &&
+        /\b(gray|ready|under half|above half|on screen|close enough|kite|farm|wait|Q\/auto|auto)\b/i.test(rep);
     case "basePush":
       return /\bstructure,\s*blocker,\s*wave,\s*or\s*exit\b/i.test(rep);
     case "firstWinCashout":
@@ -2182,6 +2272,62 @@ function repairPublishAuditRequirements(recording, fileName) {
   recording.gameDetail = stripUnmatchedClockTokens(recording.gameDetail, recording.clockAnchors);
   recording.eventEvidence = stripUnmatchedClockTokens(recording.eventEvidence || recording.evidence || "", recording.clockAnchors);
   recording.evidence = stripUnmatchedClockTokens(recording.evidence || recording.eventEvidence || "", recording.clockAnchors);
+}
+
+function enforceSamiraGreenLightFallbackShape(recording = {}) {
+  if (!requiresSamiraGreenLightAudit(recording) || recording.analysisSource !== "fallback") return;
+  const cleanAnchorDescription = (value) => coachClean(value)
+    .replace(/\bSamira\s+Samira\b/g, "Samira")
+    .replace(/,\s*so this is red[-\s]?light.*$/i, "")
+    .replace(/;\s*the leak is.*$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const cleanAnchorList = (items) => cleanClockAnchors(items).map((item) => ({
+    ...item,
+    description: cleanAnchorDescription(item.description)
+  }));
+  recording.clockMoments = cleanAnchorList(recording.clockMoments || recording.clockAnchors || []);
+  recording.clockAnchors = cleanAnchorList(recording.clockAnchors || recording.clockMoments || []);
+  const anchors = cleanClockAnchors(recording.clockMoments || recording.clockAnchors || []);
+  const anchor = anchors.find((item) => item?.clock && item?.description && !anchorDescriptionLooksWeak(item.description)) || anchors.find((item) => item?.clock);
+  const clock = anchor?.clock || (String(recording.gameDetail || "").match(/\b\d{1,2}:[0-5]\d\b/) || [])[0] || "the key timestamp";
+  const state = anchor?.description && !anchorDescriptionLooksWeak(anchor.description)
+    ? clauseDescription(anchor.description, recording.champion || "Samira")
+      .replace(/\bSamira\s+Samira\b/g, "Samira")
+      .replace(/,\s*so this is red[-\s]?light.*$/i, "")
+      .replace(/;\s*the leak is.*$/i, "")
+    : "the sampled frames do not prove W ready, HP above half, and ally close together";
+  const kda = coachClean(recording.kda || ([recording.kills, recording.deaths, recording.assists].every((value) => Number.isFinite(Number(value))) ? `${recording.kills}/${recording.deaths}/${recording.assists}` : ""));
+  const cs = finiteStatNumber(recording.cs);
+  const statSentence = kda && Number.isFinite(cs)
+    ? ` The ${kda}, ${cs} CS line stays a conservative fallback read, so this review audits W/HP/ally E discipline instead of broad macro.`
+    : "";
+  recording.feedbackTitle = recording.feedbackTitle || "Red-light E discipline first";
+  recording.title = recording.title || recording.feedbackTitle;
+  recording.feedback = "The leak is using E or forward Samira pressure before W, HP, and ally state are all proved, so Samira becomes catchable instead of farming, kiting, or waiting.";
+  recording.gameDetail = coachClean(
+    `At ${clock}, ${state}, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait.${statSentence} This matters because red-light Samira farms/kites/waits; green-light Samira can fight.`
+  );
+  recording.secondaryFocus = samiraGreenLightRep;
+  recording.mistakeTypes = [
+    "W/HP/ally green-light check",
+    "red-light E or forward click",
+    "Q/auto while backing up",
+    "ally-on-screen re-check",
+    "farm, kite, or wait discipline"
+  ];
+  recording.failureEvidence = coachClean(recording.failureEvidence || `At ${clock}, the fallback cannot prove all three green-light conditions together, so E stays locked.`);
+  recording.goodThing = coachClean(recording.goodThing || "The review is preserving Samira's damage intent, but only when the W/HP/ally light is green.");
+  recording.pattern = coachClean(recording.pattern || "Treat every champion-facing E as locked until W is ready, HP is above half, and an ally is close enough to fight.");
+  const evidenceLine = anchors
+    .filter((item) => item?.clock && item?.description)
+    .slice(0, 3)
+    .map((item) => `${item.clock} ${cleanAnchorDescription(item.description)}`)
+    .join("; ");
+  if (evidenceLine) {
+    recording.evidence = evidenceLine;
+    recording.eventEvidence = evidenceLine;
+  }
 }
 
 function hasRepeatedConversionGlossary(recording = {}) {
@@ -2720,6 +2866,9 @@ function anchorOrAnalysisHasJungleFight(analysis = {}, anchor = null) {
 
 function correctNextClickForAnalysis(analysis = {}, anchor = null) {
   const text = analysisCoachText(analysis);
+  if (requiresSamiraGreenLightAudit(analysis)) {
+    return "treat E as locked unless W is ready, HP is above half, and an ally is on screen or close enough; Q/auto while backing up, kite, farm, or wait";
+  }
   if (anchorOrAnalysisHasJungleFight(analysis, anchor)) {
     return "exit to turret, catch mid wave, reset, or regroup";
   }
@@ -2743,6 +2892,9 @@ function correctNextClickForAnalysis(analysis = {}, anchor = null) {
 
 function wrongDecisionForAnalysis(analysis = {}, anchor = null) {
   const text = analysisCoachText(analysis);
+  if (requiresSamiraGreenLightAudit(analysis)) {
+    return "using E or a forward champion click before all three green-light checks are true";
+  }
   if (anchorOrAnalysisHasJungleFight(analysis, anchor)) {
     return "continuing the same jungle fight after first value";
   }
@@ -2774,6 +2926,9 @@ function keyVisibleStateForAnchor(anchor, champion = "Samira") {
 function keyClickRuleSentence(analysis = {}, anchor = null, champion = "Samira") {
   if (!anchor?.clock) return "";
   const state = keyVisibleStateForAnchor(anchor, champion);
+  if (requiresSamiraGreenLightAudit(analysis)) {
+    return `At ${anchor.clock}, ${state}, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait.`;
+  }
   const wrong = wrongDecisionForAnalysis(analysis, anchor);
   const click = correctNextClickForAnalysis(analysis, anchor);
   return `At ${anchor.clock}, ${state}, so the wrong click is ${wrong} and the next click is to ${click}.`;
@@ -2824,7 +2979,9 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
   const leadSubject = subject === "Unknown" ? "your lead" : `a ${subject} lead`;
   const stats = statContextSentence(analysis, champion);
   const category = reviewRepCategory(analysis);
-  const why = category === "jungleFightExit" || anchorOrAnalysisHasJungleFight(analysis, primary)
+  const why = category === "samiraGreenLight"
+    ? `Red-light Samira farms, kites, waits, or back-clicks; green-light Samira fights only after W, HP, and ally are all true.`
+    : category === "jungleFightExit" || anchorOrAnalysisHasJungleFight(analysis, primary)
     ? `This is a phase problem: the first jungle value can be playable, but after value is gained the next click has to become exit, wave, reset, or group before enemies get another collapse.`
     : `This is a phase problem: the first wave, fight, or tower pressure can be legal, but after that value is gained the next click has to become exit, wave, recall, group, or another visible result before enemies get another collapse.`;
   const legalityBridge = /\b(legal|illegal|not automatically wrong|partly legal|mostly legal|setup expires|setup is gone)\b/i.test(clauses.join(" "))
@@ -2834,6 +2991,7 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
     return coachClean([
       clauses.join(" "),
       rest[0] ? `By ${rest[0].clock}, ${clauseDescription(rest[0].description, champion)}.` : "",
+      stats,
       shorthand,
       why
     ].filter(Boolean).join(" "));
@@ -2923,6 +3081,9 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
 
 function deterministicFallbackFeedback(recording, champion = "Samira") {
   const text = [recording.gameDetail, recording.feedback, recording.pattern, recording.eventEvidence].join(" ").toLowerCase();
+  if (requiresSamiraGreenLightAudit(recording) || (recording.analysisVersion === analysisVersion && /\bsamira\b/i.test(champion))) {
+    return "The leak is using E or forward champion pressure before the green light is proven, so Samira becomes catchable instead of farming, kiting, or waiting until W, HP, and ally state all allow the fight.";
+  }
   if (anchorOrAnalysisHasJungleFight(recording)) {
     return "The leak is continuing the same jungle fight after the first value window, so a playable entry becomes enemy tempo instead of turret, mid wave, reset, or regroup.";
   }
@@ -3158,7 +3319,7 @@ function visibleParagraphStandardIssues(recording = {}) {
   if (needsActionScript && /\b(?:map cash[-\s]?outs?|cash(?:ing)? (?:those )?(?:wins|moments|it)? ?out(?:s)? cleaner|cash[-\s]?out timing|cleaner map|wrong task after the map state changes|call free structure, blocked structure, or reset)\b/i.test(allVisibleText)) {
     issues.push("visible paragraph uses abstract cash-out wording instead of exact branch rules");
   }
-  if (needsActionScript && recording.analysisSource !== "manual" && /\b(tower|turret|structure|wave|inhib|inhibitor|nexus|payout|pressure)\b/i.test(allVisibleText) && !/\b(?:free tower|tower is free|hit tower|body blocks|blocker|push or clear|clear the wave|wave then recall|leave if none|closest threatened turret|who can stand in front)\b/i.test(allVisibleText)) {
+  if (needsActionScript && !requiresSamiraGreenLightAudit(recording) && recording.analysisSource !== "manual" && /\b(tower|turret|structure|wave|inhib|inhibitor|nexus|payout|pressure)\b/i.test(allVisibleText) && !/\b(?:free tower|tower is free|hit tower|body blocks|blocker|push or clear|clear the wave|wave then recall|leave if none|closest threatened turret|who can stand in front)\b/i.test(allVisibleText)) {
     issues.push("visible paragraph must separate concrete branch options");
   }
   if (needsActionScript && recording.analysisSource !== "manual" && hasStats && !/\b\d+\s*\/\s*\d+\s*\/\s*\d+\b[\s\S]{0,120}\bCS\b|\bCS\b[\s\S]{0,120}\b\d+\s*\/\s*\d+\s*\/\s*\d+\b/i.test(allVisibleText)) {
@@ -3207,6 +3368,9 @@ function visibleParagraphStandardIssues(recording = {}) {
   }
   if (needsSecondaryFocus) {
     issues.push(...secondaryFocusStandardIssues(recording));
+  }
+  if (requiresSamiraGreenLightAudit(recording)) {
+    issues.push(...samiraGreenLightSpecificityIssues(recording, recording));
   }
   if (needsTightReview && !repMatchesGameCategory(recording)) {
     issues.push("pink Rep must match the game-specific mistake type");
@@ -3266,10 +3430,10 @@ function hasKeyTimestampClickRule(text) {
     /\b(?:At|Around|By)\s+\d{1,2}:[0-5]\d\b/i.test(sentence) &&
     (
       (/\bmistake category\s*:/i.test(sentence) && /\bcorrect next click\s*:/i.test(sentence)) ||
-      /\bso\s+(?:the\s+)?next\s+(?:click|input)\s+is\b|\bthe\s+next\s+(?:click|input)\s+is\b|\b(?:back[-\s]?click|click\s+(?:back|out|away|toward|only))\b/i.test(sentence)
+      /\bso\s+(?:the\s+)?next\s+(?:click|input)\s+is\b|\bthe\s+next\s+(?:click|input)\s+is\b|\bcorrect\s+input\s+is\b|\b(?:back[-\s]?click|click\s+(?:back|out|away|toward|only))\b|\b(?:red[-\s]?light|green[-\s]?light)\b[\s\S]{0,140}\b(?:E|input|Q\/auto|auto\/Q|back|kite|farm|wait)\b/i.test(sentence)
     ) &&
-    /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free)\b/i.test(sentence) &&
-    /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back)\b/i.test(sentence)
+    /\b(tower|turret|structure|wave|objective|dragon|baron|ally front|ally-front|front|payout|visible|screen|enemy|enemies|collapse|safe|free|W|HP|ally|red[-\s]?light|green[-\s]?light)\b/i.test(sentence) &&
+    /\b(hit|clear|recall|leave|hold|wait|walk|drop|stop|defend|reset|enter|click|kite|back|Q\/auto|auto\/Q|E)\b/i.test(sentence)
   ));
 }
 
@@ -5559,20 +5723,30 @@ function fallbackFeedback(file, duration, context = {}) {
     return {
       champion: "Samira",
       confidence: "medium",
-      feedbackTitle: "Pressure mode after payout vanished",
-      feedback: "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      gameDetail: "At the first visible mid-game pressure window, Samira needs a branch before the forward click: hit tower if it is free, hit only the enemy body blocking tower if an ally can stand in front, push or clear the wave then recall if wave is the only guaranteed value, or leave if none of those are true. The leak is staying in pressure mode after the safe payout is no longer proven, because that turns a playable wave or tower state into enemy time, another collapse window, or a lost reset. The next useful rep is not a slogan; it is checking closest threatened turret, ally deaths, and front body before the click.",
-      whyTrust: "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
+      feedbackTitle: "Red-light E discipline first",
+      feedback: "The leak is using E or forward champion pressure before W, HP, and ally state are all proved, so Samira becomes catchable instead of farming, kiting, or waiting.",
+      gameDetail: "At the first visible champion-pressure window, treat the play as red light unless W is ready, HP is above half, and an ally is on screen or close enough; if any condition is missing, E toward a champion is locked and the correct input is Q/auto while backing up, kite, farm, wait, or reset spacing. The leak is not aggression itself; it is letting a red-light moment become a forward E or chase when the review cannot prove W ready, above-half HP, and ally cover together.",
+      secondaryFocus: samiraGreenLightRep,
+      mistakeTypes: [
+        "W/HP/ally green-light check",
+        "red-light forward E or chase",
+        "Q/auto while backing up",
+        "ally-on-screen re-check",
+        "farm, kite, or wait discipline"
+      ],
+      failureEvidence: "Fallback review could not recover a full model JSON, so the safe Samira standard is conservative: if W readiness, above-half HP, and ally presence are not all visible at the champion-pressure timestamp, the moment is red light and E is locked.",
+      whyTrust: "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
       eventEvidence: "",
-      goodThing: "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-      focusTag: "overstay control",
+      goodThing: "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
+      focusTag: "samira green-light discipline",
       evidence: "",
-      pattern: "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
-      diamondRule: "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
-      drill: cleanerWinExitRep.replace(/^Rep\s*:\s*/i, ""),
-      nuance: ["High kills only matter when the next click creates tower, wave, objective, reset, or base value.", "Low CS makes every unclear forward click more expensive because income is already unstable."],
-      reviewLimit: "",
-      analysisSource: "fallback"
+      pattern: "Samira climbs faster when red-light moments become farm, kite, wait, or back-click instead of another forward E.",
+      diamondRule: "No E toward a champion unless W, HP, and ally are all green.",
+      drill: samiraGreenLightRep.replace(/^Rep\s*:\s*/i, ""),
+      nuance: ["This fallback intentionally reviews the selected habit first instead of broad macro.", "If the frames cannot prove W readiness, HP, and ally cover together, the conservative call is red light."],
+      reviewLimit: "Fallback review after model JSON failure; it audits the W/HP/ally E-lock habit and does not claim frame-perfect cooldowns or hidden map state.",
+      analysisSource: "fallback",
+      analysisVersion
     };
   }
   const samiraFallbacks = [
@@ -5887,6 +6061,9 @@ function analysisSpecificityIssues(parsed, context = {}) {
     issues.push("the beginning of the main mistake window must have a visible game-clock timestamp");
   }
   if (isAutoFullReview) {
+    issues.push(...samiraGreenLightSpecificityIssues(parsed, context));
+  }
+  if (isAutoFullReview) {
     issues.push(...samiraFightMicroSpecificityIssues(parsed, context));
   }
   if (isAutoFullReview) {
@@ -6161,7 +6338,7 @@ async function detectVisibleClockAnchors({ file, sourcePath, duration, sidecar, 
   }
 }
 
-async function analyzeRecording({ file, duration, framePaths, frameTimes, sequenceLabel, reviewPhase: phase, previousAnalysis = null }) {
+async function analyzeRecording({ file, duration, framePaths, frameTimes, sequenceLabel, reviewPhase: phase, champion = "", previousAnalysis = null }) {
   const manual = manualFeedback(file);
   if (manual) return { ...manual, sampledFrames: framePaths.length };
   if (!process.env.OPENAI_API_KEY) {
@@ -6187,6 +6364,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Analyze these League of Legends replay frames extremely carefully for Alan. He explicitly wants direct, evidence-based critique across every visible part of the game so he can climb toward Challenger, not comfort feedback.",
     "Images are chronological sampled frames from the recording. Read them in order and use every visible clue: followed champion, team list/nameplate, health bars, minimap shape when visible, wave state, structure/objective context, fight numbers, target selection, spacing, fog, recalls, base state, and obvious crowd-control or cooldown evidence.",
     "The player champion is usually the champion the replay camera follows most. Use the side list/nameplate when visible. If uncertain, say low confidence and state the limit.",
+    champion ? `Local match metadata says the player champion is ${champion}. Use that as the expected champion unless the frames visibly contradict it.` : "",
     "Use capture order internally to distinguish earlier leak evidence from later implementation attempts, but do not mention recency weighting in visible output.",
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
@@ -6198,6 +6376,10 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "The feedback field must be one short red sentence beginning with 'The leak is ...'. It names the actual bad decision once and the cost once. Do not use broad claims like 'chased too much' unless the frames show the chase and the missed result.",
     "Every detailed review must answer this decision chain in the visible fields: what Alan did, what leaked because of it, what happened next or almost happened, and what the better next click/check was. Be specific enough that a replay timestamp can prove or limit each claim.",
     "Alan's latest correction: keep the single-paragraph colored format, but make the review tighter, denser, and more direct. Ideal visible structure: sharp title, outcome header, one key timestamp, visible state, wrong click, correct click, one green habit to keep, one red leak, one pink Rep. Do not repeat the same payout checklist several times. Mention tower/wave/objective/ally-front style checks once when it is the playable rule, then stay short.",
+    "Current Samira priority until Alan changes it: green-light discipline is the main review lens. For Samira, do not mainly review broad macro, rotations, cash-out, or objective conversion unless that mistake directly comes from a green-light violation.",
+    "Samira green-light rule: E toward champions is allowed only when all three are true: W is ready, Samira is above half HP, and an ally is on screen or close enough to fight with her. If W is gray/down/not visibly ready, HP is below half, or no ally is on screen/close enough, it is red light. Red-light Samira farms, kites, backs up, Q/autos while retreating, or waits. Green-light Samira can fight.",
+    "For every Samira review, first find the key timestamp or timestamps where the E/forward-toward-champion rule breaks or is nearly broken. At the main timestamp, write the audit concretely: red light or green light, which condition failed, what input was wrong (E, dash, forward click, continuing forward after auto/Q, or pressure), and what the correct input was. If W readiness cannot be verified from the frames, say W is not visibly ready and treat E as locked rather than assuming it was safe.",
+    "For Samira, the pink Rep must be the next-game green-light drill, not a generic macro drill: before any E toward a champion, call W, HP, ally; if any one is false, E key is dead and the correct input is Q/auto while backing up, kite, farm, or wait.",
     "The pink Rep must be game-specific, not a universal template. A death-heavy loss should drill low-HP exits and no re-entry; a huge-kill loss should drill cashing out after the first won fight; a controlled base-push win should drill structure, blocker, wave, or exit; a cleaner win with fewer deaths and better CS should first recognize the improvement and drill the one remaining overstay/exit branch.",
     "For the key timestamp, split the play into phases inside natural prose: legal or illegal entry, value created or not, the exact state-flip moment, the first bad next click, and the correct next click. Do not label those phases as fields; make the sentence sound like a coach replaying the moment.",
     "For objective fights, do not mark the first entry wrong just because the final result was bad. If dragon/baron/objective is visible, allies are committed, and enemies are already engaged, say the entry is legal or partly legal; then critique the second fight after value if that is the real leak.",
@@ -6212,7 +6394,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like one smooth, short replay-review paragraph, not a stat audit and not a field list: include the main visible mistake window, what happened next or almost happened, and the K/D/A-CS blocker if available. The red feedback field names the leak, the green goodThing names the keep habit, and the pink secondaryFocus names the drill, so do not repeat those claims in gameDetail unless the timestamp evidence needs one short bridge. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must include the exact visible state, the wrong click, and the correct next click. Extra timestamps are optional and should appear only when they make the critique clearer. Current-standard gameDetail should usually stay under 650 characters.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
-    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: early-lane or mid-fight Samira micro = auto/Q or first burst - back-click - re-check, with E forward only after the re-check proves ally front or wave still protects you and the target is CC'd or low; lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after the first won fight; grouped base push = structure, blocker, wave, or exit; mid-wave river chase = after mid wave gives value, ask wave, turret, reset, or river. Do not start with 'Second focus:' or a label.",
+    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. For Samira, the Rep defaults to the green-light drill: W, HP, ally; any false condition means E key is dead and the input is Q/auto while backing up, kite, farm, or wait. For non-Samira or when Samira's green-light violation is not the issue, make the Rep match the game: early-lane or mid-fight Samira micro = auto/Q or first burst - back-click - re-check, with E forward only after the re-check proves ally front or wave still protects you and the target is CC'd or low; lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after the first won fight; grouped base push = structure, blocker, wave, or exit; mid-wave river chase = after mid wave gives value, ask wave, turret, reset, or river. Do not start with 'Second focus:' or a label.",
     "For Samira fight micro, do not stop at 'first value then exit.' Translate the moment into inputs: was the entry/damage window legal, what was the first auto/Q or burst window, where did the window end, what exact forward input made it illegal or catchable, and what should the next input have been. If the sampled FPS cannot prove a literal E keypress, say forward E/click or forward pressure rather than pretending exact input certainty.",
     "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
@@ -6240,17 +6422,17 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
 
   try {
     let parsed = await requestOpenAiJson(prompt, images, 1800);
-    const detailIssues = analysisSpecificityIssues(parsed, { file, duration });
+    const detailIssues = analysisSpecificityIssues(parsed, { file, duration, champion });
     if (detailIssues.length) {
       const retryPrompt = [
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, entry legality, value or no value, state flip, first bad next click, correct next click, one green keep habit, one red leak, one pink Rep. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' For objective fights, separate legal first entry from the second fight after value. For Samira lane or mid-fight trades, name the legal trade/start, the first auto/Q or burst damage window, the exact back-click point, and whether E/forward click is legal or only a chase/re-entry; the Rep should use hit/auto/Q - back-click - re-check when that is the actual drill. Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, entry legality, value or no value, state flip, first bad next click, correct next click, one green keep habit, one red leak, one pink Rep. For Samira, green-light discipline is the main lens: at the key timestamp say red light or green light, name W readiness, HP above/below half, ally on-screen/close-enough state, the wrong E/forward input, and the correct input. If W readiness is not visible, say W is not visibly ready and E toward champion is locked. The Samira Rep must be W, HP, ally; any false condition means E key is dead and the input is Q/auto while backing up, kite, farm, or wait. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' For objective fights, separate legal first entry from the second fight after value. For Samira lane or mid-fight trades, name the legal trade/start, the first auto/Q or burst damage window, the exact back-click point, and whether E/forward click is legal or only a chase/re-entry. Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
-    const finalDetailIssues = analysisSpecificityIssues(parsed, { file, duration });
+    const finalDetailIssues = analysisSpecificityIssues(parsed, { file, duration, champion });
     if (finalDetailIssues.length) {
       parsed.reviewLimit = coachClean(
         [parsed.reviewLimit, `Detail gate still limited by: ${finalDetailIssues.join("; ")}.`].filter(Boolean).join(" "),
@@ -6283,7 +6465,9 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     };
   } catch (error) {
     console.warn(`Feedback fallback for ${file}: ${error.message}`);
-    if (previousAnalysis) {
+    const shouldReplaceFallback = previousAnalysis?.analysisSource === "fallback" &&
+      (process.env.LEAGUE_RETRY_FALLBACK === "1" || process.env.LEAGUE_FORCE_ANALYSIS === "1" || (forceAnalysisFile && file === forceAnalysisFile));
+    if (previousAnalysis && !shouldReplaceFallback) {
       return {
         ...previousAnalysis,
         reviewLimit: stripDetailRefreshFailureNotes(previousAnalysis.reviewLimit) ||
@@ -6318,6 +6502,7 @@ async function analyzeEarlyMicroPass({ file, duration, framePaths, frameTimes, c
     `Likely player champion: ${champion}. If the champion is not visually clear, say the limit and use 'the followed champion'.`,
     "Look specifically for spacing relative to support and minion wave, enemy CC threat if visible, whether support is close enough to follow, auto/Q usage while backing up, W timing only if the projectile/spell is visible, and whether E/dash/all-in is legal.",
     "For early Samira lane trades, answer the exact micro chain when visible: whether the trade start is legal, what the first damage window is, where the back click should happen, and whether E is legal or just a chase after support/wave protection thins.",
+    "For Samira, police the green-light rule before broader lane advice: E toward champions is allowed only when W is ready, HP is above half, and an ally is on screen or close enough to fight with her. If W is gray/down/not visibly ready, HP is below half, or the ally is not close enough, call red light and make the correct input Q/auto while backing up, kite, farm, or wait.",
     "Use the approved Samira drill language when it fits the evidence: auto/Q - back click - re-check. After that back click, E forward is legal only if support or wave still protects the followed champion and the target is already CC'd or low; otherwise the next click is farm the wave, hold spacing, or wait for the next support/wave engage.",
     "Do not claim frame-perfect mechanics, exact cooldown timers, exact reaction time, animation cancels, or orbwalking unless the frames visibly support it. If the micro evidence is not enough, return available=false and a reviewLimit.",
     "The visible summary must start with 'Early micro:' and should be one compact coaching sentence or two short sentences. It must include one timestamp when visible, the exact lane state, legal/illegal judgment, first damage window, the back-click point, and the correct next click. Examples of acceptable action language: stand one step behind support here; enemy CC is still up so no trade; auto/Q - back click - re-check; this E is illegal chase; support engaged close enough, follow now.",
@@ -6334,7 +6519,7 @@ async function analyzeEarlyMicroPass({ file, duration, framePaths, frameTimes, c
         prompt,
         "",
         `The first micro draft was too generic: ${microIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. If this is a Samira lane trade, the summary must identify trade legality, first damage window, back-click point, E legal/illegal/chase/not visible, and the concrete drill 'auto/Q - back click - re-check' when that is the correct habit. If the frames cannot prove E or the first damage window, say that limit directly instead of using macro language."
+        "Rewrite once with the same JSON shape. If this is a Samira lane trade, the summary must identify green light or red light, W readiness, above/below-half HP, ally-on-screen/close-enough state, trade legality, first damage window, back-click point, E legal/illegal/chase/not visible, and the concrete drill 'auto/Q - back click - re-check' when that is the correct habit. If the frames cannot prove W or E, say that limit directly and default to no E unless all three green-light conditions are visible."
       ].join("\n"), images, 900);
       microIssues = earlyMicroSpecificityIssues(parsed, champion);
       if (microIssues.length) {
@@ -6750,6 +6935,7 @@ async function main() {
       continue;
     }
 
+    const cachedAnalysisVersion = clean(cached?.analysisVersion || previousAnalysis?.analysisVersion || entry.existingEntry?.analysisVersion || "");
     let analysis = cached;
     if (!analysis) {
       await fs.mkdir(frameDir, { recursive: true });
@@ -6762,7 +6948,16 @@ async function main() {
         }
         framePaths.push(framePath);
       }
-      analysis = await analyzeRecording({ file: name, duration, framePaths, frameTimes: sampleTimes, sequenceLabel, reviewPhase: phase, previousAnalysis });
+      analysis = await analyzeRecording({
+        file: name,
+        duration,
+        framePaths,
+        frameTimes: sampleTimes,
+        sequenceLabel,
+        reviewPhase: phase,
+        champion: clean(matchStats.championName || "", ""),
+        previousAnalysis
+      });
     }
     const microInfo = earlyMicroCaptureInfo(entry.sidecar);
     if (microInfo.available && !analysis.microReview && duration > 90) {
@@ -6957,7 +7152,7 @@ async function main() {
       nuance: cleanList(analysis.nuance, 5).map((item) => normalizeVisibleCoachText(item, championName)),
       reviewLimit: normalizeVisibleCoachText(stripDetailRefreshFailureNotes(analysis.reviewLimit) || "The review is based on sampled frames, not full input/cooldown telemetry.", championName),
       analysisSource: analysis.analysisSource || "cache",
-      analysisVersion: analysis.analysisVersion || analysisVersion,
+      analysisVersion: analysis.analysisVersion || ((cached || analysis.analysisSource === "manual") ? cachedAnalysisVersion : "") || analysisVersion,
       sampledFrames: analysis.sampledFrames || (cached ? cached.sampledFrames : analysisSampleTimes(duration, entry.sidecar).length),
       ...(cleanedMicroReview ? {
         microReview: cleanedMicroReview,
@@ -6978,6 +7173,7 @@ async function main() {
       recording.rankEstimate = rankEstimate;
       recording.performanceRank = performanceRankForRecording(recording, rankEstimate);
     }
+    enforceSamiraGreenLightFallbackShape(recording);
     enforceVisibleParagraphStandard(recording, name);
     sanitizeTemplateResidue(recording);
     recordings.push(recording);
