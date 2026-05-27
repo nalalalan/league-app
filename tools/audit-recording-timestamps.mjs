@@ -12,6 +12,7 @@ const analysisRoot = path.join(appRoot, "_recording-analysis");
 const manifestPath = path.join(publicRoot, "recordings", "recordings.json");
 const model = process.env.LEAGUE_TIMESTAMP_AUDIT_MODEL || "gpt-5-nano";
 const fallbackModel = process.env.LEAGUE_TIMESTAMP_AUDIT_FALLBACK_MODEL || process.env.LEAGUE_ANALYSIS_MODEL || "gpt-4.1";
+const mistakeTableAnalysisVersion = "2026-05-27-mistake-table-v29";
 const currentPrimaryMistakeAnalysisVersions = new Set([
   "2026-05-27-samira-green-light-v28",
   "2026-05-27-samira-green-light-v27",
@@ -279,6 +280,36 @@ function requiresVisibleParagraphStandard(recording) {
     currentPrimaryMistakeAnalysisVersions.has(recording.analysisVersion);
 }
 
+function requiresMistakeTableStandard(recording) {
+  return /^auto_/i.test(recording.file || "") &&
+    Number(recording.durationSeconds || 0) >= 90 &&
+    recording.analysisVersion === mistakeTableAnalysisVersion;
+}
+
+function mistakeTableTimestamps(recording) {
+  return (Array.isArray(recording.mistakeTable) ? recording.mistakeTable : [])
+    .map((row) => normalizeClock(row?.time || row?.clock || row?.timestamp))
+    .filter(Boolean);
+}
+
+function mistakeTableAnchors(recording, allAnchors) {
+  const selected = [];
+  for (const timestamp of [...new Set(mistakeTableTimestamps(recording))]) {
+    const timestampSeconds = clockSeconds(timestamp);
+    const match = allAnchors
+      .map((anchor) => ({
+        anchor,
+        delta: Math.abs(clockSeconds(anchor.clock) - timestampSeconds)
+      }))
+      .filter((item) => Number.isFinite(item.delta) && item.delta <= 2.5)
+      .sort((a, b) => a.delta - b.delta || (b.anchor.description ? 1 : 0) - (a.anchor.description ? 1 : 0))[0]?.anchor;
+    if (match && !selected.some((anchor) => anchor.clock === match.clock && anchor.videoSeconds === match.videoSeconds)) {
+      selected.push(match);
+    }
+  }
+  return selected;
+}
+
 function unanchoredNarrativeTimestamps(recording, anchors) {
   const misses = [];
   for (const text of narrativeFields(recording)) {
@@ -423,14 +454,24 @@ async function main() {
     const duration = Number(recording.durationSeconds || 0);
     const videoPath = manifestVideoPath(recording);
     const strictVisibleStandard = requiresVisibleParagraphStandard(recording);
-    const anchors = strictVisibleStandard ? displayClockAnchors(recording, allAnchors) : [];
+    const tableStandard = requiresMistakeTableStandard(recording);
+    const anchors = strictVisibleStandard ? displayClockAnchors(recording, allAnchors) : (tableStandard ? mistakeTableAnchors(recording, allAnchors) : []);
     const unanchored = unanchoredNarrativeTimestamps(recording, allAnchors);
-    if (unanchored.length && strictVisibleStandard) {
+    const tableUnanchored = tableStandard
+      ? mistakeTableTimestamps(recording).filter((timestamp) => !timestampMatchesAnchor(timestamp, allAnchors))
+      : [];
+    if (tableUnanchored.length) {
+      failures.push(`${recording.file}: mistake table timestamp(s) without matching anchors: ${[...new Set(tableUnanchored)].join(", ")}`);
+    } else if (unanchored.length && strictVisibleStandard) {
       failures.push(`${recording.file}: visible timestamp(s) without matching anchors: ${unanchored.join(", ")}`);
     } else if (unanchored.length) {
       warnings.push(`${recording.file}: extra visible timestamp(s) without matching anchors: ${unanchored.join(", ")}`);
     }
-    if (strictVisibleStandard) {
+    if (tableStandard) {
+      const rows = Array.isArray(recording.mistakeTable) ? recording.mistakeTable : [];
+      if (!rows.length) failures.push(`${recording.file}: mistake table is missing`);
+      if (rows.length > 5) failures.push(`${recording.file}: mistake table has more than five rows`);
+    } else if (strictVisibleStandard) {
       const standardIssues = visibleParagraphStandardIssues(recording, allAnchors);
       for (const issue of standardIssues) {
         failures.push(`${recording.file}: ${issue}`);

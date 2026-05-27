@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T10:19:30.878Z",
+  "generatedAt": "2026-05-27T17:16:18.395Z",
   "source": "League of Legends Highlights folder",
   "match": "53 matches",
   "matches": [
@@ -63,7 +63,7 @@
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 27, 2026, 1:56 AM: newest full-game read Bronze I; current 3-game read Bronze III; archive median Bronze IV across 50 full games, used only as baseline context. The newest game is above the current three-game read.",
+    "focus": "Synced through May 27, 2026, 1:56 AM: newest full-game read Bronze I; current 3-game read Bronze III; archive median Iron I across 50 full games, used only as baseline context. The newest game is above the current three-game read.",
     "rule": "The newest-game blocker is w/HP/ally green-light check and red-light E or forward click; the current repeat across the latest games is q/auto while backing up, red-light E or forward click, and w/HP/ally green-light check. The keep-habit is Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
     "nextRep": "Rep: before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
@@ -92,9 +92,9 @@
     "anchoredFullGames": 51,
     "statFullGames": 51,
     "rankLabelCounts": {
-      "Bronze": 20,
+      "Bronze": 19,
       "Silver": 6,
-      "Iron": 25
+      "Iron": 26
     },
     "exactRankScale": [
       "Iron IV",
@@ -245,7 +245,7 @@
         "farm, kite, or wait discipline"
       ],
       "eventEvidence": "1:31 Samira running along top-base platform toward the fountain; 7:52 Enemy minions attacking a turret in bottom lane; 14:43 Samira standing in the jungle near a ward/brush with the minimap and enemy indicators visible.",
-      "failureEvidence": "Fallback review could not recover a full model JSON, so the safe Samira standard is conservative: if W readiness, above-half HP, and ally presence are not all visible at the Samira-pressure timestamp, the moment is red light and E is locked.",
+      "failureEvidence": "The table is conservative because sampled frames did not prove every cooldown, HP state, ally position, or hidden enemy",
       "goodThing": "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
       "whyTrust": "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
       "focusTag": "samira green-light discipline",
@@ -317,9 +317,9 @@
         "This fallback intentionally reviews the selected habit first instead of broad macro.",
         "If the frames cannot prove W readiness, HP, and ally cover together, the conservative call is red light."
       ],
-      "reviewLimit": "Fallback review after model JSON failure; it audits the W/HP/ally E-lock habit and does not claim frame-perfect cooldowns or hidden map state.",
+      "reviewLimit": "it audits the W/HP/ally E-lock habit and does not claim frame-perfect cooldowns or hidden map state",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-27-samira-green-light-v28",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "microCaptureFps": 8,
       "publicVideoBytes": 58795369,
@@ -368,7 +368,21 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "5.8 CS/min with 18/7/4 K/D/A and 7 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "1:31",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "7:52",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "14:43",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5569237516_01.mp4",
@@ -422,7 +436,7 @@
         "farm, kite, or wait discipline"
       ],
       "eventEvidence": "2:03 shows Samira attacking a cannon/minion wave in bottom lane.; 5:50 shows Samira last-hitting minions near bottom turret.; 8:20 shows Samira and ally attacking an enemy turret with minions.",
-      "failureEvidence": "Fallback review could not recover a full model JSON, so the safe Samira standard is conservative: if W readiness, above-half HP, and ally presence are not all visible at the Samira-pressure timestamp, the moment is red light and E is locked.",
+      "failureEvidence": "The table is conservative because sampled frames did not prove every cooldown, HP state, ally position, or hidden enemy",
       "goodThing": "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
       "whyTrust": "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
       "focusTag": "samira green-light discipline",
@@ -514,9 +528,9 @@
         "This fallback intentionally reviews the selected habit first instead of broad macro.",
         "If the frames cannot prove W readiness, HP, and ally cover together, the conservative call is red light."
       ],
-      "reviewLimit": "Fallback review after model JSON failure; it audits the W/HP/ally E-lock habit and does not claim frame-perfect cooldowns or hidden map state.",
+      "reviewLimit": "it audits the W/HP/ally E-lock habit and does not claim frame-perfect cooldowns or hidden map state",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-27-samira-green-light-v28",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "microCaptureFps": 8,
       "publicVideoBytes": 48458962,
@@ -565,7 +579,25 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "6.3 CS/min with 21/5/0 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "2:03",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "5:50",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "8:20",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:48",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5569169922_01.mp4",
@@ -685,7 +717,7 @@
       ],
       "reviewLimit": "Manual 2 FPS macro frames cannot prove the exact E keypress, every cooldown, or hidden flanks, but they verify the recall, bot wave setup, tower fight, turret-destroyed state, and death-timer consequence.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "microCaptureFps": 8,
       "publicVideoBytes": 69706419,
@@ -733,7 +765,25 @@
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "reason": "5.7 CS/min and 12 deaths put the game at Iron IV because fight entry is still catchable; the main leak is exit/re-entry after first value."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "17:47",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "17:57",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "10:32",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "15:47",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5569137549_01.mp4",
@@ -777,7 +827,7 @@
       "confidence": "high",
       "feedbackTitle": "Mid fight gave value, then needed back-click",
       "feedback": "The leak is that after the first mid-fight burst creates value, your next input stays forward toward the second body, so a playable ally-front fight becomes another death timer instead of back-click, wave, recall, or group.",
-      "gameDetail": "At 23:58, you are behind two allies in mid while enemies are already knocked up or near-sighted and one target is in range, so the first burst is legal, but the wrong click is staying forward after that value and the next click is back-click through mid wave or toward base while allies finish. By 24:35 you are dead, which means the fight was not a no-damage problem; the state flipped after the first burst and the next input needed to be hit - back-click - re-check. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
+      "gameDetail": "At 23:58, you are behind two allies in mid while enemies are already knocked up or near-sighted and one target is in range, so the first burst is legal, but the wrong click is staying forward after that value and the next click is back-click through mid wave or toward base while allies finish. By 24:35 you are dead, which means the fight was not a no-damage problem; the state flipped after the first burst and the next input needed to be hit - back-click - re-check.",
       "secondaryFocus": "Rep: after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.",
       "mistakeTypes": [
         "first-burst back-click timing",
@@ -842,7 +892,7 @@
       ],
       "reviewLimit": "Manual 2 FPS macro frames cannot prove the exact E keypress, cooldowns, or every hidden enemy, so the claim is about visible forward pressure and spacing after the first burst; the frames verify ally-front entry, controlled targets, and the death-timer consequence.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "microCaptureFps": 8,
       "publicVideoBytes": 57263799,
@@ -879,7 +929,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.9 CS/min and 5 deaths keep the game around Iron I even though 9/5/3 K/D/A shows real fight participation; the main leak is failing the exit/back-click after first mid-fight value, so pressure turns into dead time instead of wave, recall, or group."
+        "reason": "6.9 CS/min and 5 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -889,8 +939,26 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "6.9 CS/min and 5 deaths keep the game around Iron I even though 9/5/3 K/D/A shows real fight participation; the main leak is failing the exit/back-click after first mid-fight value, so pressure turns into dead time instead of wave, recall, or group."
-      }
+        "reason": "6.9 CS/min and 5 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "23:58",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "24:35",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "17:53",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "23:58",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5568876241_01.mp4",
@@ -1000,7 +1068,7 @@
       ],
       "reviewLimit": "Manual 2 FPS macro frames cannot prove the exact E keypress, cooldown, or fogged enemy, so the claim is about visible forward pressure and spacing after the first burst; the frames verify the low-health mid-fight state, ally-on-target context, and death-timer consequence.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "microCaptureFps": 8,
       "publicVideoBytes": 82451811,
@@ -1011,9 +1079,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "score": 17,
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "score": 9,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -1037,18 +1105,32 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.6 CS/min and 7 deaths keep the game around Iron II even though 5/7/12 K/D/A shows real fight participation; the main leak is failing the exit/back-click after first mid-fight value, so pressure turns into dead time instead of wave, recall, or group."
+        "reason": "4.6 CS/min and 7 deaths put the game at Iron III with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "4.6 CS/min and 7 deaths keep the game around Iron II even though 5/7/12 K/D/A shows real fight participation; the main leak is failing the exit/back-click after first mid-fight value, so pressure turns into dead time instead of wave, recall, or group."
-      }
+        "reason": "4.6 CS/min and 7 deaths put the game at Iron III with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "18:40",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "18:59",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "18:34",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5568775454_01.mp4",
@@ -1092,8 +1174,8 @@
       "confidence": "high",
       "feedbackTitle": "Late drake walk became a solo death window",
       "feedback": "The leak is arriving late from bot reset and still walking into the river fight alone, so a stable wave-and-recall state becomes one more death and hands Ocean Drake over instead of keeping bot wave, turret cover, or a numbers-safe regroup.",
-      "gameDetail": "At 15:20, Samira and support stabilizing the bot wave under tower, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. At 16:20, that late river entry becomes the death timer while the enemy secures Ocean Drake.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.",
+      "gameDetail": "At 15:20, Samira and support stabilizing the bot wave under tower, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. At 15:40, both you and your support have already taken the safe bot reset after the tower-defense wave, so the next job is spend, catch the next bot wave, or only move to river if allies are already fronting the objective. By 16:10, an ally is already dead and you are entering the Ocean Drake river alone from bot side with no ally screen in front of you, so the wrong click is continuing into fog and the next click is hold bot wave and turret, wait for numbers, or regroup from a safer angle. At 16:20, that late river entry becomes the death timer while the enemy secures Ocean Drake.",
+      "secondaryFocus": "Rep: after bot reset, if dragon fight is already live and you do not have ally front, do not walk in alone. Catch the wave, hold tower line, or regroup before you cross river.",
       "mistakeTypes": [
         "late objective entry",
         "solo river walk after reset",
@@ -1168,7 +1250,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove every cooldown, ward, or fogged flank, but it verifies the stable bot wave, the shared recall, the solo river walk after an ally death, and the death/Ocean Drake loss window.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 52036948,
       "captureFps": 2,
@@ -1215,7 +1297,29 @@
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "reason": "5.9 CS/min is playable, but 1/5/1 K/D/A with 5 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "15:20",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "15:40",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "16:10",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "16:20",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "16:10",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5568519322_01.mp4",
@@ -1269,7 +1373,7 @@
         "map tempo handback"
       ],
       "eventEvidence": "10:15 shows a stable bot reset state with wave and support; 22:50 shows a legal Baron setup with allies grouped; 24:50 shows Hextech Drake already secured while Samira is still fighting in the river choke.",
-      "failureEvidence": "At 24:50, hextech Drake already secured while Samira is still fighting in the river choke; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.",
+      "failureEvidence": "At 24:50 the objective is already secured and allies are positioned to leave with the dragon payout, but the next click stays in brush-fight mode instead of exit, mid wave, reset/spend, or Baron setup.",
       "goodThing": "The setup before the death is real: the 22:50 Baron posture is patient and grouped, and the Drake secure shows you can arrive to objectives with allies instead of face-checking alone; keep that first-entry shape.",
       "whyTrust": "This uses inspected 10:15, 22:50, and 24:50 frames from the same recorded match, so the coaching is tied to one visible post-objective re-entry mistake rather than a generic Samira rule.",
       "focusTag": "post-objective exit",
@@ -1324,7 +1428,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove every cooldown, fogged flank, or exact click sequence, but it verifies the grouped Baron setup, the secured Hextech Drake state, the continued river fight, and the later death-screen consequence.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 49314085,
       "captureFps": 2,
@@ -1371,7 +1475,21 @@
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "reason": "4.1 CS/min and 9 deaths keep the game at Iron II even though the first objective setup is grouped; the main leak is turning secured objective value into another brush fight instead of exit, wave, reset, or Baron setup."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "24:50",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "10:15",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:50",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5568447928_01.mp4",
@@ -1415,8 +1533,8 @@
       "confidence": "high",
       "feedbackTitle": "Bot siege became a jungle chase",
       "feedback": "The leak is that a winning bot siege keeps turning into one more chase off the tower line, so free structure tempo becomes low-value jungle fighting and another avoidable death window.",
-      "gameDetail": "At 9:58, you have bot wave under enemy tower with an ally beside you and the defender already backing off, so the wrong click is following the retreat path into red-side jungle and the next click is hit the free tower, clear the wave, or reset behind ally cover. By 10:34 you are low in enemy jungle instead of spending the bot-side value cleanly. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
-      "secondaryFocus": "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.",
+      "gameDetail": "At 9:58, you have bot wave under enemy tower with an ally beside you and the defender already backing off, so the wrong click is following the retreat path into red-side jungle and the next click is hit the free tower, clear the wave, or reset behind ally cover. By 10:34 you are low in enemy jungle instead of spending the bot-side value cleanly.",
+      "secondaryFocus": "Rep: after bot tower pressure gives value, ask tower, wave, or base before chase. If the target has already left tower range and no ally is front-lining the next screen, stop the chase and spend the wave or reset.",
       "mistakeTypes": [
         "bot siege exit after value",
         "tower-to-jungle chase drift",
@@ -1425,7 +1543,7 @@
         "low-value pursuit after win"
       ],
       "eventEvidence": "9:34 shows Samira winning the bot-side fight at tower; 9:58 shows the wave still at tower with an ally nearby; 10:10 shows the chase continuing away from the structure; 10:34 shows Samira low in red-side jungle instead of finishing the tower or cashing out.",
-      "failureEvidence": "At 9:58, the wave still at tower with an ally nearby; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.",
+      "failureEvidence": "At 9:58 the permanent value is still the bot tower and wave with ally cover, so chasing off that line into red-side jungle turns a winning siege into a thin, low-HP fight path that leaves Samira low by 10:34 instead of spending the lane win safely.",
       "goodThing": "You do create the winning bot-side state first: the 9:34 fight is aggressive in a way that earns tower pressure, and the later game shows cleaner grouped mid pressure off your lead; keep that first-win confidence.",
       "whyTrust": "This uses inspected 9:34, 9:58, 10:10, 10:34, and 18:58 frames plus the League Client 20/4/3, 117 CS Co-op AI context.",
       "focusTag": "bot siege exit",
@@ -1497,7 +1615,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns, unseen flank positions, every hidden enemy, or a clean PvP rank translation, but it verifies the bot-tower fight win, the 9:58 tower-value state, the chase continuation, the low-health jungle exit, and the 20/4/3, 117 CS Co-op AI context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 40014533,
       "captureFps": 2,
@@ -1534,7 +1652,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.5 CS/min with 24/4/3 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "6.5 CS/min with 24/4/3 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -1544,8 +1662,26 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "6.5 CS/min with 24/4/3 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      }
+        "reason": "6.5 CS/min with 24/4/3 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
+      },
+      "mistakeTable": [
+        {
+          "time": "9:58",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "10:34",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "9:58",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "9:34",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5568316539_01.mp4",
@@ -1671,7 +1807,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs, cooldowns, or every hidden enemy, but it verifies the low-health recall, bot-structure pressure, 24:21 re-fight window, 26:39 death timer, and 10/9/2, 151 CS ranked context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 56697089,
       "captureFps": 2,
@@ -1707,7 +1843,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.7 CS/min with 10/9/2 K/D/A puts the game at Iron II: damage pressure exists, but 9 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
+        "reason": "4.7 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -1717,8 +1853,26 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "4.7 CS/min with 10/9/2 K/D/A puts the game at Iron II: damage pressure exists, but 9 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
-      }
+        "reason": "4.7 CS/min and 9 deaths put the game at Iron II because fight entry is still catchable; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "24:21",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "26:39",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "9:56",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:04",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5568185590_01.mp4",
@@ -1850,7 +2004,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns or hidden enemies, but it verifies the mid-wave setup, river move, collapse, death, and 4/6/1, 148 CS ranked context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 49372220,
       "captureFps": 2,
@@ -1886,7 +2040,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min is usable, but 4/6/1 K/D/A, 6 deaths, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at Iron I."
+        "reason": "5.4 CS/min and 6 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -1896,8 +2050,30 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "5.4 CS/min is usable, but 4/6/1 K/D/A, 6 deaths, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at Iron I."
-      }
+        "reason": "5.4 CS/min and 6 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "23:05",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "23:20",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "23:05",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "19:47",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:40",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5568079693_01.mp4",
@@ -1942,7 +2118,7 @@
       "feedbackTitle": "Cleaner win, one mid-fight back-click leak remains",
       "feedback": "The leak is that after the first mid-fight damage window, your next input stays forward while low, so one useful Samira burst becomes a second re-entry death instead of hit - back-click - re-check.",
       "gameDetail": "At 21:09, the mid fight is playable at first because allies and a wave are near you and value has already happened; the first damage window is legal enough, but once you are low and enemy bodies can still re-engage, the correct next input is back-click one step through the wave, re-check ally front, enemy CC, and target HP, then recall or group if the target is no longer trapped. By 22:02 the second forward input becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one remaining mid-fight micro-exit leak.",
-      "secondaryFocus": "Rep: after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
+      "secondaryFocus": "Rep: after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.",
       "mistakeTypes": [
         "first-burst back-click timing",
         "second forward input while low",
@@ -2024,7 +2200,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns, hidden enemy positions, or exact E keypress timing, but it verifies the 19:23 recall, 21:09 low mid-fight forward-pressure state, 22:02 death, and 7/3/10, 139 CS ranked victory context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 46698992,
       "captureFps": 2,
@@ -2060,7 +2236,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "7/3/10 K/D/A and only 3 deaths are positives, while 5.4 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
+        "reason": "5.4 CS/min and 3 deaths put the game at Silver IV with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -2070,8 +2246,30 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "7/3/10 K/D/A and only 3 deaths are positives, while 5.4 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
-      }
+        "reason": "5.4 CS/min and 3 deaths put the game at Silver IV with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "21:09",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:02",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "21:09",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "19:23",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "20:42",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5567953154_01.mp4",
@@ -2198,7 +2396,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns or all hidden enemy positions, but it can verify the allied-front jungle entry, the state-flip window, the death timer, and the 1/4/3, 175 CS ranked context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 58084324,
       "captureFps": 2,
@@ -2206,18 +2404,18 @@
       "poster": "/recordings/posters/auto-na1-5567953154-01.jpg",
       "rankEstimate": {
         "version": "2026-05-25-performance-rank-v7",
-        "label": "Silver",
-        "range": "Bronze I-Silver II",
-        "exactRank": "Silver IV",
-        "exactRankValue": 8,
-        "score": 41,
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
+        "score": 27,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "middle",
+        "percentile": "developing",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -2234,18 +2432,40 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Silver IV."
+        "reason": "5.5 CS/min and 4 deaths put the game at Bronze IV with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Silver IV",
-        "exactRankValue": 8,
+        "exactRank": "Bronze IV",
+        "exactRankValue": 4,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Silver IV."
-      }
+        "reason": "5.5 CS/min and 4 deaths put the game at Bronze IV with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "22:51",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "23:39",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:51",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:31",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:41",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5567787430_01.mp4",
@@ -2344,7 +2564,7 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames and cannot prove exact cooldowns or every enemy position; the decision rule is based on visible objective, allied commitment, death state, K/D/A, and CS.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 42312514,
       "captureFps": 2,
@@ -2354,9 +2574,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron III",
-        "exactRankValue": 1,
-        "score": 8,
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
+        "score": 0,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -2380,18 +2600,32 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.3 CS/min and 9 deaths pull the game to Iron III even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
+        "reason": "4.3 CS/min and 9 deaths put the game at Iron IV because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron III",
-        "exactRankValue": 1,
+        "exactRank": "Iron IV",
+        "exactRankValue": 0,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "4.3 CS/min and 9 deaths pull the game to Iron III even though the dragon entry is partly legal; the main leak is exit/re-entry after first value."
-      }
+        "reason": "4.3 CS/min and 9 deaths put the game at Iron IV because fight entry is still catchable; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "9:58",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "9:58",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "24:09",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5567367431_01.mp4",
@@ -2512,7 +2746,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs or every cooldown, but it can verify the bot-turret entry window, the death timer, and the 0/5/0, 57 CS defeat context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 28151483,
       "captureFps": 2,
@@ -2559,7 +2793,25 @@
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "reason": "3.7 CS/min is playable, but 0/5/0 K/D/A with 5 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "9:02",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "9:22",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "8:32",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "8:52",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5567223507_01.mp4",
@@ -2680,7 +2932,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs or every cooldown, but it can verify the bot-turret overstay window, the death timer, and the improved 8/3/6, 202 CS victory context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 73132790,
       "captureFps": 2,
@@ -2716,7 +2968,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "8/3/6 K/D/A and only 3 deaths are positives, while 5.3 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
+        "reason": "5.3 CS/min and 3 deaths put the game at Silver IV because fight entry is still catchable; the remaining leak is cleaner conversion after pressure."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -2726,8 +2978,22 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "8/3/6 K/D/A and only 3 deaths are positives, while 5.3 CS/min plus the remaining fight-entry or exit/value leak keep the performance at Silver IV rather than higher."
-      }
+        "reason": "5.3 CS/min and 3 deaths put the game at Silver IV because fight entry is still catchable; the remaining leak is cleaner conversion after pressure."
+      },
+      "mistakeTable": [
+        {
+          "time": "8:47",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "9:01",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "8:27",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5566943774_01.mp4",
@@ -2772,7 +3038,7 @@
       "feedbackTitle": "Late entry with no legal fight",
       "feedback": "The leak is entering after the safe fight is gone, so pressure becomes another death timer instead of a reset or map result.",
       "gameDetail": "At 22:00, you are left of upper river with two allies nearby and enemies in front; no tower, wave, or objective is visible, so the wrong click is forward entry and the next click is one step back behind the ally line. By 24:00 that entry becomes another death; the 2/10/8, 103 CS line says death timers are the first blocker, with CS bleeding through dead time.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.",
+      "secondaryFocus": "Rep: after 15 minutes, before stepping into a fight, ask: tower, wave, objective, or ally front? If none is visible, click one step back and re-enter only from behind an ally.",
       "mistakeTypes": [
         "catchable fight entry",
         "death-state exposure",
@@ -2854,7 +3120,7 @@
       ],
       "reviewLimit": "Manual 2 FPS frame review cannot prove exact inputs or cooldowns, but it can verify the visible death timers, recall, fight-only state, missing tower/wave payout, and final K/D/A/CS context.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 53058250,
       "captureFps": 2,
@@ -2890,7 +3156,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "3.8 CS/min and 10 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
+        "reason": "3.8 CS/min and 10 deaths put the game at Iron IV because fight entry is still catchable; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -2900,8 +3166,30 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "3.8 CS/min and 10 deaths pull the game to Iron IV because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
-      }
+        "reason": "3.8 CS/min and 10 deaths put the game at Iron IV because fight entry is still catchable; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "22:00",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "24:00",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:00",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "7:59",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "12:44",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5566860300_01.mp4",
@@ -2945,8 +3233,8 @@
       "confidence": "high",
       "feedbackTitle": "Grouped base push needs click discipline",
       "feedback": "Mistake: the grouped base push was good, but the next click still needs to be structure, safe blocker, wave, or exit instead of another vague forward move. Fix: when allies are in front in base, hit free structure, hit only the defender blocking it, clear the wave, or leave as soon as those stop being true.",
-      "gameDetail": "At 19:43, Samira grouped with allies in the enemy base near exposed structures, so the wrong click is stepping forward after the safe payout disappeared and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. At 16:07 the stronger version already happened because your team is grouped near enemy mid turret as it falls, which is real conversion. At 10:43 you are 3/0/1 with 76 CS and 1031 gold in bot lane, so the lead exists before the base push. The 5/1/7, 123 CS, 23-minute line says deaths are controlled and fight impact is good; the next Challenger-path improvement is making every base click either structure, blocker, wave, or exit.",
-      "secondaryFocus": "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.",
+      "gameDetail": "At 19:43, Samira grouped with allies in the enemy base near exposed structures, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. At 16:07 the stronger version already happened because your team is grouped near enemy mid turret as it falls, which is real conversion. At 10:43 you are 3/0/1 with 76 CS and 1031 gold in bot lane, so the lead exists before the base push. The 5/1/7, 123 CS, 23-minute line says deaths are controlled and fight impact is good; the next Challenger-path improvement is making every base click either structure, blocker, wave, or exit.",
+      "secondaryFocus": "Work on base target priority: once allies are in front, keep the camera on structure and defenders so the next click is structure, blocker, wave, or exit.",
       "mistakeTypes": [
         "base structure target priority",
         "ally-frontline check",
@@ -3022,7 +3310,7 @@
       ],
       "reviewLimit": "Manual frame review used 2 FPS sampled frames and cannot prove exact clicks or cooldowns; it can judge grouped base state, structure access, stats, and exit-branch discipline.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 48482093,
       "captureFps": 2,
@@ -3058,7 +3346,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.4 CS/min and 1 death put the game at Silver I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "5.4 CS/min and 1 death put the game at Silver I with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -3068,8 +3356,26 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "5.4 CS/min and 1 death put the game at Silver I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
-      }
+        "reason": "5.4 CS/min and 1 death put the game at Silver I with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
+      },
+      "mistakeTable": [
+        {
+          "time": "19:43",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "16:07",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "10:43",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:43",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5566823161_01.mp4",
@@ -3113,8 +3419,8 @@
       "confidence": "high",
       "feedbackTitle": "Pressure mode after payout vanished",
       "feedback": "Mistake: you stayed in pressure mode after the safe mid wave or turret-defense payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      "gameDetail": "At 16:55, Samira mid beside one ally, a nearby wave, a low allied mid turret, minimap, and a 12-16 team kill score, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. Earlier at 5:26 the cleaner version is visible bot side because you have ally-and-wave cover before pressure continues, and by 18:50 and 20:44 you are still around mid turret with an ally and waves rather than a guaranteed forward structure. The leak is that you stayed in pressure mode after the safe payout stopped being clear; with a 6/3/6, 81 CS, 25-minute ranked line, the issue is not raw damage or a huge death count, it is low income plus unstable wave/tower conversion before the next forward click.",
-      "secondaryFocus": "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.",
+      "gameDetail": "At 16:55, Samira mid beside one ally, a nearby wave, a low allied mid turret, minimap, and a 12-16 team kill score, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. Earlier at 5:26 the cleaner version is visible bot side because you have ally-and-wave cover before pressure continues, and by 18:50 and 20:44 you are still around mid turret with an ally and waves rather than a guaranteed forward structure. The leak is that you stayed in pressure mode after the safe payout stopped being clear; with a 6/3/6, 81 CS, 25-minute ranked line, the issue is not raw damage or a huge death count, it is low income plus unstable wave/tower conversion before the next forward click.",
+      "secondaryFocus": "After 15 minutes, before any forward click, use camera/map-state discipline: closest threatened turret, ally deaths, and who can stand in front of me.",
       "mistakeTypes": [
         "mid wave/turret branch discipline",
         "low CS income stability",
@@ -3123,7 +3429,7 @@
         "reset after wave"
       ],
       "eventEvidence": "5:26 shows bot-side ally-and-wave cover; 16:55 shows Samira mid beside one ally, a nearby wave, a low allied mid turret, minimap, and a 12-16 team kill score; 18:50 and 20:44 show Samira still around mid turret with an ally and waves.",
-      "failureEvidence": "At 16:55, Samira mid beside one ally, a nearby wave, a low allied mid turret, minimap, and a 12-16 team kill score; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.",
+      "failureEvidence": "At 16:55 the visible state does not prove a free forward tower, a safe enemy blocker, or known enemy positions, so continuing pressure without first choosing wave clear, protected hit, or exit risks time loss instead of a permanent result.",
       "goodThing": "At 5:26, 18:50, and 20:44 you are often near allies and waves instead of randomly fighting alone; keep using ally-and-wave cover.",
       "whyTrust": "This review is based on inspected 5:26, 16:55, 18:50, and 20:44 frames plus the League Client 6/3/6 and 81 CS stat line.",
       "focusTag": "forward-click branch",
@@ -3190,7 +3496,7 @@
       ],
       "reviewLimit": "Manual frame review used 2 FPS sampled frames and cannot prove exact inputs, every enemy position, or every death timer; the branch is therefore conditional on visible tower, wave, ally, and minimap state.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 49011046,
       "captureFps": 2,
@@ -3200,9 +3506,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze III",
-        "exactRankValue": 5,
-        "score": 29,
+        "exactRank": "Bronze II",
+        "exactRankValue": 6,
+        "score": 35,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -3226,18 +3532,28 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "3.2 CS/min and 3 deaths put the game at Bronze III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "3.2 CS/min and 3 deaths put the game at Bronze II with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Bronze III",
-        "exactRankValue": 5,
+        "exactRank": "Bronze II",
+        "exactRankValue": 6,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "3.2 CS/min and 3 deaths put the game at Bronze III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
-      }
+        "reason": "3.2 CS/min and 3 deaths put the game at Bronze II with mixed fight-entry evidence; the remaining leak is cleaner conversion after pressure."
+      },
+      "mistakeTable": [
+        {
+          "time": "16:55",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "5:26",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5566786855_01.mp4",
@@ -3281,8 +3597,8 @@
       "confidence": "high",
       "feedbackTitle": "Bot pressure needs exit branch",
       "feedback": "Mistake: you created bot pressure, but the later fight windows stayed open after the safe tower or wave branch should have ended. Fix: hit tower while it is free, hit only a safe blocker, push wave then recall, or leave before the collapse returns.",
-      "gameDetail": "At 15:01, Samira and an ally hitting enemy bot turret with a wave, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. At 10:03 you were already low under allied bot turret while the wave was ahead of you, so pressure had to start from turret and wave safety rather than another forward trade. By 11:54 you are near the enemy bot side again with enemies visible around lane and the jungle entrance, which means the next click needs ally front and turret value before it becomes a chase. The 12/6/5, 156 CS, 26-minute line says your damage and lane pressure are real, but six deaths are the bigger blocker; the improvement is ending bot pressure as tower damage, wave crash, or reset before the fight reopens.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "gameDetail": "At 15:01, Samira and an ally hitting enemy bot turret with a wave, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. At 10:03 you were already low under allied bot turret while the wave was ahead of you, so pressure had to start from turret and wave safety rather than another forward trade. By 11:54 you are near the enemy bot side again with enemies visible around lane and the jungle entrance, which means the next click needs ally front and turret value before it becomes a chase. The 12/6/5, 156 CS, 26-minute line says your damage and lane pressure are real, but six deaths are the bigger blocker; the improvement is ending bot pressure as tower damage, wave crash, or reset before the fight reopens.",
+      "secondaryFocus": "Use camera/map-state checks after bot pressure: if ally front, free tower, or safe wave is gone, click back before another fight starts.",
       "mistakeTypes": [
         "tower branch exit",
         "death-state exposure",
@@ -3347,7 +3663,7 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames, so exact inputs and cooldowns are not judged.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 46021230,
       "captureFps": 2,
@@ -3357,9 +3673,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 24,
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
+        "score": 30,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -3383,18 +3699,32 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.9 CS/min with 12/6/5 K/D/A puts the game at Bronze IV: damage pressure exists, but 6 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
+        "reason": "5.9 CS/min and 6 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
+        "exactRank": "Bronze III",
+        "exactRankValue": 5,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "5.9 CS/min with 12/6/5 K/D/A puts the game at Bronze IV: damage pressure exists, but 6 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
-      }
+        "reason": "5.9 CS/min and 6 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "15:01",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "10:03",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "11:54",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5566726915_01.mp4",
@@ -3438,8 +3768,8 @@
       "confidence": "high",
       "feedbackTitle": "Fight wins need exit branch",
       "feedback": "Mistake: the fights kept staying open after the useful damage window, so kills did not reliably become objective, wave, or reset value. Fix: after the first winning exchange, choose objective, safe wave, recall, or back behind ally front before spending another forward click.",
-      "gameDetail": "At 19:12, a bot-side jungle fight with ally front and an enemy angle from lower-left, so the wrong click is continuing the same jungle fight after first value and the next click is to exit to turret, catch mid wave, reset, or regroup. At 5:41 the early safe branch is clearer because you are under allied bot turret with wave and two enemies in front, so the job is wave defense before forward trading. By 22:40 you are grouped around a river camp or objective fight with several allies, which is useful only if it becomes objective control or a reset path. The 25/8/9, 162 CS, 41-minute line says the problem is not damage, it is that eight deaths and low income stability stretch winning fights into more enemy chances. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
-      "secondaryFocus": "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.",
+      "gameDetail": "At 19:12, a bot-side jungle fight with ally front and an enemy angle from lower-left, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. At 5:41 the early safe branch is clearer because you are under allied bot turret with wave and two enemies in front, so the job is wave defense before forward trading. By 22:40 you are grouped around a river camp or objective fight with several allies, which is useful only if it becomes objective control or a reset path. The 25/8/9, 162 CS, 41-minute line says the problem is not damage, it is that eight deaths and low income stability stretch winning fights into more enemy chances.",
+      "secondaryFocus": "Work on post-fight camera checks: after the first useful damage window, look at ally front, nearest objective, and whether one enemy angle is still open.",
       "mistakeTypes": [
         "fight exit branch",
         "death-state exposure",
@@ -3504,7 +3834,7 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames and cannot prove exact cooldowns or every enemy position.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 73312301,
       "captureFps": 2,
@@ -3540,7 +3870,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.0 CS/min with 25/8/9 K/D/A and 8 deaths puts the game at Bronze III: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "4.0 CS/min and 8 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -3550,8 +3880,22 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "4.0 CS/min with 25/8/9 K/D/A and 8 deaths puts the game at Bronze III: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      }
+        "reason": "4.0 CS/min and 8 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "19:12",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "5:41",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:40",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5566620104_01.mp4",
@@ -3595,14 +3939,13 @@
       "confidence": "high",
       "feedbackTitle": "Cait deaths hide useful damage",
       "feedback": "Mistake: you let playable Cait states become extra forward or side-value clicks before checking who could reach you, so deaths erased the pressure your lane damage was creating. Fix: after a wave, camp, or fight is handled, click back behind an allied body, check the nearest threatened turret/objective, and only continue if Cait can hit from max range.",
-      "gameDetail": "At 2:16, cait's bot-side lane state with ally and wave cover, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the pressure Cait creates. At 14:21 the ability bar shows Piltover Peacemaker, confirming this is Cait footage. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys. The leak is that the won or playable moment turns back into enemy tempo before your lead becomes a permanent map result.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "gameDetail": "At 2:16, cait's bot-side lane state with ally and wave cover, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. The 0/5/6, 112 CS full-game line says the issue is not that you never join fights; it is that deaths are still too expensive for the pressure Cait creates. At 14:21 the ability bar shows Piltover Peacemaker, confirming this is Cait footage. After 15 minutes, every forward click needs one check first: who can reach me, which ally is between me and them, and what permanent payout this wave or fight buys.",
+      "secondaryFocus": "Next Cait game, before every camp, side wave, or forward fight after 15 minutes, check ally deaths, nearest threatened turret, and whether an ally can stand between Cait and the collapse.",
       "mistakeTypes": [
         "Cait spacing before forward clicks",
         "death-state exposure",
         "camera/map-state check",
-        "wave or objective payout after pressure",
-        "reset/overstay discipline"
+        "wave or objective payout after pressure"
       ],
       "eventEvidence": "2:16 shows Cait's bot-side lane state with ally and wave cover; 14:21 shows the Cait ability bar with Piltover Peacemaker; the synced stat line is 0/5/6 K/D/A and 112 CS.",
       "failureEvidence": "Cait had enough lane presence to be involved in fights, but the visible review and 0/5/6 stat line show deaths outvaluing the pressure; the failure is letting Cait become reachable before the next click has a safe target, ally body, or objective payout.",
@@ -3650,7 +3993,7 @@
       ],
       "reviewLimit": "This is a Cait-identity and visible-state repair from sampled 2 FPS footage, not a full frame-perfect Cait mechanics review.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 34335204,
       "captureFps": 2,
@@ -3698,7 +4041,17 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "5.2 CS/min is playable, but 0/5/6 K/D/A with 5 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "2:16",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "14:21",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5566563083_01.mp4",
@@ -3742,8 +4095,8 @@
       "confidence": "high",
       "feedbackTitle": "Side waves need death-state discipline",
       "feedback": "Mistake: side-wave pressure kept turning into death-state exposure, so the game gave enemies repeated reset windows. Fix: clear the safe wave, then leave toward ally front or base unless a free tower, safe blocker, or objective is already visible.",
-      "gameDetail": "At 25:49, Samira and support clearing a bottom wave near the destroyed bottom inhibitor turret, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. The cost is visible earlier at 22:59, where you are dead after a river or jungle fight while the map keeps moving without you. The 9/13/11, 162 CS, 39-minute line says the biggest issue is not refusing to fight; it is thirteen deaths and side-wave exposure turning pressure into enemy reset windows.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy sequence, take the first safe exit: recall, wave under tower, or one step behind an ally; do not re-enter while you are catchable.",
+      "gameDetail": "At 25:49, Samira and support clearing a bottom wave near the destroyed bottom inhibitor turret, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. The cost is visible earlier at 22:59, where you are dead after a river or jungle fight while the map keeps moving without you. The 9/13/11, 162 CS, 39-minute line says the biggest issue is not refusing to fight; it is thirteen deaths and side-wave exposure turning pressure into enemy reset windows.",
+      "secondaryFocus": "Use camera/map-state checks after each side wave: if ally front or a free structure is not visible, leave toward team before the next fight starts.",
       "mistakeTypes": [
         "side wave exit",
         "death-state exposure",
@@ -3797,7 +4150,7 @@
       ],
       "reviewLimit": "Manual frame review used sampled 2 FPS frames and cannot judge exact combo speed, only visible death state, wave state, ally front, and pathing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 70126406,
       "captureFps": 2,
@@ -3807,9 +4160,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "score": 16,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 22,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -3834,18 +4187,28 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.1 CS/min with 9/13/11 K/D/A puts the game at Iron II: damage pressure exists, but 13 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
+        "reason": "4.1 CS/min and 13 deaths put the game at Iron I with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
         "queueClass": "unknown",
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "4.1 CS/min with 9/13/11 K/D/A puts the game at Iron II: damage pressure exists, but 13 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
-      }
+        "reason": "4.1 CS/min and 13 deaths put the game at Iron I with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "25:49",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:59",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5566120017_01.mp4",
@@ -3889,14 +4252,13 @@
       "confidence": "high",
       "feedbackTitle": "Six deaths from bad-state clicks",
       "feedback": "Mistake: you kept looking for farm and side value after the map was already collapsing, so the enemy got to trade your jungle time into base pressure and another death. Fix: at the mistake timestamp, drop the camp or side wave and move to the closest base-defense line until teammates are alive.",
-      "gameDetail": "At 23:33, Samira alone on a side jungle camp while the enemy map state is pushing in, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.",
+      "gameDetail": "At 23:33, Samira alone on a side jungle camp while the enemy map state is pushing in, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. At 25:30 the consequence is visible: you are dead, an allied turret has fallen, and enemies are inside the base area because every extra second on the camp left Samira away from the only place that could stop the push. At 17:42, the better shape briefly appears because you are mid with an ally and a wave; mid is better in that state because it is the shortest route to defend or hit structure and your ally can stand between Samira and a collapse. At 19:39 you are again near river with an ally, which is useful only if it turns into wave control, vision, or a safe fight. When you are behind or already dying a lot, one safe defensive wave is worth more than one jungle camp.",
+      "secondaryFocus": "Next game, before taking a camp after 15 minutes, glance at mid wave, death timers, and nearest threatened turret; if any are bad, leave the camp.",
       "mistakeTypes": [
         "side farm over base defense",
         "camera/map-state check",
         "shutdown or death-state exposure",
-        "wave/objective defense timing",
-        "reset/overstay discipline"
+        "wave/objective defense timing"
       ],
       "eventEvidence": "17:42 shows Samira mid with an ally and a wave; 19:39 shows Samira near river with an ally; 23:33 shows Samira alone on a side jungle camp while the enemy map state is pushing in; 25:30 shows Samira dead as an allied turret falls and enemies are in the base area.",
       "failureEvidence": "At 23:33 Samira chooses a side jungle camp while the visible map state is already about base defense, so the failure is not farming in general; it is farming after the defend signal. By 25:30 the cost is visible because Samira is dead, an allied turret has fallen, and enemies are inside the base area.",
@@ -3966,7 +4328,7 @@
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed or every cooldown. It can judge map state, side-camp timing, ally location, death state, and whether the next click protects base.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 49207218,
       "captureFps": 2,
@@ -3976,9 +4338,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
-        "score": 12,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 18,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -4003,18 +4365,40 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.9 CS/min is playable, but 1/6/1 K/D/A with 6 deaths keeps the game at Iron II; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
+        "reason": "5.9 CS/min is playable, but 1/6/1 K/D/A with 6 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron II",
-        "exactRankValue": 2,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
         "queueClass": "unknown",
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "5.9 CS/min is playable, but 1/6/1 K/D/A with 6 deaths keeps the game at Iron II; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
-      }
+        "reason": "5.9 CS/min is playable, but 1/6/1 K/D/A with 6 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
+      },
+      "mistakeTable": [
+        {
+          "time": "23:33",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "25:30",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "17:42",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "19:39",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "23:33",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565964482_01.mp4",
@@ -4058,14 +4442,13 @@
       "confidence": "medium",
       "feedbackTitle": "Mid wave needed a side check",
       "feedback": "Mistake: you kept turning mid priority into another mid wave after the map was asking for a side-lane or objective check. Fix: after the mid wave is handled, move your camera first, then choose ally/objective movement or reset before touching the next wave.",
-      "gameDetail": "At 16:05, Samira last-hitting mid alone with no immediate structure hit, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. The leak is not that mid farm is bad; it is that mid stayed as default farm when the wave had already bought you time to look elsewhere. At 9:46 the same neutral pattern appears at mid turret, and by 21:49 the game has already produced a death/reset cycle, so the bigger climb habit is to turn one handled mid wave into a map check before the next minion. This matters because mid priority only helps Samira climb if it becomes information, vision, structure access, or a safer reset before enemies get another collapse window.",
-      "secondaryFocus": "Rep: after any low-HP fight or death-heavy lane sequence, take the first safe exit: recall, wave under tower, or one step behind support. No E toward an enemy under tower unless support is between me and them and the wave still protects me.",
+      "gameDetail": "At 16:05, Samira last-hitting mid alone with no immediate structure hit, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. The leak is not that mid farm is bad; it is that mid stayed as default farm when the wave had already bought you time to look elsewhere. At 9:46 the same neutral pattern appears at mid turret, and by 21:49 the game has already produced a death/reset cycle, so the bigger climb habit is to turn one handled mid wave into a map check before the next minion. This matters because mid priority only helps Samira climb if it becomes information, vision, structure access, or a safer reset before enemies get another collapse window.",
+      "secondaryFocus": "Next game, after every mid wave past 14 minutes, flick camera to both side lanes and death timers before autoing the next wave; if a fight or threatened turret is visible, leave mid.",
       "mistakeTypes": [
         "mid wave autopilot",
         "camera/map-state check",
         "objective or side-lane conversion",
-        "reset timing after priority",
-        "reset/overstay discipline"
+        "reset timing after priority"
       ],
       "eventEvidence": "9:46 shows Samira auto-attacking a cannon minion at mid turret. 16:05 shows Samira last-hitting mid alone with no immediate structure hit. 18:00 and 19:54 show more mid movement/wave clear. 21:49 shows Samira leaving fountain after a death/reset state.",
       "failureEvidence": "At 16:05 Samira uses the handled mid wave as permission to keep farming mid instead of checking the next side/objective state, so the wave priority leaks into autopilot time. By 21:49 the recording has reached a respawn cycle, which is the visible cost pattern when mid time does not become a useful map action soon enough.",
@@ -4140,7 +4523,7 @@
       ],
       "reviewLimit": "The 2 FPS review can judge repeated mid-wave state, map movement, and respawn timing. It cannot judge exact camera hotkey timing or frame-perfect mechanics.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 43843823,
       "captureFps": 2,
@@ -4150,9 +4533,9 @@
         "version": "2026-05-25-performance-rank-v7",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron IV",
-        "exactRankValue": 0,
-        "score": 0,
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "score": 6,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -4177,18 +4560,28 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.2 CS/min is playable, but 0/7/1 K/D/A with 7 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
+        "reason": "6.2 CS/min is playable, but 0/7/1 K/D/A with 7 deaths keeps the game at Iron III; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron IV",
-        "exactRankValue": 0,
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
         "queueClass": "unknown",
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "6.2 CS/min is playable, but 0/7/1 K/D/A with 7 deaths keeps the game at Iron IV; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
-      }
+        "reason": "6.2 CS/min is playable, but 0/7/1 K/D/A with 7 deaths keeps the game at Iron III; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
+      },
+      "mistakeTable": [
+        {
+          "time": "16:05",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "9:46",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565911037_01.mp4",
@@ -4232,14 +4625,13 @@
       "confidence": "high",
       "feedbackTitle": "Losing fights need a next-click script",
       "feedback": "Mistake: you kept playing messy or losing states as if one more fight would fix them, even when enemies were alive, your health was dropping, or teammates were dead. Fix: at the mistake timestamp, back out, clear only the safe wave, or wait behind the first ally before entering again.",
-      "gameDetail": "At 23:33, Samira behind a Baron-powered mid push with multiple enemy defenders still alive, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. By 23:43 you are dead with multiple allies also down, so the leak is not that you lacked damage; the leak is that the fight continued after the safe damage window ended and gave the enemy a clean push back. At 24:20, when you respawn with several teammates still dead, do not run out looking for a fight or a side route; hold base, clear the closest wave under turret, and wait for at least two teammates to spawn. At 26:54 the same rule appears again with four allies dead: stop at the base/inhibitor line, do not walk up bottom jungle or lane, and only clear minions that enter tower range. The simple next-game script is fight from behind a body while the state is even, and when the state is losing, defend one safe wave until teammates are alive.",
-      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
+      "gameDetail": "At 23:33, Samira behind a Baron-powered mid push with multiple enemy defenders still alive, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. By 23:43 you are dead with multiple allies also down, so the leak is not that you lacked damage; the leak is that the fight continued after the safe damage window ended and gave the enemy a clean push back. At 24:20, when you respawn with several teammates still dead, do not run out looking for a fight or a side route; hold base, clear the closest wave under turret, and wait for at least two teammates to spawn. At 26:54 the same rule appears again with four allies dead: stop at the base/inhibitor line, do not walk up bottom jungle or lane, and only clear minions that enter tower range. The simple next-game script is fight from behind a body while the state is even, and when the state is losing, defend one safe wave until teammates are alive.",
+      "secondaryFocus": "Next game, do not cross past your support/frontline until the enemy engage tool is used; at 4:55 and 7:16 the safer habit is last-hit from Q range and let the wave come to you.",
       "mistakeTypes": [
         "spacing/entry discipline",
         "shutdown or death-state exposure",
         "base-defense wave timing",
-        "forward pathing after allies die",
-        "reset/overstay discipline"
+        "forward pathing after allies die"
       ],
       "eventEvidence": "23:33 shows Samira behind a Baron-powered mid push with multiple enemy defenders still alive; 23:43 shows Samira dead after the fight continues; 24:20 shows Samira respawning while several teammates are still dead; 26:54 shows Samira moving out while four allies are dead.",
       "failureEvidence": "At 23:33 the fight is already crowded with enemy defenders alive, so the safe damage window is ending. By 23:43 Samira is dead with allies also down; at 24:20 and 26:54 the visible failure repeats as forward movement starts while teammates are still dead instead of holding the base line.",
@@ -4325,7 +4717,7 @@
       ],
       "reviewLimit": "This uses sampled 2 FPS frames, so it cannot judge exact combo speed, reaction time, or every cooldown. It can judge the visible fight state, ally death timers, spacing, and forward pathing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 47751708,
       "captureFps": 2,
@@ -4362,7 +4754,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.8 CS/min and 10 deaths pull the game to Iron I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
+        "reason": "4.8 CS/min and 10 deaths put the game at Iron I with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -4372,8 +4764,26 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "4.8 CS/min and 10 deaths pull the game to Iron I with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
-      }
+        "reason": "4.8 CS/min and 10 deaths put the game at Iron I with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "23:33",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "23:43",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "24:20",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "26:54",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565905533_01.mp4",
@@ -4478,7 +4888,25 @@
       "publicVideoBytes": 2449843,
       "captureFps": 2,
       "src": "/recordings/auto_NA1-5565905533_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5565905533-01.jpg"
+      "poster": "/recordings/posters/auto-na1-5565905533-01.jpg",
+      "mistakeTable": [
+        {
+          "time": "01:05",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:04",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:16",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:50",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565856492_01.mp4",
@@ -4616,7 +5044,7 @@
       ],
       "reviewLimit": "Cannot prove single-frame micro misplays, exact fight entries, or mid/late fights from 1Hz frames; macro direction and lane timing are clear, but individual kill/escape mechanics may not be visible.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-two-focus-coaching-v11",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 38992220,
       "captureFps": 1,
@@ -4632,7 +5060,7 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 88,
+        "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -4640,6 +5068,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
@@ -4651,7 +5080,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.7 CS/min and 7 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "5.7 CS/min and 7 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "win": true,
       "outcome": "victory",
@@ -4665,8 +5094,26 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "5.7 CS/min and 7 deaths put the game at Bronze III while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
-      }
+        "reason": "5.7 CS/min and 7 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "24:28",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "13:15",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "21:21",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "2:38",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565818690_01.mp4",
@@ -4710,14 +5157,13 @@
       "confidence": "medium",
       "feedbackTitle": "Won fight needed low-HP reset",
       "feedback": "Mistake: after a fight win, you let the next state become another low-health stay instead of turning the win into recall, structure, or wave. Fix: if the fight is won and your HP is low, recall unless a free structure is already directly in front of your team.",
-      "gameDetail": "At 14:47, a grouped objective fight near dragon pit, so the wrong click is stepping forward after the safe payout disappeared and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure.",
-      "secondaryFocus": "Rep: after every objective fight, ask: did we already get the value? If yes, choose dragon, wave, recall, or group. Do not take a second fight while low or unsupported unless an ally is still in front and the enemy is already CC'd or low.",
+      "gameDetail": "At 14:47, a grouped objective fight near dragon pit, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. At 16:27 the cost is already visible: Samira is dead in mid river after the fight sequence, so your next-game script is reset immediately after a won fight when HP is low unless a free structure is already in front of the team. The leak is staying available after the useful part of the fight is over; stronger games turn that extra stay into a death timer before your gold or tempo becomes pressure. At 10:42 the earlier warning sign is visible in bot lane because both sides are still trading while you and your ally are low, so the smaller version of the same habit is one extra forward step after health already says stop.",
+      "secondaryFocus": "Next game, in lane and river fights, stop taking the next forward step once health is below one enemy spell; hold behind ally or wave until the threat is used.",
       "mistakeTypes": [
         "reset/overstay discipline",
         "low-HP spacing",
         "post-fight exit timing",
-        "shutdown or death-state exposure",
-        "side farm over map defense"
+        "shutdown or death-state exposure"
       ],
       "eventEvidence": "10:42 shows a bot-lane skirmish with both sides still trading and Samira plus ally low. 14:47 shows a grouped objective fight near dragon pit. 16:27 shows Samira dead with the death timer open while allies push mid.",
       "failureEvidence": "At 16:27 Samira is dead after the mid-river fight sequence, so the visible failure is not refusing to fight; it is staying past the safe exit after the useful fight value is gone. The earlier 10:42 low-health lane trade shows the same HP-state habit before it becomes the later death timer.",
@@ -4775,7 +5221,7 @@
       ],
       "reviewLimit": "The 2 FPS review can judge HP-state, fight aftermath, death timer, and grouped objective shape. It cannot judge exact spell cooldowns or combo timing.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 31469760,
       "captureFps": 1,
@@ -4783,18 +5229,18 @@
       "poster": "/recordings/posters/auto-na1-5565818690-01.jpg",
       "rankEstimate": {
         "version": "2026-05-25-performance-rank-v7",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 27,
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 23,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "confidenceScore": 72,
         "queueClass": "unknown",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
+        "percentile": "new ranked fundamentals",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -4812,18 +5258,32 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.3 CS/min and 9 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
+        "reason": "5.3 CS/min and 9 deaths put the game at Iron I with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
         "queueClass": "unknown",
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "5.3 CS/min and 9 deaths pull the game to Bronze IV with objective-entry quality still not fully proven; the main question is whether objective pressure becomes dragon, wave, recall, or group."
-      }
+        "reason": "5.3 CS/min and 9 deaths put the game at Iron I with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "14:47",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "16:27",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "10:42",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565804951_01.mp4",
@@ -4956,7 +5416,7 @@
       ],
       "reviewLimit": "Due to frame sampling, exact enemy recalls or major objectives offscreen can't be guaranteed—review focuses on lane-state, visible map, and missing rotation, not skipped deaths or all-in errors. Detail gate still limited by: the beginning of the main mistake window must have a visible game-clock timestamp.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-nonredundant-macro-review-v10",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 23997509,
       "src": "/recordings/auto_NA1-5565804951_01.mp4",
@@ -4971,7 +5431,7 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 88,
+        "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -4979,6 +5439,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
@@ -5006,7 +5467,25 @@
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "reason": "5.7 CS/min is playable, but 1/6/3 K/D/A with 6 deaths keeps the game at Iron I; the main leak is fight-entry and exit value becoming another death timer instead of wave, recall, or group."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "15:55",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "9:44",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "9:44",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "14:37",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565779781_01.mp4",
@@ -5144,7 +5623,7 @@
       ],
       "reviewLimit": "Sampled frames do not cover every second of transitions, so some wave states or recall options between 18-23 minutes may be missed, but grouping habit is visibly absent post-inhib.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-nonredundant-macro-review-v10",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 36235180,
       "src": "/recordings/auto_NA1-5565779781_01.mp4",
@@ -5159,7 +5638,7 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "confidenceScore": 88,
+        "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -5167,6 +5646,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "ranked opponent pressure",
           "enough ranked full-game samples for calibration"
         ],
@@ -5178,7 +5658,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.3 CS/min and 13 deaths pull the game to Iron II because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
+        "reason": "5.3 CS/min and 13 deaths put the game at Iron II with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "captureFps": 1,
       "win": false,
@@ -5193,8 +5673,26 @@
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "5.3 CS/min and 13 deaths pull the game to Iron II because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline."
-      }
+        "reason": "5.3 CS/min and 13 deaths put the game at Iron II with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "23:20",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "4:45",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "11:48",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:14",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565766659_01.mp4",
@@ -5319,7 +5817,7 @@
       ],
       "reviewLimit": "This sampling doesn't show the exact consequence (death, zone, or lost CS), but does show a full wave of visible post-dive overstay with no immediate reset, which allows for a solid call on reset leak. Not all possible threats or enemy rotations are visible, so the review focuses on the clear risk and best practice. Detail gate still limited by: the beginning of the main mistake window must have a visible game-clock timestamp.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-primary-mistake-timestamp-v8",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 10627792,
       "src": "/recordings/auto_NA1-5565766659_01.mp4",
@@ -5334,7 +5832,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -5342,6 +5840,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -5370,7 +5869,21 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "4.0 CS/min with 6/1/2 K/D/A and 1 death is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "0:42",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:16",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "2:59",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565758308_01.mp4",
@@ -5453,7 +5966,7 @@
       ],
       "reviewLimit": "The sampled frames cover lane phase, fights, and objective conversion, but are too sparse to fully evaluate early wave management or specific fight mechanics beyond macro resets and team grouping.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-primary-mistake-timestamp-v8",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 18105160,
       "src": "/recordings/auto_NA1-5565758308_01.mp4",
@@ -5468,7 +5981,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -5476,6 +5989,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -5504,7 +6018,21 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "5.5 CS/min with 14/3/3 K/D/A and 3 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "3:12",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:43",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:38",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565578420_01.mp4",
@@ -5587,7 +6115,7 @@
       ],
       "reviewLimit": "The frames do not show the exact moment you get picked off for shutdown, but there is clear proof of missed reset with unspent gold and unsynchronized map state after mid inhib went down.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-22-primary-mistake-timestamp-v8",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 24741296,
       "src": "/recordings/auto_NA1-5565578420_01.mp4",
@@ -5602,7 +6130,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "middle",
@@ -5610,6 +6138,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -5622,7 +6151,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths is a low-confidence ranked-habit read near Silver IV: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths is a low-confidence ranked-habit read near Silver IV: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 1,
       "win": true,
@@ -5637,8 +6166,22 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths is a low-confidence ranked-habit read near Silver IV: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      }
+        "reason": "6.5 CS/min with 19/3/2 K/D/A and 3 deaths is a low-confidence ranked-habit read near Silver IV: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
+      },
+      "mistakeTable": [
+        {
+          "time": "5:27",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:32",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "3:35",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565518539_01.mp4",
@@ -5746,7 +6289,7 @@
       ],
       "reviewLimit": "This review is limited to replay frames showing objective, wave, and death screens; specifics of dragon/baron outcome immediately after the throw are not clear, but the macro rule and tempo penalty are visible.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 29,
       "publicVideoBytes": 27622246,
       "src": "/recordings/auto_NA1-5565518539_01.mp4",
@@ -5760,14 +6303,15 @@
         "score": 29,
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "medium",
-        "confidenceScore": 48,
+        "evidenceConfidence": "high",
+        "confidenceScore": 58,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
         "confidenceSignals": [
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -5781,7 +6325,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 2,
       "win": true,
@@ -5795,9 +6339,27 @@
         "queueClass": "bot",
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "medium",
-        "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      }
+        "evidenceConfidence": "high",
+        "reason": "5.8 CS/min with 29/6/1 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
+      },
+      "mistakeTable": [
+        {
+          "time": "1:29",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "9:20",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "10:37",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:08",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565445744_01.mp4",
@@ -5957,7 +6519,7 @@
       ],
       "reviewLimit": "This review uses visible replay frames and match-clock anchors; it cannot prove exact clicks or voice comms.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 34,
       "publicVideoBytes": 24317981,
       "captureFps": 2,
@@ -5994,7 +6556,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.6 CS/min and 6 deaths put the game at Iron I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "4.6 CS/min and 6 deaths put the game at Iron I because fight entry is still catchable; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -6004,8 +6566,22 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "4.6 CS/min and 6 deaths put the game at Iron I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
-      }
+        "reason": "4.6 CS/min and 6 deaths put the game at Iron I because fight entry is still catchable; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "3:23",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:31",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "4:36",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565387627_01.mp4",
@@ -6049,17 +6625,11 @@
       "confidence": "high",
       "feedbackTitle": "Turn the shutdown into a grouped push",
       "feedback": "Mistake: after spending a huge lead, you let side fights test your shutdown before your team was set up to take tower or base. Fix: choose the safest visible payout first: group with the wave and allies, hit free structure, or reset if teammates cannot follow.",
-      "gameDetail": "At 10:25, Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present, so the wrong click is continuing the old task after the visible state changed and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. At 09:11 you are in base/shop after a strong 4/0/2 start, and that part is good because you spend instead of dragging raw gold around. At 11:12 the better shape appears: you are grouped mid behind allies with enemies in front because allies protect the entry and mid points the lead toward towers/base instead of fog collapse. At 12:42 you are 8/0/2 mid while several allies are dead or on timers, so the next check is wait, reset, or hold the wave until the next push is together.",
-      "secondaryFocus": "Rep: after the first won exchange, choose one result before another fight: objective, tower, wave crash, or recall; if none is visible, click back behind ally front.",
-      "mistakeTypes": [
-        "reset/overstay discipline",
-        "side farm over map defense",
-        "spacing/entry discipline",
-        "wave/objective conversion",
-        "camera/map-state check"
-      ],
+      "gameDetail": "At 10:25, Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. At 09:11 you are in base/shop after a strong 4/0/2 start, and that part is good because you spend instead of dragging raw gold around. At 11:12 the better shape appears: you are grouped mid behind allies with enemies in front because allies protect the entry and mid points the lead toward towers/base instead of fog collapse. At 12:42 you are 8/0/2 mid while several allies are dead or on timers, so the next check is wait, reset, or hold the wave until the next push is together.",
+      "secondaryFocus": "",
+      "mistakeTypes": [],
       "eventEvidence": "09:11 shows Samira in shop after a 4/0/2 start with Immortal Shieldbow visible and low remaining gold. 10:25 shows Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present. 11:12 shows Samira grouped mid behind allies while enemies are in front. 12:42 shows Samira 8/0/2 mid while multiple allies are dead or on timers. 13:10 to 13:24 shows the team turning the lead into enemy-base damage.",
-      "failureEvidence": "At 10:25, Samira 6/0/2 in bot-side lane during a shutdown message with enemies and a wave still present; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or defense and gives the enemy another fight or push window.",
+      "failureEvidence": "",
       "goodThing": "You did spend, you did group with allies, and you did end through the base. The improvement is protecting the shutdown lead between those good moments.",
       "whyTrust": "The frames show both the good habit and the leak: you bought at 09:11 and ended with the team at 13:24, but the risky windows were the side-fight exposure at 10:25 and the alone-before-team state at 12:42.",
       "focusTag": "shutdown lead conversion",
@@ -6143,7 +6713,7 @@
       ],
       "reviewLimit": "This review uses sampled visible frames and game-clock anchors. It does not infer hidden clicks, voice calls, or cooldowns that are not visible in the recording.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 14,
       "publicVideoBytes": 25268675,
       "captureFps": 2,
@@ -6151,18 +6721,18 @@
       "poster": "/recordings/posters/auto-na1-5565387627-01.jpg",
       "rankEstimate": {
         "version": "2026-05-25-performance-rank-v7",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze I",
-        "exactRankValue": 7,
-        "score": 39,
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "exactRank": "Silver III",
+        "exactRankValue": 9,
+        "score": 45,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "confidenceScore": 58,
         "queueClass": "unknown",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
+        "percentile": "middle",
         "confidenceSignals": [
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
@@ -6180,18 +6750,40 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.5 CS/min with 24/5/3 K/D/A and 5 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "5.5 CS/min and 5 deaths put the game at Silver III with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Bronze I",
-        "exactRankValue": 7,
+        "exactRank": "Silver III",
+        "exactRankValue": 9,
         "queueClass": "unknown",
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "5.5 CS/min with 24/5/3 K/D/A and 5 deaths puts the game at Bronze I: fight entry and impact are real, but the main leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      }
+        "reason": "5.5 CS/min and 5 deaths put the game at Silver III with mixed fight-entry evidence; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "10:25",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "09:11",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "11:12",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "12:42",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "9:11",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565356454_01.mp4",
@@ -6314,7 +6906,7 @@
       ],
       "reviewLimit": "The sequence doesn't show Alan dying from the overstay, but the risk and tempo loss are both clear in the sampled maps; can't verify deeper vision or enemy jungle path for specific punish.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-visible-paragraph-standard-v6",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 25344462,
       "src": "/recordings/auto_NA1-5565356454_01.mp4",
@@ -6328,14 +6920,15 @@
         "score": 32,
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "medium",
-        "confidenceScore": 48,
+        "evidenceConfidence": "high",
+        "confidenceScore": 58,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
         "confidenceSignals": [
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -6363,9 +6956,23 @@
         "queueClass": "bot",
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "medium",
+        "evidenceConfidence": "high",
         "reason": "5.4 CS/min with 4/3/7 K/D/A and 3 deaths is a low-confidence ranked-habit read near Bronze II: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "0:50",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:29",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "3:06",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565308644_01.mp4",
@@ -6528,7 +7135,7 @@
       ],
       "reviewLimit": "This review uses sampled visible frames, not raw clicks or comms. The exact recall channel is not visible, so the critique is narrowed to the visible spend-down and re-entry sync window.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 27604601,
       "captureFps": 2,
@@ -6565,7 +7172,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -6575,8 +7182,30 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
-      }
+        "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because fight entry is still catchable; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "11:12",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "11:27",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "11:47",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "12:32",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "12:52",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565242641_01.mp4",
@@ -6738,7 +7367,7 @@
       ],
       "reviewLimit": "The recording has some non-League desktop frames from full-desktop capture, so this review uses only visible League frames as evidence and does not infer clicks during desktop portions.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 73707816,
       "captureFps": 2,
@@ -6775,7 +7404,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "7.7 CS/min with 15/12/3 K/D/A puts the game at Iron I: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
+        "reason": "7.7 CS/min and 12 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -6785,8 +7414,22 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "7.7 CS/min with 15/12/3 K/D/A puts the game at Iron I: damage pressure exists, but 12 deaths and the exit/re-entry leak keep turning value into dead time instead of structure, wave, recall, or group."
-      }
+        "reason": "7.7 CS/min and 12 deaths put the game at Iron I because fight entry is still catchable; the main leak is exit/re-entry after first value."
+      },
+      "mistakeTable": [
+        {
+          "time": "20:58",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "21:14",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "22:27",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565226188_01.mp4",
@@ -6906,7 +7549,7 @@
       ],
       "reviewLimit": "The sampled frames do not prove every post-inhib click, so this review does not claim every late fight was wrong. It calls out the visible low-HP retest risk and preserves the visible objective conversion.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 80518700,
       "src": "/recordings/auto_NA1-5565226188_01.mp4",
@@ -6921,7 +7564,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -6929,6 +7572,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -6957,7 +7601,29 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "4.7 CS/min with 17/3/4 K/D/A and 3 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "6:02",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "6:02",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "7:07",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "11:14",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:34",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565193158_01.mp4",
@@ -7045,7 +7711,7 @@
       ],
       "reviewLimit": "Sampled frames do not show every recall timer, but visible fight, gold, and objectives are clear enough for this claim.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 91418422,
       "src": "/recordings/auto_NA1-5565193158_01.mp4",
@@ -7060,7 +7726,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -7068,6 +7734,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -7096,7 +7763,21 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "5.8 CS/min with 16/4/4 K/D/A and 4 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "14:01",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "5:44",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:02",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565145132_01.mp4",
@@ -7219,7 +7900,7 @@
       ],
       "reviewLimit": "Frame samples mostly show fights and recalls, not full vision setups or all enemy pathing, so jungle threat is sometimes inferred, not strictly proven every second.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 78269244,
       "src": "/recordings/auto_NA1-5565145132_01.mp4",
@@ -7234,7 +7915,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -7242,6 +7923,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -7270,7 +7952,25 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "3.9 CS/min with 8/12/2 K/D/A and 12 deaths is a low-confidence ranked-habit read near Iron IV: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "6:18",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "10:28",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "11:23",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:12",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565058943_01.mp4",
@@ -7378,7 +8078,7 @@
       ],
       "reviewLimit": "Frames do not show post-structure punish (like enemy respawn wipe), but the open path and chase instead of conversion are directly visible at 16:22.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 78244571,
       "src": "/recordings/auto_NA1-5565058943_01.mp4",
@@ -7393,7 +8093,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -7401,6 +8101,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -7429,7 +8130,25 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "7.5 CS/min with 22/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "12:11",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "5:09",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "3:15",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "3:55",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565048601_01.mp4",
@@ -7557,7 +8276,7 @@
       ],
       "reviewLimit": "Frames between 5:47-5:59 give direct evidence for the reset leak, but do not display a subsequent punishment or full enemy respawn collapse, only showing the overstay window and resulting gold delay.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 79203118,
       "src": "/recordings/auto_NA1-5565048601_01.mp4",
@@ -7572,7 +8291,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -7580,6 +8299,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -7592,7 +8312,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 6,
       "win": true,
@@ -7607,8 +8327,22 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      }
+        "reason": "6.3 CS/min with 24/5/2 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
+      },
+      "mistakeTable": [
+        {
+          "time": "3:17",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:22",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:21",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565044205_01.mp4",
@@ -7721,7 +8455,7 @@
       ],
       "reviewLimit": "This sample doesn't show late-game teamfighting or macro, just repeated lane/postfight recall errors. Exact recall click isn't always visible but post-fight indecisiveness and resulting deaths are clear.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 83857975,
       "src": "/recordings/auto_NA1-5565044205_01.mp4",
@@ -7736,7 +8470,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
@@ -7744,6 +8478,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -7756,7 +8491,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "captureFps": 6,
       "win": true,
@@ -7771,8 +8506,26 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      }
+        "reason": "6.9 CS/min with 19/6/2 K/D/A and 6 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
+      },
+      "mistakeTable": [
+        {
+          "time": "3:41",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "4:32",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "5:33",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:05",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5565025543_01.mp4",
@@ -7895,7 +8648,7 @@
       ],
       "reviewLimit": "Frames between 03:08 and 03:29 are dense enough for this conversion critique; other windows (like mid game, or if enemy bodies block turret) are handled properly or not shown.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 36,
       "publicVideoBytes": 92445880,
       "src": "/recordings/auto_NA1-5565025543_01.mp4",
@@ -7910,7 +8663,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 62,
+        "confidenceScore": 72,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
@@ -7918,6 +8671,7 @@
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -7946,7 +8700,25 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "4.6 CS/min with 20/6/3 K/D/A and 6 deaths is a low-confidence ranked-habit read near Bronze III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "1:25",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "1:25",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "5:50",
+          "mistake": "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."
+        },
+        {
+          "time": "11:47",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5564835832_01.mp4",
@@ -8084,7 +8856,7 @@
       ],
       "reviewLimit": "Frames focus on fights and base pressure; not all fights result in deaths, but the overstay risk and loss of tempo is repeatedly visible and would be punished in harder games.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 25,
       "publicVideoBytes": 48461876,
       "src": "/recordings/auto_NA1-5564835832_01.mp4",
@@ -8098,14 +8870,15 @@
         "score": 11,
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "medium",
-        "confidenceScore": 48,
+        "evidenceConfidence": "high",
+        "confidenceScore": 58,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
         "confidenceSignals": [
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -8133,9 +8906,27 @@
         "queueClass": "bot",
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "medium",
+        "evidenceConfidence": "high",
         "reason": "4.6 CS/min with 15/7/0 K/D/A and 7 deaths is a low-confidence ranked-habit read near Iron III: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "15:33",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "15:38",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "16:56",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "14:55",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        }
+      ]
     },
     {
       "file": "auto_NA1-5564718141_01.mp4",
@@ -8243,7 +9034,7 @@
       ],
       "reviewLimit": "These frames do not show an actual death or gank, but the leak is clear due to clock, minimap, HP, and gold situation.",
       "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 27,
       "publicVideoBytes": 88166283,
       "src": "/recordings/auto_NA1-5564718141_01.mp4",
@@ -8257,14 +9048,15 @@
         "score": 0,
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "medium",
-        "confidenceScore": 48,
+        "evidenceConfidence": "high",
+        "confidenceScore": 58,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "new ranked fundamentals",
         "confidenceSignals": [
           "K/D/A, CS, and game length are available",
           "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
@@ -8292,9 +9084,23 @@
         "queueClass": "bot",
         "confidence": "low",
         "rankedTransferConfidence": "low",
-        "evidenceConfidence": "medium",
+        "evidenceConfidence": "high",
         "reason": "2.7 CS/min with 4/7/2 K/D/A and 7 deaths is a low-confidence ranked-habit read near Iron IV: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "0:55",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:57",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:32",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "16-10_NA1-5564259818_01.webm",
@@ -8554,7 +9360,7 @@
       ],
       "reviewLimit": "The clip has desktop-capture segments mixed with game footage, so the narrative only claims the visible game moments.",
       "analysisSource": "manual",
-      "analysisVersion": "2026-05-21-visible-paragraph-teaching-standard-v7",
+      "analysisVersion": "2026-05-27-mistake-table-v29",
       "sampledFrames": 18,
       "publicVideoBytes": 30104756,
       "captureFps": 2,
@@ -8591,7 +9397,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "2.4 CS/min and 6 deaths put the game at Iron III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+        "reason": "2.4 CS/min and 6 deaths put the game at Iron III because fight entry is still catchable; the main leak is failing to turn pressure into a safe exit or map result."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -8601,8 +9407,26 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "2.4 CS/min and 6 deaths put the game at Iron III because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
-      }
+        "reason": "2.4 CS/min and 6 deaths put the game at Iron III because fight entry is still catchable; the main leak is failing to turn pressure into a safe exit or map result."
+      },
+      "mistakeTable": [
+        {
+          "time": "12:10",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "13:05",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "13:15",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "14:19",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "16-10_NA1-5563352800_01.webm",
@@ -8870,7 +9694,29 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "4.2 CS/min and 3 deaths put the game at Bronze III with mixed fight-entry evidence; the main leak is exit/re-entry after first value."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "1:24",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "7:58",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "10:32",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "12:44",
+          "mistake": "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop."
+        },
+        {
+          "time": "14:23",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "16-10_NA1-5563301586_01.webm",
@@ -9138,7 +9984,29 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "6.6 CS/min with 6/4/2 K/D/A puts the game at Silver IV: early trade setup is cleaner when support or wave starts the contact, but the remaining leak is the extra forward click after the first damage window."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "2:43",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "3:27",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "4:57",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "14:28",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:20",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "16-10_NA1-5563247854_13.webm",
@@ -9321,7 +10189,25 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "medium",
         "reason": "7.3 CS/min and 7 deaths put the game at Bronze I while base-entry quality is mixed; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
-      }
+      },
+      "mistakeTable": [
+        {
+          "time": "7:22",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "8:19",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "0:42",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        },
+        {
+          "time": "1:39",
+          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
+        }
+      ]
     },
     {
       "file": "16-10_NA1-5563247854_12.webm",

@@ -1476,6 +1476,12 @@ function recordingDetailCell(item) {
   const detail = document.createElement("div");
   detail.className = "recording-table-detail";
 
+  const mistakeTable = recordingMistakeTable(item);
+  if (mistakeTable) {
+    detail.append(mistakeTable);
+    return detail;
+  }
+
   const description = document.createElement("p");
   description.textContent = item.feedback || item.pattern || "No feedback generated yet.";
   detail.append(description);
@@ -2123,6 +2129,158 @@ function recordingStatsSentence(item) {
   return parts.length ? `Stats: ${parts.join(", ")}.` : "";
 }
 
+function normalizeMistakeTime(value) {
+  return String(value || "").match(/\b\d{1,2}:[0-5]\d\b/)?.[0] || "";
+}
+
+function recordingMistakeCategory(text) {
+  const source = String(text || "").toLowerCase();
+  if (/\b(red[-\s]?light|w\s*(?:gray|grey|down|not ready)|below half|under half|no ally|ally .*not|e\s*(?:toward|forward|key|locked|dead|illegal)|dash)\b/i.test(source)) {
+    return "Red-light E";
+  }
+  if (/\b(second|after first|first value|first burst|value window|objective secured|drake is already secured|already got value|won the trade|secured|done)\b/i.test(source)) {
+    return "Second fight after value";
+  }
+  if (/\b(chase|chased|chasing|river|jungle|brush|fog|enemy side|under tower|under turret|tower-line|retreat path|deeper)\b/i.test(source)) {
+    return "Chased into bad space";
+  }
+  return "Red-light commit";
+}
+
+function cleanMistakeSentence(value) {
+  return String(value || "")
+    .replace(/\b(?:fallback|model json|openai|deterministic fallback|detail gate|review frame|current-match)\b[^.!?;]*/gi, "")
+    .replace(/\bApprox(?:imate)?\s+(?:performance\s+)?rank\b[^.!?;]*/gi, "")
+    .replace(/\bReason\s*:\s*[^.!?;]*/gi, "")
+    .replace(/\bStats\s*:\s*[^.!?;]*/gi, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^[,;:. -]+|[,;:. -]+$/g, "");
+}
+
+function normalizeMistakeRow(row, item) {
+  const raw = typeof row === "string" ? row : [
+    row?.mistake,
+    row?.text,
+    row?.description,
+    row?.error,
+    row?.correctAction
+  ].filter(Boolean).join(" ");
+  const time = normalizeMistakeTime(
+    (typeof row === "object" && row ? row.time || row.clock || row.timestamp : "") || raw
+  );
+  let mistake = cleanMistakeSentence(raw);
+  if (!mistake) return null;
+  const category = (/^(Red-light E|Red-light commit|Second fight after value|Chased into bad space)\b/i.exec(mistake)?.[1]) ||
+    (typeof row === "object" && row ? row.category : "") ||
+    recordingMistakeCategory(mistake);
+  const normalizedCategory = /^red[-\s]?light\s+e$/i.test(category)
+    ? "Red-light E"
+    : /^red[-\s]?light\s+commit$/i.test(category)
+      ? "Red-light commit"
+      : /^second/i.test(category)
+        ? "Second fight after value"
+        : /^chased/i.test(category)
+          ? "Chased into bad space"
+          : recordingMistakeCategory(mistake);
+  mistake = cleanMistakeSentence(mistake.replace(/^(Red-light E|Red-light commit|Second fight after value|Chased into bad space)\s*:?\s*/i, ""));
+  if (!mistake) return null;
+  if (mistake.length > 210) {
+    mistake = `${mistake.slice(0, 207).replace(/\s+\S*$/, "")}...`;
+  }
+  return {
+    time,
+    mistake: `${normalizedCategory}: ${mistake.replace(/[.!?]*$/g, ".")}`
+  };
+}
+
+function inferredMistakeRows(item) {
+  const rows = [];
+  const sources = [
+    ...storySentences(item.gameDetail),
+    item.failureEvidence,
+    item.feedback,
+    item.pattern
+  ].map(cleanMistakeSentence).filter(Boolean);
+  for (const source of sources) {
+    const time = normalizeMistakeTime(source);
+    if (!time) continue;
+    const category = recordingMistakeCategory(source);
+    let mistake;
+    if (/^red/i.test(category)) {
+      mistake = `${category}: one green-light condition was missing or not proven, but the play still went forward. Correct action: Q/auto while backing up.`;
+    } else if (/^second/i.test(category)) {
+      mistake = "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective.";
+    } else {
+      mistake = "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop.";
+    }
+    rows.push({ time, mistake });
+    if (rows.length >= 5) break;
+  }
+  if (!rows.length) {
+    const anchor = (Array.isArray(item.clockMoments) ? item.clockMoments : []).find((moment) => normalizeMistakeTime(moment?.clock)) ||
+      (Array.isArray(item.clockAnchors) ? item.clockAnchors : []).find((clockAnchor) => normalizeMistakeTime(clockAnchor?.clock));
+    const time = normalizeMistakeTime(anchor?.clock) || normalizeMistakeTime(item.gameDetail);
+    if (time) {
+      const category = recordingMistakeCategory([
+        item.feedbackTitle,
+        item.feedback,
+        item.gameDetail,
+        item.secondaryFocus,
+        item.failureEvidence
+      ].join(" "));
+      rows.push({
+        time,
+        mistake: `${category}: this is the main review timestamp. Correct action: stop the forward commit and choose back, wave, recall, group, or wait.`
+      });
+    }
+  }
+  return rows;
+}
+
+function recordingMistakeRows(item) {
+  const explicit = Array.isArray(item?.mistakeTable)
+    ? item.mistakeTable
+    : (Array.isArray(item?.mistakes) ? item.mistakes : []);
+  return (explicit.length ? explicit : inferredMistakeRows(item))
+    .map((row) => normalizeMistakeRow(row, item))
+    .filter(Boolean)
+    .filter((row, index, array) => array.findIndex((other) => (
+      other.time === row.time && other.mistake.toLowerCase() === row.mistake.toLowerCase()
+    )) === index)
+    .slice(0, 5);
+}
+
+function recordingMistakeTable(item) {
+  const rows = recordingMistakeRows(item);
+  if (!rows.length) return null;
+  const table = document.createElement("table");
+  table.className = "recording-mistake-table";
+  table.setAttribute("aria-label", "Mistake timestamps");
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  ["Time", "Mistake"].forEach((label) => {
+    const th = document.createElement("th");
+    th.scope = "col";
+    th.textContent = label;
+    headRow.append(th);
+  });
+  thead.append(headRow);
+  const tbody = document.createElement("tbody");
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    const time = document.createElement("td");
+    if (row.time) appendTimestampButton(time, row.time, item);
+    else time.textContent = "-";
+    const mistake = document.createElement("td");
+    mistake.textContent = row.mistake;
+    tr.append(time, mistake);
+    tbody.append(tr);
+  });
+  table.append(thead, tbody);
+  return table;
+}
+
 function recordingStoryParagraph(item) {
   const paragraph = document.createElement("p");
   paragraph.className = "recording-list-story";
@@ -2533,10 +2691,14 @@ function recordingListCard(item) {
   const copy = document.createElement("div");
   copy.className = "recording-list-copy";
 
-  const title = document.createElement("h3");
-  title.textContent = item.feedbackTitle || "Focus";
-
-  copy.append(title, recordingStoryParagraph(item));
+  const mistakeTable = recordingMistakeTable(item);
+  if (mistakeTable) {
+    copy.append(mistakeTable);
+  } else {
+    const title = document.createElement("h3");
+    title.textContent = item.feedbackTitle || "Focus";
+    copy.append(title, recordingStoryParagraph(item));
+  }
 
   const videoWrap = document.createElement("div");
   videoWrap.className = "recording-list-video";

@@ -6,6 +6,7 @@ import { hasExactJungleBuffName, unverifiedChampionNames } from "./review-text-g
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(__dirname, "..");
 const manifestPath = path.join(appRoot, "public", "recordings", "recordings.json");
+const mistakeTableAnalysisVersion = "2026-05-27-mistake-table-v29";
 const samiraGreenLightAnalysisVersion = "2026-05-27-samira-green-light-v28";
 
 function clean(value) {
@@ -66,6 +67,32 @@ function visibleFields(recording = {}) {
 
 function visibleText(recording = {}) {
   return visibleFields(recording).map(([, value]) => clean(value)).filter(Boolean).join(" ");
+}
+
+function mistakeTime(value) {
+  return String(value || "").match(/\b\d{1,2}:[0-5]\d\b/)?.[0] || "";
+}
+
+function mistakeTableIssues(recording = {}) {
+  if (!isFullReview(recording)) return [];
+  const rows = Array.isArray(recording.mistakeTable) ? recording.mistakeTable : [];
+  const issues = [];
+  if (!rows.length) issues.push("full review missing mistakeTable");
+  if (rows.length > 5) issues.push("mistakeTable has more than five rows");
+  const allowed = /^(Red-light E|Red-light commit|Second fight after value|Chased into bad space)\s*:/i;
+  const forbidden = /\b(?:fallback|model json|openai|detail gate|visible paragraph|rank read|performance rank|Approx(?:imate)? rank|Reason:|Stats:|pressure mode)\b/i;
+  rows.forEach((row, index) => {
+    const time = mistakeTime(row?.time || row?.clock || row?.timestamp || "");
+    const mistake = clean(row?.mistake || row?.text || row?.description || "");
+    if (!time) issues.push(`mistakeTable row ${index + 1} missing Time`);
+    if (!mistake) issues.push(`mistakeTable row ${index + 1} missing Mistake`);
+    if (mistake && !allowed.test(mistake)) {
+      issues.push(`mistakeTable row ${index + 1} must use an allowed category`);
+    }
+    if (mistake.length > 240) issues.push(`mistakeTable row ${index + 1} is too long`);
+    if (forbidden.test(mistake)) issues.push(`mistakeTable row ${index + 1} contains internal/rank/paragraph wording`);
+  });
+  return issues;
 }
 
 const forensicPhaseReviewFiles = new Set([
@@ -252,6 +279,9 @@ function samiraGreenLightStandardIssues(recording = {}) {
 
 function feedbackIssues(recording = {}) {
   const issues = [];
+  if (recording.analysisVersion === mistakeTableAnalysisVersion) {
+    return mistakeTableIssues(recording);
+  }
   const title = clean(recording.feedbackTitle);
   const detail = clean(recording.gameDetail);
   const secondaryFocus = clean(recording.secondaryFocus || recording.secondaryImprovement);

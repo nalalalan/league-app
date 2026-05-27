@@ -33,8 +33,14 @@ const midRiverChaseRep = "Rep: after mid wave gives value, ask: wave, turret, re
 const earlyLaneBackclickRep = "Rep: first 10 minutes, every trade is auto/Q - back click - re-check. After the back click, E forward only if support or wave still protects you and the target is already CC'd or low; otherwise farm the wave.";
 const midFightValueExitRep = "Rep: after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.";
 const samiraGreenLightRep = "Rep: before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.";
-const analysisVersion = "2026-05-27-samira-green-light-v28";
+const analysisVersion = "2026-05-27-mistake-table-v29";
 const earlyMicroAnalysisVersion = "2026-05-26-early-lane-micro-v1";
+const allowedMistakeCategories = [
+  "Red-light E",
+  "Red-light commit",
+  "Second fight after value",
+  "Chased into bad space"
+];
 const earlyMicroMinFps = Number(process.env.LEAGUE_EARLY_MICRO_MIN_FPS || 6);
 const earlyMicroMaxFrames = Number(process.env.LEAGUE_EARLY_MICRO_MAX_FRAMES || 24);
 const compatibleAnalysisVersions = new Set([
@@ -2330,6 +2336,171 @@ function enforceSamiraGreenLightFallbackShape(recording = {}) {
   }
 }
 
+function normalizeMistakeTime(value) {
+  return String(value || "").match(/\b\d{1,2}:[0-5]\d\b/)?.[0] || "";
+}
+
+function mistakeTableCategory(text) {
+  const source = String(text || "").toLowerCase();
+  if (/\b(red[-\s]?light|w\s*(?:gray|grey|down|not ready|not visibly ready|locked)|below half|under half|low[-\s]?hp|no ally|ally .*not|e\s*(?:toward|forward|key|locked|dead|illegal)|dash)\b/i.test(source)) {
+    return "Red-light E";
+  }
+  if (/\b(second|after first|first value|first burst|value window|objective secured|drake is already secured|already got value|won the trade|secured|done|post-secure|re-fight|re-entry|reentry)\b/i.test(source)) {
+    return "Second fight after value";
+  }
+  if (/\b(chase|chased|chasing|river|jungle|brush|fog|enemy side|under tower|under turret|tower-line|retreat path|deeper)\b/i.test(source)) {
+    return "Chased into bad space";
+  }
+  return "Red-light commit";
+}
+
+function normalizeMistakeCategory(value, fallbackText = "") {
+  const source = coachClean(value, "");
+  if (/^red[-\s]?light\s+e$/i.test(source)) return "Red-light E";
+  if (/^red[-\s]?light\s+commit$/i.test(source)) return "Red-light commit";
+  if (/^second/i.test(source)) return "Second fight after value";
+  if (/^chased/i.test(source)) return "Chased into bad space";
+  return mistakeTableCategory(`${source} ${fallbackText}`);
+}
+
+function cleanMistakeText(value) {
+  return coachClean(value, "")
+    .replace(/\b(?:fallback|model json|openai|deterministic fallback|detail gate|review frame|current-match|visible paragraph|field labels)\b[^.!?;]*/gi, " ")
+    .replace(/\bApprox(?:imate)?\s+(?:performance\s+)?rank\b[^.!?;]*/gi, " ")
+    .replace(/\bReason\s*:\s*[^.!?;]*/gi, " ")
+    .replace(/\bStats\s*:\s*[^.!?;]*/gi, " ")
+    .replace(/\b(?:Failure evidence|Other mistake types|Second focus)\s*:\s*/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^[,;:. -]+|[,;:. -]+$/g, "");
+}
+
+function normalizeMistakeTableRow(row, context = {}) {
+  const raw = typeof row === "string" ? row : [
+    row?.mistake,
+    row?.text,
+    row?.description,
+    row?.error,
+    row?.wrongInput,
+    row?.correctAction
+  ].filter(Boolean).join(" ");
+  const time = normalizeMistakeTime(
+    (typeof row === "object" && row ? row.time || row.clock || row.timestamp : "") || raw || context.clock
+  );
+  let mistake = cleanMistakeText(raw);
+  if (!mistake) return null;
+  const category = normalizeMistakeCategory(
+    (/^(Red-light E|Red-light commit|Second fight after value|Chased into bad space)\b/i.exec(mistake)?.[1]) ||
+      (typeof row === "object" && row ? row.category || row.type : ""),
+    mistake
+  );
+  mistake = cleanMistakeText(mistake.replace(/^(Red-light E|Red-light commit|Second fight after value|Chased into bad space)\s*:?\s*/i, ""));
+  if (!mistake || !time) return null;
+  if (mistake.length > 210) {
+    mistake = `${mistake.slice(0, 207).replace(/\s+\S*$/, "")}...`;
+  }
+  return {
+    time,
+    mistake: `${category}: ${mistake.replace(/[.!?]*$/g, ".")}`
+  };
+}
+
+function defaultMistakeForCategory(category) {
+  if (/^red/i.test(category)) {
+    return "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up.";
+  }
+  if (/^second/i.test(category)) {
+    return "Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective.";
+  }
+  return "Chased into bad space: I followed into tower, brush, river, jungle, or enemy side when the correct play was to stop.";
+}
+
+function inferredMistakeTableRows(recording = {}) {
+  const rows = [];
+  const sources = [
+    ...sentenceParts(recording.gameDetail || ""),
+    recording.failureEvidence,
+    recording.feedback,
+    recording.pattern,
+    ...(Array.isArray(recording.clockMoments) ? recording.clockMoments.map((moment) => `${moment.clock || ""} ${moment.description || ""}`) : []),
+    ...(Array.isArray(recording.clockAnchors) ? recording.clockAnchors.map((anchor) => `${anchor.clock || ""} ${anchor.description || ""}`) : [])
+  ].map(cleanMistakeText).filter(Boolean);
+  for (const source of sources) {
+    const time = normalizeMistakeTime(source);
+    if (!time) continue;
+    const category = mistakeTableCategory(source);
+    rows.push({ time, mistake: defaultMistakeForCategory(category) });
+    if (rows.length >= 5) break;
+  }
+  if (!rows.length) {
+    const anchor = cleanClockAnchors(recording.clockMoments || recording.clockAnchors || [])[0];
+    const time = normalizeMistakeTime(anchor?.clock) || normalizeMistakeTime(recording.gameDetail || recording.eventEvidence || recording.evidence);
+    if (time) rows.push({ time, mistake: defaultMistakeForCategory(mistakeTableCategory(visibleCoachText(recording))) });
+  }
+  return rows;
+}
+
+function visibleCoachText(recording = {}) {
+  return [
+    recording.feedbackTitle,
+    recording.feedback,
+    recording.gameDetail,
+    recording.goodThing,
+    recording.failureEvidence,
+    recording.pattern,
+    recording.secondaryFocus,
+    recording.eventEvidence,
+    recording.evidence,
+    Array.isArray(recording.mistakeTypes) ? recording.mistakeTypes.join(" ") : "",
+    Array.isArray(recording.nuance) ? recording.nuance.join(" ") : ""
+  ].filter(Boolean).join(" ");
+}
+
+function mistakeTableStandardIssues(recording = {}, context = {}) {
+  const isFull = Number(recording.durationSeconds || context.duration || 0) >= 90 || /^auto_/i.test(context.file || recording.file || "");
+  if (!isFull) return [];
+  const rows = Array.isArray(recording.mistakeTable) ? recording.mistakeTable : [];
+  const issues = [];
+  if (!rows.length) issues.push("mistakeTable must contain at least one row");
+  if (rows.length > 5) issues.push("mistakeTable must have five rows max");
+  const forbidden = /\b(?:fallback|model json|openai|detail gate|visible paragraph|rank read|performance rank|Approx(?:imate)? rank|Reason:|Stats:|pressure mode after payout vanished)\b/i;
+  for (const [index, row] of rows.entries()) {
+    const time = normalizeMistakeTime(row?.time || row?.clock || row?.timestamp || "");
+    const mistake = coachClean(row?.mistake || row?.text || row?.description || "");
+    if (!time) issues.push(`mistakeTable row ${index + 1} missing game-clock time`);
+    if (!mistake) issues.push(`mistakeTable row ${index + 1} missing mistake text`);
+    if (mistake && !allowedMistakeCategories.some((category) => new RegExp(`^${category.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:`, "i").test(mistake))) {
+      issues.push(`mistakeTable row ${index + 1} must start with an allowed mistake category`);
+    }
+    if (mistake.length > 240) issues.push(`mistakeTable row ${index + 1} is too long`);
+    if (forbidden.test(mistake)) issues.push(`mistakeTable row ${index + 1} contains paragraph/internal/rank wording`);
+  }
+  return issues;
+}
+
+function ensureMistakeTableShape(recording = {}, fileName = "") {
+  const isAuto = /^auto_/i.test(fileName || recording.file || "");
+  const isFull = Number(recording.durationSeconds || 0) >= 90;
+  if (!isAuto && !isFull) return;
+  const explicit = Array.isArray(recording.mistakeTable) ? recording.mistakeTable : [];
+  const normalized = (explicit.length ? explicit : inferredMistakeTableRows(recording))
+    .map((row) => normalizeMistakeTableRow(row, recording))
+    .filter(Boolean)
+    .filter((row, index, array) => array.findIndex((other) => (
+      other.time === row.time && other.mistake.toLowerCase() === row.mistake.toLowerCase()
+    )) === index)
+    .slice(0, 5);
+  if (normalized.length) {
+    recording.mistakeTable = normalized;
+  }
+  if (recording.analysisSource === "fallback") {
+    recording.failureEvidence = cleanMistakeText(recording.failureEvidence) ||
+      "The table is conservative because sampled frames did not prove every cooldown, HP state, ally position, or hidden enemy.";
+    recording.reviewLimit = cleanMistakeText(recording.reviewLimit) ||
+      "The table is conservative because sampled frames cannot prove frame-perfect input timing.";
+  }
+}
+
 function hasRepeatedConversionGlossary(recording = {}) {
   return /\b(?:A\s+)?conversion\s+(?:just\s+)?means\b/i.test(recording.gameDetail || "");
 }
@@ -3239,8 +3410,20 @@ function hasUsablePrimaryMistakeAnchor(recording, champion = "Samira") {
 function requiresVisibleParagraphStandard(fileName, recording = {}) {
   const isAuto = /^auto_/i.test(fileName || recording?.file || "");
   const duration = Number(recording?.durationSeconds || 0);
+  if (recording?.analysisVersion === analysisVersion || !recording?.analysisVersion) return false;
   if (recording?.analysisSource === "fallback") return false;
-  const isNewStandard = recording?.analysisVersion === analysisVersion || !recording?.analysisVersion || manualFeedback(fileName || recording?.file);
+  const paragraphStandardVersions = new Set([
+    "2026-05-27-samira-green-light-v28",
+    "2026-05-27-samira-green-light-v27",
+    "2026-05-26-early-micro-pass-v26",
+    "2026-05-25-forensic-performance-rank-v25",
+    "2026-05-24-command-lane-rep-v24",
+    "2026-05-24-lane-specific-rep-v23",
+    "2026-05-24-game-specific-rep-v22",
+    "2026-05-24-dense-click-review-v21",
+    "2026-05-24-tight-click-review-v20"
+  ]);
+  const isNewStandard = paragraphStandardVersions.has(recording?.analysisVersion) || manualFeedback(fileName || recording?.file);
   return isAuto && duration >= 90 && isNewStandard;
 }
 
@@ -5734,7 +5917,7 @@ function fallbackFeedback(file, duration, context = {}) {
         "ally-on-screen re-check",
         "farm, kite, or wait discipline"
       ],
-      failureEvidence: "Fallback review could not recover a full model JSON, so the safe Samira standard is conservative: if W readiness, above-half HP, and ally presence are not all visible at the champion-pressure timestamp, the moment is red light and E is locked.",
+      failureEvidence: "The conservative table only calls a forward champion commit legal when W readiness, above-half HP, and ally presence are all visible together.",
       whyTrust: "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
       eventEvidence: "",
       goodThing: "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
@@ -5744,7 +5927,7 @@ function fallbackFeedback(file, duration, context = {}) {
       diamondRule: "No E toward a champion unless W, HP, and ally are all green.",
       drill: samiraGreenLightRep.replace(/^Rep\s*:\s*/i, ""),
       nuance: ["This fallback intentionally reviews the selected habit first instead of broad macro.", "If the frames cannot prove W readiness, HP, and ally cover together, the conservative call is red light."],
-      reviewLimit: "Fallback review after model JSON failure; it audits the W/HP/ally E-lock habit and does not claim frame-perfect cooldowns or hidden map state.",
+      reviewLimit: "The table is conservative because sampled frames cannot prove frame-perfect cooldowns, hidden enemies, or exact inputs.",
       analysisSource: "fallback",
       analysisVersion
     };
@@ -5963,6 +6146,18 @@ function analysisSpecificityIssues(parsed, context = {}) {
     Number.isFinite(Number(context.deaths)) &&
     Number.isFinite(Number(context.assists)) &&
     Number.isFinite(Number(context.cs));
+  if (isAutoFullReview) {
+    const tableDraft = {
+      ...parsed,
+      file: context.file || parsed?.file || "",
+      durationSeconds: context.duration || parsed?.durationSeconds || 0,
+      clockAnchors: parsed?.clockAnchors || [],
+      clockMoments: parsed?.clockMoments || []
+    };
+    ensureMistakeTableShape(tableDraft, context.file || "");
+    parsed.mistakeTable = tableDraft.mistakeTable || [];
+    return mistakeTableStandardIssues(tableDraft, context);
+  }
   if (!(/\bThe leak is(?:\s+that)?\b[\s\S]{40,}/i.test(feedback) || /Mistake:\s*\S+[\s\S]*Fix:\s*\S+/i.test(feedback))) {
     issues.push("feedback must name the leak in one direct red sentence");
   }
@@ -6368,6 +6563,9 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Use capture order internally to distinguish earlier leak evidence from later implementation attempts, but do not mention recency weighting in visible output.",
     `This recording is ${sequenceLabel}. Review phase: ${phase}.`,
     `Sampled frame times: ${frameList}. Duration: ${mmss(duration)}.`,
+    "HARD FORMAT OVERRIDE: Alan is overwhelmed. The public review now renders mistakeTable only, not a paragraph. Return mistakeTable with 1-5 rows max and exactly the visible columns Time and Mistake. Do not include rank explanation, broad paragraph labels, or internal fallback/model wording in mistakeTable.",
+    "Allowed mistakeTable categories only: Red-light E, Red-light commit, Second fight after value, Chased into bad space. Each row must start with one of those categories followed by a colon, then a short concrete mistake and correct action when visible.",
+    "For Samira, audit green-light E first. Red-light E/commit means W is down/not visibly ready, HP is below half, or no ally is on screen/close enough, but the play still goes forward. If the frames cannot prove W/HP/ally are all green, call the commit red light.",
     "The recorder is intentionally low-FPS for low-lag review. At 2 FPS, scan every visible aspect that can honestly be judged: macro, reset timing, objective conversion, side-lane drift, base pressure, shutdown protection, map tempo, camera stability, spacing, entry timing, target choice, cooldown/CC accounting, wave state, fog/vision pathing, and repeated cursor/pathing patterns. Do not over-index on single-frame mechanics.",
     "Do not name allied or enemy champions unless the name is verified from visible roster/nameplate evidence. If uncertain, say ally, enemy, support, jungler, defender, or teammate. Do not name red buff or blue buff unless the camp label is visually verified; say jungle camp instead.",
     "Coach like a blunt but serious Challenger-path League coach: name the actual mistake, do not soften it, and do not insult Alan. If a play is greedy, late, unsafe, low-value, disconnected, or not transferable to stronger ranked games, say that plainly and tie it to visible evidence.",
@@ -6416,7 +6614,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Visible page copy should be concise and operational. Second person is allowed here because this is a personal coaching surface, but avoid vague 'you should' advice and broad motivational coaching.",
     "Visible output must address the player as 'you' or the detected player champion, never 'Alan' in third person.",
     "Return only JSON with this shape:",
-    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"short sharp title naming the actual mistake","feedback":"The leak is that [exact wrong decision and what it costs].","gameDetail":"short decision paragraph with one key timestamp, exact visible state, wrong click, correct click, and compact consequence/stat context; no field labels","secondaryFocus":"Rep: one pink next-game drill Alan can apply immediately; must be click-specific","mistakeTypes":["3-5 short distinct mistake lanes visible or honestly limited by the recording"],"eventEvidence":"compact proof of what visibly happened in the game","failureEvidence":"one natural sentence proving failure: what Alan did, what state made it wrong, what leaked, and what happened next or almost happened; no label prefix","goodThing":"one concrete keep-doing-this habit, or empty string","whyTrust":"one concrete reason to trust this feedback","focusTag":"short tag","evidence":"short visual basis","pattern":"fuller read of the visible pattern, 1-2 sentences","diamondRule":"one exact rule that would still matter as games get harder","drill":"one next-game repetition","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["3-5 specific bullets: what was good, what leaked, consequence, second/third mistake lane, next check"],"reviewLimit":"what the sampled frames cannot prove"}',
+    '{"champion":"detected champion","confidence":"high|medium|low","feedbackTitle":"internal short title","mistakeTable":[{"time":"MM:SS","mistake":"Red-light E: W was not visibly ready and HP was below half, but I still committed forward. Correct action: Q/auto while backing up."},{"time":"MM:SS","mistake":"Second fight after value: value was already gained, but I kept fighting instead of wave/recall/group/objective."}],"feedback":"internal concise leak sentence","gameDetail":"internal evidence notes only; page will not render this paragraph","secondaryFocus":"internal drill only","mistakeTypes":["internal tags"],"eventEvidence":"internal proof","failureEvidence":"internal proof without fallback/model wording","goodThing":"internal keep habit or empty string","whyTrust":"internal evidence basis","focusTag":"short tag","evidence":"short visual basis","pattern":"internal pattern","diamondRule":"internal rule","drill":"internal drill","timeline":["00:00 - exact visible event from the frame, for internal evidence only"],"clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"nuance":["internal notes"],"reviewLimit":"what the sampled frames cannot prove"}',
     `Recording file: ${file}.`
   ].join("\n");
 
@@ -6428,7 +6626,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, entry legality, value or no value, state flip, first bad next click, correct next click, one green keep habit, one red leak, one pink Rep. For Samira, green-light discipline is the main lens: at the key timestamp say red light or green light, name W readiness, HP above/below half, ally on-screen/close-enough state, the wrong E/forward input, and the correct input. If W readiness is not visible, say W is not visibly ready and E toward champion is locked. The Samira Rep must be W, HP, ally; any false condition means E key is dead and the input is Q/auto while backing up, kite, farm, or wait. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' For objective fights, separate legal first entry from the second fight after value. For Samira lane or mid-fight trades, name the legal trade/start, the first auto/Q or burst damage window, the exact back-click point, and whether E/forward click is legal or only a chase/re-entry. Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Fix mistakeTable only: 1-5 rows, each with time and mistake. Each mistake must start with Red-light E:, Red-light commit:, Second fight after value:, or Chased into bad space:. Keep each row short and concrete. No rank explanation, no paragraph-style title, no pressure-mode slogan, no fallback/model/internal wording. For Samira, use the green-light audit first: W ready, above-half HP, ally on screen/close enough. If any condition fails or cannot be proven and the play goes forward, it is red light. Say the wrong input and the correct input in the same row when visible."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
@@ -6456,6 +6654,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
       pattern: coachClean(parsed.pattern, "The recording points to one repeatable decision pattern."),
       diamondRule: coachClean(parsed.diamondRule, "Convert the first winning moment before taking the next fight."),
       drill: coachClean(parsed.drill, "Name the payout before committing."),
+      mistakeTable: Array.isArray(parsed.mistakeTable) ? parsed.mistakeTable : [],
       timeline: cleanList(parsed.timeline, 6).map((item) => coachClean(item)),
       clockAnchors: cleanClockAnchors(parsed.clockAnchors),
       nuance: cleanList(parsed.nuance, 5).map((item) => coachClean(item)),
@@ -6915,6 +7114,7 @@ async function main() {
       const cachedMicroFps = microCaptureFpsForEntry(entry) || Number(cached.microCaptureFps || 0) || null;
       const cachedRecording = {
         ...cached,
+        ...(duration > 90 && /^auto_/i.test(name) ? { analysisVersion } : {}),
         ...(cachedRankEstimate ? { rankEstimate: cachedRankEstimate } : {}),
         ...(cachedRankEstimate ? { performanceRank: performanceRankForRecording(cached, cachedRankEstimate) } : {}),
         ...(cachedCaptureFps ? { captureFps: cachedCaptureFps } : {}),
@@ -6929,6 +7129,7 @@ async function main() {
         src: publicPath(destPath),
         poster: publicPath(posterPath)
       };
+      ensureMistakeTableShape(cachedRecording, name);
       sanitizeAbstractBranchLanguage(cachedRecording);
       recordings.push(cachedRecording);
       console.log(`${name}: ${recordings.at(-1).reviewPhase || phase} - ${recordings.at(-1).champion} - ${recordings.at(-1).feedbackTitle}`);
@@ -7044,7 +7245,7 @@ async function main() {
     const cleanedEventEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.eventEvidence, analysis.evidence || ""), narrativeClockAnchors), championName);
     const cleanedEvidence = normalizeVisibleCoachText(stripUnverifiedClockReferences(coachClean(analysis.evidence, "Generated from sampled replay frames."), narrativeClockAnchors), championName);
     let finalEventEvidence = normalizeCoachPunctuation(clockMomentEvidence || (isGenericEvidenceText(cleanedEventEvidence) ? "" : cleanedEventEvidence));
-    if (!isManualAnalysis && isFullReview) {
+    if (!isManualAnalysis && isFullReview && process.env.LEAGUE_ENABLE_PARAGRAPH_REPAIR === "1") {
       const repairMoments = standardRepairMoments(analysis, annotatedClockAnchors, clockMoments, championName);
       let projectedIssues = visibleParagraphStandardIssues({
         file: name,
@@ -7164,6 +7365,7 @@ async function main() {
       src: publicPath(destPath),
       poster: publicPath(posterPath)
     };
+    if (isFullReview && /^auto_/i.test(name)) recording.analysisVersion = analysisVersion;
     repairVisibleReviewForStandard(recording, name);
     repairPublishAuditRequirements(recording, name);
     sanitizeAbstractBranchLanguage(recording);
@@ -7174,6 +7376,7 @@ async function main() {
       recording.performanceRank = performanceRankForRecording(recording, rankEstimate);
     }
     enforceSamiraGreenLightFallbackShape(recording);
+    ensureMistakeTableShape(recording, name);
     enforceVisibleParagraphStandard(recording, name);
     sanitizeTemplateResidue(recording);
     recordings.push(recording);
@@ -7183,6 +7386,7 @@ async function main() {
   const calibrationContext = rankCalibrationContext(recordings);
   for (const recording of recordings) {
     sanitizeTemplateResidue(recording);
+    ensureMistakeTableShape(recording, recording.file || "");
     const rankEstimate = rankedEquivalentForRecording(recording, calibrationContext);
     if (rankEstimate) {
       recording.rankEstimate = rankEstimate;
