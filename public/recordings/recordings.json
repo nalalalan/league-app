@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T06:31:23.392Z",
+  "generatedAt": "2026-05-27T09:59:15.761Z",
   "source": "League of Legends Highlights folder",
   "match": "53 matches",
   "matches": [
@@ -63,9 +63,9 @@
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 27, 2026, 1:56 AM: newest full-game read Iron I; current 3-game read Iron II; archive median Iron I across 50 full games, used only as baseline context. The newest game is around the current three-game read.",
-    "rule": "The newest-game blocker is reset/overstay discipline and missed structure/objective conversion; the current repeat across the latest games is missed structure/objective conversion, reset/overstay discipline, and low-HP or catchable forward input. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-    "nextRep": "after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
+    "focus": "Synced through May 27, 2026, 1:56 AM: newest full-game read Bronze I; current 3-game read Bronze III; archive median Bronze IV across 50 full games, used only as baseline context. The newest game is above the current three-game read.",
+    "rule": "The newest-game blocker is w/HP/ally green-light check and red-light E or forward click; the current repeat across the latest games is q/auto while backing up, red-light E or forward click, and w/HP/ally green-light check. The keep-habit is Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
+    "nextRep": "Rep: before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
     "pattern": "Latest file auto_NA1-5569250494_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
@@ -92,9 +92,9 @@
     "anchoredFullGames": 51,
     "statFullGames": 51,
     "rankLabelCounts": {
-      "Bronze": 19,
+      "Bronze": 20,
       "Silver": 6,
-      "Iron": 26
+      "Iron": 25
     },
     "exactRankScale": [
       "Iron IV",
@@ -214,7 +214,7 @@
       "queueId": 880,
       "gameType": "Co-op vs AI Beginner",
       "gameTypeSource": "LeagueClient log",
-      "title": "Pressure mode after payout vanished",
+      "title": "Red-light E discipline first",
       "duration": "20:48",
       "durationSeconds": 1248,
       "gameLength": "24:08",
@@ -233,22 +233,48 @@
       "reviewPhase": "current form",
       "champion": "Samira",
       "confidence": "medium",
-      "feedbackTitle": "Pressure mode after payout vanished",
-      "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      "gameDetail": "At 8:08, the fallback cannot verify enough visible state to name a safe payout, so the wrong click is stepping forward after the safe payout disappeared and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. by 9:44, Samira in a current-match lane-to-map transition review frame. By 9:44, Samira in a current-match lane-to-map transition review frame. This is a phase problem: the first wave, fight, or tower pressure can be legal, but after that value is gained the next click has to become exit, wave, recall, group, or another visible result before enemies get another collapse.",
-      "secondaryFocus": "",
-      "mistakeTypes": [],
-      "eventEvidence": "8:08 shows Samira in a current-match lane-to-map transition review frame",
-      "failureEvidence": "",
-      "goodThing": "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-      "whyTrust": "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
-      "focusTag": "overstay control",
-      "evidence": "8:08 shows Samira in a current-match lane-to-map transition review frame",
-      "pattern": "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
-      "diamondRule": "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
-      "drill": "after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
+      "feedbackTitle": "Red-light E discipline first",
+      "feedback": "The leak is using E or forward Samira pressure before W, HP, and ally state are all proved, so Samira becomes catchable instead of farming, kiting, or waiting.",
+      "gameDetail": "At 1:31, Samira Samira running along top-base platform toward the fountain, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. The 18/7/4, 139 CS line stays a conservative fallback read, so this review audits W/HP/ally E discipline instead of broad macro. This matters because red-light Samira farms/kites/waits; green-light Samira can fight.",
+      "secondaryFocus": "Rep: before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
+      "mistakeTypes": [
+        "W/HP/ally green-light check",
+        "red-light E or forward click",
+        "Q/auto while backing up",
+        "ally-on-screen re-check",
+        "farm, kite, or wait discipline"
+      ],
+      "eventEvidence": "7:52 shows enemy minions attacking a turret in bottom lane; Samira nearby and minimap visible. 14:43 shows Samira standing in the jungle near a ward/brush with the minimap and enemy indicators visible. 3:06 shows Samira moving along lane near brush with minimap showing allied/enemy positions. 4:42 shows 'You have slain an enemy!' banner at top center; Samira near minions by the top lane.",
+      "failureEvidence": "Fallback review could not recover a full model JSON, so the safe Samira standard is conservative: if W readiness, above-half HP, and ally presence are not all visible at the Samira-pressure timestamp, the moment is red light and E is locked.",
+      "goodThing": "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
+      "whyTrust": "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
+      "focusTag": "samira green-light discipline",
+      "evidence": "1:31 Samira Samira running along top-base platform toward the fountain; 7:52 Enemy minions attacking a turret in bottom lane; Samira nearby and minimap visible. 14:43 Samira standing in the jungle near a ward/brush with the minimap and enemy indicators visible.",
+      "pattern": "Samira climbs faster when red-light moments become farm, kite, wait, or back-click instead of another forward E.",
+      "diamondRule": "No E toward a Samira unless W, HP, and ally are all green.",
+      "drill": "before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
       "timeline": [],
       "clockAnchors": [
+        {
+          "clock": "1:31",
+          "videoSeconds": 99.385,
+          "description": "Player champion running along top-base platform toward the fountain; HUD and minimap visible."
+        },
+        {
+          "clock": "3:06",
+          "videoSeconds": 194.769,
+          "description": "Champion moving along lane near brush with minimap showing allied/enemy positions."
+        },
+        {
+          "clock": "4:42",
+          "videoSeconds": 290.154,
+          "description": "'You have slain an enemy!' banner at top center; champion near minions by the top lane."
+        },
+        {
+          "clock": "7:52",
+          "videoSeconds": 480.923,
+          "description": "Enemy minions attacking a turret in bottom lane; champion nearby and minimap visible."
+        },
         {
           "clock": "8:08",
           "videoSeconds": 480.923,
@@ -263,22 +289,37 @@
           "clock": "11:19",
           "videoSeconds": 671.692,
           "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
+          "clock": "14:43",
+          "videoSeconds": 862.462,
+          "description": "Champion standing in the jungle near a ward/brush with the minimap and enemy indicators visible."
         }
       ],
       "clockMoments": [
         {
-          "clock": "8:08",
+          "clock": "1:31",
+          "videoSeconds": 99.385,
+          "description": "Samira Samira running along top-base platform toward the fountain"
+        },
+        {
+          "clock": "7:52",
           "videoSeconds": 480.923,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
+          "description": "Enemy minions attacking a turret in bottom lane; Samira nearby and minimap visible."
+        },
+        {
+          "clock": "14:43",
+          "videoSeconds": 862.462,
+          "description": "Samira standing in the jungle near a ward/brush with the minimap and enemy indicators visible."
         }
       ],
       "nuance": [
-        "High kills only matter when the next click creates tower, wave, objective, reset, or base value.",
-        "Low CS makes every unclear forward click more expensive because income is already unstable."
+        "This fallback intentionally reviews the selected habit first instead of broad macro.",
+        "If the frames cannot prove W readiness, HP, and ally cover together, the conservative call is red light."
       ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
+      "reviewLimit": "Fallback review after model JSON failure; it audits the W/HP/ally E-lock habit and does not claim frame-perfect cooldowns or hidden map state.",
       "analysisSource": "fallback",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "analysisVersion": "2026-05-27-samira-green-light-v28",
       "sampledFrames": 14,
       "microCaptureFps": 8,
       "publicVideoBytes": 58795369,
@@ -287,142 +328,11 @@
       "poster": "/recordings/posters/auto-na1-5569250494-01.jpg",
       "rankEstimate": {
         "version": "2026-05-25-performance-rank-v7",
-        "label": "Iron",
-        "range": "Iron IV-Iron II",
-        "exactRank": "Iron I",
-        "exactRankValue": 3,
-        "score": 19,
-        "confidence": "low",
-        "rankedTransferConfidence": "low",
-        "evidenceConfidence": "high",
-        "confidenceScore": 72,
-        "queueClass": "bot",
-        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "new ranked fundamentals",
-        "confidenceSignals": [
-          "near-full macro recording",
-          "K/D/A, CS, and game length are available",
-          "visible timestamp anchors exist",
-          "review passed the current evidence standard or manual frame review",
-          "enough ranked full-game samples for calibration"
-        ],
-        "confidenceBlockers": [
-          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure"
-        ],
-        "researchBasis": [
-          "riot-ranked-tiers-2026",
-          "riot-apex-tiers-2026",
-          "bennett-poulus-novak-2025",
-          "srl-league-2021",
-          "kpi-objective-vision-2025"
-        ],
-        "reason": "5.8 CS/min with 18/7/4 K/D/A and 7 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      },
-      "performanceRank": {
-        "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron I",
-        "exactRankValue": 3,
-        "queueClass": "bot",
-        "confidence": "low",
-        "rankedTransferConfidence": "low",
-        "evidenceConfidence": "high",
-        "reason": "5.8 CS/min with 18/7/4 K/D/A and 7 deaths is a low-confidence ranked-habit read near Iron I: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
-      }
-    },
-    {
-      "file": "auto_NA1-5569237516_01.mp4",
-      "publicFile": "auto_NA1-5569237516_01.mp4",
-      "cacheKey": "48458962:1779861167622",
-      "fingerprint": "48f905546085",
-      "matchId": "NA1-5569237516",
-      "score": "auto",
-      "clipNumber": 1,
-      "matchTimeMs": 1779860028588,
-      "gameHappenedAt": "2026-05-27T05:33:48.588Z",
-      "gameHappenedAtLabel": "May 27, 2026, 1:33 AM",
-      "recordedAt": "2026-05-27T05:52:47.719Z",
-      "recordedAtLabel": "May 27, 2026, 1:52 AM",
-      "recordedAtTimeLabel": "1:52 AM",
-      "clipTimestampSeconds": null,
-      "clipTimestamp": "",
-      "clipWindow": "",
-      "timestamp": "",
-      "queueId": 880,
-      "gameType": "Co-op vs AI Beginner",
-      "gameTypeSource": "LeagueClient log",
-      "title": "Pressure mode after payout vanished",
-      "duration": "16:29",
-      "durationSeconds": 988.5,
-      "gameLength": "17:45",
-      "gameLengthSeconds": 1065,
-      "kda": "21/5/0",
-      "kills": 21,
-      "deaths": 5,
-      "assists": 0,
-      "cs": 112,
-      "statsSource": "League Client match history",
-      "win": true,
-      "outcome": "victory",
-      "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history",
-      "kind": "full review",
-      "reviewPhase": "current form",
-      "champion": "Samira",
-      "confidence": "medium",
-      "feedbackTitle": "Pressure mode after payout vanished",
-      "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
-      "gameDetail": "At 8:14, the fallback cannot verify enough visible state to name a safe payout, so the wrong click is stepping forward after the safe payout disappeared and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. by 9:30, Samira in a current-match lane-to-map transition review frame. By 9:30, Samira in a current-match lane-to-map transition review frame. This is a phase problem: the first wave, fight, or tower pressure can be legal, but after that value is gained the next click has to become exit, wave, recall, group, or another visible result before enemies get another collapse.",
-      "secondaryFocus": "",
-      "mistakeTypes": [],
-      "eventEvidence": "8:14 shows Samira in a current-match lane-to-map transition review frame",
-      "failureEvidence": "",
-      "goodThing": "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
-      "whyTrust": "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
-      "focusTag": "overstay control",
-      "evidence": "8:14 shows Samira in a current-match lane-to-map transition review frame",
-      "pattern": "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
-      "diamondRule": "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
-      "drill": "after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
-      "timeline": [],
-      "clockAnchors": [
-        {
-          "clock": "8:14",
-          "videoSeconds": 456.538,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
-        },
-        {
-          "clock": "9:30",
-          "videoSeconds": 531.962,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "8:14",
-          "videoSeconds": 456.538,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
-        }
-      ],
-      "nuance": [
-        "High kills only matter when the next click creates tower, wave, objective, reset, or base value.",
-        "Low CS makes every unclear forward click more expensive because income is already unstable."
-      ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "fallback",
-      "analysisVersion": "2026-05-26-early-micro-pass-v26",
-      "sampledFrames": 14,
-      "microCaptureFps": 8,
-      "publicVideoBytes": 48458962,
-      "captureFps": 2,
-      "src": "/recordings/auto_NA1-5569237516_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5569237516-01.jpg",
-      "rankEstimate": {
-        "version": "2026-05-25-performance-rank-v7",
         "label": "Bronze",
         "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 24,
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "score": 38,
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
@@ -447,17 +357,214 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "6.3 CS/min with 21/5/0 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze IV: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "5.8 CS/min with 18/7/4 K/D/A and 7 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
         "queueClass": "bot",
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "6.3 CS/min with 21/5/0 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze IV: Co-op AI inflates fight success, but the habit leak is exit/value after the first won fight, where cash-out should become tower, wave, recall, or group instead of another fight window."
+        "reason": "5.8 CS/min with 18/7/4 K/D/A and 7 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
+      }
+    },
+    {
+      "file": "auto_NA1-5569237516_01.mp4",
+      "publicFile": "auto_NA1-5569237516_01.mp4",
+      "cacheKey": "48458962:1779861167622",
+      "fingerprint": "48f905546085",
+      "matchId": "NA1-5569237516",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779860028588,
+      "gameHappenedAt": "2026-05-27T05:33:48.588Z",
+      "gameHappenedAtLabel": "May 27, 2026, 1:33 AM",
+      "recordedAt": "2026-05-27T05:52:47.719Z",
+      "recordedAtLabel": "May 27, 2026, 1:52 AM",
+      "recordedAtTimeLabel": "1:52 AM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 880,
+      "gameType": "Co-op vs AI Beginner",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Red-light E discipline first",
+      "duration": "16:29",
+      "durationSeconds": 988.5,
+      "gameLength": "17:45",
+      "gameLengthSeconds": 1065,
+      "kda": "21/5/0",
+      "kills": 21,
+      "deaths": 5,
+      "assists": 0,
+      "cs": 112,
+      "statsSource": "League Client match history",
+      "win": true,
+      "outcome": "victory",
+      "outcomeLabel": "VICTORY",
+      "outcomeSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "medium",
+      "feedbackTitle": "Red-light E discipline first",
+      "feedback": "The leak is using E or forward Samira pressure before W, HP, and ally state are all proved, so Samira becomes catchable instead of farming, kiting, or waiting.",
+      "gameDetail": "At 2:03, Samira attacking a cannon/minion wave in bottom lane, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. The 21/5/0, 112 CS line stays a conservative fallback read, so this review audits W/HP/ally E discipline instead of broad macro. This matters because red-light Samira farms/kites/waits; green-light Samira can fight.",
+      "secondaryFocus": "Rep: before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
+      "mistakeTypes": [
+        "W/HP/ally green-light check",
+        "red-light E or forward click",
+        "Q/auto while backing up",
+        "ally-on-screen re-check",
+        "farm, kite, or wait discipline"
+      ],
+      "eventEvidence": "8:20 shows Samira and ally attacking an enemy turret with minions. 2:03 shows Samira attacking a cannon/minion wave in bottom lane. 5:50 shows Samira last-hitting minions near bottom turret. 10:50 shows two allied champions with a large ally shield effect in bottom lane; minions present.",
+      "failureEvidence": "Fallback review could not recover a full model JSON, so the safe Samira standard is conservative: if W readiness, above-half HP, and ally presence are not all visible at the Samira-pressure timestamp, the moment is red light and E is locked.",
+      "goodThing": "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
+      "whyTrust": "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
+      "focusTag": "samira green-light discipline",
+      "evidence": "2:03 shows Samira attacking a cannon/minion wave in bottom lane. 5:50 shows Samira last-hitting minions near bottom turret. 8:20 shows Samira and ally attacking an enemy turret with minions.",
+      "pattern": "Samira climbs faster when red-light moments become farm, kite, wait, or back-click instead of another forward E.",
+      "diamondRule": "No E toward a Samira unless W, HP, and ally are all green.",
+      "drill": "before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "0:48",
+          "videoSeconds": 4,
+          "description": "Champion standing near allied bottom turret; minimap visible."
+        },
+        {
+          "clock": "2:03",
+          "videoSeconds": 79.423,
+          "description": "Player attacking a cannon/minion wave in bottom lane; cursor over minion."
+        },
+        {
+          "clock": "3:19",
+          "videoSeconds": 154.846,
+          "description": "Player channeling Recall in brush with recall progress bar visible."
+        },
+        {
+          "clock": "4:34",
+          "videoSeconds": 230.269,
+          "description": "Champion running toward allied base turret; empty lane and minimap visible."
+        },
+        {
+          "clock": "5:50",
+          "videoSeconds": 305.692,
+          "description": "Player last-hitting minions near bottom turret; gold pop numbers visible."
+        },
+        {
+          "clock": "7:05",
+          "videoSeconds": 381.115,
+          "description": "Skirmish in bottom lane with multiple champions and a circular shield effect."
+        },
+        {
+          "clock": "8:14",
+          "videoSeconds": 456.538,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
+          "clock": "8:20",
+          "videoSeconds": 456.538,
+          "description": "Player and ally attacking an enemy turret with minions; damage number shown."
+        },
+        {
+          "clock": "9:30",
+          "videoSeconds": 531.962,
+          "description": "shows Samira in a current-match lane-to-map transition review frame"
+        },
+        {
+          "clock": "10:50",
+          "videoSeconds": 531.962,
+          "description": "Two allied champions with a large ally shield effect in bottom lane; minions present."
+        },
+        {
+          "clock": "12:05",
+          "videoSeconds": 607.385,
+          "description": "Champion near base fountain with another allied champion; minimap visible."
+        },
+        {
+          "clock": "13:22",
+          "videoSeconds": 682.808,
+          "description": "Three champions near river/dragon area; on-screen UI and minimap visible."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "2:03",
+          "videoSeconds": 79.423,
+          "description": "shows Samira attacking a cannon/minion wave in bottom lane."
+        },
+        {
+          "clock": "5:50",
+          "videoSeconds": 305.692,
+          "description": "shows Samira last-hitting minions near bottom turret."
+        },
+        {
+          "clock": "8:20",
+          "videoSeconds": 456.538,
+          "description": "shows Samira and ally attacking an enemy turret with minions."
+        }
+      ],
+      "nuance": [
+        "This fallback intentionally reviews the selected habit first instead of broad macro.",
+        "If the frames cannot prove W readiness, HP, and ally cover together, the conservative call is red light."
+      ],
+      "reviewLimit": "Fallback review after model JSON failure; it audits the W/HP/ally E-lock habit and does not claim frame-perfect cooldowns or hidden map state.",
+      "analysisSource": "fallback",
+      "analysisVersion": "2026-05-27-samira-green-light-v28",
+      "sampledFrames": 14,
+      "microCaptureFps": 8,
+      "publicVideoBytes": 48458962,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5569237516_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5569237516-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-25-performance-rank-v7",
+        "label": "Bronze",
+        "range": "Iron I-Bronze II",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "score": 39,
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "confidenceScore": 72,
+        "queueClass": "bot",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "developing",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [
+          "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure"
+        ],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "6.3 CS/min with 21/5/0 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v5",
+        "exactRank": "Bronze I",
+        "exactRankValue": 7,
+        "queueClass": "bot",
+        "confidence": "low",
+        "rankedTransferConfidence": "low",
+        "evidenceConfidence": "high",
+        "reason": "6.3 CS/min with 21/5/0 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
       }
     },
     {
