@@ -30,7 +30,7 @@ const basePushRep = "Rep: in every base push, say structure, blocker, wave, or e
 const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
 const jungleFightExitRep = "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.";
 const midRiverChaseRep = "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.";
-const earlyLaneBackclickRep = "Rep: first 15 minutes, every trade is one-window Samira: support or wave creates contact, auto/Q from behind cover, one backclick, then re-check. No E to start, no E under tower, no E after the wave or support cover thins.";
+const earlyLaneBackclickRep = "Rep: first 10 minutes, every trade is auto/Q - back click - re-check. After the back click, E forward only if support or wave still protects you and the target is already CC'd or low; otherwise farm the wave.";
 const midFightValueExitRep = "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.";
 const analysisVersion = "2026-05-26-early-micro-pass-v26";
 const earlyMicroAnalysisVersion = "2026-05-26-early-lane-micro-v1";
@@ -1169,6 +1169,31 @@ function sanitizeMicroReview(microReview, anchors = [], champion = "Unknown") {
   };
 }
 
+function earlyMicroSpecificityIssues(microReview, champion = "Unknown") {
+  const summary = clean(microReview?.summary || "");
+  if (!summary) return ["summary is empty"];
+  const isSamira = /\bsamira\b/i.test(champion) || /\bsamira\b/i.test(summary);
+  if (!isSamira) return [];
+  const laneTradeLike = /\b(trade|damage window|first damage|auto|\/Q|support|wave|lane|all-?in|dash|enemy|tower|turret|spacing)\b/i.test(summary);
+  const issues = [];
+  if (!/\b(legal|illegal|playable|not legal|no trade|follow|do not trade|chase)\b/i.test(summary)) {
+    issues.push("must judge whether the trade or E is legal");
+  }
+  if (laneTradeLike && !/\b(auto\/Q|auto\s*\/\s*Q|auto|Q\b|first damage window)\b/i.test(summary)) {
+    issues.push("must name the first auto/Q damage window or say it is not visible");
+  }
+  if (laneTradeLike && !/\b(back click|backclick|one step back|backward click|reset spacing|back up)\b/i.test(summary)) {
+    issues.push("must name the back-click or reset-spacing point");
+  }
+  if (laneTradeLike && !/\b(re-check|recheck)\b/i.test(summary)) {
+    issues.push("must include the re-check after the back click");
+  }
+  if (laneTradeLike && !/\b(E|dash)\b/i.test(summary)) {
+    issues.push("must say whether E/dash is legal, illegal, chase, or not visible");
+  }
+  return issues;
+}
+
 function nearestClockReadTime(videoSeconds, readTimes) {
   const target = Number(videoSeconds);
   if (!Number.isFinite(target)) return null;
@@ -1780,8 +1805,8 @@ function reviewRepCategory(recording = {}) {
     return "laneDeathExit";
   }
   if (isSamira &&
-      /\b(early lane|first 15 minutes|first 10 minutes|one-window Samira|auto\/q from behind|no e to start|no e under tower|one damage window, then backclick)\b/i.test(text) &&
-      /\b(wave|support|ally|turret|tower|trade|damage window|setup expires|cover thins|backclick)\b/i.test(text)) {
+      /\b(early lane|first 15 minutes|first 10 minutes|one-window Samira|auto\/q from behind|auto\/q\s*-\s*back click|no e to start|no e under tower|one damage window, then back\s*click|reset spacing)\b/i.test(text) &&
+      /\b(wave|support|ally|turret|tower|trade|damage window|setup expires|cover thins|back\s*click|re-check|spacing)\b/i.test(text)) {
     return "earlyLaneBackclick";
   }
   if (/\bmid[-\s]?wave\b/i.test(text) &&
@@ -1877,7 +1902,7 @@ function repMatchesGameCategory(recording = {}) {
     case "laneDeathExit":
       return /\bdeath-heavy lane sequence\b|\bNo E toward\b|\bDo not E\/dash\b|\bwave still protects (?:me|you)\b|\bone step behind support\b/i.test(rep);
     case "earlyLaneBackclick":
-      return /\bone-window Samira\b|\bauto\/Q\b|\bone backclick\b|\bNo E to start\b|\bNo E under tower\b|\bwave or support cover thins\b/i.test(rep);
+      return /\bone-window Samira\b|\bauto\/Q\s*-\s*back click\s*-\s*re-check\b|\bone back\s*click\b|\bNo E to start\b|\bNo E under tower\b|\bwave or support cover thins\b/i.test(rep);
     case "objectiveFight":
       return /\bdid we already get the value\b|\bobjective done\s*-\s*exit or next map result\b|\bwalk out with allies,\s*mid wave,\s*reset\/spend,\s*or\s*Baron setup\b|\bdragon,\s*wave,\s*recall,\s*or\s*group\b|\bsecond fight\b[\s\S]{0,100}\blow or unsupported\b/i.test(rep);
     case "deathExit":
@@ -6011,7 +6036,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
     "Also include goodThing: one honest positive thing Alan did well if the footage supports it, especially when it contrasts with the mistake. If nothing positive is visible, use an empty string rather than inventing praise.",
     "Write gameDetail like one smooth, short replay-review paragraph, not a stat audit and not a field list: include the main visible mistake window, what happened next or almost happened, and the K/D/A-CS blocker if available. The red feedback field names the leak, the green goodThing names the keep habit, and the pink secondaryFocus names the drill, so do not repeat those claims in gameDetail unless the timestamp evidence needs one short bridge. The beginning or nearest visible beginning of the biggest mistake window must have a game-clock timestamp, and that timestamped sentence must include the exact visible state, the wrong click, and the correct next click. Extra timestamps are optional and should appear only when they make the critique clearer. Current-standard gameDetail should usually stay under 650 characters.",
     "Do not copy the feedback field back into gameDetail. gameDetail must not contain 'Mistake:' or 'Fix:' labels; use it for new timestamped evidence, why the fix is correct, and the final lesson.",
-    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after first won fight; grouped base push = structure, blocker, wave, or exit; mid-wave river chase = after mid wave gives value, ask wave, turret, reset, or river. Do not start with 'Second focus:' or a label.",
+    "secondaryFocus must start with 'Rep:' and be the exact drill Alan can run next ranked game. Keep it playable and short. If he read only the pink text, he should know exactly what to ask or click next game. Avoid vague drills like 'what permanent thing do we win?' because ally front can make a fight legal even when it is not permanent. Make the Rep match the game: early-lane Samira micro = auto/Q - back click - re-check, with E forward only after the re-check proves support/wave still protects you and the target is CC'd or low; lane death = first safe exit/no illegal E; objective fight = after first value choose dragon, wave, recall, or group; fed loss = cash out after first won fight; grouped base push = structure, blocker, wave, or exit; mid-wave river chase = after mid wave gives value, ask wave, turret, reset, or river. Do not start with 'Second focus:' or a label.",
     "mistakeTypes must list 3-5 distinct mistake lanes in short phrases. Good examples: side farm over base defense, camera/map-state check, spacing/entry discipline, reset/overstay discipline, target choice/chase drift, wave/objective conversion, vision/fog pathing, shutdown or death-state exposure. Only include a lane if the frames support it or the limit is stated.",
     "At 2 FPS, do not pretend to judge frame-perfect mechanics, animation cancels, exact combo speed, or reaction time. You may still critique mechanics-adjacent habits that are visible over seconds: spacing, moving while low HP, target choice, camera staying with the wrong fight, clicking toward fog, entering first, using dash before the fight is ready, or repeated pathing/cursor drift. If mechanics are limited by FPS, say that plainly inside secondaryFocus.",
     "Do not assume mechanics are the blocker. If visible coordination is fine and decision-making is the real leak, say that directly; if a visible mechanics-adjacent habit is costing value, name it as the second focus.",
@@ -6044,7 +6069,7 @@ async function analyzeRecording({ file, duration, framePaths, frameTimes, sequen
         prompt,
         "",
         `The first JSON draft failed the detail gate: ${detailIssues.join("; ")}.`,
-        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, entry legality, value or no value, state flip, first bad next click, correct next click, one green keep habit, one red leak, one pink Rep. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' For objective fights, separate legal first entry from the second fight after value. Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
+        "Rewrite once with the same JSON shape. Keep the page format compact and tight: one key timestamp, visible state, entry legality, value or no value, state flip, first bad next click, correct next click, one green keep habit, one red leak, one pink Rep. The first gameDetail sentence must be natural, not a label list: 'At MM:SS, [exact visible state], so the wrong click is [bad click] and the next click is [the click/check to do now].' For objective fights, separate legal first entry from the second fight after value. For early-lane Samira trades, name the legal trade start, the first auto/Q damage window, the exact back-click point, and whether E is legal or only a chase; the Rep should use 'auto/Q - back click - re-check' when that is the actual drill. Do not repeat the tower/wave/objective/ally-front checklist more than once. Do not use vague drill language like 'what permanent thing do we win?'. Include failureEvidence internally as visible proof, include mistakeTypes with at least three distinct mistake lanes, and make secondaryFocus start with 'Rep:' followed by one click-specific drill. Keep Mistake/Fix labels out of gameDetail, do not write 'mistake category:' or 'correct next click:' in visible prose, do not name unverified allied/enemy champions or exact jungle buffs, and use only visible frame evidence. Do not write visible labels like Failure evidence, Other mistake types, or Second focus; make those fields natural paragraph sentences. If the evidence cannot support a claim, narrow the claim and state the limit instead of writing vague advice."
       ].join("\n");
       parsed = await requestOpenAiJson(retryPrompt, images, 1800);
     }
@@ -6115,15 +6140,33 @@ async function analyzeEarlyMicroPass({ file, duration, framePaths, frameTimes, c
     `The early-lane sample is about ${captureFps} FPS evidence, not the 2 FPS macro pass. Duration: ${mmss(duration)}. Sampled frame times: ${frameList}.`,
     `Likely player champion: ${champion}. If the champion is not visually clear, say the limit and use 'the followed champion'.`,
     "Look specifically for spacing relative to support and minion wave, enemy CC threat if visible, whether support is close enough to follow, auto/Q usage while backing up, W timing only if the projectile/spell is visible, and whether E/dash/all-in is legal.",
+    "For early Samira lane trades, answer the exact micro chain when visible: whether the trade start is legal, what the first damage window is, where the back click should happen, and whether E is legal or just a chase after support/wave protection thins.",
+    "Use the approved Samira drill language when it fits the evidence: auto/Q - back click - re-check. After that back click, E forward is legal only if support or wave still protects the followed champion and the target is already CC'd or low; otherwise the next click is farm the wave, hold spacing, or wait for the next support/wave engage.",
     "Do not claim frame-perfect mechanics, exact cooldown timers, exact reaction time, animation cancels, or orbwalking unless the frames visibly support it. If the micro evidence is not enough, return available=false and a reviewLimit.",
-    "The visible summary must start with 'Early micro:' and should be one compact coaching sentence or two short sentences. It must include one timestamp when visible, the exact lane state, legal/illegal judgment, and the correct next click. Examples of acceptable action language: stand one step behind support here; enemy CC is still up so no trade; auto/Q while backing up; this E is illegal; support engaged close enough, follow now.",
+    "The visible summary must start with 'Early micro:' and should be one compact coaching sentence or two short sentences. It must include one timestamp when visible, the exact lane state, legal/illegal judgment, first damage window, the back-click point, and the correct next click. Examples of acceptable action language: stand one step behind support here; enemy CC is still up so no trade; auto/Q - back click - re-check; this E is illegal chase; support engaged close enough, follow now.",
     "Do not recycle the macro review language about payout, map cash-out, objective conversion, or pressure mode unless that exact lane frame actually shows it. This pass is for lane mechanics and short-trade decisions.",
     "Return only JSON with this shape:",
-    '{"available":true,"summary":"Early micro: At MM:SS, exact lane state; legal/illegal trade judgment; correct next click.","focusTag":"lane micro","clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"reviewLimit":"short evidence limit"}',
+    '{"available":true,"summary":"Early micro: At MM:SS, exact lane state; legal/illegal trade judgment; first damage window; back-click point; E legal/illegal; correct next click.","focusTag":"lane micro","clockAnchors":[{"clock":"MM:SS","videoSeconds":0}],"reviewLimit":"short evidence limit"}',
     `Recording file: ${file}.`
   ].join("\n");
   try {
-    const parsed = await requestOpenAiJson(prompt, images, 900);
+    let parsed = await requestOpenAiJson(prompt, images, 900);
+    let microIssues = earlyMicroSpecificityIssues(parsed, champion);
+    if (microIssues.length) {
+      parsed = await requestOpenAiJson([
+        prompt,
+        "",
+        `The first micro draft was too generic: ${microIssues.join("; ")}.`,
+        "Rewrite once with the same JSON shape. If this is a Samira lane trade, the summary must identify trade legality, first damage window, back-click point, E legal/illegal/chase/not visible, and the concrete drill 'auto/Q - back click - re-check' when that is the correct habit. If the frames cannot prove E or the first damage window, say that limit directly instead of using macro language."
+      ].join("\n"), images, 900);
+      microIssues = earlyMicroSpecificityIssues(parsed, champion);
+      if (microIssues.length) {
+        parsed.reviewLimit = coachClean(
+          [parsed.reviewLimit, `Micro detail gate still limited by: ${microIssues.join("; ")}.`].filter(Boolean).join(" "),
+          "The higher-FPS early lane frames did not support a fully specific micro review."
+        );
+      }
+    }
     const summary = coachClean(parsed.summary, "");
     const available = parsed.available !== false && summary.length > 0;
     if (!available) {
