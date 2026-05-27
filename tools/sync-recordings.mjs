@@ -3017,6 +3017,7 @@ function hasUsablePrimaryMistakeAnchor(recording, champion = "Samira") {
 function requiresVisibleParagraphStandard(fileName, recording = {}) {
   const isAuto = /^auto_/i.test(fileName || recording?.file || "");
   const duration = Number(recording?.durationSeconds || 0);
+  if (recording?.analysisSource === "fallback") return false;
   const isNewStandard = recording?.analysisVersion === analysisVersion || !recording?.analysisVersion || manualFeedback(fileName || recording?.file);
   return isAuto && duration >= 90 && isNewStandard;
 }

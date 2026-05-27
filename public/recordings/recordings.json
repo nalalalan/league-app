@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-27T00:15:08.244Z",
+  "generatedAt": "2026-05-27T04:23:33.800Z",
   "source": "League of Legends Highlights folder",
-  "match": "49 matches",
+  "match": "50 matches",
   "matches": [
     "NA1-5563247854",
     "NA1-5563301586",
@@ -51,19 +51,20 @@
     "NA1-5568447928",
     "NA1-5568519322",
     "NA1-5568775454",
-    "NA1-5568876241"
+    "NA1-5568876241",
+    "NA1-5569137549"
   ],
-  "captured": "May 18, 2026, 5:46 PM to May 26, 2026, 6:29 PM ET",
-  "totalDuration": "832:43",
-  "totalRecordings": 61,
+  "captured": "May 18, 2026, 5:46 PM to May 26, 2026, 11:58 PM ET",
+  "totalDuration": "853:53",
+  "totalRecordings": 62,
   "reviewBasis": "Newest match first; duplicate same-match captures collapse to the fullest auto review.",
   "mainFeedback": {
     "title": "Samira latest synced state",
-    "focus": "Synced through May 26, 2026, 5:54 PM: newest full-game read Iron IV; current 3-game read Iron III; archive median Bronze IV across 46 full games, used only as baseline context. The newest game is around the current three-game read.",
-    "rule": "The newest-game blocker is second mid-fight re-entry after value and low-health exit discipline; the current repeat across the latest games is low-health exit discipline, recall-to-next-play discipline, and second mid-fight re-entry after value. The keep-habit is you do the keepable part: finish a safe recall under friendly turret with spendable gold instead of forcing another bot-lane screen.",
-    "nextRep": "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
+    "focus": "Synced through May 26, 2026, 11:28 PM: newest full-game read Iron I; current 3-game read Iron III; archive median Bronze IV across 47 full games, used only as baseline context. The newest game is around the current three-game read.",
+    "rule": "The newest-game blocker is reset/overstay discipline and missed structure/objective conversion; the current repeat across the latest games is missed structure/objective conversion, reset/overstay discipline, and e/click legality after value. The keep-habit is You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
+    "nextRep": "after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
     "whyTrust": "This is latest-weighted: the newest full game carries the coaching state, the last 3 full games set the current pattern, and older games only provide baseline context.",
-    "pattern": "Latest file auto_NA1-5568876241_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
+    "pattern": "Latest file auto_NA1-5569137549_01.mp4 is the state source; the archive median is kept for the plot and baseline only.",
     "checklist": [
       "Read the newest-game point.",
       "Use the latest-game next action.",
@@ -76,21 +77,21 @@
     "method": "forensic performance-grade estimate with CS/min, death timing, entry legality, exit quality, conversion, queue, timestamp, and cross-game confidence gates",
     "highConfidenceReady": true,
     "currentLimitation": "",
-    "fullReviewGames": 47,
+    "fullReviewGames": 48,
     "queueCounts": {
       "unknown": 14,
       "bot": 15,
-      "ranked_solo": 18
+      "ranked_solo": 19
     },
-    "rankedFullGames": 18,
-    "pvpFullGames": 18,
+    "rankedFullGames": 19,
+    "pvpFullGames": 19,
     "botFullGames": 15,
-    "anchoredFullGames": 47,
-    "statFullGames": 47,
+    "anchoredFullGames": 48,
+    "statFullGames": 48,
     "rankLabelCounts": {
-      "Bronze": 19,
-      "Silver": 5,
-      "Iron": 23
+      "Bronze": 18,
+      "Silver": 6,
+      "Iron": 24
     },
     "exactRankScale": [
       "Iron IV",
@@ -173,7 +174,7 @@
       "id": "samira",
       "name": "Samira",
       "confidence": "high",
-      "recordings": 60,
+      "recordings": 61,
       "evidence": "3:34 Blue team pushes bottom lane with minions near enemy turret; 3:37 Red team Samira teleports in, blue Samira is stunned in bot lane fight; 3:40 Samira is killed for a shutdown—shows the consequence of staying too far forward and not respecting the incoming Teleport, supporting the lesson on respecting missing enemies and incoming TPs.",
       "improvementTitle": "Respect missing and incoming TPs",
       "improvement": "Mistake: You stayed too far forward in lane and did not respect the enemy Teleport coming in while exposed. Fix: When your ADC is hitting the wave and the enemy TP is coming down, immediately back off from melee range and give ground until you confirm numbers and threat."
@@ -190,19 +191,19 @@
   ],
   "recordings": [
     {
-      "file": "auto_NA1-5568876241_01.mp4",
-      "publicFile": "auto_NA1-5568876241_01.mp4",
-      "cacheKey": "82451811:1779834573323",
-      "fingerprint": "387250922a94",
-      "matchId": "NA1-5568876241",
+      "file": "auto_NA1-5569137549_01.mp4",
+      "publicFile": "auto_NA1-5569137549_01.mp4",
+      "cacheKey": "57263799:1779854284410",
+      "fingerprint": "eb7e0d471815",
+      "matchId": "NA1-5569137549",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779832447044,
-      "gameHappenedAt": "2026-05-26T21:54:07.044Z",
-      "gameHappenedAtLabel": "May 26, 2026, 5:54 PM",
-      "recordedAt": "2026-05-26T22:29:33.410Z",
-      "recordedAtLabel": "May 26, 2026, 6:29 PM",
-      "recordedAtTimeLabel": "6:29 PM",
+      "matchTimeMs": 1779852525596,
+      "gameHappenedAt": "2026-05-27T03:28:45.596Z",
+      "gameHappenedAtLabel": "May 26, 2026, 11:28 PM",
+      "recordedAt": "2026-05-27T03:58:04.513Z",
+      "recordedAtLabel": "May 26, 2026, 11:58 PM",
+      "recordedAtTimeLabel": "11:58 PM",
       "clipTimestampSeconds": null,
       "clipTimestamp": "",
       "clipWindow": "",
@@ -210,16 +211,16 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Mid fight needed one value, then exit",
-      "duration": "31:26",
-      "durationSeconds": 1886,
-      "gameLength": "34:21",
-      "gameLengthSeconds": 2061,
-      "kda": "5/7/12",
-      "kills": 5,
-      "deaths": 7,
-      "assists": 12,
-      "cs": 159,
+      "title": "Pressure mode after payout vanished",
+      "duration": "21:10",
+      "durationSeconds": 1270,
+      "gameLength": "28:02",
+      "gameLengthSeconds": 1682,
+      "kda": "9/5/3",
+      "kills": 9,
+      "deaths": 5,
+      "assists": 3,
+      "cs": 193,
       "statsSource": "League Client match history",
       "win": false,
       "outcome": "defeat",
@@ -228,100 +229,81 @@
       "kind": "full review",
       "reviewPhase": "current form",
       "champion": "Samira",
-      "confidence": "high",
-      "feedbackTitle": "Mid fight needed one value, then exit",
-      "feedback": "The leak is the second mid-fight re-entry after the first value: once you are low and an ally can keep the play alive, staying forward turns a won pressure window into a death timer instead of recall, mid wave, or group.",
-      "gameDetail": "At 18:40, the mid fight has already created value: an enemy is low, an ally is on the target, and Samira is low enough to be punished, so the wrong click is staying in for the second body and the next click is back toward mid wave or base while the ally finishes. At 16:10 you show the right habit by recalling safely under friendly turret with about 1088 gold. By 18:59 the cost is visible as a death timer even though the team gets turret value, and the 5/7/12, 159 CS line says damage and assists exist but the extra re-entry keeps paying value back.",
-      "secondaryFocus": "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
-      "mistakeTypes": [
-        "second mid-fight re-entry after value",
-        "low-health exit discipline",
-        "recall-to-next-play discipline",
-        "ally-front check",
-        "death-state exposure"
-      ],
-      "eventEvidence": "16:10 shows Samira safely recalling under friendly turret with about 1088 gold; 18:34 shows Samira returning to mid wave with an ally nearby; 18:40 shows the low-health mid-fight re-entry; 18:59 shows the death timer.",
-      "failureEvidence": "At 18:40 the first mid-fight value is already real, but Samira stays forward while low for the second body; by 18:59 that extra re-entry becomes a death timer instead of a clean reset, wave, or group.",
-      "goodThing": "At 16:10 you do the keepable part: finish a safe recall under friendly turret with spendable gold instead of forcing another bot-lane screen. Keep that reset discipline.",
-      "whyTrust": "This uses inspected 16:10, 18:34, 18:40, and 18:59 frames from the same ranked match, so the review does not treat the safe recall or shop menu as the mistake.",
-      "focusTag": "mid fight exit after value",
-      "evidence": "Manual frame inspection of the safe recall, mid wave return, low-health mid fight, and death-timer consequence from the same match.",
-      "pattern": "The first setup is not always wrong: wave, support, and ally-front context often make the first damage window playable. The blocker is the second forward click after that window has already paid.",
-      "diamondRule": "After a fight gives one value, Samira exits to wave, recall, or group unless an ally is still in front and the next target is already CC'd, low, or trapped.",
-      "drill": "after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
-      "timeline": [
-        "16:10 - Samira recalls safely under friendly turret with about 1088 gold.",
-        "18:34 - Samira returns to mid wave with an ally nearby and an enemy in front.",
-        "18:40 - Samira is low in the mid fight while an ally is still on the target.",
-        "18:59 - Samira is on a death timer after the extra mid-fight re-entry."
-      ],
+      "confidence": "medium",
+      "feedbackTitle": "Pressure mode after payout vanished",
+      "feedback": "Mistake: you stayed in pressure mode after the safe wave or tower payout stopped being clear. Fix: before any forward click, check closest threatened turret, ally deaths, and who can stand in front; hit tower if free, hit only the blocker if safe, push or clear wave then recall, or leave.",
+      "gameDetail": "At 9:47, Samira farming a bot-lane minion wave; +20 gold popup visible above a minion, so the wrong click is stepping forward after the safe payout disappeared and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. by 17:53, Samira in mid lane pushing a minion wave with wards placed on the ground visible on the minimap. The first value window may be playable, but the state flip is where the next click becomes illegal if no ally front, wave, tower, or objective is still visible. This is a phase problem: the first wave, fight, or tower pressure can be legal, but after that value is gained the next click has to become exit, wave, recall, group, or another visible result before enemies get another collapse.",
+      "secondaryFocus": "",
+      "mistakeTypes": [],
+      "eventEvidence": "9:47 shows Samira farming a bot-lane minion wave; +20 gold popup visible above a minion. 17:53 shows Samira in mid lane pushing a minion wave with wards placed on the ground visible on the minimap. 2:42 shows Samira's Samira near bot-lane minion wave while two enemy champions stand further up the lane. 23:58 shows teamfight in mid with multiple champions crowd-controlled; Samira's Samira approaching from the left.",
+      "failureEvidence": "",
+      "goodThing": "You are finding fights and creating damage pressure; keep that, but attach each forward click to a visible wave, tower, objective, or reset branch.",
+      "whyTrust": "The visible frames and client stats show whether Samira is getting damage, deaths, CS, and wave/tower value; the review is about protecting that pressure with a concrete next-click branch.",
+      "focusTag": "overstay control",
+      "evidence": "2:42 Samira's Samira near bot-lane minion wave while two enemy champions stand further up the lane. 9:47 Samira farming a bot-lane minion wave; +20 gold popup visible above a minion. 17:53 Samira in mid lane pushing a minion wave with wards placed on the ground visible on the minimap.",
+      "pattern": "The carry score says damage is available, so the rank leak is the exact branch after a wave, tower, fight, or reset state appears.",
+      "diamondRule": "After 15 minutes, every forward click needs one visible branch: free tower, safe blocker, wave then recall, or leave.",
+      "drill": "after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
+      "timeline": [],
       "clockAnchors": [
         {
-          "clock": "16:10",
-          "videoSeconds": 870.769,
-          "description": "Samira recalls safely under friendly turret with about 1088 gold."
+          "clock": "2:42",
+          "videoSeconds": 101.077,
+          "description": "Player's champion near bot-lane minion wave while two enemy champions stand further up the lane."
         },
         {
-          "clock": "18:34",
-          "videoSeconds": 990,
-          "description": "Samira returns to mid wave with an ally nearby and an enemy in front."
+          "clock": "9:47",
+          "videoSeconds": 392.308,
+          "description": "Player farming a bot-lane minion wave; +20 gold popup visible above a minion."
         },
         {
-          "clock": "18:40",
-          "videoSeconds": 996,
-          "description": "Samira is low in the mid fight while an ally is still on the target."
+          "clock": "17:53",
+          "videoSeconds": 780.615,
+          "description": "Player in mid lane pushing a minion wave with wards placed on the ground visible on the minimap."
         },
         {
-          "clock": "18:59",
-          "videoSeconds": 1015.231,
-          "description": "Samira is on a death timer after the extra mid-fight re-entry."
+          "clock": "23:58",
+          "videoSeconds": 1071.846,
+          "description": "Teamfight in mid with multiple champions crowd-controlled; player's champion approaching from the left."
         }
       ],
       "clockMoments": [
         {
-          "clock": "16:10",
-          "videoSeconds": 870.769,
-          "description": "shows Samira safely recalling under friendly turret with about 1088 gold"
+          "clock": "2:42",
+          "videoSeconds": 101.077,
+          "description": "Samira's Samira near bot-lane minion wave while two enemy champions stand further up the lane."
         },
         {
-          "clock": "18:34",
-          "videoSeconds": 990,
-          "description": "shows Samira returning to mid wave with an ally nearby"
+          "clock": "9:47",
+          "videoSeconds": 392.308,
+          "description": "Samira farming a bot-lane minion wave; +20 gold popup visible above a minion."
         },
         {
-          "clock": "18:40",
-          "videoSeconds": 996,
-          "description": "shows the low-health mid-fight re-entry"
-        },
-        {
-          "clock": "18:59",
-          "videoSeconds": 1015.231,
-          "description": "shows the death timer."
+          "clock": "17:53",
+          "videoSeconds": 780.615,
+          "description": "Samira in mid lane pushing a minion wave with wards placed on the ground visible on the minimap."
         }
       ],
       "nuance": [
-        "The safe 16:10 recall is a concrete improvement and should stay.",
-        "The mistake is not the recall; it is the later re-entry after the first fight value.",
-        "The 18:40 frame shows the state flip: low health plus an ally already on the target means the next value is exit, not another body.",
-        "The 5/7/12 line shows you are participating in fights, but seven deaths keep handing back tempo.",
-        "The next-game rep is recall/spend, wave, or group after first value."
+        "High kills only matter when the next click creates tower, wave, objective, reset, or base value.",
+        "Low CS makes every unclear forward click more expensive because income is already unstable."
       ],
-      "reviewLimit": "Manual 2 FPS macro frames cannot prove every cooldown, input, or fogged enemy, but they verify the safe recall, the low-health mid-fight state, and the death-timer consequence.",
-      "analysisSource": "manual",
+      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
+      "analysisSource": "fallback",
       "analysisVersion": "2026-05-26-early-micro-pass-v26",
       "sampledFrames": 14,
       "microCaptureFps": 8,
-      "publicVideoBytes": 82451811,
+      "publicVideoBytes": 57263799,
       "captureFps": 2,
-      "src": "/recordings/auto_NA1-5568876241_01.mp4",
-      "poster": "/recordings/posters/auto-na1-5568876241-01.jpg",
+      "src": "/recordings/auto_NA1-5569137549_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5569137549-01.jpg",
       "rankEstimate": {
         "version": "2026-05-25-performance-rank-v7",
         "label": "Iron",
         "range": "Iron IV-Iron II",
-        "exactRank": "Iron IV",
-        "exactRankValue": 0,
-        "score": 0,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
+        "score": 18,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
@@ -345,17 +327,175 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "4.6 CS/min and 7 deaths put the game at Iron IV: the mid-fight entry creates value, but exit/re-entry after first value still turns pressure into dead time instead of wave, recall, or group."
+        "reason": "6.9 CS/min and 5 deaths put the game at Iron I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Iron IV",
-        "exactRankValue": 0,
+        "exactRank": "Iron I",
+        "exactRankValue": 3,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "4.6 CS/min and 7 deaths put the game at Iron IV: the mid-fight entry creates value, but exit/re-entry after first value still turns pressure into dead time instead of wave, recall, or group."
+        "reason": "6.9 CS/min and 5 deaths put the game at Iron I because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
+      }
+    },
+    {
+      "file": "auto_NA1-5568876241_01.mp4",
+      "publicFile": "auto_NA1-5568876241_01.mp4",
+      "cacheKey": "82451811:1779834573323",
+      "fingerprint": "387250922a94",
+      "matchId": "NA1-5568876241",
+      "score": "auto",
+      "clipNumber": 1,
+      "matchTimeMs": 1779832447044,
+      "gameHappenedAt": "2026-05-26T21:54:07.044Z",
+      "gameHappenedAtLabel": "May 26, 2026, 5:54 PM",
+      "recordedAt": "2026-05-26T22:29:33.410Z",
+      "recordedAtLabel": "May 26, 2026, 6:29 PM",
+      "recordedAtTimeLabel": "6:29 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": 420,
+      "gameType": "Ranked Solo",
+      "gameTypeSource": "LeagueClient log",
+      "title": "Mid fight needed one value, then back-click",
+      "duration": "31:26",
+      "durationSeconds": 1886,
+      "gameLength": "34:21",
+      "gameLengthSeconds": 2061,
+      "kda": "5/7/12",
+      "kills": 5,
+      "deaths": 7,
+      "assists": 12,
+      "cs": 159,
+      "statsSource": "League Client match history",
+      "win": false,
+      "outcome": "defeat",
+      "outcomeLabel": "DEFEAT",
+      "outcomeSource": "League Client match history",
+      "kind": "full review",
+      "reviewPhase": "current form",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Mid fight needed one value, then back-click",
+      "feedback": "The leak is that after the first mid-fight auto/Q or burst window, your next input stays forward while low, so one playable damage window becomes a second Samira re-entry death instead of hit - back-click - re-check.",
+      "gameDetail": "At 18:40, the mid fight has already created value: an enemy is low, an ally is on the target, and you are low, so the entry/value window is playable but the first bad next input is staying forward for a second body; the next input is back-click through mid wave or toward base while the ally finishes. By 18:59 the cost is visible as another death timer even though the team still gets turret value, which means the mechanical error is not no damage; it is auto/Q or E pressure while your movement stays toward enemy reach instead of hit - back-click - re-check.",
+      "secondaryFocus": "Rep: first 10 minutes, every trade is auto/Q - back click - re-check. After the back click, E forward only if support or wave still protects you and the target is already CC'd or low; otherwise farm the wave.",
+      "mistakeTypes": [
+        "first-burst back-click timing",
+        "second forward input while low",
+        "E/click legality after value",
+        "ally-front and target-HP re-check",
+        "death-state exposure"
+      ],
+      "eventEvidence": "18:34 shows Samira back near mid wave with an ally nearby; 18:40 shows the playable first value already created while Samira is low; 18:59 shows the death timer after the extra forward re-entry.",
+      "failureEvidence": "At 18:40 the first mid-fight value is already real, but Samira keeps the next input forward while low for a second body; by 18:59 that extra re-entry becomes a death timer instead of wave, recall, or group.",
+      "goodThing": "At 18:40 you do the keepable part first: you are close enough to contribute damage after an ally is already on the target, which is a playable first window. Keep that first burst, then reset spacing.",
+      "whyTrust": "This uses inspected 18:34, 18:40, and 18:59 frames from the same ranked match; at 2 FPS it does not claim the exact keypress, but it does verify the low-health forward-pressure shape and death-timer cost.",
+      "focusTag": "mid fight back-click after value",
+      "evidence": "Manual frame inspection of the mid wave return, first playable damage window, low-health forward pressure, and death-timer consequence from the same match.",
+      "pattern": "The first setup is not always wrong: wave, support, and ally-front context can make the first burst playable. The blocker is the next forward input after that window has already paid.",
+      "diamondRule": "After one Samira damage window, hit, back-click, and re-check; re-enter only if an ally is still in front and the target is CC'd, low, or trapped.",
+      "drill": "after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.",
+      "timeline": [
+        "18:34 - Samira returns to mid wave with an ally nearby and an enemy in front.",
+        "18:40 - Samira has one playable damage window but is low enough that the next input should be a back-click.",
+        "18:59 - Samira is on a death timer after the extra forward re-entry."
+      ],
+      "clockAnchors": [
+        {
+          "clock": "18:34",
+          "videoSeconds": 990,
+          "description": "Samira returns to mid wave with an ally nearby and an enemy in front."
+        },
+        {
+          "clock": "18:40",
+          "videoSeconds": 996,
+          "description": "Samira has one playable damage window but is low enough that the next input should be a back-click."
+        },
+        {
+          "clock": "18:59",
+          "videoSeconds": 1015.231,
+          "description": "Samira is on a death timer after the extra forward re-entry."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "18:34",
+          "videoSeconds": 990,
+          "description": "shows Samira back near mid wave with an ally nearby"
+        },
+        {
+          "clock": "18:40",
+          "videoSeconds": 996,
+          "description": "shows the playable first value already created while Samira is low"
+        },
+        {
+          "clock": "18:59",
+          "videoSeconds": 1015.231,
+          "description": "shows the death timer after the extra forward re-entry."
+        }
+      ],
+      "nuance": [
+        "The first damage window is playable because an ally is already on the target.",
+        "The mistake is the next input after that burst staying forward while you are low.",
+        "The 18:40 frame shows the state flip: low health plus an ally already on the target means the next input is back-click and re-check, not another body.",
+        "The 5/7/12 line shows you are participating in fights, but seven deaths keep handing back tempo.",
+        "The next-game rep is hit, back-click, re-check before any second E/click."
+      ],
+      "reviewLimit": "Manual 2 FPS macro frames cannot prove the exact E keypress, cooldown, or fogged enemy, so the claim is about visible forward pressure and spacing after the first burst; the frames verify the low-health mid-fight state, ally-on-target context, and death-timer consequence.",
+      "analysisSource": "manual",
+      "analysisVersion": "2026-05-26-early-micro-pass-v26",
+      "sampledFrames": 14,
+      "microCaptureFps": 8,
+      "publicVideoBytes": 82451811,
+      "captureFps": 2,
+      "src": "/recordings/auto_NA1-5568876241_01.mp4",
+      "poster": "/recordings/posters/auto-na1-5568876241-01.jpg",
+      "rankEstimate": {
+        "version": "2026-05-25-performance-rank-v7",
+        "label": "Iron",
+        "range": "Iron IV-Iron II",
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "score": 9,
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "confidenceScore": 98,
+        "queueClass": "ranked_solo",
+        "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
+        "percentile": "new ranked fundamentals",
+        "confidenceSignals": [
+          "near-full macro recording",
+          "K/D/A, CS, and game length are available",
+          "visible timestamp anchors exist",
+          "review passed the current evidence standard or manual frame review",
+          "ranked opponent pressure",
+          "enough ranked full-game samples for calibration"
+        ],
+        "confidenceBlockers": [],
+        "researchBasis": [
+          "riot-ranked-tiers-2026",
+          "riot-apex-tiers-2026",
+          "bennett-poulus-novak-2025",
+          "srl-league-2021",
+          "kpi-objective-vision-2025"
+        ],
+        "reason": "4.6 CS/min with 5/7/12 K/D/A puts the game at Iron III: early trade setup is cleaner when support or wave starts the contact, but the remaining leak is the extra forward click after the first damage window."
+      },
+      "performanceRank": {
+        "version": "2026-05-25-performance-rank-v5",
+        "exactRank": "Iron III",
+        "exactRankValue": 1,
+        "queueClass": "ranked_solo",
+        "confidence": "high",
+        "rankedTransferConfidence": "high",
+        "evidenceConfidence": "high",
+        "reason": "4.6 CS/min with 5/7/12 K/D/A puts the game at Iron III: early trade setup is cleaner when support or wave starts the contact, but the remaining leak is the extra forward click after the first damage window."
       }
     },
     {
@@ -562,7 +702,7 @@
       "outcomeLabel": "DEFEAT",
       "outcomeSource": "League Client match history",
       "kind": "full review",
-      "reviewPhase": "current form",
+      "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
       "feedbackTitle": "Drake secure became one more death window",
@@ -1228,7 +1368,7 @@
       "queueId": 420,
       "gameType": "Ranked Solo",
       "gameTypeSource": "LeagueClient log",
-      "title": "Cleaner win, one mid re-entry death remains",
+      "title": "Cleaner win, one mid-fight back-click leak remains",
       "duration": "23:15",
       "durationSeconds": 1395,
       "gameLength": "25:32",
@@ -1247,31 +1387,31 @@
       "reviewPhase": "implementation",
       "champion": "Samira",
       "confidence": "high",
-      "feedbackTitle": "Cleaner win, one mid re-entry death remains",
-      "feedback": "The leak is staying forward for a second mid-fight re-entry after the first value window has already become wave, recall, or regroup.",
-      "gameDetail": "At 21:09, the first mid fight is legal enough because allies and a wave are near you and value has already happened, but the state flip is exit/value: you are low, enemy bodies can still re-engage, and the next click is one step back through the wave, then recall or group. The first bad next click is staying forward for another Samira re-entry. By 22:02 the re-entry becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one mid-fight exit leak.",
-      "secondaryFocus": "Rep: after a mid fight gives one kill, assist, wave, or turret pressure, say wave, recall, or regroup. If you are low or no ally is clearly in front, no second forward E; take one step back through the wave first.",
+      "feedbackTitle": "Cleaner win, one mid-fight back-click leak remains",
+      "feedback": "The leak is that after the first mid-fight damage window, your next input stays forward while low, so one useful Samira burst becomes a second re-entry death instead of hit - back-click - re-check.",
+      "gameDetail": "At 21:09, the mid fight is playable at first because allies and a wave are near you and value has already happened; the first damage window is legal enough, but once you are low and enemy bodies can still re-engage, the correct next input is back-click one step through the wave, re-check ally front, enemy CC, and target HP, then recall or group if the target is no longer trapped. By 22:02 the second forward input becomes your third death, so this is a cleaner 7/3/10, 139 CS victory with one remaining mid-fight micro-exit leak.",
+      "secondaryFocus": "Rep: after 15 minutes, before stepping forward after a wave, tower hit, or fight start, ask: tower, wave, objective, or ally front? If none is visible, click one step back and reset/group; re-enter only when an ally is between you and them and the target is CC'd, low, or already committed.",
       "mistakeTypes": [
-        "mid-fight exit after value",
-        "low-HP re-entry discipline",
-        "wave-to-recall conversion",
-        "ally-front check",
-        "reset/overstay discipline"
+        "first-burst back-click timing",
+        "second forward input while low",
+        "E/click legality after value",
+        "ally-front and target-HP re-check",
+        "wave-to-recall conversion"
       ],
-      "eventEvidence": "19:23 shows Samira recalling after bot-side pressure with about 1687 gold; 21:09 shows Samira low in mid with wave/ally context and enemy bodies still able to re-engage; 22:02 shows the death timer after the re-entry.",
-      "failureEvidence": "At 21:09 the first value has already happened and the legal branch is wave, recall, or regroup; staying forward turns the play into the 22:02 death timer instead of a stable result.",
-      "goodThing": "At 19:23 you recall after bot-side tower pressure with about 1687 gold; keep that exit instinct.",
-      "whyTrust": "This uses inspected 19:23, 21:09, and 22:02 frames plus the League Client 7/3/10, 139 CS ranked victory context.",
-      "focusTag": "mid-fight exit",
+      "eventEvidence": "19:23 shows the earlier safe recall after bot-side pressure; 21:09 shows Samira low in mid with wave/ally context and enemy bodies still able to re-engage; 22:02 shows the death timer after the second forward input.",
+      "failureEvidence": "At 21:09 the first damage/value window has already paid and the legal branch is hit - back-click - re-check, then wave, recall, or regroup; staying forward turns the play into the 22:02 death timer instead of a stable result.",
+      "goodThing": "At 21:09 the first mid-fight window is not random: you are playing near allies and wave before the state flips; keep starting fights from that cover instead of being first body.",
+      "whyTrust": "This uses inspected 19:23, 21:09, and 22:02 frames plus the League Client 7/3/10, 139 CS ranked victory context; the review does not claim exact E keypress certainty beyond visible forward pressure.",
+      "focusTag": "mid-fight micro exit",
       "evidence": "Manual frame inspection of the mid re-entry window and League Client ranked stats for the same match.",
-      "pattern": "This is a cleaner win with one remaining mid-fight exit leak, not the old chain-feeding pattern.",
-      "diamondRule": "After mid value, no second forward Samira click while low unless ally front is clear and the target is already CC'd or low.",
-      "drill": "after a mid fight gives one kill, assist, wave, or turret pressure, say wave, recall, or regroup. If you are low or no ally is clearly in front, no second forward E; take one step back through the wave first.",
+      "pattern": "This is a cleaner win with one remaining mid-fight input leak, not the old chain-feeding pattern.",
+      "diamondRule": "After the first Samira burst, back-click once and re-check before any second E or forward click.",
+      "drill": "after the first burst in any lane or mid fight, say one window. Auto/Q, back-click once through the wave or toward base, then re-check ally front, enemy CC, and target HP. Only E forward again if an ally is still in front and the target is CC'd or low.",
       "timeline": [
         "19:23 - Samira recalls after bot-side pressure with about 1687 gold.",
         "20:42 - Samira is low near mid with an ally nearby and enemy bodies in front.",
         "20:57 - Samira is still low with mid wave visible and exit available.",
-        "21:09 - Samira stays forward for another mid re-entry after first value.",
+        "21:09 - Samira stays forward for another mid-fight input after first value instead of back-clicking through wave.",
         "22:02 - Samira is dead with BACK IN 38 visible."
       ],
       "clockAnchors": [
@@ -1293,7 +1433,7 @@
         {
           "clock": "21:09",
           "videoSeconds": 1177.615,
-          "description": "Samira stays forward for another mid re-entry after first value."
+          "description": "Samira stays forward for another mid-fight input after first value instead of back-clicking through wave."
         },
         {
           "clock": "22:02",
@@ -1305,7 +1445,7 @@
         {
           "clock": "19:23",
           "videoSeconds": 1070.923,
-          "description": "shows Samira recalling after bot-side pressure with about 1687 gold"
+          "description": "shows the earlier safe recall after bot-side pressure"
         },
         {
           "clock": "20:42",
@@ -1326,11 +1466,11 @@
       "nuance": [
         "This is a cleaner ranked victory, not the same death-heavy collapse pattern.",
         "The useful part is that farming, fighting, and deaths are more controlled.",
-        "The mistake starts after the first mid value window, when the next click stays re-entry instead of exit.",
+        "The mistake starts after the first mid value window, when the next input stays forward instead of hit - back-click - re-check.",
         "The 139 CS and 3 deaths show Silver-level survival for this session, but the remaining re-entry death keeps it from a cleaner grade.",
-        "The next-game rep is a mid-fight exit check, not a generic pressure-mode slogan."
+        "The next-game rep is a mid-fight input check, not a generic pressure-mode slogan."
       ],
-      "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns or hidden enemy positions, but it verifies the 19:23 recall, 21:09 re-entry state, 22:02 death, and 7/3/10, 139 CS ranked victory context.",
+      "reviewLimit": "Manual 2 FPS frame review cannot prove exact cooldowns, hidden enemy positions, or exact E keypress timing, but it verifies the 19:23 recall, 21:09 low mid-fight forward-pressure state, 22:02 death, and 7/3/10, 139 CS ranked victory context.",
       "analysisSource": "manual",
       "analysisVersion": "2026-05-26-early-micro-pass-v26",
       "sampledFrames": 14,
@@ -1424,7 +1564,7 @@
       "feedbackTitle": "Jungle fight continued after first value",
       "feedback": "The leak is that after the first jungle value window ends, you keep chasing the same fight through blue-side jungle instead of choosing a stable result.",
       "gameDetail": "At 22:51, the blue-side jungle fight is playable at first: allies are in front, an enemy is already committed, and Samira can threaten from behind the line, so the first value window is not the issue and the next click is exit to turret, catch mid wave, reset, or regroup after that value is gone. Once no enemy is already CC'd or low, no ally is clearly body-blocking, and no tower, wave, or objective is visible, Samira's next click has to be exit, not another forward chase. By 23:39 the playable entry has turned into enemy tempo and another death timer.",
-      "secondaryFocus": "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
+      "secondaryFocus": "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.",
       "mistakeTypes": [
         "jungle fight exit after first value",
         "side wave to map-result conversion",
@@ -1514,18 +1654,18 @@
       "poster": "/recordings/posters/auto-na1-5567953154-01.jpg",
       "rankEstimate": {
         "version": "2026-05-25-performance-rank-v7",
-        "label": "Bronze",
-        "range": "Iron I-Bronze II",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
-        "score": 27,
+        "label": "Silver",
+        "range": "Bronze I-Silver II",
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
+        "score": 41,
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
         "confidenceScore": 98,
         "queueClass": "ranked_solo",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
-        "percentile": "developing",
+        "percentile": "middle",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
@@ -1542,17 +1682,17 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.5 CS/min and 4 deaths put the game at Bronze IV: the mid-fight entry creates value, but exit/re-entry after first value still turns pressure into dead time instead of wave, recall, or group."
+        "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Silver IV."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
-        "exactRank": "Bronze IV",
-        "exactRankValue": 4,
+        "exactRank": "Silver IV",
+        "exactRankValue": 8,
         "queueClass": "ranked_solo",
         "confidence": "high",
         "rankedTransferConfidence": "high",
         "evidenceConfidence": "high",
-        "reason": "5.5 CS/min and 4 deaths put the game at Bronze IV: the mid-fight entry creates value, but exit/re-entry after first value still turns pressure into dead time instead of wave, recall, or group."
+        "reason": "5.5 CS/min and only 4 deaths show calmer farming and survival than the death-heavy games, but 1/4/3 K/D/A fight impact and the late jungle-fight exit/value leak keep the performance at Silver IV."
       }
     },
     {
@@ -5718,7 +5858,7 @@
       "feedbackTitle": "Base break became a delayed sync",
       "feedback": "Mistake: after the base was cracked, you let the next minute become mid-wave cleanup and a late rejoin instead of an immediate finish-or-reset call. Fix: once the inhibitor/nexus area opens, say finish, reset, or sync next wave before touching another mid wave.",
       "gameDetail": "At 11:12, the base already cracked with Samira and allies inside, so the wrong click is stepping forward after the safe payout disappeared and the next click is to choose the visible result now: structure, wave, recall, group, or one step back if none is safe. At 11:27 you correctly fight with allies in the base and get the takedown instead of chasing somewhere useless. At 11:47 the next decision point appears: the tower is down, you have about 3034 gold, minions and allies are still in the base, and the clean Master-climb call is either finish now or reset on the same timing as the team. At 12:32 and 12:42 you are back mid collecting waves after spending, which means the old reset critique was too vague; the actual leak is that the next base hit is no longer clearly synced. By 12:52 your team is fighting again near the opened base while you are still arriving from mid, and at 13:00 the rejoin works in this game, but stronger teams use that delay to clear waves, respawn, or collapse on the late carry. The lesson is: after base breaks, do not let a correct reset turn into a disconnected re-entry.",
-      "secondaryFocus": "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
+      "secondaryFocus": "Rep: in every base push, say structure, blocker, wave, or exit before the forward click; hit the structure if free, hit only the blocker if safe, otherwise leave.",
       "mistakeTypes": [
         "reset/overstay discipline",
         "side farm over map defense",
@@ -5873,7 +6013,7 @@
           "srl-league-2021",
           "kpi-objective-vision-2025"
         ],
-        "reason": "5.8 CS/min and 2 deaths put the game at Bronze II: the mid-fight entry creates value, but exit/re-entry after first value still turns pressure into dead time instead of wave, recall, or group."
+        "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       },
       "performanceRank": {
         "version": "2026-05-25-performance-rank-v5",
@@ -5883,7 +6023,7 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "reason": "5.8 CS/min and 2 deaths put the game at Bronze II: the mid-fight entry creates value, but exit/re-entry after first value still turns pressure into dead time instead of wave, recall, or group."
+        "reason": "5.8 CS/min and 2 deaths put the game at Bronze II because some forward clicks are still catchable; the main leak is whether base pressure becomes structure, blocker, wave, or exit."
       }
     },
     {
