@@ -30,6 +30,8 @@ const basePushRep = "Rep: in every base push, say structure, blocker, wave, or e
 const sideFarmDefenseRep = "Rep: after 15 minutes, before a camp or side wave, check nearest threatened turret and ally deaths; if either is bad, leave the farm and defend or group.";
 const jungleFightExitRep = "Rep: after a jungle fight gives first value, ask: exit to turret, catch mid wave, reset, or regroup? Do not keep chasing through jungle unless an ally is still in front and the target is already CC'd or low.";
 const midRiverChaseRep = "Rep: after mid wave gives value, ask: wave, turret, reset, or river? River is legal only if an ally is clearly in front and the target is already CC'd/low or an objective is active. If not, catch the wave and take one step back.";
+const earlyLaneBackclickRep = "Rep: first 15 minutes, every trade is one-window Samira: support or wave creates contact, auto/Q from behind cover, one backclick, then re-check. No E to start, no E under tower, no E after the wave or support cover thins.";
+const midFightValueExitRep = "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.";
 const analysisVersion = "2026-05-26-early-micro-pass-v26";
 const earlyMicroAnalysisVersion = "2026-05-26-early-lane-micro-v1";
 const earlyMicroMinFps = Number(process.env.LEAGUE_EARLY_MICRO_MIN_FPS || 6);
@@ -64,6 +66,7 @@ const clockAnchorVersion = "2026-05-22-visible-clock-coverage-v6";
 const coachEvidenceVersion = "2026-05-22-evidence-score-order-v6";
 const forceAnalysisFile = clean(process.env.LEAGUE_FORCE_ANALYSIS_FILE || "");
 const refreshedManualFeedbackFiles = new Set([
+  "auto_NA1-5568876241_01.mp4",
   "auto_NA1-5568775454_01.mp4",
   "auto_NA1-5568519322_01.mp4",
   "auto_NA1-5568447928_01.mp4",
@@ -1327,11 +1330,17 @@ function anchorDescriptionLooksWeak(anchorText) {
   return /\b(player|champion)\s+(uses ability|casts abilities|begins walking out|moving in river|farming minions|last-hits minions|is moving alone|walks toward|running down)\b/i.test(anchorText) ||
     /\bcurrent-match\b/i.test(anchorText) ||
     /\breview frame\b/i.test(anchorText) ||
-    /\b(minions have spawned|scuttle crab|scoreboard open|shop open|item shop|shop interface|stealth ward selected|loaded into the game at fountain|game start|standing at (the )?fountain|leaving (?:base|fountain)|near base fountain|running from fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
+    /\b(minions have spawned|scuttle crab|scoreboard open|shop open|shop menu|item sets|item shop|shop interface|in-base shop|stealth ward selected|loaded into the game at fountain|game start|standing at (the )?fountain|leaving (?:base|fountain)|near base fountain|running from fountain|fountain at game start|normal gameplay)\b/i.test(anchorText);
 }
 
 function anchorIsConsequenceOnly(anchorText) {
   return /\b(dead|death|respawn timer|revive timer|grey screen|gray screen|shop open, player dead|player dead|death timer)\b/i.test(anchorText || "");
+}
+
+function anchorIsPositiveResetOnly(anchorText) {
+  const text = String(anchorText || "");
+  return /\b(recall(?:ing)?|recall progress|shop|shop menu|item sets|base|fountain)\b/i.test(text) &&
+    !/\b(low hp|low-health|caught|collapse|enemy|enemies|death|dead|died|chase|fight|dragon|baron|inhib|nexus)\b/i.test(text);
 }
 
 function coachWantsEnemyStructureEvidence(analysisText) {
@@ -1561,7 +1570,12 @@ function firstUsefulReviewAnchor(recording = {}) {
   const anchors = dedupeClockAnchors([
     ...(Array.isArray(recording.clockMoments) ? recording.clockMoments : []),
     ...(Array.isArray(recording.clockAnchors) ? recording.clockAnchors : [])
-  ]).filter((anchor) => anchor.clock && anchor.description && !anchorDescriptionLooksWeak(anchor.description));
+  ]).filter((anchor) => (
+    anchor.clock &&
+    anchor.description &&
+    !anchorDescriptionLooksWeak(anchor.description) &&
+    !anchorIsPositiveResetOnly(anchor.description)
+  ));
   if (!anchors.length) return null;
   const reviewAnchors = anchors;
   const firstDetailSecond = timestampSecondsInText(recording.gameDetail)[0];
@@ -1765,10 +1779,19 @@ function reviewRepCategory(recording = {}) {
       ((Number.isFinite(kills) && Number.isFinite(deaths) && kills <= 2 && deaths >= 5) || /\bdeath-heavy lane\b/i.test(text))) {
     return "laneDeathExit";
   }
+  if (isSamira &&
+      /\b(early lane|first 15 minutes|first 10 minutes|one-window Samira|auto\/q from behind|no e to start|no e under tower|one damage window, then backclick)\b/i.test(text) &&
+      /\b(wave|support|ally|turret|tower|trade|damage window|setup expires|cover thins|backclick)\b/i.test(text)) {
+    return "earlyLaneBackclick";
+  }
   if (/\bmid[-\s]?wave\b/i.test(text) &&
       /\briver\b/i.test(text) &&
       /\b(chase|entry|front|collapse|ally[-\s]?front)\b/i.test(text)) {
     return "midRiverChase";
+  }
+  if (/\b(mid fight|mid-fight|mid wave|mid-lane)\b/i.test(text) &&
+      /\b(first value|first burst|second body|second forward|re-entry|reentry|low enough|low health|low[-\s]?hp)\b/i.test(text)) {
+    return "midFightValueExit";
   }
   if (!won &&
       Number.isFinite(deaths) &&
@@ -1816,6 +1839,8 @@ function specificRepForRecording(recording = {}) {
       return firstWinCashoutRep;
     case "laneDeathExit":
       return laneDeathExitRep;
+    case "earlyLaneBackclick":
+      return earlyLaneBackclickRep;
     case "objectiveFight":
       return objectiveFightRep;
     case "deathExit":
@@ -1827,6 +1852,8 @@ function specificRepForRecording(recording = {}) {
       return sideFarmDefenseRep;
     case "midRiverChase":
       return midRiverChaseRep;
+    case "midFightValueExit":
+      return midFightValueExitRep;
     case "fightEntry":
       return fightEntryRep;
     case "cleanerWinExit":
@@ -1849,6 +1876,8 @@ function repMatchesGameCategory(recording = {}) {
       return /\bfirst won exchange\b|\bobjective,\s*tower,\s*wave crash,\s*or\s*recall\b/i.test(rep);
     case "laneDeathExit":
       return /\bdeath-heavy lane sequence\b|\bNo E toward\b|\bDo not E\/dash\b|\bwave still protects (?:me|you)\b|\bone step behind support\b/i.test(rep);
+    case "earlyLaneBackclick":
+      return /\bone-window Samira\b|\bauto\/Q\b|\bone backclick\b|\bNo E to start\b|\bNo E under tower\b|\bwave or support cover thins\b/i.test(rep);
     case "objectiveFight":
       return /\bdid we already get the value\b|\bobjective done\s*-\s*exit or next map result\b|\bwalk out with allies,\s*mid wave,\s*reset\/spend,\s*or\s*Baron setup\b|\bdragon,\s*wave,\s*recall,\s*or\s*group\b|\bsecond fight\b[\s\S]{0,100}\blow or unsupported\b/i.test(rep);
     case "deathExit":
@@ -1857,6 +1886,8 @@ function repMatchesGameCategory(recording = {}) {
       return /\bcamp or side wave\b|\bnearest threatened turret\b|\bleave the farm\b|\bjungle fight gives first value\b|\bexit to turret,\s*catch mid wave,\s*reset,\s*or\s*regroup\b|\bDo not keep chasing through jungle\b/i.test(rep);
     case "midRiverChase":
       return /\bafter mid wave gives value\b|\bwave,\s*turret,\s*reset,\s*or\s*river\b|\bRiver is legal only if\b|\bcatch the wave and take one step back\b/i.test(rep);
+    case "midFightValueExit":
+      return /\brecall setup\b|\bfirst mid[-\s]?fight value\b|\bfinish recall\/spend\b|\bNo forward E\/click\b|\bfirst burst\b/i.test(rep);
     case "fightEntry":
       return /\btower,\s*wave,\s*objective,\s*or\s*ally[-\s]?front\b/i.test(rep);
     case "cleanerWinExit":
@@ -2683,14 +2714,21 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
   const preConsequencePrimary = firstConsequence
     ? moments
       .filter((moment) => !anchorIsConsequenceOnly(moment.description))
+      .filter((moment) => !anchorIsPositiveResetOnly(moment.description))
       .filter((moment) => Number(moment.videoSeconds) < Number(firstConsequence.videoSeconds))
       .sort((a, b) => Number(b.videoSeconds) - Number(a.videoSeconds))[0]
     : null;
-  const primary = preConsequencePrimary || moments
+  const decisionMoments = moments.filter((moment) => (
+    !anchorIsConsequenceOnly(moment.description) &&
+    !anchorIsPositiveResetOnly(moment.description) &&
+    !anchorDescriptionLooksWeak(moment.description)
+  ));
+  const primary = preConsequencePrimary || (decisionMoments.length ? decisionMoments : moments)
     .map((moment, index) => ({
       moment,
       score: anchorEvidenceScore(moment, analysis, index) +
         (primaryMistakeTextPattern().test(moment.description || "") ? 6 : 0) -
+        (anchorIsPositiveResetOnly(moment.description) ? 10 : 0) -
         (anchorIsConsequenceOnly(moment.description) ? 18 : 0)
     }))
     .sort((a, b) => b.score - a.score || a.moment.videoSeconds - b.moment.videoSeconds)[0]?.moment || moments[0];
@@ -2707,10 +2745,17 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
   const subject = clean(champion, "your champion");
   const leadSubject = subject === "Unknown" ? "your lead" : `a ${subject} lead`;
   const stats = statContextSentence(analysis, champion);
-  const why = `The sharper leak is staying in pressure mode after the safe payout is no longer proven; ${leadSubject} climbs when the next click turns the wave or fight into a stable result before enemies get another collapse window.`;
+  const category = reviewRepCategory(analysis);
+  const why = category === "jungleFightExit" || anchorOrAnalysisHasJungleFight(analysis, primary)
+    ? `This is a phase problem: the first jungle value can be playable, but after value is gained the next click has to become exit, wave, reset, or group before enemies get another collapse.`
+    : `This is a phase problem: the first wave, fight, or tower pressure can be legal, but after that value is gained the next click has to become exit, wave, recall, group, or another visible result before enemies get another collapse.`;
+  const legalityBridge = /\b(legal|illegal|not automatically wrong|partly legal|mostly legal|setup expires|setup is gone)\b/i.test(clauses.join(" "))
+    ? ""
+    : `The first value window may be playable, but the state flip is where the next click becomes illegal if no ally front, wave, tower, or objective is still visible.`;
   return coachClean([
     clauses.join(" "),
     hasTimestampedActionScript(clauses.join(" ")) ? "" : branchActionSentence(primary.clock) || advice,
+    legalityBridge,
     stats,
     shorthand,
     why
@@ -2720,6 +2765,7 @@ function teachingDetailFromMoments(analysis, clockMoments, champion = "Samira") 
 function eventEvidenceFromMoments(clockMoments, champion = "Samira") {
   const moments = cleanClockAnchors(clockMoments)
     .filter((moment) => moment.description)
+    .filter((moment) => !anchorDescriptionLooksWeak(moment.description))
     .slice(0, 4);
   if (!moments.length) return "";
   const evidence = coachClean(moments
@@ -2740,7 +2786,8 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
     .filter(isUsefulClock)
     .filter((moment) => moment.description)
     .map((moment) => ({ ...moment, description: normalizeEvidenceDescription(moment.description, champion) }))
-    .filter((moment) => !anchorDescriptionLooksWeak(moment.description));
+    .filter((moment) => !anchorDescriptionLooksWeak(moment.description))
+    .filter((moment) => !anchorIsPositiveResetOnly(moment.description));
   if (existing.length) {
     const existingKeys = new Set(existing.map((anchor) => `${anchor.clock}@${anchor.videoSeconds}`));
     const fill = cleanClockAnchors(clockAnchors)
@@ -2753,6 +2800,7 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
           (Number(clockSeconds(anchor.clock)) >= 1200 ? 5 : 0)
       }))
       .filter((item) => item.anchor.description && !anchorDescriptionLooksWeak(item.anchor.description))
+      .filter((item) => !anchorIsPositiveResetOnly(item.anchor.description))
       .filter((item) => !existingKeys.has(`${item.anchor.clock}@${item.anchor.videoSeconds}`))
       .sort((a, b) => b.score - a.score || a.anchor.videoSeconds - b.anchor.videoSeconds)
       .map((item) => item.anchor)
@@ -2778,7 +2826,7 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
         (Number(clockSeconds(anchor.clock)) >= 1200 ? 6 : 0)
     }))
     .filter((item) => item.anchor.description);
-  const nonWeak = candidates.filter((item) => !anchorDescriptionLooksWeak(item.anchor.description));
+  const nonWeak = candidates.filter((item) => !anchorDescriptionLooksWeak(item.anchor.description) && !anchorIsPositiveResetOnly(item.anchor.description));
   const scored = nonWeak.filter((item) => item.score >= -4);
   const pool = scored.length ? scored : (nonWeak.length ? nonWeak : candidates);
   return pool
@@ -2789,6 +2837,18 @@ function standardRepairMoments(analysis, clockAnchors, clockMoments, champion = 
 
 function deterministicFallbackFeedback(recording, champion = "Samira") {
   const text = [recording.gameDetail, recording.feedback, recording.pattern, recording.eventEvidence].join(" ").toLowerCase();
+  if (anchorOrAnalysisHasJungleFight(recording)) {
+    return "The leak is continuing the same jungle fight after the first value window, so a playable entry becomes enemy tempo instead of turret, mid wave, reset, or regroup.";
+  }
+  if (/\b(dragon|baron|objective|pit)\b/i.test(text)) {
+    return "The leak is taking the post-objective or post-value fight again, so secured value becomes another death window instead of exit, wave, reset, or setup.";
+  }
+  if (/\b(mid[-\s]?wave|river)\b/i.test(text)) {
+    return "The leak is leaving safe mid-wave and ally context for a river chase, so the wave value turns into a catchable fight instead of reset or regroup.";
+  }
+  if (/\b(bot|lane|support|enemy turret|under turret|tower-line|auto\/q|first damage|trade)\b/i.test(text)) {
+    return "The leak is trying to make one lane damage window continue after support, wave, or tower-line protection thins, so a playable trade becomes a catchable chase instead of wave, recall, or backclick.";
+  }
   if (/\b(base|inhib|inhibitor|nexus|tower|turret|structure|end)\b/i.test(text)) {
     return "The leak is staying in pressure mode after the safe result stops being clear, so the next forward click gives enemies another collapse window.";
   }
@@ -2834,8 +2894,11 @@ function applyDeterministicVisibleReviewFallback(recording, fileName) {
   }
   const primaryMoment = cleanClockAnchors(recording.clockMoments)[0];
   if (primaryMoment?.clock && primaryMoment.description) {
+    const failure = anchorOrAnalysisHasJungleFight(recording, primaryMoment)
+      ? `At ${primaryMoment.clock}, ${clauseDescription(primaryMoment.description, champion)}; the failure is continuing the same jungle fight after first value instead of exiting to turret, catching mid wave, resetting, or regrouping, so the play gives enemies another collapse window.`
+      : `At ${primaryMoment.clock}, ${clauseDescription(primaryMoment.description, champion)}; the failure is taking another forward click after the first value window instead of turning it into wave, recall, group, or one step back, so the play gives enemies another fight or defense window.`;
     recording.failureEvidence = repairUnverifiedVisibleNames(
-      `At ${primaryMoment.clock}, ${clauseDescription(primaryMoment.description, champion)}; the failure is staying in pressure mode after the safe payout is no longer proven, which leaks time, safety, or objective pressure and gives the enemy another fight or defense window.`,
+      failure,
       champion
     );
   }
@@ -3726,8 +3789,14 @@ function performanceRankReason(recording = {}, context = {}) {
   if (category === "laneDeathExit") {
     return `${csText} and ${deathText} pull the game to ${rank} because the lane entry keeps continuing after support or wave protection expires; the main leak is first safe exit discipline.`;
   }
+  if (category === "earlyLaneBackclick") {
+    return `${csText} with ${kdaText} puts the game at ${rank}: early trade setup is cleaner when support or wave starts the contact, but the remaining leak is the extra forward click after the first damage window.`;
+  }
   if (category === "midRiverChase") {
     return `${csText} is usable, but ${kdaText}, ${deathText}, low fight impact, and the avoidable mid-wave-to-river exit leak keep the game at ${rank}.`;
+  }
+  if (category === "midFightValueExit") {
+    return `${csText} and ${deathText} put the game at ${rank}: the mid-fight entry creates value, but exit/re-entry after first value still turns pressure into dead time instead of wave, recall, or group.`;
   }
   if (category === "sideFarmDefense") {
     if (/\b(blue-side jungle|jungle fight|jungle value|jungle-exit)\b/i.test(analysisCoachText(recording))) {
@@ -3744,7 +3813,7 @@ function performanceRankReason(recording = {}, context = {}) {
   const entryClause = flags.illegalEntry ? "because fight entry is still catchable" : "with mixed fight-entry evidence";
   const leakClause = flags.stateFlipExit
     ? "the main leak is exit/re-entry after first value"
-    : (Number.isFinite(deaths) && deaths <= 3 ? "the remaining leak is cleaner conversion after pressure" : "the main leak is turning pressure into a safe exit or map result");
+    : (Number.isFinite(deaths) && deaths <= 3 ? "the remaining leak is cleaner conversion after pressure" : "the main leak is failing to turn pressure into a safe exit or map result");
   return `${csText} and ${deathText} put the game at ${rank} ${entryClause}; ${leakClause}.`;
 }
 
@@ -3798,6 +3867,56 @@ function cachedRecording(existing, fileName, cacheKey) {
 }
 
 function manualFeedback(file) {
+  if (file === "auto_NA1-5568876241_01.mp4") {
+    return {
+      champion: "Samira",
+      confidence: "high",
+      feedbackTitle: "Mid fight needed one value, then exit",
+      feedback: "The leak is the second mid-fight re-entry after the first value: once you are low and an ally can keep the play alive, staying forward turns a won pressure window into a death timer instead of recall, mid wave, or group.",
+      gameDetail: "At 18:40, the mid fight has already created value: an enemy is low, an ally is on the target, and Samira is low enough to be punished, so the wrong click is staying in for the second body and the next click is back toward mid wave or base while the ally finishes. At 16:10 you show the right habit by recalling safely under friendly turret with about 1088 gold. By 18:59 the cost is visible as a death timer even though the team gets turret value, and the 5/7/12, 159 CS line says damage and assists exist but the extra re-entry keeps paying value back.",
+      secondaryFocus: "Rep: after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
+      mistakeTypes: [
+        "second mid-fight re-entry after value",
+        "low-health exit discipline",
+        "recall-to-next-play discipline",
+        "ally-front check",
+        "death-state exposure"
+      ],
+      eventEvidence: "16:10 shows Samira safely recalling under friendly turret with about 1088 gold; 18:34 shows Samira returning to mid wave with an ally nearby; 18:40 shows the low-health mid-fight re-entry; 18:59 shows the death timer.",
+      failureEvidence: "At 18:40 the first mid-fight value is already real, but Samira stays forward while low for the second body; by 18:59 that extra re-entry becomes a death timer instead of a clean reset, wave, or group.",
+      goodThing: "At 16:10 you do the keepable part: finish a safe recall under friendly turret with spendable gold instead of forcing another bot-lane screen. Keep that reset discipline.",
+      whyTrust: "This uses inspected 16:10, 18:34, 18:40, and 18:59 frames from the same ranked match, so the review does not treat the safe recall or shop menu as the mistake.",
+      focusTag: "mid fight exit after value",
+      evidence: "Manual frame inspection of the safe recall, mid wave return, low-health mid fight, and death-timer consequence from the same match.",
+      pattern: "The first setup is not always wrong: wave, support, and ally-front context often make the first damage window playable. The blocker is the second forward click after that window has already paid.",
+      diamondRule: "After a fight gives one value, Samira exits to wave, recall, or group unless an ally is still in front and the next target is already CC'd, low, or trapped.",
+      drill: "after a recall setup or first mid-fight value, finish recall/spend, then return to wave or group. No forward E/click after the first burst unless wave, tower, objective, or ally-front fight is still visible.",
+      timeline: [
+        "16:10 - Samira recalls safely under friendly turret with about 1088 gold.",
+        "18:34 - Samira returns to mid wave with an ally nearby and an enemy in front.",
+        "18:40 - Samira is low in the mid fight while an ally is still on the target.",
+        "18:59 - Samira is on a death timer after the extra mid-fight re-entry."
+      ],
+      clockAnchors: [
+        { clock: "16:10", videoSeconds: 870.769, description: "Samira recalls safely under friendly turret with about 1088 gold." },
+        { clock: "18:34", videoSeconds: 990, description: "Samira returns to mid wave with an ally nearby and an enemy in front." },
+        { clock: "18:40", videoSeconds: 996, description: "Samira is low in the mid fight while an ally is still on the target." },
+        { clock: "18:59", videoSeconds: 1015.231, description: "Samira is on a death timer after the extra mid-fight re-entry." }
+      ],
+      nuance: [
+        "The safe 16:10 recall is a concrete improvement and should stay.",
+        "The mistake is not the recall; it is the later re-entry after the first fight value.",
+        "The 18:40 frame shows the state flip: low health plus an ally already on the target means the next value is exit, not another body.",
+        "The 5/7/12 line shows you are participating in fights, but seven deaths keep handing back tempo.",
+        "The next-game rep is recall/spend, wave, or group after first value."
+      ],
+      reviewLimit: "Manual 2 FPS macro frames cannot prove every cooldown, input, or fogged enemy, but they verify the safe recall, the low-health mid-fight state, and the death-timer consequence.",
+      outcome: "defeat",
+      outcomeLabel: "DEFEAT",
+      outcomeSource: "Manual review and League Client stat context",
+      analysisSource: "manual"
+    };
+  }
   if (file === "auto_NA1-5568775454_01.mp4") {
     return {
       champion: "Samira",
