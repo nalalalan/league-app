@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T17:16:18.395Z",
+  "generatedAt": "2026-05-28T09:53:27.469Z",
   "source": "League of Legends Highlights folder",
   "match": "53 matches",
   "matches": [
@@ -89,7 +89,7 @@
     "rankedFullGames": 20,
     "pvpFullGames": 20,
     "botFullGames": 17,
-    "anchoredFullGames": 51,
+    "anchoredFullGames": 50,
     "statFullGames": 51,
     "rankLabelCounts": {
       "Bronze": 19,
@@ -392,7 +392,7 @@
       "matchId": "NA1-5569237516",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779860028588,
+      "matchTimeMs": 1779861167622.312,
       "gameHappenedAt": "2026-05-27T05:33:48.588Z",
       "gameHappenedAtLabel": "May 27, 2026, 1:33 AM",
       "recordedAt": "2026-05-27T05:52:47.719Z",
@@ -426,7 +426,7 @@
       "confidence": "medium",
       "feedbackTitle": "Red-light E discipline first",
       "feedback": "The leak is using E or forward Samira pressure before W, HP, and ally state are all proved, so Samira becomes catchable instead of farming, kiting, or waiting.",
-      "gameDetail": "At 2:03, Samira attacking a cannon/minion wave in bottom lane, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. The 21/5/0, 112 CS line stays a conservative fallback read, so this review audits W/HP/ally E discipline instead of broad macro. This matters because red-light Samira farms/kites/waits; green-light Samira can fight.",
+      "gameDetail": "At the key timestamp, the sampled frames do not prove W ready, HP above half, and ally close together, so this is red light unless W is ready, HP is above half, and an ally is on screen or close enough; the leak is treating that red-light state as a fight, the wrong input is E or forward champion pressure before those checks are green, and the correct input is Q/auto while backing up, kite, farm, or wait. The 21/5/0, 112 CS line stays a conservative fallback read, so this review audits W/HP/ally E discipline instead of broad macro. This matters because red-light Samira farms/kites/waits; green-light Samira can fight.",
       "secondaryFocus": "Rep: before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
       "mistakeTypes": [
         "W/HP/ally green-light check",
@@ -435,95 +435,18 @@
         "ally-on-screen re-check",
         "farm, kite, or wait discipline"
       ],
-      "eventEvidence": "2:03 shows Samira attacking a cannon/minion wave in bottom lane.; 5:50 shows Samira last-hitting minions near bottom turret.; 8:20 shows Samira and ally attacking an enemy turret with minions.",
+      "eventEvidence": "",
       "failureEvidence": "The table is conservative because sampled frames did not prove every cooldown, HP state, ally position, or hidden enemy",
       "goodThing": "Keep looking for fights only when the green light is actually proven: W ready, above-half HP, and an ally close enough to fight with you.",
       "whyTrust": "This fallback is intentionally narrow: it does not claim exact cooldowns or hidden enemies, but it preserves the user-selected green-light habit from visible Samira pressure frames.",
       "focusTag": "samira green-light discipline",
-      "evidence": "2:03 shows Samira attacking a cannon/minion wave in bottom lane.; 5:50 shows Samira last-hitting minions near bottom turret.; 8:20 shows Samira and ally attacking an enemy turret with minions.",
+      "evidence": "",
       "pattern": "Samira climbs faster when red-light moments become farm, kite, wait, or back-click instead of another forward E.",
       "diamondRule": "No E toward a Samira unless W, HP, and ally are all green.",
       "drill": "before any E toward an enemy, call W, HP, ally. If W is gray, HP is under half, or no ally is on screen/close enough, E key is dead: Q/auto while backing up, kite, farm, or wait. Green-light E only when W is ready, you are above half HP, and an ally can fight with you.",
       "timeline": [],
-      "clockAnchors": [
-        {
-          "clock": "0:48",
-          "videoSeconds": 4,
-          "description": "Champion standing near allied bottom turret; minimap visible."
-        },
-        {
-          "clock": "2:03",
-          "videoSeconds": 79.423,
-          "description": "Player attacking a cannon/minion wave in bottom lane; cursor over minion."
-        },
-        {
-          "clock": "3:19",
-          "videoSeconds": 154.846,
-          "description": "Player channeling Recall in brush with recall progress bar visible."
-        },
-        {
-          "clock": "4:34",
-          "videoSeconds": 230.269,
-          "description": "Champion running toward allied base turret; empty lane and minimap visible."
-        },
-        {
-          "clock": "5:50",
-          "videoSeconds": 305.692,
-          "description": "Player last-hitting minions near bottom turret; gold pop numbers visible."
-        },
-        {
-          "clock": "7:05",
-          "videoSeconds": 381.115,
-          "description": "Skirmish in bottom lane with multiple champions and a circular shield effect."
-        },
-        {
-          "clock": "8:14",
-          "videoSeconds": 456.538,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
-        },
-        {
-          "clock": "8:20",
-          "videoSeconds": 456.538,
-          "description": "Player and ally attacking an enemy turret with minions; damage number shown."
-        },
-        {
-          "clock": "9:30",
-          "videoSeconds": 531.962,
-          "description": "shows Samira in a current-match lane-to-map transition review frame"
-        },
-        {
-          "clock": "10:50",
-          "videoSeconds": 531.962,
-          "description": "Two allied champions with a large ally shield effect in bottom lane; minions present."
-        },
-        {
-          "clock": "12:05",
-          "videoSeconds": 607.385,
-          "description": "Champion near base fountain with another allied champion; minimap visible."
-        },
-        {
-          "clock": "13:22",
-          "videoSeconds": 682.808,
-          "description": "Three champions near river/dragon area; on-screen UI and minimap visible."
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "2:03",
-          "videoSeconds": 79.423,
-          "description": "shows Samira attacking a cannon/minion wave in bottom lane."
-        },
-        {
-          "clock": "5:50",
-          "videoSeconds": 305.692,
-          "description": "shows Samira last-hitting minions near bottom turret."
-        },
-        {
-          "clock": "8:20",
-          "videoSeconds": 456.538,
-          "description": "shows Samira and ally attacking an enemy turret with minions."
-        }
-      ],
+      "clockAnchors": [],
+      "clockMoments": [],
       "nuance": [
         "This fallback intentionally reviews the selected habit first instead of broad macro.",
         "If the frames cannot prove W readiness, HP, and ally cover together, the conservative call is red light."
@@ -547,18 +470,18 @@
         "confidence": "low",
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
-        "confidenceScore": 72,
+        "confidenceScore": 56,
         "queueClass": "bot",
         "basis": "research-calibrated rank-equivalent macro estimate from full-game review text, visible timestamps, K/D/A, CS, queue context, and cross-game calibration gates; not Riot MMR",
         "percentile": "developing",
         "confidenceSignals": [
           "near-full macro recording",
           "K/D/A, CS, and game length are available",
-          "visible timestamp anchors exist",
           "review passed the current evidence standard or manual frame review",
           "enough ranked full-game samples for calibration"
         ],
         "confidenceBlockers": [
+          "no verified visible timestamp anchor",
           "Co-op vs AI inflates fight success and cannot prove ranked opponent pressure"
         ],
         "researchBasis": [
@@ -579,25 +502,7 @@
         "rankedTransferConfidence": "low",
         "evidenceConfidence": "high",
         "reason": "6.3 CS/min with 21/5/0 K/D/A and 5 deaths is a low-confidence ranked-habit read near Bronze I: Co-op AI inflates fight success, so only the decision habit transfers; the leak is whether pressure becomes tower, wave, recall, group, or a safe exit instead of another chase."
-      },
-      "mistakeTable": [
-        {
-          "time": "2:03",
-          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
-        },
-        {
-          "time": "5:50",
-          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
-        },
-        {
-          "time": "8:20",
-          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
-        },
-        {
-          "time": "0:48",
-          "mistake": "Red-light E: W, HP, or ally state was missing or not proven, but I still committed forward. Correct action: Q/auto while backing up."
-        }
-      ]
+      }
     },
     {
       "file": "auto_NA1-5569169922_01.mp4",
@@ -607,7 +512,7 @@
       "matchId": "NA1-5569169922",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779854619520,
+      "matchTimeMs": 1779856668895.2036,
       "gameHappenedAt": "2026-05-27T04:03:39.520Z",
       "gameHappenedAtLabel": "May 27, 2026, 12:03 AM",
       "recordedAt": "2026-05-27T04:37:48.978Z",
@@ -793,7 +698,7 @@
       "matchId": "NA1-5569137549",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779852525596,
+      "matchTimeMs": 1779854284409.834,
       "gameHappenedAt": "2026-05-27T03:28:45.596Z",
       "gameHappenedAtLabel": "May 26, 2026, 11:28 PM",
       "recordedAt": "2026-05-27T03:58:04.513Z",
@@ -968,7 +873,7 @@
       "matchId": "NA1-5568876241",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779832447044,
+      "matchTimeMs": 1779834573322.5735,
       "gameHappenedAt": "2026-05-26T21:54:07.044Z",
       "gameHappenedAtLabel": "May 26, 2026, 5:54 PM",
       "recordedAt": "2026-05-26T22:29:33.410Z",
@@ -1140,7 +1045,7 @@
       "matchId": "NA1-5568775454",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779819636235,
+      "matchTimeMs": 1779821363739.5808,
       "gameHappenedAt": "2026-05-26T18:20:36.235Z",
       "gameHappenedAtLabel": "May 26, 2026, 2:20 PM",
       "recordedAt": "2026-05-26T18:49:23.861Z",
@@ -1329,7 +1234,7 @@
       "matchId": "NA1-5568519322",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779769153184,
+      "matchTimeMs": 1779770865860.0564,
       "gameHappenedAt": "2026-05-26T04:19:13.184Z",
       "gameHappenedAtLabel": "May 26, 2026, 12:19 AM",
       "recordedAt": "2026-05-26T04:47:45.965Z",
@@ -1499,7 +1404,7 @@
       "matchId": "NA1-5568447928",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779764423942,
+      "matchTimeMs": 1779765748823.951,
       "gameHappenedAt": "2026-05-26T03:00:23.942Z",
       "gameHappenedAtLabel": "May 25, 2026, 11:00 PM",
       "recordedAt": "2026-05-26T03:22:28.926Z",
@@ -1691,7 +1596,7 @@
       "matchId": "NA1-5568316539",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779756318651,
+      "matchTimeMs": 1779758529156.2378,
       "gameHappenedAt": "2026-05-26T00:45:18.651Z",
       "gameHappenedAtLabel": "May 25, 2026, 8:45 PM",
       "recordedAt": "2026-05-26T01:22:09.285Z",
@@ -1882,7 +1787,7 @@
       "matchId": "NA1-5568185590",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779746492393,
+      "matchTimeMs": 1779748280374.3926,
       "gameHappenedAt": "2026-05-25T22:01:32.393Z",
       "gameHappenedAtLabel": "May 25, 2026, 6:01 PM",
       "recordedAt": "2026-05-25T22:31:20.442Z",
@@ -2083,9 +1988,9 @@
       "matchId": "NA1-5568079693",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779737138362,
-      "gameHappenedAt": "2026-05-25T19:25:38.362Z",
-      "gameHappenedAtLabel": "May 25, 2026, 3:25 PM",
+      "matchTimeMs": 1779741557925.3494,
+      "gameHappenedAt": "2026-05-25T20:39:17.925Z",
+      "gameHappenedAtLabel": "May 25, 2026, 4:39 PM",
       "recordedAt": "2026-05-25T19:52:22.608Z",
       "recordedAtLabel": "May 25, 2026, 3:52 PM",
       "recordedAtTimeLabel": "3:52 PM",
@@ -2279,7 +2184,7 @@
       "matchId": "NA1-5567953154",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779719963585,
+      "matchTimeMs": 1779721974995.5598,
       "gameHappenedAt": "2026-05-25T14:39:23.585Z",
       "gameHappenedAtLabel": "May 25, 2026, 10:39 AM",
       "recordedAt": "2026-05-25T15:12:55.066Z",
@@ -2475,9 +2380,9 @@
       "matchId": "NA1-5567787430",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779687159589,
-      "gameHappenedAt": "2026-05-25T05:32:39.589Z",
-      "gameHappenedAtLabel": "May 25, 2026, 1:32 AM",
+      "matchTimeMs": 1779689915221.8945,
+      "gameHappenedAt": "2026-05-25T06:18:35.221Z",
+      "gameHappenedAtLabel": "May 25, 2026, 2:18 AM",
       "recordedAt": "2026-05-25T06:01:59.804Z",
       "recordedAtLabel": "May 25, 2026, 2:01 AM",
       "recordedAtTimeLabel": "2:01 AM",
@@ -2635,7 +2540,7 @@
       "matchId": "NA1-5567367431",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779657382369,
+      "matchTimeMs": 1779658475830.7327,
       "gameHappenedAt": "2026-05-24T21:16:22.369Z",
       "gameHappenedAtLabel": "May 24, 2026, 5:16 PM",
       "recordedAt": "2026-05-24T21:34:35.896Z",
@@ -2821,7 +2726,7 @@
       "matchId": "NA1-5567223507",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779642598162,
+      "matchTimeMs": 1779644934524.318,
       "gameHappenedAt": "2026-05-24T17:09:58.162Z",
       "gameHappenedAtLabel": "May 24, 2026, 1:09 PM",
       "recordedAt": "2026-05-24T17:48:54.969Z",
@@ -3003,7 +2908,7 @@
       "matchId": "NA1-5566943774",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779596322460,
+      "matchTimeMs": 1779598103503.8647,
       "gameHappenedAt": "2026-05-24T04:18:42.460Z",
       "gameHappenedAtLabel": "May 24, 2026, 12:18 AM",
       "recordedAt": "2026-05-24T04:48:23.571Z",
@@ -3199,7 +3104,7 @@
       "matchId": "NA1-5566860300",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779591070036,
+      "matchTimeMs": 1779592499451.9756,
       "gameHappenedAt": "2026-05-24T02:51:10.036Z",
       "gameHappenedAtLabel": "May 23, 2026, 10:51 PM",
       "recordedAt": "2026-05-24T03:14:59.521Z",
@@ -3385,7 +3290,7 @@
       "matchId": "NA1-5566823161",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779588647353,
+      "matchTimeMs": 1779590227877.8457,
       "gameHappenedAt": "2026-05-24T02:10:47.353Z",
       "gameHappenedAtLabel": "May 23, 2026, 10:10 PM",
       "recordedAt": "2026-05-24T02:37:07.993Z",
@@ -3563,7 +3468,7 @@
       "matchId": "NA1-5566786855",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779585869089,
+      "matchTimeMs": 1779587526128.9023,
       "gameHappenedAt": "2026-05-24T01:24:29.089Z",
       "gameHappenedAtLabel": "May 23, 2026, 9:24 PM",
       "recordedAt": "2026-05-24T01:52:06.198Z",
@@ -3734,7 +3639,7 @@
       "matchId": "NA1-5566726915",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779581146096,
+      "matchTimeMs": 1779583660934.676,
       "gameHappenedAt": "2026-05-24T00:05:46.096Z",
       "gameHappenedAtLabel": "May 23, 2026, 8:05 PM",
       "recordedAt": "2026-05-24T00:47:41.083Z",
@@ -3905,7 +3810,7 @@
       "matchId": "NA1-5566620104",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779571497614,
+      "matchTimeMs": 1779572907669.7183,
       "gameHappenedAt": "2026-05-23T21:24:57.614Z",
       "gameHappenedAtLabel": "May 23, 2026, 5:24 PM",
       "recordedAt": "2026-05-23T21:48:27.743Z",
@@ -4061,7 +3966,7 @@
       "matchId": "NA1-5566563083",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779565914911,
+      "matchTimeMs": 1779568344960.2954,
       "gameHappenedAt": "2026-05-23T19:51:54.911Z",
       "gameHappenedAtLabel": "May 23, 2026, 3:51 PM",
       "recordedAt": "2026-05-23T20:32:25.142Z",
@@ -4218,7 +4123,7 @@
       "matchId": "NA1-5566120017",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779504841362,
+      "matchTimeMs": 1779506457691.7144,
       "gameHappenedAt": "2026-05-23T02:54:01.362Z",
       "gameHappenedAtLabel": "May 22, 2026, 10:54 PM",
       "recordedAt": "2026-05-23T03:20:57.821Z",
@@ -4408,7 +4313,7 @@
       "matchId": "NA1-5565964482",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779493311615,
+      "matchTimeMs": 1779494911052.1433,
       "gameHappenedAt": "2026-05-22T23:41:51.615Z",
       "gameHappenedAtLabel": "May 22, 2026, 7:41 PM",
       "recordedAt": "2026-05-23T00:08:31.117Z",
@@ -4591,7 +4496,7 @@
       "matchId": "NA1-5565911037",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779487903889,
+      "matchTimeMs": 1779489876832.0188,
       "gameHappenedAt": "2026-05-22T22:11:43.889Z",
       "gameHappenedAtLabel": "May 22, 2026, 6:11 PM",
       "recordedAt": "2026-05-22T22:44:36.957Z",
@@ -4793,7 +4698,7 @@
       "matchId": "NA1-5565905533",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779487560279,
+      "matchTimeMs": 1779487726334.3333,
       "gameHappenedAt": "2026-05-22T22:06:00.279Z",
       "gameHappenedAtLabel": "May 22, 2026, 6:06 PM",
       "recordedAt": "2026-05-22T22:08:46.390Z",
@@ -5123,7 +5028,7 @@
       "matchId": "NA1-5565818690",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779477997903,
+      "matchTimeMs": 1779480016297.4944,
       "gameHappenedAt": "2026-05-22T19:26:37.903Z",
       "gameHappenedAtLabel": "May 22, 2026, 3:26 PM",
       "recordedAt": "2026-05-22T20:00:16.377Z",
@@ -6591,7 +6496,7 @@
       "matchId": "NA1-5565387627",
       "score": "auto",
       "clipNumber": 1,
-      "matchTimeMs": 1779415146635,
+      "matchTimeMs": 1779418337947.5144,
       "gameHappenedAt": "2026-05-22T01:59:06.635Z",
       "gameHappenedAtLabel": "May 21, 2026, 9:59 PM",
       "recordedAt": "2026-05-22T02:52:18.025Z",
@@ -10009,6 +9914,221 @@
       ]
     },
     {
+      "file": "16-10_NA1-5563247854_08.webm",
+      "publicFile": "16-10_NA1-5563247854_08.webm",
+      "cacheKey": "8294186:1779141088858",
+      "fingerprint": "c62a3f294f0f",
+      "matchId": "NA1-5563247854",
+      "score": "16-10",
+      "clipNumber": 8,
+      "matchTimeMs": 1779140361853.122,
+      "gameHappenedAt": "2026-05-18T21:39:21.853Z",
+      "gameHappenedAtLabel": "May 18, 2026, 5:39 PM",
+      "recordedAt": "2026-05-18T21:51:28.857Z",
+      "recordedAtLabel": "May 18, 2026, 5:51 PM",
+      "recordedAtTimeLabel": "5:51 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": null,
+      "gameType": "Unverified",
+      "gameTypeSource": "No queue id found in local logs",
+      "title": "Overstayed for solo kill, punished by post-fight turret death",
+      "duration": "0:17",
+      "durationSeconds": 17.141,
+      "gameLength": "17:25",
+      "gameLengthSeconds": 1045,
+      "kda": "15/7/5",
+      "kills": 15,
+      "deaths": 7,
+      "assists": 5,
+      "cs": 128,
+      "statsSource": "League Client match history",
+      "win": true,
+      "outcome": "victory",
+      "outcomeLabel": "VICTORY",
+      "outcomeSource": "League Client match history",
+      "kind": "highlight",
+      "reviewPhase": "baseline",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Overstayed for solo kill, punished by post-fight turret death",
+      "feedback": "Mistake: Chased deep for a solo kill under turret with low HP and no backup, resulting in being instantly killed by the respawning enemy. Fix: After the initial kill or escape, reset or retreat rather than greeting for another solo play under enemy threat.",
+      "gameDetail": "After surviving the initial tower dive and 2v2 with Heimerdinger and Swain, Samira remained in the lane with low health and went back in for a kill on Heimerdinger just after the initial action (see 10:48). The better next click would be to back off after the first survival, preserving shutdown and prepping for the next team play. Around 10:39, Samira fighting two enemy champions under allied turret with minions present; By 10:44, Samira at low health clearing minions near allied turret; Then around 10:48, Samira secures a risky solo kill at low HP instead of resetting, showing the overstay mistake. A hard lesson: do not overstay for an unnecessary kill when escape is an option.",
+      "secondaryFocus": "",
+      "mistakeTypes": [],
+      "eventEvidence": "10:39 Samira fighting two enemy champions under allied turret with minions present; 10:44 Samira at low health clearing minions near allied turret; 10:48 Samira secures a risky solo kill at low HP instead of resetting, showing the overstay mistake",
+      "failureEvidence": "",
+      "goodThing": "Samira executed well in the duel and secured the initial kill cleanly.",
+      "whyTrust": "This habit leaks games at every level on Samira, as giving over a shutdown or free death with no tower conversion ruins your tempo and opens the map for enemies.",
+      "focusTag": "overstay reset",
+      "evidence": "10:39 Samira fighting two enemy champions under allied turret with minions present; 10:44 Samira at low health clearing minions near allied turret; 10:48 Samira secures a risky solo kill at low HP instead of resetting, showing the overstay mistake",
+      "pattern": "Samira stayed alone under enemy turret for a risky second kill instead of retreating, securing one, but got caught in low-health territory and died on the reset by the respawning enemy.",
+      "diamondRule": "Never stay for a solo play under enemy turret after a risky fight unless your escape and enemy respawn timing are accounted for.",
+      "drill": "Next game, if you get a kill low HP under enemy turret, immediately retreat toward safety or bush and recall—do not stay for another play.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "10:39",
+          "videoSeconds": 0.686,
+          "description": "Samira fighting two enemy champions under allied turret with minions present"
+        },
+        {
+          "clock": "10:44",
+          "videoSeconds": 5.191,
+          "description": "Samira at low health clearing minions near allied turret; one enemy retreating"
+        },
+        {
+          "clock": "10:48",
+          "videoSeconds": 9.697,
+          "description": "Samira slays Heimerdinger Bot and collects gold near enemy minions"
+        },
+        {
+          "clock": "10:53",
+          "videoSeconds": 14.203,
+          "description": "Heimerdinger Bot has slain Samira; Samira's death timer active"
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "10:39",
+          "videoSeconds": 0.686,
+          "description": "Samira fighting two enemy champions under allied turret with minions present"
+        },
+        {
+          "clock": "10:44",
+          "videoSeconds": 5.191,
+          "description": "Samira at low health clearing minions near allied turret"
+        },
+        {
+          "clock": "10:48",
+          "videoSeconds": 9.697,
+          "description": "Samira secures a risky solo kill at low HP instead of resetting, showing the overstay mistake"
+        }
+      ],
+      "nuance": [
+        "Samira showed great mechanical finish by cleaning up Heimerdinger solo under pressure.",
+        "Samira did not reset after the fight, exposing herself to a guaranteed punish.",
+        "The consequence was an instant death after the kill, losing shutdown and tempo.",
+        "In higher games, any death like this can lose Baron setup or give the enemy a path back.",
+        "The next check: as soon as you're low and win a fight under tower, check enemy respawn timers and retreat, not greet for more solo gold."
+      ],
+      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "sampledFrames": 4,
+      "publicVideoBytes": 8294186,
+      "captureFps": 2,
+      "src": "/recordings/16-10_NA1-5563247854_08.webm",
+      "poster": "/recordings/posters/16-10-na1-5563247854-08.jpg"
+    },
+    {
+      "file": "16-10_NA1-5563247854_03.webm",
+      "publicFile": "16-10_NA1-5563247854_03.webm",
+      "cacheKey": "6517189:1779140879640",
+      "fingerprint": "fe42164fa4f2",
+      "matchId": "NA1-5563247854",
+      "score": "16-10",
+      "clipNumber": 3,
+      "matchTimeMs": 1779140361853.122,
+      "gameHappenedAt": "2026-05-18T21:39:21.853Z",
+      "gameHappenedAtLabel": "May 18, 2026, 5:39 PM",
+      "recordedAt": "2026-05-18T21:47:59.639Z",
+      "recordedAtLabel": "May 18, 2026, 5:47 PM",
+      "recordedAtTimeLabel": "5:47 PM",
+      "clipTimestampSeconds": null,
+      "clipTimestamp": "",
+      "clipWindow": "",
+      "timestamp": "",
+      "queueId": null,
+      "gameType": "Unverified",
+      "gameTypeSource": "No queue id found in local logs",
+      "title": "Low health overchase for 1v1 finisher",
+      "duration": "0:13",
+      "durationSeconds": 12.693,
+      "gameLength": "17:25",
+      "gameLengthSeconds": 1045,
+      "kda": "15/7/5",
+      "kills": 15,
+      "deaths": 7,
+      "assists": 5,
+      "cs": 128,
+      "statsSource": "League Client match history",
+      "win": true,
+      "outcome": "victory",
+      "outcomeLabel": "VICTORY",
+      "outcomeSource": "League Client match history",
+      "kind": "highlight",
+      "reviewPhase": "baseline",
+      "champion": "Samira",
+      "confidence": "high",
+      "feedbackTitle": "Low health overchase for 1v1 finisher",
+      "feedback": "Mistake: You chased Heimerdinger for a kill with very low HP and no vision on potential enemy rotations. Fix: When you're this low and alone after a skirmish, immediately pull back and reset, not chase for the last hit.",
+      "gameDetail": "At 4:39, Samira is left low HP in bot lane with a wave to clear, but instead of resetting safely, you approach and commit to an all-in against a fleeing Heimerdinger, despite lacking any HP buffer and having no backup or vision on possible enemy jungler/support rotations. The better move was to hard disengage after the push or use the window for a fast recall, denying the enemy a free trade or respawn punish. Trying to force this kill can backfire to respawn losses or even a cross-map play if you die here. Around 4:39, setup: Samira is low HP after a fight but chooses to stay in lane instead of resetting, setting up the risky overchase; By 4:46, consequence: Samira is still low HP but all-ins Heimerdinger instead of disengaging, showing the mistake of overchasing at 1-spell-from-death. The recurring lesson: When you're one spell from death, do not flip for the solo kill with no vision or map knowledge—reset the lane state and keep your gold/XP lead.",
+      "secondaryFocus": "",
+      "mistakeTypes": [],
+      "eventEvidence": "4:39 Samira stands back near wave, some minions attacking, post-fight. 4:46 Start of Samira's low-HP hard-commit all-in with no vision—this is the evidence of overchasing instead of disengaging or resetting.",
+      "failureEvidence": "",
+      "goodThing": "You aggressively traded to get Heimerdinger low and play for potential advantage.",
+      "whyTrust": "This fix will protect your shutdown, let you keep tempo, and actually climb out of silver—Samira does not need to flip-close every low-HP 1v1 if the risk is losing map tempo, and every strong Samira resets here.",
+      "focusTag": "overstay/overchase",
+      "evidence": "4:39 Samira stands back near wave, some minions attacking, post-fight. 4:46 Start of Samira's low-HP hard-commit all-in with no vision—this is the evidence of overchasing instead of disengaging or resetting.",
+      "pattern": "You stayed to chase a near-dead enemy with almost no HP, ignoring that any mistake or unseen enemy closes the trade and leaks your lead. In higher ranks, this always gets punished by map rotations or flash/ignite turns.",
+      "diamondRule": "Never all-in at sub-25% HP in enemy territory when you have no support, vision, or respawn pressure—even if the kill looks free, resets win games.",
+      "drill": "Next time you're this low after a trade and see a greedy chase window, hit B and leave, even if the kill looks right there.",
+      "timeline": [],
+      "clockAnchors": [
+        {
+          "clock": "4:39",
+          "videoSeconds": 0.508,
+          "description": "Samira stands back near wave, some minions attacking, post-fight."
+        },
+        {
+          "clock": "4:42",
+          "videoSeconds": 3.844,
+          "description": "Samira and enemy champion fighting near blue minions in bot lane."
+        },
+        {
+          "clock": "4:46",
+          "videoSeconds": 7.181,
+          "description": "Samira and enemy champion close, both low HP, about to engage."
+        },
+        {
+          "clock": "4:49",
+          "videoSeconds": 10.517,
+          "description": "Samira uses ability, large blue visual effect hits the enemy."
+        }
+      ],
+      "clockMoments": [
+        {
+          "clock": "4:39",
+          "videoSeconds": 0.508,
+          "description": "Samira stands back near wave, some minions attacking, post-fight."
+        },
+        {
+          "clock": "4:46",
+          "videoSeconds": 7.181,
+          "description": "Start of Samira's low-HP hard-commit all-in with no vision—this is the evidence of overchasing instead of disengaging or resetting."
+        }
+      ],
+      "nuance": [
+        "You mechanically out-traded Heimer pre-chase and saw a potential kill angle.",
+        "You ignored your low HP and fog risk, needlessly staying for a greedy kill.",
+        "If you die here, you lose wave, XP, and possibly shutdown gold—any competent enemy rotates for the punish.",
+        "The better habit: after a successful fight on 20% HP, hit B and reset tempo, not stay to flip coin one more kill.",
+        "This discipline is what makes leads transfer and prevents chain deaths and thrown advantages."
+      ],
+      "reviewLimit": "Frames are tight and don't show the actual aftermath or reinforcements, but the risk and overstay are fully visible.",
+      "analysisSource": "openai",
+      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
+      "sampledFrames": 4,
+      "publicVideoBytes": 6517189,
+      "captureFps": 2,
+      "src": "/recordings/16-10_NA1-5563247854_03.webm",
+      "poster": "/recordings/posters/16-10-na1-5563247854-03.jpg"
+    },
+    {
       "file": "16-10_NA1-5563247854_13.webm",
       "publicFile": "16-10_NA1-5563247854_13.mp4",
       "cacheKey": "55606684:1779141430041",
@@ -10618,116 +10738,6 @@
       "outcomeSource": "League Client match history"
     },
     {
-      "file": "16-10_NA1-5563247854_08.webm",
-      "publicFile": "16-10_NA1-5563247854_08.webm",
-      "cacheKey": "8294186:1779141088858",
-      "fingerprint": "c62a3f294f0f",
-      "matchId": "NA1-5563247854",
-      "score": "16-10",
-      "clipNumber": 8,
-      "matchTimeMs": 1779139258386,
-      "gameHappenedAt": "2026-05-18T21:20:58.386Z",
-      "gameHappenedAtLabel": "May 18, 2026, 5:20 PM",
-      "recordedAt": "2026-05-18T21:51:28.857Z",
-      "recordedAtLabel": "May 18, 2026, 5:51 PM",
-      "recordedAtTimeLabel": "5:51 PM",
-      "clipTimestampSeconds": null,
-      "clipTimestamp": "",
-      "clipWindow": "",
-      "timestamp": "",
-      "queueId": null,
-      "gameType": "Unverified",
-      "gameTypeSource": "No queue id found in local logs",
-      "title": "Overstayed for solo kill, punished by post-fight turret death",
-      "duration": "0:17",
-      "durationSeconds": 17.141,
-      "gameLength": "17:25",
-      "gameLengthSeconds": 1045,
-      "kda": "15/7/5",
-      "kills": 15,
-      "deaths": 7,
-      "assists": 5,
-      "cs": 128,
-      "statsSource": "League Client match history",
-      "win": true,
-      "outcome": "victory",
-      "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history",
-      "kind": "highlight",
-      "reviewPhase": "baseline",
-      "champion": "Samira",
-      "confidence": "high",
-      "feedbackTitle": "Overstayed for solo kill, punished by post-fight turret death",
-      "feedback": "Mistake: Chased deep for a solo kill under turret with low HP and no backup, resulting in being instantly killed by the respawning enemy. Fix: After the initial kill or escape, reset or retreat rather than greeting for another solo play under enemy threat.",
-      "gameDetail": "After surviving the initial tower dive and 2v2 with Heimerdinger and Swain, Samira remained in the lane with low health and went back in for a kill on Heimerdinger just after the initial action (see 10:48). The better next click would be to back off after the first survival, preserving shutdown and prepping for the next team play. Around 10:39, Samira fighting two enemy champions under allied turret with minions present; By 10:44, Samira at low health clearing minions near allied turret; Then around 10:48, Samira secures a risky solo kill at low HP instead of resetting, showing the overstay mistake. A hard lesson: do not overstay for an unnecessary kill when escape is an option.",
-      "secondaryFocus": "",
-      "mistakeTypes": [],
-      "eventEvidence": "10:39 Samira fighting two enemy champions under allied turret with minions present; 10:44 Samira at low health clearing minions near allied turret; 10:48 Samira secures a risky solo kill at low HP instead of resetting, showing the overstay mistake",
-      "failureEvidence": "",
-      "goodThing": "Samira executed well in the duel and secured the initial kill cleanly.",
-      "whyTrust": "This habit leaks games at every level on Samira, as giving over a shutdown or free death with no tower conversion ruins your tempo and opens the map for enemies.",
-      "focusTag": "overstay reset",
-      "evidence": "10:39 Samira fighting two enemy champions under allied turret with minions present; 10:44 Samira at low health clearing minions near allied turret; 10:48 Samira secures a risky solo kill at low HP instead of resetting, showing the overstay mistake",
-      "pattern": "Samira stayed alone under enemy turret for a risky second kill instead of retreating, securing one, but got caught in low-health territory and died on the reset by the respawning enemy.",
-      "diamondRule": "Never stay for a solo play under enemy turret after a risky fight unless your escape and enemy respawn timing are accounted for.",
-      "drill": "Next game, if you get a kill low HP under enemy turret, immediately retreat toward safety or bush and recall—do not stay for another play.",
-      "timeline": [],
-      "clockAnchors": [
-        {
-          "clock": "10:39",
-          "videoSeconds": 0.686,
-          "description": "Samira fighting two enemy champions under allied turret with minions present"
-        },
-        {
-          "clock": "10:44",
-          "videoSeconds": 5.191,
-          "description": "Samira at low health clearing minions near allied turret; one enemy retreating"
-        },
-        {
-          "clock": "10:48",
-          "videoSeconds": 9.697,
-          "description": "Samira slays Heimerdinger Bot and collects gold near enemy minions"
-        },
-        {
-          "clock": "10:53",
-          "videoSeconds": 14.203,
-          "description": "Heimerdinger Bot has slain Samira; Samira's death timer active"
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "10:39",
-          "videoSeconds": 0.686,
-          "description": "Samira fighting two enemy champions under allied turret with minions present"
-        },
-        {
-          "clock": "10:44",
-          "videoSeconds": 5.191,
-          "description": "Samira at low health clearing minions near allied turret"
-        },
-        {
-          "clock": "10:48",
-          "videoSeconds": 9.697,
-          "description": "Samira secures a risky solo kill at low HP instead of resetting, showing the overstay mistake"
-        }
-      ],
-      "nuance": [
-        "Samira showed great mechanical finish by cleaning up Heimerdinger solo under pressure.",
-        "Samira did not reset after the fight, exposing herself to a guaranteed punish.",
-        "The consequence was an instant death after the kill, losing shutdown and tempo.",
-        "In higher games, any death like this can lose Baron setup or give the enemy a path back.",
-        "The next check: as soon as you're low and win a fight under tower, check enemy respawn timers and retreat, not greet for more solo gold."
-      ],
-      "reviewLimit": "The review is based on sampled frames, not full input/cooldown telemetry.",
-      "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
-      "sampledFrames": 4,
-      "publicVideoBytes": 8294186,
-      "captureFps": 2,
-      "src": "/recordings/16-10_NA1-5563247854_08.webm",
-      "poster": "/recordings/posters/16-10-na1-5563247854-08.jpg"
-    },
-    {
       "file": "16-10_NA1-5563247854_04.webm",
       "publicFile": "16-10_NA1-5563247854_04.webm",
       "cacheKey": "8174947:1779140946108",
@@ -10923,111 +10933,6 @@
       "outcome": "victory",
       "outcomeLabel": "VICTORY",
       "outcomeSource": "League Client match history"
-    },
-    {
-      "file": "16-10_NA1-5563247854_03.webm",
-      "publicFile": "16-10_NA1-5563247854_03.webm",
-      "cacheKey": "6517189:1779140879640",
-      "fingerprint": "fe42164fa4f2",
-      "matchId": "NA1-5563247854",
-      "score": "16-10",
-      "clipNumber": 3,
-      "matchTimeMs": 1779139258386,
-      "gameHappenedAt": "2026-05-18T21:20:58.386Z",
-      "gameHappenedAtLabel": "May 18, 2026, 5:20 PM",
-      "recordedAt": "2026-05-18T21:47:59.639Z",
-      "recordedAtLabel": "May 18, 2026, 5:47 PM",
-      "recordedAtTimeLabel": "5:47 PM",
-      "clipTimestampSeconds": null,
-      "clipTimestamp": "",
-      "clipWindow": "",
-      "timestamp": "",
-      "queueId": null,
-      "gameType": "Unverified",
-      "gameTypeSource": "No queue id found in local logs",
-      "title": "Low health overchase for 1v1 finisher",
-      "duration": "0:13",
-      "durationSeconds": 12.693,
-      "gameLength": "17:25",
-      "gameLengthSeconds": 1045,
-      "kda": "15/7/5",
-      "kills": 15,
-      "deaths": 7,
-      "assists": 5,
-      "cs": 128,
-      "statsSource": "League Client match history",
-      "win": true,
-      "outcome": "victory",
-      "outcomeLabel": "VICTORY",
-      "outcomeSource": "League Client match history",
-      "kind": "highlight",
-      "reviewPhase": "baseline",
-      "champion": "Samira",
-      "confidence": "high",
-      "feedbackTitle": "Low health overchase for 1v1 finisher",
-      "feedback": "Mistake: You chased Heimerdinger for a kill with very low HP and no vision on potential enemy rotations. Fix: When you're this low and alone after a skirmish, immediately pull back and reset, not chase for the last hit.",
-      "gameDetail": "At 4:39, Samira is left low HP in bot lane with a wave to clear, but instead of resetting safely, you approach and commit to an all-in against a fleeing Heimerdinger, despite lacking any HP buffer and having no backup or vision on possible enemy jungler/support rotations. The better move was to hard disengage after the push or use the window for a fast recall, denying the enemy a free trade or respawn punish. Trying to force this kill can backfire to respawn losses or even a cross-map play if you die here. Around 4:39, setup: Samira is low HP after a fight but chooses to stay in lane instead of resetting, setting up the risky overchase; By 4:46, consequence: Samira is still low HP but all-ins Heimerdinger instead of disengaging, showing the mistake of overchasing at 1-spell-from-death. The recurring lesson: When you're one spell from death, do not flip for the solo kill with no vision or map knowledge—reset the lane state and keep your gold/XP lead.",
-      "secondaryFocus": "",
-      "mistakeTypes": [],
-      "eventEvidence": "4:39 Samira stands back near wave, some minions attacking, post-fight. 4:46 Start of Samira's low-HP hard-commit all-in with no vision—this is the evidence of overchasing instead of disengaging or resetting.",
-      "failureEvidence": "",
-      "goodThing": "You aggressively traded to get Heimerdinger low and play for potential advantage.",
-      "whyTrust": "This fix will protect your shutdown, let you keep tempo, and actually climb out of silver—Samira does not need to flip-close every low-HP 1v1 if the risk is losing map tempo, and every strong Samira resets here.",
-      "focusTag": "overstay/overchase",
-      "evidence": "4:39 Samira stands back near wave, some minions attacking, post-fight. 4:46 Start of Samira's low-HP hard-commit all-in with no vision—this is the evidence of overchasing instead of disengaging or resetting.",
-      "pattern": "You stayed to chase a near-dead enemy with almost no HP, ignoring that any mistake or unseen enemy closes the trade and leaks your lead. In higher ranks, this always gets punished by map rotations or flash/ignite turns.",
-      "diamondRule": "Never all-in at sub-25% HP in enemy territory when you have no support, vision, or respawn pressure—even if the kill looks free, resets win games.",
-      "drill": "Next time you're this low after a trade and see a greedy chase window, hit B and leave, even if the kill looks right there.",
-      "timeline": [],
-      "clockAnchors": [
-        {
-          "clock": "4:39",
-          "videoSeconds": 0.508,
-          "description": "Samira stands back near wave, some minions attacking, post-fight."
-        },
-        {
-          "clock": "4:42",
-          "videoSeconds": 3.844,
-          "description": "Samira and enemy champion fighting near blue minions in bot lane."
-        },
-        {
-          "clock": "4:46",
-          "videoSeconds": 7.181,
-          "description": "Samira and enemy champion close, both low HP, about to engage."
-        },
-        {
-          "clock": "4:49",
-          "videoSeconds": 10.517,
-          "description": "Samira uses ability, large blue visual effect hits the enemy."
-        }
-      ],
-      "clockMoments": [
-        {
-          "clock": "4:39",
-          "videoSeconds": 0.508,
-          "description": "Samira stands back near wave, some minions attacking, post-fight."
-        },
-        {
-          "clock": "4:46",
-          "videoSeconds": 7.181,
-          "description": "Start of Samira's low-HP hard-commit all-in with no vision—this is the evidence of overchasing instead of disengaging or resetting."
-        }
-      ],
-      "nuance": [
-        "You mechanically out-traded Heimer pre-chase and saw a potential kill angle.",
-        "You ignored your low HP and fog risk, needlessly staying for a greedy kill.",
-        "If you die here, you lose wave, XP, and possibly shutdown gold—any competent enemy rotates for the punish.",
-        "The better habit: after a successful fight on 20% HP, hit B and reset tempo, not stay to flip coin one more kill.",
-        "This discipline is what makes leads transfer and prevents chain deaths and thrown advantages."
-      ],
-      "reviewLimit": "Frames are tight and don't show the actual aftermath or reinforcements, but the risk and overstay are fully visible.",
-      "analysisSource": "openai",
-      "analysisVersion": "2026-05-21-specific-decision-chain-v4",
-      "sampledFrames": 4,
-      "publicVideoBytes": 6517189,
-      "captureFps": 2,
-      "src": "/recordings/16-10_NA1-5563247854_03.webm",
-      "poster": "/recordings/posters/16-10-na1-5563247854-03.jpg"
     },
     {
       "file": "16-10_NA1-5563247854_11.webm",
