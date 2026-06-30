@@ -373,6 +373,7 @@ function publicSamiraNote(note = {}, overallRank = {}) {
   return {
     id,
     title: cleanText(note.title || "Samira note", 90),
+    main_takeaway: samiraNoteMainTakeaway(note),
     created_at: note.created_at || "",
     source: cleanText(note.source || "", 40),
     body: cleanParagraphText(note.body || "", 140000),
@@ -380,6 +381,21 @@ function publicSamiraNote(note = {}, overallRank = {}) {
     pdf_url: id ? `/api/samira/notes/${encodeURIComponent(id)}.pdf` : "",
     rank_read: rankRead
   };
+}
+
+function samiraNoteMainTakeaway(note = {}) {
+  const text = cleanParagraphText(note.body || note.title || "", 140000);
+  const lower = text.toLowerCase();
+  if (lower.includes("controlled violence plus clean exits")) {
+    return lower.includes("simple roles plus calm commands")
+      ? "Controlled violence plus clean exits; simple roles plus calm commands."
+      : "Controlled violence plus clean exits.";
+  }
+  const lockIn = text.match(/Alan locks in by making the game smaller:\s*([^.!?]+[.!?]?)/i);
+  if (lockIn?.[1]) return cleanText(`Make the game smaller: ${lockIn[1]}`, 120);
+  const problem = text.match(/problem is this:\s*([^.!?]+[.!?]?)/i);
+  if (problem?.[1]) return cleanText(problem[1], 120);
+  return sentenceStart(text || note.title || "Samira note", 120);
 }
 
 function localDateKey(value = new Date()) {

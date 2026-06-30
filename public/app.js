@@ -6821,7 +6821,7 @@ function samiraPdfCard(note) {
   const pdfUrl = note.pdf_url || (note.id ? `/api/samira/notes/${encodeURIComponent(note.id)}.pdf` : "");
   const rank = note.rank_read || {};
   const fullTitle = note.title || "Samira note";
-  const displayTitle = compactSamiraTitle(fullTitle);
+  const takeaway = compactSamiraTitle(note.main_takeaway || fullTitle, 92);
 
   const thumb = document.createElement(pdfUrl ? "a" : "div");
   thumb.className = "samira-pdf-thumb";
@@ -6837,14 +6837,7 @@ function samiraPdfCard(note) {
   const pdfMark = document.createElement("span");
   pdfMark.className = "samira-pdf-mark";
   pdfMark.textContent = "PDF";
-  const sheetTitle = document.createElement("strong");
-  sheetTitle.textContent = compactSamiraTitle(fullTitle, 46);
-  sheetTitle.title = fullTitle;
-  const sheetRank = document.createElement("em");
-  sheetRank.textContent = rank.exactRank || "unrated";
-  const sheetPreview = document.createElement("p");
-  sheetPreview.textContent = note.preview || note.body || "";
-  sheet.append(pdfMark, sheetTitle, sheetRank, sheetPreview);
+  sheet.append(pdfMark);
   thumb.append(sheet);
 
   const main = document.createElement("div");
@@ -6853,21 +6846,13 @@ function samiraPdfCard(note) {
   time.dateTime = note.created_at || "";
   time.textContent = formatDate(note.created_at);
   const title = document.createElement("h3");
-  title.textContent = displayTitle;
-  title.title = fullTitle;
+  title.textContent = takeaway;
+  title.title = note.main_takeaway || fullTitle;
   const rankLine = document.createElement("p");
   rankLine.className = "samira-pdf-rank";
   const rankValue = document.createElement("strong");
   rankValue.textContent = rank.exactRank || "unrated";
-  const rankMeta = document.createElement("span");
-  rankMeta.textContent = rank.range ? `approx ${rank.range}` : "approx rank read";
-  rankLine.append(rankValue, rankMeta);
-  const reason = document.createElement("p");
-  reason.className = "samira-pdf-reason";
-  reason.textContent = rank.reason || "Saved note language plus current Samira baseline.";
-  const boundary = document.createElement("p");
-  boundary.className = "samira-pdf-boundary";
-  boundary.textContent = rank.basis || "saved note + current Samira baseline; not Riot MMR";
+  rankLine.append(rankValue);
   const action = document.createElement("a");
   action.className = "samira-pdf-action";
   action.href = pdfUrl || "#";
@@ -6875,7 +6860,7 @@ function samiraPdfCard(note) {
   action.rel = "noopener";
   action.textContent = "Open PDF";
   if (!pdfUrl) action.setAttribute("aria-disabled", "true");
-  main.append(time, title, rankLine, reason, boundary, action);
+  main.append(time, title, rankLine, action);
   article.append(thumb, main);
   return article;
 }
