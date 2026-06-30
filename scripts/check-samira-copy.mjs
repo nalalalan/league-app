@@ -177,6 +177,18 @@ try {
   if (!/\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*minmax\(320px,\s*460px\)\s+minmax\(360px,\s*1fr\);[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;/.test(styles)) {
     throw new Error("Samira intake still uses a big enclosing card instead of a compact work layout.");
   }
+  if (!/\.samira-head\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1;/.test(styles)) {
+    throw new Error("Samira heading is not separated from the composer/current-read row.");
+  }
+  if (!/\.samira-main-takeaway\s*\{[\s\S]*?align-self:\s*start;[\s\S]*?min-height:\s*0;/.test(styles) || /\.samira-main-takeaway\s*\{[\s\S]*?grid-row:\s*1\s*\/\s*span\s*2;/.test(styles)) {
+    throw new Error("Samira current read is stretched across the heading/composer block.");
+  }
+  if (!/\.samira-pdf-main\s*\{[\s\S]*?grid-template-rows:\s*auto\s+auto\s+auto;/.test(styles)) {
+    throw new Error("Samira note cards still stretch short notes into empty towers.");
+  }
+  if (!/@media\s*\(max-width:\s*820px\)\s*\{[\s\S]*?\.paper-strip-compact\s*\{[\s\S]*?display:\s*flex;/.test(styles)) {
+    throw new Error("Samira mobile paper strip still uses a stacked layout.");
+  }
   console.log("Samira generated copy has no role-prefix labels, useless signal counters, or template card prose.");
 } finally {
   server.kill();

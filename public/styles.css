@@ -1716,6 +1716,7 @@ summary {
   display: grid;
   grid-template-columns: minmax(320px, 460px) minmax(360px, 1fr);
   gap: 12px 18px;
+  align-items: start;
   width: 100%;
   margin: 0 auto;
   padding: 0;
@@ -1724,7 +1725,7 @@ summary {
 }
 
 .samira-head {
-  grid-column: 1;
+  grid-column: 1 / -1;
   align-self: end;
   margin: 0;
 }
@@ -1830,11 +1831,10 @@ summary {
 
 .samira-main-takeaway {
   grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: stretch;
+  align-self: start;
   display: flex;
-  align-items: center;
-  min-height: 110px;
+  align-items: flex-start;
+  min-height: 0;
   margin: 0;
   border: 1px solid rgba(104, 87, 68, .16);
   border-radius: 8px;
@@ -1875,8 +1875,9 @@ summary {
 
 .samira-pdf-main {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto auto auto;
   gap: 9px;
+  align-content: start;
   min-width: 0;
 }
 
@@ -4237,6 +4238,32 @@ h1 {
     gap: 9px;
   }
 
+  .paper-strip-compact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 11px;
+  }
+
+  .paper-strip-compact .paper-title {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 12.5px;
+    line-height: 1.16;
+  }
+
+  .paper-strip-compact p {
+    display: none;
+  }
+
+  .paper-strip-compact .paper-button {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
   .recording-head {
     align-items: start;
   }
@@ -4254,6 +4281,11 @@ h1 {
   .page {
     width: min(1180px, calc(100% - 22px));
     padding-top: 16px;
+  }
+
+  .page-intake {
+    width: min(100%, calc(100vw - 22px));
+    padding-top: 14px;
   }
 
   .samira-intake {
@@ -4811,10 +4843,9 @@ h1 {
   }
 
   .paper-strip-compact {
-    display: grid;
-    grid-template-columns: 1fr;
-    align-items: start;
-    justify-content: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .paper-button {
@@ -4888,7 +4919,7 @@ h1 {
   .paper-strip-compact strong,
   .paper-strip-compact .paper-title {
     max-width: none;
-    font-size: 14px;
+    font-size: 12.5px;
   }
 
   .recording-main {
