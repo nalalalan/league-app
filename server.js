@@ -465,7 +465,8 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
     improvement.push("you mention the green-light check");
   }
   if (improvement.length) {
-    pieces.push(`The note is stronger because ${improvement.join("; ")}.`);
+    const sentence = improvement.join("; ").replace(/^([a-z])/, (_, letter) => letter.toUpperCase());
+    pieces.push(`${sentence}.`);
   } else {
     pieces.push("The note is long but still thin on a repeatable Samira habit.");
   }
