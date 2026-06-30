@@ -306,6 +306,29 @@ function countSamiraMatches(text, patterns) {
   return patterns.reduce((total, pattern) => total + (text.match(pattern) || []).length, 0);
 }
 
+function hasSamiraConcept(text, patterns) {
+  return patterns.some((pattern) => pattern.test(text));
+}
+
+function samiraConceptSentence(text) {
+  if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i, /death as the fight-ending/i])) {
+    return "The valuable part is the flight pattern: edge is altitude, E is the dive, return to edge is the climb; stop using death as the fight ending.";
+  }
+  if (hasSamiraConcept(text, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
+    return "The valuable part is the ugly-lane rule: bad support and early HP loss are not permission to chase the game back through harder fights.";
+  }
+  if (hasSamiraConcept(text, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
+    return "The valuable part is the duo-voice rule: use short commands, then let the fight stay small enough to execute.";
+  }
+  if (hasSamiraConcept(text, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i])) {
+    return "The valuable part is the payout rule: kill becomes wave, plate, objective, buy, or reset before the second fight eats the lead.";
+  }
+  if (hasSamiraConcept(text, [/w ready/i, /hp above half/i, /ally close/i, /green light/i])) {
+    return "The valuable part is the gate: W ready, HP above half, ally close, then E; otherwise Q and auto while backing out.";
+  }
+  return "The valuable part is the pattern you named, not the length of the note; convert it into one repeatable in-game rule.";
+}
+
 function samiraNoteRankRead(note = {}, overallRank = {}) {
   const text = samiraNoteAnalysisText(note);
   const explicit = samiraRankValueFromText(text);
@@ -423,6 +446,9 @@ function samiraCorpusMainTakeaway(notes = [], review = {}, overallRank = {}) {
     /\btilt\b/g,
     /\bstay\b/g
   ]);
+  if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i])) {
+    return "Play boom-and-zoom Samira: edge, dive, damage, climb out, re-check.";
+  }
   if (exits >= 5 && leaks >= 5) {
     return "You have damage. Your problem is payout discipline: kill, step out, buy.";
   }
@@ -481,15 +507,18 @@ function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
   const leak = Number(signals.leak || 0);
   const conversion = Number(signals.conversion || 0);
   const greenLight = Number(signals.greenLight || 0);
-  const parts = [
-    `${rankRead.exactRank || "Unrated"} because the note still says you can make damage, then turn the next five seconds into a problem.`,
-  ];
+  const sourceText = `${note.title || ""}\n${note.body || ""}`;
+  const parts = [`${rankRead.exactRank || "Unrated"} read. ${samiraConceptSentence(sourceText)}`];
   if (conversion || leak || greenLight) {
-    const checkWord = greenLight === 1 ? "check" : "checks";
-    parts.push(`${conversion} value-conversion signals, ${leak} leak signals, ${greenLight} green-light ${checkWord}.`);
+    const checkWord = greenLight === 1 ? "green-light check" : "green-light checks";
+    parts.push(`${conversion} payout signals, ${leak} leak signals, ${greenLight} ${checkWord}; the note is useful only if it changes the next click.`);
   }
   parts.push(samiraPreviousGameImprovement(note, rankRead, overallRank));
-  parts.push("You are not losing because Samira lacks damage. You are losing because you stay after the payout.");
+  if (hasSamiraConcept(sourceText, [/fixed flight pattern/i, /boom-and-zoom/i, /return to edge/i])) {
+    parts.push("Mean version: stop turnfighting on the ground. One pass, out, re-check, then another pass.");
+  } else {
+    parts.push("Mean version: stop admiring the kill. Cash it out or leave.");
+  }
   return cleanText(parts.join(" "), 700);
 }
 
@@ -939,6 +968,29 @@ async function handleApi(req, res, url) {
     const notes = [note, ...(await loadNotes())].slice(0, 200);
     await saveNotes(notes);
     sendJson(res, 201, { note, samira: await samiraState() });
+    return true;
+  }
+
+  const samiraNoteDeleteMatch = url.pathname.match(/^\/api\/samira\/notes\/([^/]+)$/);
+  if (samiraNoteDeleteMatch && req.method === "DELETE") {
+    if (isRailway && !writeToken) {
+      sendJson(res, 503, { error: "Write token is not configured" });
+      return true;
+    }
+    const headerToken = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "") || String(req.headers["x-league-write-token"] || "");
+    if (writeToken && headerToken !== writeToken) {
+      sendJson(res, 401, { error: "Unauthorized" });
+      return true;
+    }
+    const id = decodeURIComponent(samiraNoteDeleteMatch[1] || "");
+    const notes = await loadNotes();
+    const nextNotes = notes.filter((note) => note.id !== id);
+    if (nextNotes.length === notes.length) {
+      sendJson(res, 404, { error: "Samira note not found" });
+      return true;
+    }
+    await saveNotes(nextNotes);
+    sendJson(res, 200, { ok: true, deleted_id: id, samira: await samiraState() });
     return true;
   }
 

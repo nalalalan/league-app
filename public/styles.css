@@ -1888,7 +1888,15 @@ summary {
   overflow-wrap: break-word;
 }
 
-.samira-pdf-action {
+.samira-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.samira-pdf-action,
+.samira-delete-note {
   width: max-content;
   max-width: 100%;
   margin-top: 2px;
@@ -1901,6 +1909,19 @@ summary {
   font-weight: 400;
   line-height: 1;
   text-decoration: none;
+}
+
+.samira-delete-note {
+  background: transparent;
+  color: #7b6252;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.samira-delete-note:disabled {
+  cursor: default;
+  opacity: .55;
 }
 
 .page-intake .notice {

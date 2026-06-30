@@ -6815,6 +6815,7 @@ function noteNode(note) {
 function samiraPdfCard(note) {
   const article = document.createElement("article");
   article.className = "samira-pdf-card";
+  if (note.id) article.dataset.noteId = note.id;
   const pdfUrl = note.pdf_url || (note.id ? `/api/samira/notes/${encodeURIComponent(note.id)}.pdf` : "");
   const rank = note.rank_read || {};
   const description = note.description || note.preview || "";
@@ -6842,7 +6843,19 @@ function samiraPdfCard(note) {
   action.rel = "noopener";
   action.textContent = "Open PDF";
   if (!pdfUrl) action.setAttribute("aria-disabled", "true");
-  main.append(meta, descriptionText, action);
+
+  const actions = document.createElement("div");
+  actions.className = "samira-card-actions";
+  actions.append(action);
+  if (note.id) {
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "samira-delete-note";
+    deleteButton.type = "button";
+    deleteButton.dataset.noteId = note.id;
+    deleteButton.textContent = "Delete";
+    actions.append(deleteButton);
+  }
+  main.append(meta, descriptionText, actions);
   article.append(main);
   return article;
 }
@@ -6941,6 +6954,39 @@ async function saveSamiraNote(event) {
   }
 }
 
+async function deleteSamiraNote(noteId, button) {
+  if (!noteId || !samiraNoteStatus) return;
+  const token = samiraNoteToken?.value.trim() || localStorage.getItem("leagueSamiraWriteKey") || "";
+  if (!token) {
+    samiraNoteStatus.textContent = "write key required";
+    samiraNoteToken?.focus();
+    return;
+  }
+  if (button) button.disabled = true;
+  samiraNoteStatus.textContent = "deleting";
+  try {
+    const response = await fetch(`/api/samira/notes/${encodeURIComponent(noteId)}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      samiraNoteStatus.textContent = response.status === 401 ? "write key rejected" : (data.error || "delete failed");
+      if (button) button.disabled = false;
+      return;
+    }
+    samiraNoteStatus.textContent = "deleted";
+    renderSamiraState(data.samira);
+    hydratePublicNotes();
+  } catch {
+    samiraNoteStatus.textContent = "delete failed";
+    if (button) button.disabled = false;
+  }
+}
+
 const hasChampionSurface = Boolean(championPicker && championPanel);
 const hasRecordingSurface = Boolean(recordingsSection && recordingSummary && recordingFocus && recordingGrid);
 
@@ -6953,6 +6999,15 @@ if (samiraNoteToken) {
 }
 if (samiraNoteForm) {
   samiraNoteForm.addEventListener("submit", saveSamiraNote);
+}
+
+if (samiraNoteList) {
+  samiraNoteList.addEventListener("click", (event) => {
+    const button = event.target.closest?.(".samira-delete-note");
+    if (!button) return;
+    event.preventDefault();
+    deleteSamiraNote(button.dataset.noteId || "", button);
+  });
 }
 
 document.addEventListener("click", (event) => {
