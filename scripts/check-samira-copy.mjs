@@ -46,33 +46,47 @@ function generatedSamiraStrings(data) {
 
 try {
   await waitForServer();
-  const sampleBody = [
-    "Ranked solo queue loss. K/D/A 6/11/2. 174 CS. 21,209 damage. 12,004 gold. 412 gold/min.",
-    "Alan's Samira game shows fixed flight pattern and boom-and-zoom.",
-    "Edge is altitude. E is the dive. Return to edge is the climb.",
-    "W ready, HP above half, ally close is the gate.",
-    "The game got bad when I stayed in the middle after damage instead of leaving."
-  ].join(" ");
-  const saveResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes`, {
-    method: "POST",
-    headers: { Accept: "application/json", "Content-Type": "application/json" },
-    body: JSON.stringify({ body: sampleBody })
-  });
-  if (!saveResponse.ok) {
-    throw new Error(`Samira sample note did not save without token: ${saveResponse.status}`);
+  const sampleBodies = [
+    [
+      "Ranked solo queue loss. K/D/A 6/11/2. 174 CS. 21,209 damage. 12,004 gold. 412 gold/min.",
+      "Alan's Samira game shows fixed flight pattern and boom-and-zoom.",
+      "Edge is altitude. E is the dive. Return to edge is the climb.",
+      "W ready, HP above half, ally close is the gate.",
+      "The game got bad when I stayed in the middle after damage instead of leaving."
+    ].join(" "),
+    "Ranked solo queue. S loaded and S rank appeared, but R was only availability, not permission to R.",
+    "Ranked solo queue. Fog chase turned into one more fight instead of wave, reset, or objective.",
+    "Ranked solo queue. Teemo support, Pyke lane, 309/720 HP, 6/11/2. Make the bad lane smaller.",
+    "Duo game with Lily. Use short commands, behind me, peel me, and calm commands before the fight.",
+    "Ranked solo queue. Unspent gold and shutdown gold stayed on the map instead of buy, reset, wave, or objective.",
+    "Ranked solo queue. W ready, HP above half, ally close is the green light before E."
+  ];
+  let saved = null;
+  for (const sampleBody of sampleBodies) {
+    const saveResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ body: sampleBody })
+    });
+    if (!saveResponse.ok) {
+      throw new Error(`Samira sample note did not save without token: ${saveResponse.status}`);
+    }
+    saved = await saveResponse.json();
   }
-  const saved = await saveResponse.json();
-  const sampleNote = saved?.samira?.notes?.find((note) => note?.body === sampleBody);
-  if (!sampleNote) throw new Error("Saved Samira sample note was not visible in /api/samira.");
+  const sampleNotes = sampleBodies.map((sampleBody) => saved?.samira?.notes?.find((note) => note?.body === sampleBody));
+  if (sampleNotes.some((note) => !note)) throw new Error("Saved Samira sample notes were not all visible in /api/samira.");
+  const sampleNote = sampleNotes[0];
   if (!/ranked solo/i.test(sampleNote.game_meta_line || "") || !/6\/11\/2/.test(sampleNote.game_meta_line || "") || !/174 CS/.test(sampleNote.game_meta_line || "")) {
     throw new Error(`Samira sample note did not expose game facts: ${sampleNote.game_meta_line || ""}`);
   }
-  const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(sampleNote.id)}`, {
-    method: "DELETE",
-    headers: { Accept: "application/json" }
-  });
-  if (!deleteResponse.ok) {
-    throw new Error(`Samira sample note did not delete without token: ${deleteResponse.status}`);
+  for (const note of sampleNotes) {
+    const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(note.id)}`, {
+      method: "DELETE",
+      headers: { Accept: "application/json" }
+    });
+    if (!deleteResponse.ok) {
+      throw new Error(`Samira sample note did not delete without token: ${deleteResponse.status}`);
+    }
   }
   const data = saved.samira;
   const bannedLabels = [
@@ -111,7 +125,12 @@ try {
   if (repetitiveOffending.length) {
     throw new Error(`Generated Samira copy still uses repeated fallback prose:\n${repetitiveOffending.join("\n")}`);
   }
-  const sourceFiles = ["server.js", "public/app.js", "public/league-practice-room.tex"];
+  const bannedPrefaceCopy = /\bThe\s+(?:improvement|note|duo lesson|money leak|entry rule|death|lesson|leak|rule)\s+(?:is|was)\b|\bThe map payout has to\b|\bThis is an ugly-lane note\b/i;
+  const prefaceOffending = generatedSamiraStrings(data).filter((text) => bannedPrefaceCopy.test(text));
+  if (prefaceOffending.length) {
+    throw new Error(`Generated Samira copy still uses assistant preface stems:\n${prefaceOffending.join("\n")}`);
+  }
+  const sourceFiles = ["server.js", "public/league-practice-room.tex"];
   const sourceOnlyBanned = [
     "Blunt read:",
     "Honest read:",
@@ -121,7 +140,13 @@ try {
     "payout signals",
     "leak signals",
     "green-light signals",
-    "green-light checks"
+    "green-light checks",
+    "The improvement is naming",
+    "The improvement is separating",
+    "The improvement is seeing",
+    "The improvement is giving",
+    "The improvement is shrinking",
+    "The improvement is making"
   ];
   const sourceOffenders = [];
   for (const file of sourceFiles) {
@@ -134,16 +159,23 @@ try {
   if (sourceOffenders.length) {
     throw new Error(`League source still contains visible role-prefix text:\n${sourceOffenders.join("\n")}`);
   }
+  const appSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
+  if (!/function\s+directVisibleCopy\s*\(/.test(appSource) || !/descriptionText\.textContent\s*=\s*directVisibleCopy\(description\)/.test(appSource)) {
+    throw new Error("Samira note-card descriptions do not pass through the direct visible-copy sanitizer.");
+  }
   const styles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
   const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
-  if (!/\.samira-note-form\s*\{[\s\S]*?width:\s*min\(520px,\s*100%\);[\s\S]*?max-width:\s*520px;/.test(styles)) {
+  if (!/\.samira-note-form\s*\{[\s\S]*?max-width:\s*460px;/.test(styles)) {
     throw new Error("Samira note composer is not capped independently from the saved-note grid.");
   }
-  if (!/<textarea[^>]+id="samira-note-body"[^>]+rows="1"/.test(html) || !/\.samira-note-form textarea\s*\{[\s\S]*?height:\s*42px;[\s\S]*?overflow:\s*auto;/.test(styles)) {
+  if (!/<textarea[^>]+id="samira-note-body"[^>]+rows="1"/.test(html) || !/\.samira-note-form textarea\s*\{[\s\S]*?height:\s*44px;[\s\S]*?overflow:\s*auto;/.test(styles)) {
     throw new Error("Samira note composer is not a compact one-row scrolling paste box.");
   }
-  if (!/\.samira-note-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(auto-fill,\s*minmax\(min\(100%,\s*215px\),\s*1fr\)\);/.test(styles)) {
-    throw new Error("Samira saved-note grid is no longer dense/multi-column.");
+  if (!/\.samira-note-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(auto-fill,\s*minmax\(min\(100%,\s*320px\),\s*1fr\)\);/.test(styles)) {
+    throw new Error("Samira saved-note grid is no longer wide enough to avoid skinny text towers.");
+  }
+  if (!/\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*minmax\(320px,\s*460px\)\s+minmax\(360px,\s*1fr\);[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;/.test(styles)) {
+    throw new Error("Samira intake still uses a big enclosing card instead of a compact work layout.");
   }
   console.log("Samira generated copy has no role-prefix labels, useless signal counters, or template card prose.");
 } finally {

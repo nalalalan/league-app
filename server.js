@@ -64,7 +64,7 @@ const seedNotes = [
     id: "samira-a-plus-proof",
     created_at: "2026-05-18T00:00:00-04:00",
     title: "A+ Samira follow-up",
-    body: "User-supplied follow-up: 10/1/8, 21,209 damage, 16,272 gold, 871 gold/min, A+ in a win. The lesson is not cockiness; it is that the boring rules are what made the good game happen."
+    body: "User-supplied follow-up: 10/1/8, 21,209 damage, 16,272 gold, 871 gold/min, A+ in a win. Boring rules made the good game happen."
   },
   {
     id: "samira-safe-gold-late-entry",
@@ -367,30 +367,30 @@ function hasSamiraConcept(text, patterns) {
 
 function samiraConceptSentence(text) {
   if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i, /death as the fight-ending/i])) {
-    return "You are describing a flight pattern, not a brawl. Edge, dive, damage, climb out.";
+    return "Use the flight pattern: edge, dive, damage, climb out.";
   }
   if (hasSamiraConcept(text, [/\bs loaded\b/i, /\bs rank\b/i, /permission to r/i, /ready to r/i])) {
     return "S loaded is only availability. It is not permission to press R.";
   }
   if (hasSamiraConcept(text, [/\bfog\b/i, /\bchase\b/i, /turns? into wave/i, /turns? into objective/i])) {
-    return "Fog chase is the throw pattern. The map payout has to come before the second fight.";
+    return "Treat fog chase as the throw pattern. Take map payout before the second fight.";
   }
   if (hasSamiraConcept(text, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
-    return "This is an ugly-lane note. Bad support and early HP loss do not make a bigger fight correct.";
+    return "Make ugly lane smaller. Bad support and early HP loss do not make a bigger fight correct.";
   }
   if (hasSamiraConcept(text, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
-    return "The duo lesson is command discipline: one short call, then play the fight.";
+    return "Use one short duo call, then play the fight.";
   }
   if (hasSamiraConcept(text, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i])) {
-    return "The money leak is clear. A kill has to become wave, plate, objective, buy, or reset.";
+    return "Turn each kill into wave, plate, objective, buy, or reset.";
   }
   if (hasSamiraConcept(text, [/w ready/i, /hp above half/i, /ally close/i, /green light/i])) {
-    return "The entry rule is W ready, HP above half, ally close; otherwise Q and auto while backing out.";
+    return "Check W ready, HP above half, ally close; otherwise Q and auto while backing out.";
   }
   if (hasSamiraConcept(text, [/\bdeath\b/i, /\bdied\b/i, /\bstayed\b/i, /\bstay\b/i, /\bin the middle\b/i])) {
-    return "The death is not random. You stayed where Samira is easiest to punish.";
+    return "Do not call the death random. You stayed where Samira is easiest to punish.";
   }
-  return "The note is not useful until it names the next wrong click.";
+  return "Name the next wrong click before the note can help.";
 }
 
 function samiraNextClickSentence(text) {
@@ -571,21 +571,21 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
   const signals = rankRead.signals || {};
   const pieces = [];
   if (/fixed flight pattern|boom-and-zoom|edge is altitude|return to edge/.test(text)) {
-    pieces.push("The improvement is naming the climb-out after damage, not only the dive.");
+    pieces.push("Name the climb-out after damage, not after the dive.");
   } else if (/\bs loaded\b|\bs rank\b|permission to r|ready to r/.test(text)) {
-    pieces.push("The improvement is separating R availability from R permission.");
+    pieces.push("Separate R availability from R permission.");
   } else if (/\bfog\b|\bchase\b|turns? into wave|turns? into objective/.test(text)) {
-    pieces.push("The improvement is seeing the chase as a map-choice leak instead of a mechanics problem.");
+    pieces.push("See the chase as a map-choice leak, not a mechanics problem.");
   } else if (/teemo support|pyke lane|stabil|309\/720|6\/11\/2/.test(text)) {
-    pieces.push("The improvement is giving bad lane a boring response: farm, recall, stop forcing.");
+    pieces.push("Give bad lane a boring response: farm, recall, stop forcing.");
   } else if (/quiet fight|short call|behind me|peel me|bubble diver|calm commands|lily/.test(text)) {
-    pieces.push("The improvement is shrinking duo comms into one command before the fight starts.");
+    pieces.push("Shrink duo comms into one command before the fight starts.");
   } else if (signals.conversion >= 4 || /exit|reset|recall|buy|wave|objective|step out|plate/.test(text)) {
-    pieces.push("The improvement is naming where the value goes after the kill.");
+    pieces.push("Name where the value goes after the kill.");
   } else if (/w ready|hp above half|ally close|green light/.test(text)) {
-    pieces.push("The improvement is making E conditional instead of emotional.");
+    pieces.push("Make E conditional instead of emotional.");
   } else {
-    pieces.push("The note is still too broad unless the next game proves one changed click.");
+    pieces.push("Narrow the next note until the next game proves one changed click.");
   }
   if ((signals.leak || 0) >= (signals.greenLight || 0) + 5 && !/\bfog\b|\bchase\b/.test(text)) {
     pieces.push("Too much of the paragraph is still panic language; make the next game prove the check.");
@@ -595,9 +595,7 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
 
 function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
   const sourceText = `${note.title || ""}\n${note.body || ""}`;
-  const meta = samiraNoteGameMeta(note);
-  const header = [rankRead.exactRank || "unrated", meta.line].filter(Boolean).join(" / ");
-  const parts = [header ? `${header}.` : "", samiraConceptSentence(sourceText)];
+  const parts = [samiraConceptSentence(sourceText)];
   parts.push(samiraNextClickSentence(sourceText));
   parts.push(samiraPreviousGameImprovement(note, rankRead, overallRank));
   if (hasSamiraConcept(sourceText, [/fixed flight pattern/i, /boom-and-zoom/i, /return to edge/i])) {
@@ -617,7 +615,11 @@ function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
   } else {
     parts.push("Stop admiring the kill. Cash it out or leave.");
   }
-  return cleanText(parts.join(" "), 700);
+  const uniqueParts = parts.filter((part, index, array) => {
+    const normalized = cleanParagraphText(part, 400).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    return normalized && array.findIndex((other) => cleanParagraphText(other, 400).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() === normalized) === index;
+  });
+  return cleanText(uniqueParts.join(" "), 430);
 }
 
 function localDateKey(value = new Date()) {

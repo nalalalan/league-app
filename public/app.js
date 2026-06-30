@@ -461,7 +461,7 @@ const champions = [
       },
       {
         title: "A good Samira game makes reckless Samira feel unlocked.",
-        response: "The lesson from S+ and A+ games is not that you are now allowed to E whenever. The lesson is that the boring rules caused the good game: Q a lot, save W for real danger, wait for enemy disadvantage, E only when real, R only when they are losing, stay near teammates, run when chased, and leave bad fights. A good game proves the blueprint; it does not remove the blueprint."
+        response: "Do not use S+ and A+ games as permission to E whenever. Keep the boring rules that caused the good game: Q a lot, save W for real danger, wait for enemy disadvantage, E only when real, R only when they are losing, stay near teammates, run when chased, and leave bad fights. A good game proves the blueprint; it does not remove the blueprint."
       },
       {
         title: "Normals still feel like judgment even when you are improving.",
@@ -599,7 +599,7 @@ const champions = [
     situations: [
       {
         title: "Ezreal Q gives safe button spam while the fight is unclear.",
-        response: "Ezreal Q gives your hands something safe to do when the fight is uncertain and hard commitment feels bad. Use it as a test button and movement rhythm: Q, move, Q, move. The lesson is safe repetition under pressure, not randomly drifting forward because the button is available."
+        response: "Ezreal Q gives your hands something safe to do when the fight is uncertain and hard commitment feels bad. Use it as a test button and movement rhythm: Q, move, Q, move. Use safe repetition under pressure, not randomly drifting forward because the button is available."
       },
       {
         title: "Useful Q rhythm does not mean Ezreal will earn reps.",
@@ -1491,12 +1491,12 @@ function recordingDetailCell(item) {
   }
 
   const description = document.createElement("p");
-  description.textContent = item.feedback || item.pattern || "No feedback generated yet.";
+  description.textContent = directVisibleCopy(item.feedback || item.pattern || "No feedback generated yet.");
   detail.append(description);
 
   if (hasText(item.pattern) && item.pattern !== item.feedback) {
     const pattern = document.createElement("p");
-    pattern.textContent = item.pattern;
+    pattern.textContent = directVisibleCopy(item.pattern);
     detail.append(pattern);
   }
 
@@ -1546,11 +1546,11 @@ function recordingPreviewCard(item) {
 
   const description = document.createElement("p");
   description.className = "recording-preview-description";
-  description.textContent = item.feedback || item.pattern || "No feedback generated yet.";
+  description.textContent = directVisibleCopy(item.feedback || item.pattern || "No feedback generated yet.");
 
   const why = document.createElement("p");
   why.className = "recording-preview-why";
-  why.textContent = item.whyTrust || "";
+  why.textContent = directVisibleCopy(item.whyTrust || "");
 
   copy.append(title, meta, takeaway, description);
   if (why.textContent) copy.append(why);
@@ -1686,17 +1686,17 @@ function isRedundantStorySentence(sentence, item, critique) {
 function displayCritique(item) {
   const byFile = {
     "auto_NA1-5563660362_01.mp4": "The throw risk is drifting sideways after the base is already open; stand behind the first body in and hit the structure as soon as space is made.",
-    "16-10_NA1-5563352800_01.webm": "The leak is accepting another fight after the first win; cash out wave, tower, reset, or end before touching another champion.",
-    "16-10_NA1-5563301586_01.webm": "The leak is playing the wave when one auto or spell kills Samira; give the wave and recall before the lane turns into a death timer."
+    "16-10_NA1-5563352800_01.webm": "Stop accepting another fight after the first win; cash out wave, tower, reset, or end before touching another champion.",
+    "16-10_NA1-5563301586_01.webm": "Stop playing the wave when one auto or spell kills Samira; give the wave and recall before the lane turns into a death timer."
   };
-  if (byFile[item.file]) return byFile[item.file];
+  if (byFile[item.file]) return directVisibleCopy(byFile[item.file]);
   const lesson = recordingLesson(item);
   const mistakeOnly = String(lesson || "").match(/\bMistake:\s*([\s\S]*?)(?:\s*\bFix:|$)/i)?.[1] || lesson;
-  return stripCoachPrefix(mistakeOnly)
-    .replace(/^You\s+/i, "The leak is that you ")
-    .replace(/^Your\s+/i, "The leak is ")
+  return directVisibleCopy(stripCoachPrefix(mistakeOnly)
+    .replace(/^You\s+/i, "")
+    .replace(/^Your\s+/i, "")
     .replace(/\s+/g, " ")
-    .trim();
+    .trim());
 }
 
 function displayPraise(item) {
@@ -1705,13 +1705,13 @@ function displayPraise(item) {
     "16-10_NA1-5563352800_01.webm": "The strong part is turning one bot-side win into turret pressure instead of only chasing kills.",
     "16-10_NA1-5563301586_01.webm": "The strong part is getting back into the game later and converting pressure into the ending push."
   };
-  if (byFile[item.file]) return byFile[item.file];
-  return stripCoachPrefix(item.goodThing || "")
+  if (byFile[item.file]) return directVisibleCopy(byFile[item.file]);
+  return directVisibleCopy(stripCoachPrefix(item.goodThing || "")
     .replace(/^You\s+/i, "The strong part is that you ")
     .replace(/^The good part was real:\s*/i, "The strong part is ")
     .replace(/^The useful positive sign is that\s*/i, "The strong part is that ")
     .replace(/\s+/g, " ")
-    .trim();
+    .trim());
 }
 
 function displaySecondaryFocus(item) {
@@ -1777,6 +1777,49 @@ function stripVisibleCoachLabel(text) {
     .replace(/^\s*(?:Failure evidence|Other mistake types|Second focus)\s*:\s*/i, "")
     .replace(/^\s*Second focus\s+is\s+/i, "")
     .trim();
+}
+
+function directVisibleCopy(text) {
+  let cleaned = String(text || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const replacements = [
+    [/^The improvement is naming\b/i, "Name"],
+    [/^The improvement is separating\b/i, "Separate"],
+    [/^The improvement is seeing\b/i, "See"],
+    [/^The improvement is giving\b/i, "Give"],
+    [/^The improvement is shrinking\b/i, "Shrink"],
+    [/^The improvement is making\b/i, "Make"],
+    [/^The note is still too broad unless the next game proves one changed click\.?$/i, "Narrow the next note until the next game proves one changed click."],
+    [/^The note is not useful until it names the next wrong click\.?$/i, "Name the next wrong click before the note can help."],
+    [/^The duo lesson is command discipline:\s*/i, "Use one short duo call, then "],
+    [/^The money leak is clear\.\s*A kill has to become\b/i, "Turn each kill into"],
+    [/^The entry rule is\b/i, "Check"],
+    [/^The death is not random\.\s*/i, "Do not call the death random. "],
+    [/^The map payout has to come before the second fight\.?$/i, "Take map payout before the second fight."],
+    [/^This is an ugly-lane note\.\s*/i, "Make ugly lane smaller. "],
+    [/^The lesson from S\+ and A\+ games is not that you are now allowed to E whenever\.\s*The lesson is that\b/i, ""],
+    [/^The lesson is not cockiness;\s*it is that\b/i, ""],
+    [/^The lesson is simple:\s*/i, ""],
+    [/^The lesson is to\s+/i, ""],
+    [/^The lesson is\s+/i, ""],
+    [/^The leak is accepting\b/i, "Stop accepting"],
+    [/^The leak is playing\b/i, "Stop playing"],
+    [/^The leak is using\b/i, "Stop using"],
+    [/^The leak is taking\b/i, "Stop taking"],
+    [/^The leak is treating\b/i, "Stop treating"],
+    [/^The leak is entering\b/i, "Stop entering"],
+    [/^The leak is staying\b/i, "Stop staying"],
+    [/^The leak is arriving\b/i, "Stop arriving"],
+    [/^The leak is that\s+/i, ""],
+    [/^The leak is\s+/i, ""],
+    [/^The strong part is that\s+/i, "Keep "],
+    [/^The strong part is\s+/i, "Keep "]
+  ];
+  for (const [pattern, replacement] of replacements) {
+    cleaned = cleaned.replace(pattern, replacement).trim();
+  }
+  return sentenceCase(cleaned);
 }
 
 function sentenceCase(text) {
@@ -1856,7 +1899,7 @@ function cleanStorySentence(sentence) {
     .replace(rolePrefixPattern("Honest read"), "")
     .replace(/\s+/g, " ")
     .trim();
-  return cleaned.replace(/^([a-z])/, (_, letter) => letter.toUpperCase());
+  return directVisibleCopy(cleaned);
 }
 
 function sentenceMatches(sentence, patterns) {
@@ -6839,7 +6882,7 @@ function samiraPdfCard(note) {
 
   const descriptionText = document.createElement("p");
   descriptionText.className = "samira-card-description";
-  descriptionText.textContent = description;
+  descriptionText.textContent = directVisibleCopy(description);
 
   const action = document.createElement("a");
   action.className = "samira-pdf-action";
@@ -6889,17 +6932,17 @@ function renderSamiraState(data) {
     samiraRankRead.textContent = `approx ${rank.exactRank || "unrated"}${current}`;
   }
   if (samiraBoundary) {
-    samiraBoundary.textContent = rank.basis || data.source_boundary || "";
+    samiraBoundary.textContent = directVisibleCopy(rank.basis || data.source_boundary || "");
   }
   if (samiraMainTakeaway) {
-    samiraMainTakeaway.textContent = data.main_takeaway || "";
+    samiraMainTakeaway.textContent = directVisibleCopy(data.main_takeaway || "");
     samiraMainTakeaway.hidden = !data.main_takeaway;
   }
   if (samiraTipList) {
     const tips = Array.isArray(data.tips) ? data.tips : [];
     samiraTipList.replaceChildren(...tips.map((tip) => {
       const item = document.createElement("li");
-      item.textContent = tip;
+      item.textContent = directVisibleCopy(tip);
       return item;
     }));
   }
