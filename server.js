@@ -298,12 +298,16 @@ function samiraTips(notes, review = {}) {
   return tips.slice(0, 5);
 }
 
+function samiraNoteAnalysisText(note = {}) {
+  return `${note.title || ""}\n${note.body || ""}`.toLowerCase();
+}
+
 function countSamiraMatches(text, patterns) {
   return patterns.reduce((total, pattern) => total + (text.match(pattern) || []).length, 0);
 }
 
 function samiraNoteRankRead(note = {}, overallRank = {}) {
-  const text = `${note.title || ""}\n${note.body || ""}`.toLowerCase();
+  const text = samiraNoteAnalysisText(note);
   const explicit = samiraRankValueFromText(text);
   const baseline = samiraRankValueFromText(overallRank.exactRank || overallRank.currentRead || "") ?? 3;
   const greenLight = countSamiraMatches(text, [
@@ -374,6 +378,9 @@ function publicSamiraNote(note = {}, overallRank = {}) {
     id,
     title: cleanText(note.title || "Samira note", 90),
     main_takeaway: samiraNoteMainTakeaway(note),
+    play_takeaway: samiraNotePlayTakeaway(note, rankRead, overallRank),
+    description: samiraNoteDescription(note, rankRead, overallRank),
+    previous_game_improvement: samiraPreviousGameImprovement(note, rankRead, overallRank),
     created_at: note.created_at || "",
     source: cleanText(note.source || "", 40),
     body: cleanParagraphText(note.body || "", 140000),
@@ -396,6 +403,67 @@ function samiraNoteMainTakeaway(note = {}) {
   const problem = text.match(/problem is this:\s*([^.!?]+[.!?]?)/i);
   if (problem?.[1]) return cleanText(problem[1], 120);
   return sentenceStart(text || note.title || "Samira note", 120);
+}
+
+function samiraNotePlayTakeaway(note = {}, rankRead = {}, overallRank = {}) {
+  const text = samiraNoteAnalysisText(note);
+  if (text.includes("live there") || text.includes("step out") || text.includes("exit") || text.includes("leaves the middle")) {
+    return "E collects. It does not let you live in the middle. Kill, step out, buy.";
+  }
+  if (text.includes("w ready") || text.includes("hp above half") || text.includes("ally close") || text.includes("green light")) {
+    return "Before E, prove W, HP, and ally. If one is missing, Q/auto out.";
+  }
+  if (text.includes("gold") || text.includes("recall") || text.includes("buy")) {
+    return "A rich Samira with unspent gold is not ahead. Kill, wave, buy.";
+  }
+  if (text.includes("quiet fight") || text.includes("short call") || text.includes("lily")) {
+    return "Use short duo calls. Do not coach while fighting.";
+  }
+  return cleanText(overallRank.reason || rankRead.reason || "Stop making every fight bigger than the first useful win.", 150);
+}
+
+function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {}) {
+  const text = samiraNoteAnalysisText(note);
+  const signals = rankRead.signals || {};
+  const pieces = [];
+  if (String(overallRank.reason || "").toLowerCase().includes("red-light")) {
+    pieces.push("Previous game punished red-light E and forward click.");
+  } else if (overallRank.newestRecording) {
+    pieces.push(`Previous game read: ${overallRank.newestRecording}.`);
+  }
+  const improvement = [];
+  if (signals.conversion >= 4 || /exit|reset|recall|buy|wave|objective|step out/.test(text)) {
+    improvement.push("you finally name exits, resets, spending, and value cash-out");
+  }
+  if (/quiet fight|short call|behind me|peel me|bubble diver|calm commands/.test(text)) {
+    improvement.push("you reduce duo chaos into short commands");
+  }
+  if (/w ready|hp above half|ally close|green light/.test(text)) {
+    improvement.push("you mention the green-light check");
+  }
+  if (!improvement.length) improvement.push("the note is long but still thin on a repeatable Samira habit");
+  pieces.push(`Improvement: ${improvement.join("; ")}.`);
+  if ((signals.leak || 0) >= (signals.greenLight || 0) + 5) {
+    pieces.push("Still too much leak language. Make the next note prove the check, not the panic.");
+  }
+  return cleanText(pieces.join(" "), 300);
+}
+
+function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
+  const signals = rankRead.signals || {};
+  const leak = Number(signals.leak || 0);
+  const conversion = Number(signals.conversion || 0);
+  const greenLight = Number(signals.greenLight || 0);
+  const parts = [
+    `${rankRead.exactRank || "Unrated"} because the note still says you can make damage, then turn the next five seconds into a problem.`,
+  ];
+  if (conversion || leak || greenLight) {
+    const checkWord = greenLight === 1 ? "check" : "checks";
+    parts.push(`${conversion} value-conversion signals, ${leak} leak signals, ${greenLight} green-light ${checkWord}.`);
+  }
+  parts.push(samiraPreviousGameImprovement(note, rankRead, overallRank));
+  parts.push("Blunt read: you are not losing because Samira lacks damage. You are losing because you stay after the payout.");
+  return cleanText(parts.join(" "), 700);
 }
 
 function localDateKey(value = new Date()) {

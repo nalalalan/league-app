@@ -6821,38 +6821,42 @@ function samiraPdfCard(note) {
   const pdfUrl = note.pdf_url || (note.id ? `/api/samira/notes/${encodeURIComponent(note.id)}.pdf` : "");
   const rank = note.rank_read || {};
   const fullTitle = note.title || "Samira note";
-  const takeaway = compactSamiraTitle(note.main_takeaway || fullTitle, 92);
-
-  const thumb = document.createElement(pdfUrl ? "a" : "div");
-  thumb.className = "samira-pdf-thumb";
-  if (pdfUrl) {
-    thumb.href = pdfUrl;
-    thumb.target = "_blank";
-    thumb.rel = "noopener";
-    thumb.setAttribute("aria-label", `Open PDF for ${fullTitle}`);
-  }
-
-  const sheet = document.createElement("div");
-  sheet.className = "samira-pdf-sheet";
-  const pdfMark = document.createElement("span");
-  pdfMark.className = "samira-pdf-mark";
-  pdfMark.textContent = "PDF";
-  sheet.append(pdfMark);
-  thumb.append(sheet);
+  const mainTakeaway = compactSamiraTitle(note.play_takeaway || note.main_takeaway || fullTitle, 150);
+  const description = note.description || note.previous_game_improvement || note.preview || "";
 
   const main = document.createElement("div");
   main.className = "samira-pdf-main";
+  const meta = document.createElement("div");
+  meta.className = "samira-card-meta";
   const time = document.createElement("time");
   time.dateTime = note.created_at || "";
   time.textContent = formatDate(note.created_at);
-  const title = document.createElement("h3");
-  title.textContent = takeaway;
-  title.title = note.main_takeaway || fullTitle;
-  const rankLine = document.createElement("p");
+  const rankLine = document.createElement("span");
   rankLine.className = "samira-pdf-rank";
-  const rankValue = document.createElement("strong");
-  rankValue.textContent = rank.exactRank || "unrated";
-  rankLine.append(rankValue);
+  rankLine.textContent = rank.exactRank || "unrated";
+  meta.append(time, rankLine);
+
+  const takeawayBlock = document.createElement("section");
+  takeawayBlock.className = "samira-read-block";
+  const takeawayLabel = document.createElement("p");
+  takeawayLabel.className = "samira-read-label";
+  takeawayLabel.textContent = "main takeaway";
+  const takeawayText = document.createElement("p");
+  takeawayText.className = "samira-read-text samira-read-main";
+  takeawayText.textContent = mainTakeaway;
+  takeawayText.title = note.play_takeaway || note.main_takeaway || fullTitle;
+  takeawayBlock.append(takeawayLabel, takeawayText);
+
+  const descriptionBlock = document.createElement("section");
+  descriptionBlock.className = "samira-read-block";
+  const descriptionLabel = document.createElement("p");
+  descriptionLabel.className = "samira-read-label";
+  descriptionLabel.textContent = "description";
+  const descriptionText = document.createElement("p");
+  descriptionText.className = "samira-read-text";
+  descriptionText.textContent = description;
+  descriptionBlock.append(descriptionLabel, descriptionText);
+
   const action = document.createElement("a");
   action.className = "samira-pdf-action";
   action.href = pdfUrl || "#";
@@ -6860,8 +6864,9 @@ function samiraPdfCard(note) {
   action.rel = "noopener";
   action.textContent = "Open PDF";
   if (!pdfUrl) action.setAttribute("aria-disabled", "true");
-  main.append(time, title, rankLine, action);
-  article.append(thumb, main);
+  main.append(meta, takeawayBlock, descriptionBlock);
+  main.append(action);
+  article.append(main);
   return article;
 }
 
@@ -6901,7 +6906,7 @@ function renderSamiraState(data) {
   }
   if (samiraNoteList) {
     const notes = Array.isArray(data.notes) ? data.notes : [];
-    samiraNoteList.replaceChildren(...notes.slice(0, 6).map(samiraPdfCard));
+    samiraNoteList.replaceChildren(...notes.slice(0, 1).map(samiraPdfCard));
   }
 }
 

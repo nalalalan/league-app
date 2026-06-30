@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#eee7dd">
   <title>league.aolabs.io</title>
-    <meta name="description" content="A public AO Labs Samira note intake.">
+    <meta name="description" content="A public AO Labs Samira note intake with one current takeaway, rank read, and note PDF.">
     <link rel="canonical" href="https://league.aolabs.io/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AO Labs">
   <meta property="og:title" content="league">
-  <meta property="og:description" content="Samira note intake.">
+  <meta property="og:description" content="Samira note intake with one current takeaway, rank read, and note PDF.">
   <meta property="og:url" content="https://league.aolabs.io/">
   <meta property="og:image" content="https://aolabs.io/previews/league-20260612.png">
   <meta property="og:image:secure_url" content="https://aolabs.io/previews/league-20260612.png">
@@ -20,7 +20,7 @@
   <meta property="og:image:alt" content="league preview card.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="league">
-  <meta name="twitter:description" content="Samira note intake.">
+  <meta name="twitter:description" content="Samira note intake with one current takeaway, rank read, and note PDF.">
   <meta name="twitter:image" content="https://aolabs.io/previews/league-20260612.png">
   <meta name="twitter:image:alt" content="league preview card.">
   <link rel="icon" href="/icon.svg?v=20260517-league-mark2" type="image/svg+xml">
@@ -31,8 +31,8 @@
     <link rel="stylesheet" href="https://aolabs.io/suite-header.css?v=20260516-suite-bloom">
     <link rel="modulepreload" href="/vfx3d.js?v=20260518-world-vfx24">
     <link rel="modulepreload" href="/vendor/three.module.min.js">
-    <link rel="stylesheet" href="/styles.css?v=20260630-samira-card1">
-    <script src="/app.js?v=20260630-samira-card1" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20260630-samira-card3">
+    <script src="/app.js?v=20260630-samira-card3" defer></script>
   </head>
   <body>
     <header class="suite-topbar" aria-label="league navigation">
@@ -49,7 +49,7 @@
 
     <header class="paper-strip paper-strip-compact" aria-label="League paper">
       <div>
-        <strong>A low-threat practice-room interface for neurodivergent game learning</strong>
+        <span class="paper-title">A low-threat practice-room interface for neurodivergent game learning</span>
         <p>Personal case study. No clinical claim.</p>
       </div>
       <a class="paper-button" href="/league-practice-room.pdf" download>Open PDF</a>
@@ -64,7 +64,7 @@
         </div>
         <form class="samira-note-form" id="samira-note-form">
           <label for="samira-note-body">paste note block</label>
-          <textarea id="samira-note-body" name="body" rows="8" spellcheck="true"></textarea>
+          <textarea id="samira-note-body" name="body" rows="3" spellcheck="true"></textarea>
           <div class="samira-note-actions">
             <input id="samira-note-token" name="token" type="password" autocomplete="off" placeholder="write key">
             <button type="submit">save note</button>
