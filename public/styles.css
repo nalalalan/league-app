@@ -1808,7 +1808,7 @@ summary {
   background: #2f2824;
   color: #fff9ef;
   font: inherit;
-  font-weight: 420;
+  font-weight: 400;
   cursor: pointer;
 }
 
@@ -1819,12 +1819,25 @@ summary {
   font-size: 13px;
 }
 
+.samira-main-takeaway {
+  margin: 0;
+  border-top: 1px solid rgba(104, 87, 68, .14);
+  padding-top: 14px;
+  color: #2f2824;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.38;
+}
+
+.samira-main-takeaway:empty,
+.samira-main-takeaway[hidden] {
+  display: none;
+}
+
 .samira-note-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
   gap: 14px;
-  border-top: 1px solid rgba(104, 87, 68, .14);
-  padding-top: 14px;
 }
 
 .samira-note-list:empty {
@@ -1843,7 +1856,7 @@ summary {
 .samira-pdf-main {
   display: grid;
   align-content: start;
-  gap: 10px;
+  gap: 9px;
   min-width: 0;
 }
 
@@ -1858,7 +1871,7 @@ summary {
 .samira-pdf-rank {
   color: var(--muted);
   font-size: 12px;
-  font-weight: 430;
+  font-weight: 400;
   line-height: 1.2;
 }
 
@@ -1866,32 +1879,13 @@ summary {
   color: #835339;
 }
 
-.samira-read-block {
-  display: grid;
-  gap: 3px;
-}
-
-.samira-read-label {
-  margin: 0;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 420;
-  line-height: 1.2;
-  text-transform: lowercase;
-}
-
-.samira-read-text {
+.samira-card-description {
   margin: 0;
   color: #2f2824;
   font-size: 14px;
-  font-weight: 420;
+  font-weight: 400;
   line-height: 1.36;
   overflow-wrap: break-word;
-}
-
-.samira-read-main {
-  font-size: 16px;
-  line-height: 1.3;
 }
 
 .samira-pdf-action {
@@ -1904,7 +1898,7 @@ summary {
   background: #2f2824;
   color: #fff9ef;
   font-size: 12px;
-  font-weight: 420;
+  font-weight: 400;
   line-height: 1;
   text-decoration: none;
 }
@@ -4256,7 +4250,7 @@ h1 {
     overflow: hidden;
   }
 
-  .samira-read-text {
+  .samira-card-description {
     width: 100%;
     min-width: 0;
     max-width: calc(100vw - 68px);

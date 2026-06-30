@@ -377,10 +377,7 @@ function publicSamiraNote(note = {}, overallRank = {}) {
   return {
     id,
     title: cleanText(note.title || "Samira note", 90),
-    main_takeaway: samiraNoteMainTakeaway(note),
-    play_takeaway: samiraNotePlayTakeaway(note, rankRead, overallRank),
     description: samiraNoteDescription(note, rankRead, overallRank),
-    previous_game_improvement: samiraPreviousGameImprovement(note, rankRead, overallRank),
     created_at: note.created_at || "",
     source: cleanText(note.source || "", 40),
     body: cleanParagraphText(note.body || "", 140000),
@@ -390,36 +387,62 @@ function publicSamiraNote(note = {}, overallRank = {}) {
   };
 }
 
-function samiraNoteMainTakeaway(note = {}) {
-  const text = cleanParagraphText(note.body || note.title || "", 140000);
+function samiraCorpusMainTakeaway(notes = [], review = {}, overallRank = {}) {
+  const text = cleanParagraphText(notes.map((note) => `${note.title || ""}\n${note.body || ""}`).join("\n"), 300000);
   const lower = text.toLowerCase();
+  const greenLight = countSamiraMatches(lower, [
+    /\bw ready\b/g,
+    /\bhp above half\b/g,
+    /\bally close\b/g,
+    /\bgreen light\b/g,
+    /\bq before e\b/g,
+    /\bauto(?:\/| and )?q\b/g
+  ]);
+  const exits = countSamiraMatches(lower, [
+    /\btake wave\b/g,
+    /\bplate\b/g,
+    /\bobjective\b/g,
+    /\brecall\b/g,
+    /\bbuy\b/g,
+    /\bexit\b/g,
+    /\bstep out\b/g,
+    /\bkite\b/g
+  ]);
+  const leaks = countSamiraMatches(lower, [
+    /\bred light\b/g,
+    /\bpanic\b/g,
+    /\bgreed\b/g,
+    /\bchase\b/g,
+    /\bfog\b/g,
+    /\bw down\b/g,
+    /\blow hp\b/g,
+    /\bno ally\b/g,
+    /\bsecond fight\b/g,
+    /\billegal e\b/g,
+    /\bunspent\b/g,
+    /\btilt\b/g,
+    /\bstay\b/g
+  ]);
+  if (exits >= 5 && leaks >= 5) {
+    return "You have damage. Your problem is payout discipline: kill, step out, buy.";
+  }
+  if (greenLight >= 4 && leaks >= 4) {
+    return "Your E needs a gate. W ready, HP above half, ally close, then go.";
+  }
   if (lower.includes("controlled violence plus clean exits")) {
-    return lower.includes("simple roles plus calm commands")
-      ? "Controlled violence plus clean exits; simple roles plus calm commands."
-      : "Controlled violence plus clean exits.";
+    return "Controlled violence is fine. The exit after the violence is still the test.";
+  }
+  if (/quiet fight|short call|behind me|peel me|bubble diver|calm commands/.test(lower)) {
+    return "Short calls are helping. Stop turning one fight into five instructions.";
   }
   const lockIn = text.match(/Alan locks in by making the game smaller:\s*([^.!?]+[.!?]?)/i);
   if (lockIn?.[1]) return cleanText(`Make the game smaller: ${lockIn[1]}`, 120);
   const problem = text.match(/problem is this:\s*([^.!?]+[.!?]?)/i);
   if (problem?.[1]) return cleanText(problem[1], 120);
-  return sentenceStart(text || note.title || "Samira note", 120);
-}
-
-function samiraNotePlayTakeaway(note = {}, rankRead = {}, overallRank = {}) {
-  const text = samiraNoteAnalysisText(note);
-  if (text.includes("live there") || text.includes("step out") || text.includes("exit") || text.includes("leaves the middle")) {
-    return "E collects. It does not let you live in the middle. Kill, step out, buy.";
+  if (notes.length) {
+    return "Stop treating damage as the hard part. Take the payout and leave.";
   }
-  if (text.includes("w ready") || text.includes("hp above half") || text.includes("ally close") || text.includes("green light")) {
-    return "Before E, prove W, HP, and ally. If one is missing, Q/auto out.";
-  }
-  if (text.includes("gold") || text.includes("recall") || text.includes("buy")) {
-    return "A rich Samira with unspent gold is not ahead. Kill, wave, buy.";
-  }
-  if (text.includes("quiet fight") || text.includes("short call") || text.includes("lily")) {
-    return "Use short duo calls. Do not coach while fighting.";
-  }
-  return cleanText(overallRank.reason || rankRead.reason || "Stop making every fight bigger than the first useful win.", 150);
+  return "Stop making every fight bigger than the first useful win.";
 }
 
 function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {}) {
@@ -513,6 +536,7 @@ async function samiraState(extraNotes = []) {
     note_count: notes.length,
     visible_note_count: visibleNotes.length,
     archived_note_count: Math.max(0, notes.length - visibleNotes.length),
+    main_takeaway: samiraCorpusMainTakeaway(notes, review, rankEstimate),
     latest_note: newestNote
       ? {
           title: newestNote.title || "Samira note",

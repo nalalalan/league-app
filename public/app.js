@@ -743,6 +743,7 @@ const samiraNoteForm = document.querySelector("#samira-note-form");
 const samiraNoteBody = document.querySelector("#samira-note-body");
 const samiraNoteToken = document.querySelector("#samira-note-token");
 const samiraNoteStatus = document.querySelector("#samira-note-status");
+const samiraMainTakeaway = document.querySelector("#samira-main-takeaway");
 const samiraNoteList = document.querySelector("#samira-note-list");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -6806,23 +6807,12 @@ function noteNode(note) {
   return article;
 }
 
-function compactSamiraTitle(title = "Samira note", limit = 48) {
-  const cleanTitle = String(title || "Samira note").replace(/\s+/g, " ").trim();
-  if (cleanTitle.length <= limit) return cleanTitle;
-  const cut = cleanTitle.slice(0, limit + 1);
-  const lastSpace = cut.lastIndexOf(" ");
-  const clipped = cleanTitle.slice(0, lastSpace > 36 ? lastSpace : limit).trim();
-  return `${clipped}...`;
-}
-
 function samiraPdfCard(note) {
   const article = document.createElement("article");
   article.className = "samira-pdf-card";
   const pdfUrl = note.pdf_url || (note.id ? `/api/samira/notes/${encodeURIComponent(note.id)}.pdf` : "");
   const rank = note.rank_read || {};
-  const fullTitle = note.title || "Samira note";
-  const mainTakeaway = compactSamiraTitle(note.play_takeaway || note.main_takeaway || fullTitle, 150);
-  const description = note.description || note.previous_game_improvement || note.preview || "";
+  const description = note.description || note.preview || "";
 
   const main = document.createElement("div");
   main.className = "samira-pdf-main";
@@ -6836,26 +6826,9 @@ function samiraPdfCard(note) {
   rankLine.textContent = rank.exactRank || "unrated";
   meta.append(time, rankLine);
 
-  const takeawayBlock = document.createElement("section");
-  takeawayBlock.className = "samira-read-block";
-  const takeawayLabel = document.createElement("p");
-  takeawayLabel.className = "samira-read-label";
-  takeawayLabel.textContent = "main takeaway";
-  const takeawayText = document.createElement("p");
-  takeawayText.className = "samira-read-text samira-read-main";
-  takeawayText.textContent = mainTakeaway;
-  takeawayText.title = note.play_takeaway || note.main_takeaway || fullTitle;
-  takeawayBlock.append(takeawayLabel, takeawayText);
-
-  const descriptionBlock = document.createElement("section");
-  descriptionBlock.className = "samira-read-block";
-  const descriptionLabel = document.createElement("p");
-  descriptionLabel.className = "samira-read-label";
-  descriptionLabel.textContent = "description";
   const descriptionText = document.createElement("p");
-  descriptionText.className = "samira-read-text";
+  descriptionText.className = "samira-card-description";
   descriptionText.textContent = description;
-  descriptionBlock.append(descriptionLabel, descriptionText);
 
   const action = document.createElement("a");
   action.className = "samira-pdf-action";
@@ -6864,8 +6837,7 @@ function samiraPdfCard(note) {
   action.rel = "noopener";
   action.textContent = "Open PDF";
   if (!pdfUrl) action.setAttribute("aria-disabled", "true");
-  main.append(meta, takeawayBlock, descriptionBlock);
-  main.append(action);
+  main.append(meta, descriptionText, action);
   article.append(main);
   return article;
 }
@@ -6896,6 +6868,10 @@ function renderSamiraState(data) {
   if (samiraBoundary) {
     samiraBoundary.textContent = rank.basis || data.source_boundary || "";
   }
+  if (samiraMainTakeaway) {
+    samiraMainTakeaway.textContent = data.main_takeaway || "";
+    samiraMainTakeaway.hidden = !data.main_takeaway;
+  }
   if (samiraTipList) {
     const tips = Array.isArray(data.tips) ? data.tips : [];
     samiraTipList.replaceChildren(...tips.map((tip) => {
@@ -6911,7 +6887,7 @@ function renderSamiraState(data) {
 }
 
 async function hydrateSamiraState() {
-  if (!samiraRankRead && !samiraTipList && !samiraNoteList) return;
+  if (!samiraRankRead && !samiraTipList && !samiraNoteList && !samiraMainTakeaway) return;
   try {
     const response = await fetch("/api/samira", { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error("samira read unavailable");
@@ -6919,6 +6895,7 @@ async function hydrateSamiraState() {
   } catch {
     if (samiraRankRead) samiraRankRead.textContent = "Samira notes unavailable";
     if (samiraBoundary) samiraBoundary.textContent = "Paste later when the note store is reachable.";
+    if (samiraMainTakeaway) samiraMainTakeaway.hidden = true;
   }
 }
 
