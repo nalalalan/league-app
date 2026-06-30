@@ -329,6 +329,25 @@ function samiraConceptSentence(text) {
   return "The valuable part is the pattern you named, not the length of the note; convert it into one repeatable in-game rule.";
 }
 
+function samiraNextClickSentence(text) {
+  if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i, /death as the fight-ending/i])) {
+    return "Play edge, dive, damage, out. If you are still in the middle after the pass, you are already wrong.";
+  }
+  if (hasSamiraConcept(text, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
+    return "When support or lane is bad, stabilize first. Farm, recall, stop trying to win the lane back through another fight.";
+  }
+  if (hasSamiraConcept(text, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
+    return "Say one short command, then play the fight. More words will not make the engage cleaner.";
+  }
+  if (hasSamiraConcept(text, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i])) {
+    return "After value, spend it. Wave, plate, objective, buy, or reset; no second fight by default.";
+  }
+  if (hasSamiraConcept(text, [/w ready/i, /hp above half/i, /ally close/i, /green light/i])) {
+    return "If W, HP, and ally are not true, stay on Q, auto, and backstep.";
+  }
+  return "Before queueing, turn the note into one next click you can actually press.";
+}
+
 function samiraNoteRankRead(note = {}, overallRank = {}) {
   const text = samiraNoteAnalysisText(note);
   const explicit = samiraRankValueFromText(text);
@@ -378,7 +397,7 @@ function samiraNoteRankRead(note = {}, overallRank = {}) {
   const reason = leak > greenLight + conversion
     ? "Red-light commits, chase pressure, or exit leaks dominate."
     : greenLight + conversion > 0
-      ? "Green-light checks, exits, or value conversion show up."
+      ? "The note names when to enter and how to cash out."
       : "Limited ranked-habit evidence beyond baseline.";
   return {
     exactRank,
@@ -488,7 +507,7 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
     improvement.push("you reduce duo chaos into short commands");
   }
   if (/w ready|hp above half|ally close|green light/.test(text)) {
-    improvement.push("you mention the green-light check");
+    improvement.push("you name W ready, HP above half, and ally close before E");
   }
   if (improvement.length) {
     const sentence = improvement.join("; ").replace(/^([a-z])/, (_, letter) => letter.toUpperCase());
@@ -503,16 +522,9 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
 }
 
 function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
-  const signals = rankRead.signals || {};
-  const leak = Number(signals.leak || 0);
-  const conversion = Number(signals.conversion || 0);
-  const greenLight = Number(signals.greenLight || 0);
   const sourceText = `${note.title || ""}\n${note.body || ""}`;
   const parts = [`${rankRead.exactRank || "Unrated"} read. ${samiraConceptSentence(sourceText)}`];
-  if (conversion || leak || greenLight) {
-    const checkWord = greenLight === 1 ? "green-light check" : "green-light checks";
-    parts.push(`${conversion} payout signals, ${leak} leak signals, ${greenLight} ${checkWord}; the note is useful only if it changes the next click.`);
-  }
+  parts.push(samiraNextClickSentence(sourceText));
   parts.push(samiraPreviousGameImprovement(note, rankRead, overallRank));
   if (hasSamiraConcept(sourceText, [/fixed flight pattern/i, /boom-and-zoom/i, /return to edge/i])) {
     parts.push("Mean version: stop turnfighting on the ground. One pass, out, re-check, then another pass.");

@@ -64,26 +64,35 @@ try {
   if (offending.length) {
     throw new Error(`Generated Samira copy contains role-prefix text:\n${offending.join("\n")}`);
   }
+  const bannedCounterCopy = /\b\d+\s+(?:value-conversion|payout|leak|green-light)\s+(?:signals?|checks?)\b|\b(?:value-conversion|payout|leak|green-light)\s+signals?\b/i;
+  const counterOffending = generatedSamiraStrings(data).filter((text) => bannedCounterCopy.test(text));
+  if (counterOffending.length) {
+    throw new Error(`Generated Samira copy contains useless signal counters:\n${counterOffending.join("\n")}`);
+  }
   const sourceFiles = ["server.js", "public/app.js", "public/league-practice-room.tex"];
   const sourceOnlyBanned = [
     "Blunt read:",
     "Honest read:",
-    "Improvement:",
     "Previous game read:",
     "Approx rank read:",
-    "Reason:"
+    "value-conversion signals",
+    "payout signals",
+    "leak signals",
+    "green-light signals",
+    "green-light checks"
   ];
   const sourceOffenders = [];
   for (const file of sourceFiles) {
     const source = await readFile(new URL(`../${file}`, import.meta.url), "utf8");
+    const lowerSource = source.toLowerCase();
     for (const label of sourceOnlyBanned) {
-      if (source.includes(label)) sourceOffenders.push(`${file}: ${label}`);
+      if (lowerSource.includes(label.toLowerCase())) sourceOffenders.push(`${file}: ${label}`);
     }
   }
   if (sourceOffenders.length) {
     throw new Error(`League source still contains visible role-prefix text:\n${sourceOffenders.join("\n")}`);
   }
-  console.log("Samira generated copy has no role-prefix labels.");
+  console.log("Samira generated copy has no role-prefix labels or useless signal counters.");
 } finally {
   server.kill();
 }
