@@ -249,6 +249,61 @@ function parseRankPhrase(text, label) {
   return match ? cleanText(match[1], 48) : "";
 }
 
+function numberWithCommas(value) {
+  const digits = String(value || "").replace(/[^\d]/g, "");
+  if (!digits) return "";
+  return Number(digits).toLocaleString("en-US");
+}
+
+function normalizedGameType(text) {
+  const source = String(text || "");
+  const patterns = [
+    { re: /\branked\s+solo(?:\/duo)?\b|\bsolo\s+queue\b/i, label: "ranked solo" },
+    { re: /\branked\s+flex\b|\bflex\s+queue\b/i, label: "ranked flex" },
+    { re: /\bquickplay\b/i, label: "quickplay" },
+    { re: /\bnormal\s+draft\b|\bdraft\s+pick\b/i, label: "normal draft" },
+    { re: /\bnormal\s+blind\b|\bblind\s+pick\b/i, label: "normal blind" },
+    { re: /\baram\b/i, label: "ARAM" },
+    { re: /\bco-?op\s+vs\.?\s+ai\b|\bbot\s+game\b|\bbeginner\s+bots?\b|\bintro\s+bots?\b|\bintermediate\s+bots?\b/i, label: "bot game" },
+    { re: /\bswiftplay\b/i, label: "Swiftplay" },
+    { re: /\bcustom\b/i, label: "custom" },
+    { re: /\branked\b/i, label: "ranked" },
+    { re: /\bnormal\b/i, label: "normal" }
+  ];
+  return patterns.find((item) => item.re.test(source))?.label || "";
+}
+
+function samiraNoteGameMeta(note = {}) {
+  const text = `${note.title || ""}\n${note.body || ""}`;
+  const resultMatch = text.match(/\b(victory|defeat|won|win|lost|loss)\b/i);
+  const result = resultMatch
+    ? (/victory|won|win/i.test(resultMatch[1]) ? "win" : "loss")
+    : "";
+  const kdaMatch = text.match(/\b(?:k\/?d\/?a|score|went|finished|ending)?\s*:?\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/i);
+  const csMatch = text.match(/\b(?:cs|creep\s+score|farm)\s*[:=]?\s*(\d{2,4})\b/i) ||
+    text.match(/\b(\d{2,4})\s*(?:cs|creep\s+score)\b/i);
+  const damageMatch = text.match(/\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*(?:damage|dmg)\b/i);
+  const goldMatch = text.match(/\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*gold\b/i);
+  const goldPerMinuteMatch = text.match(/\b(\d{2,4})\s*(?:gold\/min|gpm)\b/i);
+  const gameType = normalizedGameType(text);
+  const kda = kdaMatch ? `${kdaMatch[1]}/${kdaMatch[2]}/${kdaMatch[3]}` : "";
+  const cs = csMatch ? `${csMatch[1]} CS` : "";
+  const damage = damageMatch ? `${numberWithCommas(damageMatch[1])} damage` : "";
+  const gold = goldMatch ? `${numberWithCommas(goldMatch[1])} gold` : "";
+  const gpm = goldPerMinuteMatch ? `${goldPerMinuteMatch[1]} gold/min` : "";
+  const parts = [gameType, result, kda, cs, damage, gold, gpm].filter(Boolean);
+  return {
+    game_type: gameType,
+    result,
+    kda,
+    cs,
+    damage,
+    gold,
+    gold_per_minute: gpm,
+    line: cleanText(parts.join(" / "), 160)
+  };
+}
+
 function isSamiraNote(note = {}) {
   const haystack = `${note.title || ""} ${note.body || ""} ${note.source || ""}`.toLowerCase();
   return haystack.includes("samira") || haystack.includes("e key") || haystack.includes("w/hp/ally") || haystack.includes("inferno trigger");
@@ -312,40 +367,58 @@ function hasSamiraConcept(text, patterns) {
 
 function samiraConceptSentence(text) {
   if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i, /death as the fight-ending/i])) {
-    return "The valuable part is the flight pattern: edge is altitude, E is the dive, return to edge is the climb; stop using death as the fight ending.";
+    return "You are describing a flight pattern, not a brawl. Edge, dive, damage, climb out.";
+  }
+  if (hasSamiraConcept(text, [/\bs loaded\b/i, /\bs rank\b/i, /permission to r/i, /ready to r/i])) {
+    return "S loaded is only availability. It is not permission to press R.";
+  }
+  if (hasSamiraConcept(text, [/\bfog\b/i, /\bchase\b/i, /turns? into wave/i, /turns? into objective/i])) {
+    return "Fog chase is the throw pattern. The map payout has to come before the second fight.";
   }
   if (hasSamiraConcept(text, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
-    return "The valuable part is the ugly-lane rule: bad support and early HP loss are not permission to chase the game back through harder fights.";
+    return "This is an ugly-lane note. Bad support and early HP loss do not make a bigger fight correct.";
   }
   if (hasSamiraConcept(text, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
-    return "The valuable part is the duo-voice rule: use short commands, then let the fight stay small enough to execute.";
+    return "The duo lesson is command discipline: one short call, then play the fight.";
   }
   if (hasSamiraConcept(text, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i])) {
-    return "The valuable part is the payout rule: kill becomes wave, plate, objective, buy, or reset before the second fight eats the lead.";
+    return "The money leak is clear. A kill has to become wave, plate, objective, buy, or reset.";
   }
   if (hasSamiraConcept(text, [/w ready/i, /hp above half/i, /ally close/i, /green light/i])) {
-    return "The valuable part is the gate: W ready, HP above half, ally close, then E; otherwise Q and auto while backing out.";
+    return "The entry rule is W ready, HP above half, ally close; otherwise Q and auto while backing out.";
   }
-  return "The valuable part is the pattern you named, not the length of the note; convert it into one repeatable in-game rule.";
+  if (hasSamiraConcept(text, [/\bdeath\b/i, /\bdied\b/i, /\bstayed\b/i, /\bstay\b/i, /\bin the middle\b/i])) {
+    return "The death is not random. You stayed where Samira is easiest to punish.";
+  }
+  return "The note is not useful until it names the next wrong click.";
 }
 
 function samiraNextClickSentence(text) {
   if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i, /death as the fight-ending/i])) {
     return "Play edge, dive, damage, out. If you are still in the middle after the pass, you are already wrong.";
   }
+  if (hasSamiraConcept(text, [/\bs loaded\b/i, /\bs rank\b/i, /permission to r/i, /ready to r/i])) {
+    return "Treat S as a light, not a command. Re-check W, HP, ally, and exit before R.";
+  }
+  if (hasSamiraConcept(text, [/\bfog\b/i, /\bchase\b/i, /turns? into wave/i, /turns? into objective/i])) {
+    return "When the enemy runs into fog, take wave, plate, objective, or reset unless vision and ally position are already true.";
+  }
   if (hasSamiraConcept(text, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
     return "When support or lane is bad, stabilize first. Farm, recall, stop trying to win the lane back through another fight.";
   }
   if (hasSamiraConcept(text, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
-    return "Say one short command, then play the fight. More words will not make the engage cleaner.";
+    return "Say the command once, then spend attention on spacing instead of talking.";
   }
   if (hasSamiraConcept(text, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i])) {
-    return "After value, spend it. Wave, plate, objective, buy, or reset; no second fight by default.";
+    return "Spend the kill before hunting again. Wave, plate, objective, buy, or reset.";
   }
   if (hasSamiraConcept(text, [/w ready/i, /hp above half/i, /ally close/i, /green light/i])) {
     return "If W, HP, and ally are not true, stay on Q, auto, and backstep.";
   }
-  return "Before queueing, turn the note into one next click you can actually press.";
+  if (hasSamiraConcept(text, [/\bdeath\b/i, /\bdied\b/i, /\bstayed\b/i, /\bstay\b/i, /\bin the middle\b/i])) {
+    return "After damage, click out first. Re-enter only after the next cooldown check.";
+  }
+  return "Name the next click before queue starts, or the note will not change the game.";
 }
 
 function samiraNoteRankRead(note = {}, overallRank = {}) {
@@ -416,6 +489,7 @@ function samiraNoteRankRead(note = {}, overallRank = {}) {
 function publicSamiraNote(note = {}, overallRank = {}) {
   const id = cleanText(note.id, 120);
   const rankRead = samiraNoteRankRead(note, overallRank);
+  const gameMeta = samiraNoteGameMeta(note);
   return {
     id,
     title: cleanText(note.title || "Samira note", 90),
@@ -424,6 +498,8 @@ function publicSamiraNote(note = {}, overallRank = {}) {
     source: cleanText(note.source || "", 40),
     body: cleanParagraphText(note.body || "", 140000),
     preview: sentenceStart(note.body, 260),
+    game_meta: gameMeta,
+    game_meta_line: gameMeta.line,
     pdf_url: id ? `/api/samira/notes/${encodeURIComponent(id)}.pdf` : "",
     rank_read: rankRead
   };
@@ -494,42 +570,52 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
   const text = samiraNoteAnalysisText(note);
   const signals = rankRead.signals || {};
   const pieces = [];
-  if (String(overallRank.reason || "").toLowerCase().includes("red-light")) {
-    pieces.push("Previous game punished red-light E and forward click.");
-  } else if (overallRank.newestRecording) {
-    pieces.push(`${overallRank.newestRecording} is the previous game context.`);
-  }
-  const improvement = [];
-  if (signals.conversion >= 4 || /exit|reset|recall|buy|wave|objective|step out/.test(text)) {
-    improvement.push("you finally name exits, resets, spending, and value cash-out");
-  }
-  if (/quiet fight|short call|behind me|peel me|bubble diver|calm commands/.test(text)) {
-    improvement.push("you reduce duo chaos into short commands");
-  }
-  if (/w ready|hp above half|ally close|green light/.test(text)) {
-    improvement.push("you name W ready, HP above half, and ally close before E");
-  }
-  if (improvement.length) {
-    const sentence = improvement.join("; ").replace(/^([a-z])/, (_, letter) => letter.toUpperCase());
-    pieces.push(`${sentence}.`);
+  if (/fixed flight pattern|boom-and-zoom|edge is altitude|return to edge/.test(text)) {
+    pieces.push("The improvement is naming the climb-out after damage, not only the dive.");
+  } else if (/\bs loaded\b|\bs rank\b|permission to r|ready to r/.test(text)) {
+    pieces.push("The improvement is separating R availability from R permission.");
+  } else if (/\bfog\b|\bchase\b|turns? into wave|turns? into objective/.test(text)) {
+    pieces.push("The improvement is seeing the chase as a map-choice leak instead of a mechanics problem.");
+  } else if (/teemo support|pyke lane|stabil|309\/720|6\/11\/2/.test(text)) {
+    pieces.push("The improvement is giving bad lane a boring response: farm, recall, stop forcing.");
+  } else if (/quiet fight|short call|behind me|peel me|bubble diver|calm commands|lily/.test(text)) {
+    pieces.push("The improvement is shrinking duo comms into one command before the fight starts.");
+  } else if (signals.conversion >= 4 || /exit|reset|recall|buy|wave|objective|step out|plate/.test(text)) {
+    pieces.push("The improvement is naming where the value goes after the kill.");
+  } else if (/w ready|hp above half|ally close|green light/.test(text)) {
+    pieces.push("The improvement is making E conditional instead of emotional.");
   } else {
-    pieces.push("The note is long but still thin on a repeatable Samira habit.");
+    pieces.push("The note is still too broad unless the next game proves one changed click.");
   }
-  if ((signals.leak || 0) >= (signals.greenLight || 0) + 5) {
-    pieces.push("Still too much leak language. Make the next note prove the check, not the panic.");
+  if ((signals.leak || 0) >= (signals.greenLight || 0) + 5 && !/\bfog\b|\bchase\b/.test(text)) {
+    pieces.push("Too much of the paragraph is still panic language; make the next game prove the check.");
   }
   return cleanText(pieces.join(" "), 300);
 }
 
 function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
   const sourceText = `${note.title || ""}\n${note.body || ""}`;
-  const parts = [`${rankRead.exactRank || "Unrated"} read. ${samiraConceptSentence(sourceText)}`];
+  const meta = samiraNoteGameMeta(note);
+  const header = [rankRead.exactRank || "unrated", meta.line].filter(Boolean).join(" / ");
+  const parts = [header ? `${header}.` : "", samiraConceptSentence(sourceText)];
   parts.push(samiraNextClickSentence(sourceText));
   parts.push(samiraPreviousGameImprovement(note, rankRead, overallRank));
   if (hasSamiraConcept(sourceText, [/fixed flight pattern/i, /boom-and-zoom/i, /return to edge/i])) {
-    parts.push("Mean version: stop turnfighting on the ground. One pass, out, re-check, then another pass.");
+    parts.push("Stop turnfighting on the ground. One pass, out, re-check, then another pass.");
+  } else if (hasSamiraConcept(sourceText, [/\bs loaded\b/i, /\bs rank\b/i, /permission to r/i])) {
+    parts.push("Do not ult just because the letter appears.");
+  } else if (hasSamiraConcept(sourceText, [/\bfog\b/i, /\bchase\b/i])) {
+    parts.push("Fog is not a slot machine. Convert first, chase second.");
+  } else if (hasSamiraConcept(sourceText, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
+    parts.push("Bad lane gets smaller, not louder.");
+  } else if (hasSamiraConcept(sourceText, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
+    parts.push("One calm command is enough.");
+  } else if (hasSamiraConcept(sourceText, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i, /\bplate\b/i])) {
+    parts.push("Do not donate the shutdown back.");
+  } else if (hasSamiraConcept(sourceText, [/w ready/i, /hp above half/i, /ally close/i, /green light/i])) {
+    parts.push("No gate, no E.");
   } else {
-    parts.push("Mean version: stop admiring the kill. Cash it out or leave.");
+    parts.push("Stop admiring the kill. Cash it out or leave.");
   }
   return cleanText(parts.join(" "), 700);
 }
@@ -555,16 +641,16 @@ function samiraNoteDedupeKey(note = {}) {
 }
 
 function visibleSamiraNotes(notes = [], now = new Date()) {
-  const todayKey = localDateKey(now);
   const seen = new Set();
   return notes
-    .filter((note) => localDateKey(note.created_at) === todayKey)
+    .filter((note) => note.source === "samira-intake")
     .filter((note) => {
       const key = samiraNoteDedupeKey(note);
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
-    });
+    })
+    .slice(0, 80);
 }
 
 async function samiraState(extraNotes = []) {
@@ -629,9 +715,11 @@ function wrapPdfText(value, maxChars = 84) {
 
 function samiraNotePdfLines(note = {}, rankRead = {}) {
   const body = cleanParagraphText(note.body || "", 140000);
+  const gameMeta = samiraNoteGameMeta(note);
   const lines = [
     { text: cleanText(note.title || "Samira note", 90), font: "F2", size: 16, leading: 22 },
     { text: `approx rank: ${rankRead.exactRank || "unrated"}`, font: "F2", size: 12, leading: 17 },
+    ...(gameMeta.line ? [{ text: gameMeta.line, font: "F1", size: 10, leading: 15 }] : []),
     { text: rankRead.basis || "saved note language; not Riot MMR", font: "F1", size: 9, leading: 14 },
     { text: `created: ${cleanText(note.created_at || "", 48)}`, font: "F1", size: 9, leading: 20 },
     { text: "note", font: "F2", size: 11, leading: 16 }
@@ -954,15 +1042,6 @@ async function handleApi(req, res, url) {
   }
 
   if (url.pathname === "/api/samira/notes" && req.method === "POST") {
-    if (isRailway && !writeToken) {
-      sendJson(res, 503, { error: "Write token is not configured" });
-      return true;
-    }
-    const headerToken = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "") || String(req.headers["x-league-write-token"] || "");
-    if (writeToken && headerToken !== writeToken) {
-      sendJson(res, 401, { error: "Unauthorized" });
-      return true;
-    }
     const payload = await readJsonBody(req, 160000);
     const body = cleanParagraphText(payload.body, 140000);
     const title = cleanText(payload.title, 80) || cleanText(body.split("\n")[0], 80) || "Samira note";
@@ -985,15 +1064,6 @@ async function handleApi(req, res, url) {
 
   const samiraNoteDeleteMatch = url.pathname.match(/^\/api\/samira\/notes\/([^/]+)$/);
   if (samiraNoteDeleteMatch && req.method === "DELETE") {
-    if (isRailway && !writeToken) {
-      sendJson(res, 503, { error: "Write token is not configured" });
-      return true;
-    }
-    const headerToken = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "") || String(req.headers["x-league-write-token"] || "");
-    if (writeToken && headerToken !== writeToken) {
-      sendJson(res, 401, { error: "Unauthorized" });
-      return true;
-    }
     const id = decodeURIComponent(samiraNoteDeleteMatch[1] || "");
     const notes = await loadNotes();
     const nextNotes = notes.filter((note) => note.id !== id);

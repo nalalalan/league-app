@@ -741,7 +741,6 @@ const samiraBoundary = document.querySelector("#samira-boundary");
 const samiraTipList = document.querySelector("#samira-tip-list");
 const samiraNoteForm = document.querySelector("#samira-note-form");
 const samiraNoteBody = document.querySelector("#samira-note-body");
-const samiraNoteToken = document.querySelector("#samira-note-token");
 const samiraNoteStatus = document.querySelector("#samira-note-status");
 const samiraMainTakeaway = document.querySelector("#samira-main-takeaway");
 const samiraNoteList = document.querySelector("#samira-note-list");
@@ -6831,6 +6830,12 @@ function samiraPdfCard(note) {
   rankLine.className = "samira-pdf-rank";
   rankLine.textContent = rank.exactRank || "unrated";
   meta.append(time, rankLine);
+  if (note.game_meta_line) {
+    const gameMeta = document.createElement("span");
+    gameMeta.className = "samira-game-meta";
+    gameMeta.textContent = note.game_meta_line;
+    meta.append(gameMeta);
+  }
 
   const descriptionText = document.createElement("p");
   descriptionText.className = "samira-card-description";
@@ -6925,24 +6930,19 @@ async function saveSamiraNote(event) {
     samiraNoteStatus.textContent = "paste a note block first";
     return;
   }
-  const token = samiraNoteToken?.value.trim() || localStorage.getItem("leagueSamiraWriteKey") || "";
-  if (samiraNoteToken?.value.trim()) {
-    localStorage.setItem("leagueSamiraWriteKey", samiraNoteToken.value.trim());
-  }
   samiraNoteStatus.textContent = "saving";
   try {
     const response = await fetch("/api/samira/notes", {
       method: "POST",
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ body })
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      samiraNoteStatus.textContent = response.status === 401 ? "write key rejected" : (data.error || "save failed");
+      samiraNoteStatus.textContent = data.error || "save failed";
       return;
     }
     samiraNoteBody.value = "";
@@ -6956,25 +6956,18 @@ async function saveSamiraNote(event) {
 
 async function deleteSamiraNote(noteId, button) {
   if (!noteId || !samiraNoteStatus) return;
-  const token = samiraNoteToken?.value.trim() || localStorage.getItem("leagueSamiraWriteKey") || "";
-  if (!token) {
-    samiraNoteStatus.textContent = "write key required";
-    samiraNoteToken?.focus();
-    return;
-  }
   if (button) button.disabled = true;
   samiraNoteStatus.textContent = "deleting";
   try {
     const response = await fetch(`/api/samira/notes/${encodeURIComponent(noteId)}`, {
       method: "DELETE",
       headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`
+        Accept: "application/json"
       }
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      samiraNoteStatus.textContent = response.status === 401 ? "write key rejected" : (data.error || "delete failed");
+      samiraNoteStatus.textContent = data.error || "delete failed";
       if (button) button.disabled = false;
       return;
     }
@@ -6994,9 +6987,6 @@ if (page) {
   applyFxProfileVars(page, fxProfileFor("samira"));
 }
 
-if (samiraNoteToken) {
-  samiraNoteToken.value = localStorage.getItem("leagueSamiraWriteKey") || "";
-}
 if (samiraNoteForm) {
   samiraNoteForm.addEventListener("submit", saveSamiraNote);
 }

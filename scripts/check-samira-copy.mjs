@@ -1,10 +1,13 @@
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { spawn } from "node:child_process";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const port = String(4300 + Math.floor(Math.random() * 400));
+const dataDir = await mkdtemp(join(tmpdir(), "league-samira-copy-"));
 const server = spawn(process.execPath, ["server.js"], {
   cwd: new URL("..", import.meta.url),
-  env: { ...process.env, PORT: port },
+  env: { ...process.env, PORT: port, LEAGUE_DATA_DIR: dataDir },
   stdio: ["ignore", "pipe", "pipe"]
 });
 
@@ -42,7 +45,36 @@ function generatedSamiraStrings(data) {
 }
 
 try {
-  const data = await waitForServer();
+  await waitForServer();
+  const sampleBody = [
+    "Ranked solo queue loss. K/D/A 6/11/2. 174 CS. 21,209 damage. 12,004 gold. 412 gold/min.",
+    "Alan's Samira game shows fixed flight pattern and boom-and-zoom.",
+    "Edge is altitude. E is the dive. Return to edge is the climb.",
+    "W ready, HP above half, ally close is the gate.",
+    "The game got bad when I stayed in the middle after damage instead of leaving."
+  ].join(" ");
+  const saveResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes`, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify({ body: sampleBody })
+  });
+  if (!saveResponse.ok) {
+    throw new Error(`Samira sample note did not save without token: ${saveResponse.status}`);
+  }
+  const saved = await saveResponse.json();
+  const sampleNote = saved?.samira?.notes?.find((note) => note?.body === sampleBody);
+  if (!sampleNote) throw new Error("Saved Samira sample note was not visible in /api/samira.");
+  if (!/ranked solo/i.test(sampleNote.game_meta_line || "") || !/6\/11\/2/.test(sampleNote.game_meta_line || "") || !/174 CS/.test(sampleNote.game_meta_line || "")) {
+    throw new Error(`Samira sample note did not expose game facts: ${sampleNote.game_meta_line || ""}`);
+  }
+  const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(sampleNote.id)}`, {
+    method: "DELETE",
+    headers: { Accept: "application/json" }
+  });
+  if (!deleteResponse.ok) {
+    throw new Error(`Samira sample note did not delete without token: ${deleteResponse.status}`);
+  }
+  const data = saved.samira;
   const bannedLabels = [
     "Good sign",
     "Biggest watchout",
@@ -69,6 +101,16 @@ try {
   if (counterOffending.length) {
     throw new Error(`Generated Samira copy contains useless signal counters:\n${counterOffending.join("\n")}`);
   }
+  const bannedTemplateCopy = /\bThe valuable part is\b|\bMean version\b|\bPrevious game punished\b|\bBronze\s+[IVX]+\s+read\b|\bIron\s+[IVX]+\s+read\b/i;
+  const templateOffending = generatedSamiraStrings(data).filter((text) => bannedTemplateCopy.test(text));
+  if (templateOffending.length) {
+    throw new Error(`Generated Samira copy is still template-like:\n${templateOffending.join("\n")}`);
+  }
+  const repetitiveFallbackCopy = /\bTurn the note into one pressable habit\b|\bBefore queueing, turn the note\b|\bThe old leak was red-light E\b/i;
+  const repetitiveOffending = generatedSamiraStrings(data).filter((text) => repetitiveFallbackCopy.test(text));
+  if (repetitiveOffending.length) {
+    throw new Error(`Generated Samira copy still uses repeated fallback prose:\n${repetitiveOffending.join("\n")}`);
+  }
   const sourceFiles = ["server.js", "public/app.js", "public/league-practice-room.tex"];
   const sourceOnlyBanned = [
     "Blunt read:",
@@ -92,7 +134,8 @@ try {
   if (sourceOffenders.length) {
     throw new Error(`League source still contains visible role-prefix text:\n${sourceOffenders.join("\n")}`);
   }
-  console.log("Samira generated copy has no role-prefix labels or useless signal counters.");
+  console.log("Samira generated copy has no role-prefix labels, useless signal counters, or template card prose.");
 } finally {
   server.kill();
+  await rm(dataDir, { recursive: true, force: true });
 }
