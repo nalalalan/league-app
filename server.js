@@ -452,7 +452,7 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
   if (String(overallRank.reason || "").toLowerCase().includes("red-light")) {
     pieces.push("Previous game punished red-light E and forward click.");
   } else if (overallRank.newestRecording) {
-    pieces.push(`Previous game read: ${overallRank.newestRecording}.`);
+    pieces.push(`${overallRank.newestRecording} is the previous game context.`);
   }
   const improvement = [];
   if (signals.conversion >= 4 || /exit|reset|recall|buy|wave|objective|step out/.test(text)) {
@@ -464,8 +464,11 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
   if (/w ready|hp above half|ally close|green light/.test(text)) {
     improvement.push("you mention the green-light check");
   }
-  if (!improvement.length) improvement.push("the note is long but still thin on a repeatable Samira habit");
-  pieces.push(`Improvement: ${improvement.join("; ")}.`);
+  if (improvement.length) {
+    pieces.push(`The note is stronger because ${improvement.join("; ")}.`);
+  } else {
+    pieces.push("The note is long but still thin on a repeatable Samira habit.");
+  }
   if ((signals.leak || 0) >= (signals.greenLight || 0) + 5) {
     pieces.push("Still too much leak language. Make the next note prove the check, not the panic.");
   }
@@ -485,7 +488,7 @@ function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
     parts.push(`${conversion} value-conversion signals, ${leak} leak signals, ${greenLight} green-light ${checkWord}.`);
   }
   parts.push(samiraPreviousGameImprovement(note, rankRead, overallRank));
-  parts.push("Blunt read: you are not losing because Samira lacks damage. You are losing because you stay after the payout.");
+  parts.push("You are not losing because Samira lacks damage. You are losing because you stay after the payout.");
   return cleanText(parts.join(" "), 700);
 }
 

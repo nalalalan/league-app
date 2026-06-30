@@ -1369,7 +1369,7 @@ function recordingMainCard(review) {
     item.rule || item.nextRep || "Before E/R: wave, tower, dragon, recall, or nexus. If none is real, hold the dash.",
     item.nextRep || ""
   ]
-    .map((text) => String(text || "").replace(/^\s*Honest read:\s*/i, "").trim())
+    .map((text) => String(text || "").replace(rolePrefixPattern("Honest read"), "").trim())
     .filter(Boolean)
     .join(" ")
     .replace(/^([a-z])/, (match) => match.toUpperCase());
@@ -1847,9 +1847,14 @@ function storySentences(text) {
     .match(/[^.!?]+[.!?]+(?:["')\]]+)?|[^.!?]+$/g)?.map(cleanStorySentence) || [];
 }
 
+function rolePrefixPattern(label) {
+  const escaped = String(label || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^\\s*${escaped}\\s*:`, "i");
+}
+
 function cleanStorySentence(sentence) {
   const cleaned = String(sentence || "")
-    .replace(/^\s*Honest read:\s*/i, "")
+    .replace(rolePrefixPattern("Honest read"), "")
     .replace(/\s+/g, " ")
     .trim();
   return cleaned.replace(/^([a-z])/, (_, letter) => letter.toUpperCase());
@@ -1864,7 +1869,7 @@ function critiqueInsertIndex(sentences) {
   const searchFrom = firstEventIndex >= 0 ? firstEventIndex : 0;
   const index = sentences.findIndex((sentence, sentenceIndex) => (
     sentenceIndex >= searchFrom &&
-    !/^\s*Honest read:/i.test(sentence) &&
+    !rolePrefixPattern("Honest read").test(sentence) &&
     sentenceMatches(sentence, [
     /\bmistake\b/i,
     /\brisk/i,
@@ -2117,12 +2122,12 @@ function recordingRankSentence(item) {
     const label = lowConfidenceRankedHabitRead(item, performance)
       ? "Low-confidence ranked-habit read"
       : "Approx performance rank";
-    return `${label}: ${performance.rank}.${performance.reason ? ` Reason: ${performance.reason}` : ""}`;
+    return `${label} ${performance.rank}.${performance.reason ? ` ${performance.reason}` : ""}`;
   }
   const estimate = item?.rankEstimate || {};
   const exact = recordingExactRank(item);
   const label = exact?.rank || String(estimate.label || "").trim();
-  return label ? `Approx rank read: ${label}.` : "";
+  return label ? `Approx rank ${label}.` : "";
 }
 
 function recordingStatsSentence(item) {
@@ -2397,7 +2402,7 @@ function championLatestMainFeedback(champion, championRecordings = []) {
     .filter(Boolean)
     .join(", ");
   const performance = recordingPerformanceRank(latest);
-  const rankLine = performance ? `Approx performance ${performance.rank}` : (latest.rankEstimate?.exactRank ? `Approx rank read: ${latest.rankEstimate.exactRank}` : "");
+  const rankLine = performance ? `Approx performance ${performance.rank}` : (latest.rankEstimate?.exactRank ? `Approx rank ${latest.rankEstimate.exactRank}` : "");
   const sourceLine = [
     rankLine,
     statLine ? `stats ${statLine}` : "",
@@ -6863,7 +6868,7 @@ function renderSamiraState(data) {
     const current = rank.currentRead && rank.currentRead !== rank.exactRank
       ? ` / ${rank.currentRead} recent ceiling`
       : "";
-    samiraRankRead.textContent = `approx rank read: ${rank.exactRank || "unrated"}${current}`;
+    samiraRankRead.textContent = `approx ${rank.exactRank || "unrated"}${current}`;
   }
   if (samiraBoundary) {
     samiraBoundary.textContent = rank.basis || data.source_boundary || "";
