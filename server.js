@@ -195,6 +195,11 @@ const samiraRankScale = [
   "Master", "Grandmaster", "Challenger"
 ];
 const samiraRankValueByName = new Map(samiraRankScale.map((rank, index) => [rank.toLowerCase(), index]));
+const samiraRankTrendDateFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  month: "numeric",
+  day: "numeric"
+});
 
 function samiraRankNameForValue(value) {
   const number = Number(value);
@@ -336,6 +341,60 @@ function samiraRankEstimate(notes, review = {}) {
     basis: cleanText(`recordings.json full-game reviews plus ${notes.length} Samira notes; not Riot MMR`, 160),
     reason: cleanText(review.mainFeedback?.rule || newestRank?.reason || "No full-game Samira rank reason is available yet.", 260),
     newestRecording: newestLine
+  };
+}
+
+function samiraRankTrendDateLabel(timeMs) {
+  const date = new Date(timeMs);
+  if (Number.isNaN(date.getTime())) return "";
+  return samiraRankTrendDateFormatter.format(date);
+}
+
+function samiraRankTrendPoint({ source, title, rank, value, timeMs }) {
+  if (!rank || !Number.isFinite(value) || !Number.isFinite(timeMs) || timeMs <= 0) return null;
+  return {
+    source: cleanText(source, 24),
+    title: cleanText(title, 100),
+    rank: cleanText(rank, 32),
+    value,
+    time_ms: timeMs,
+    created_at: new Date(timeMs).toISOString(),
+    date_label: samiraRankTrendDateLabel(timeMs)
+  };
+}
+
+function samiraRankTrend(notes = [], review = {}, overallRank = {}) {
+  const recordingPoints = samiraRecordings(review)
+    .map((item) => {
+      const rank = samiraRecordingRank(item);
+      return samiraRankTrendPoint({
+        source: "full game",
+        title: item.title || item.file || "Samira recording",
+        rank: rank?.rank || "",
+        value: Number(rank?.value),
+        timeMs: samiraRecordingTime(item)
+      });
+    })
+    .filter(Boolean);
+  const notePoints = notes
+    .map((note) => {
+      const rankRead = samiraNoteRankRead(note, overallRank);
+      const value = samiraRankValueFromText(rankRead.exactRank);
+      return samiraRankTrendPoint({
+        source: "note",
+        title: note.title || "Samira note",
+        rank: rankRead.exactRank,
+        value,
+        timeMs: Date.parse(note.created_at || "")
+      });
+    })
+    .filter(Boolean);
+  const points = [...recordingPoints, ...notePoints]
+    .sort((a, b) => a.time_ms - b.time_ms || a.value - b.value || a.title.localeCompare(b.title))
+    .slice(-80);
+  return {
+    points,
+    basis: "saved Samira notes plus full-game review rank reads; not Riot MMR"
   };
 }
 
@@ -677,6 +736,7 @@ async function samiraState(extraNotes = []) {
         }
       : null,
     rank_estimate: rankEstimate,
+    rank_trend: samiraRankTrend(visibleNotes, review, rankEstimate),
     tips: samiraTips(notes, review),
     source_boundary: "Approximate rank read from saved notes and recording reviews, not Riot MMR.",
     notes: visibleNotes.map((note) => publicSamiraNote(note, rankEstimate))

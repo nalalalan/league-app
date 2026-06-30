@@ -743,6 +743,7 @@ const samiraNoteForm = document.querySelector("#samira-note-form");
 const samiraNoteBody = document.querySelector("#samira-note-body");
 const samiraNoteStatus = document.querySelector("#samira-note-status");
 const samiraMainTakeaway = document.querySelector("#samira-main-takeaway");
+const samiraRankTrend = document.querySelector("#samira-rank-trend");
 const samiraNoteList = document.querySelector("#samira-note-list");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -2589,10 +2590,13 @@ function rankTrendDateLabel(time) {
   return rankTrendMonthFormatter.format(date);
 }
 
-function rankTrendSvg(points) {
+function rankTrendSvg(points, options = {}) {
+  const compact = options.compact === true;
   const width = 640;
-  const height = 274;
-  const margin = { top: 18, right: 22, bottom: 34, left: 74 };
+  const height = compact ? 210 : 274;
+  const margin = compact
+    ? { top: 14, right: 18, bottom: 30, left: 68 }
+    : { top: 18, right: 22, bottom: 34, left: 74 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
   const values = points.map((point) => point.value);
@@ -2681,7 +2685,7 @@ function rankTrendSvg(points) {
     const circle = svgNode("circle", {
       cx: xScale(point.time),
       cy: yScale(point.value),
-      r: 4.2,
+      r: compact ? 3.8 : 4.2,
       class: "rank-trend-point"
     });
     const title = svgNode("title");
@@ -2864,6 +2868,7 @@ function renderRecordingLoading() {
 }
 
 async function hydrateRecordings() {
+  if (!recordingSummary || !recordingFocus || !recordingGrid) return;
   renderRecordingLoading();
   try {
     const response = await fetch("/recordings/recordings.json", {
@@ -6908,6 +6913,56 @@ function samiraPdfCard(note) {
   return article;
 }
 
+function samiraRankTrendPoints(data) {
+  const rawPoints = Array.isArray(data?.rank_trend?.points) ? data.rank_trend.points : [];
+  return rawPoints
+    .map((point) => {
+      const time = Number(point.time_ms) || Date.parse(point.created_at || point.time || "");
+      const rank = String(point.rank || "").trim();
+      const mappedValue = rankTrendValueByName.get(rank.toLowerCase());
+      const value = Number.isFinite(Number(point.value)) ? Number(point.value) : mappedValue;
+      if (!rank || !Number.isFinite(value) || !Number.isFinite(time) || time <= 0) return null;
+      return {
+        rank,
+        value,
+        time,
+        dateLabel: point.date_label || rankTrendDateLabel(time),
+        source: point.source || ""
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.time - b.time || a.value - b.value || a.rank.localeCompare(b.rank));
+}
+
+function renderSamiraRankTrend(data) {
+  if (!samiraRankTrend) return;
+  const points = samiraRankTrendPoints(data);
+  const heading = document.createElement("div");
+  heading.className = "rank-trend-head";
+  const title = document.createElement("h2");
+  title.textContent = "rank vs time";
+  const meta = document.createElement("p");
+  meta.textContent = points.length ? `${points.length} reads` : "no rank reads";
+  heading.append(title, meta);
+
+  if (!points.length) {
+    const empty = document.createElement("p");
+    empty.className = "rank-trend-empty";
+    empty.textContent = "Paste one scored note first.";
+    samiraRankTrend.replaceChildren(heading, empty);
+    return;
+  }
+
+  const latest = points.at(-1);
+  const chart = document.createElement("div");
+  chart.className = "rank-trend-chart";
+  chart.append(rankTrendSvg(points, { compact: true }));
+  const latestLine = document.createElement("p");
+  latestLine.className = "rank-trend-latest";
+  latestLine.textContent = `${latest.rank} / ${latest.dateLabel}`;
+  samiraRankTrend.replaceChildren(heading, chart, latestLine);
+}
+
 async function hydratePublicNotes() {
   const stream = document.querySelector("#notes-stream");
   if (!stream) return;
@@ -6938,6 +6993,7 @@ function renderSamiraState(data) {
     samiraMainTakeaway.textContent = directVisibleCopy(data.main_takeaway || "");
     samiraMainTakeaway.hidden = !data.main_takeaway;
   }
+  renderSamiraRankTrend(data);
   if (samiraTipList) {
     const tips = Array.isArray(data.tips) ? data.tips : [];
     samiraTipList.replaceChildren(...tips.map((tip) => {

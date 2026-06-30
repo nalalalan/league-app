@@ -75,6 +75,9 @@ try {
   }
   const sampleNotes = sampleBodies.map((sampleBody) => saved?.samira?.notes?.find((note) => note?.body === sampleBody));
   if (sampleNotes.some((note) => !note)) throw new Error("Saved Samira sample notes were not all visible in /api/samira.");
+  if (!Array.isArray(saved?.samira?.rank_trend?.points) || saved.samira.rank_trend.points.length < 2) {
+    throw new Error("Samira API does not expose source-bound rank-over-time points.");
+  }
   const sampleNote = sampleNotes[0];
   if (!/ranked solo/i.test(sampleNote.game_meta_line || "") || !/6\/11\/2/.test(sampleNote.game_meta_line || "") || !/174 CS/.test(sampleNote.game_meta_line || "")) {
     throw new Error(`Samira sample note did not expose game facts: ${sampleNote.game_meta_line || ""}`);
@@ -165,26 +168,32 @@ try {
   }
   const styles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
   const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
-  if (!/\.samira-note-form\s*\{[\s\S]*?max-width:\s*460px;/.test(styles)) {
+  if (!/\.samira-note-form\s*\{[\s\S]*?max-width:\s*390px;/.test(styles)) {
     throw new Error("Samira note composer is not capped independently from the saved-note grid.");
   }
-  if (!/<textarea[^>]+id="samira-note-body"[^>]+rows="1"/.test(html) || !/\.samira-note-form textarea\s*\{[\s\S]*?height:\s*44px;[\s\S]*?overflow:\s*auto;/.test(styles)) {
+  if (!/<textarea[^>]+id="samira-note-body"[^>]+rows="1"/.test(html) || !/\.samira-note-form textarea\s*\{[\s\S]*?height:\s*38px;[\s\S]*?overflow:\s*auto;/.test(styles)) {
     throw new Error("Samira note composer is not a compact one-row scrolling paste box.");
   }
   if (!/\.samira-note-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(auto-fill,\s*minmax\(min\(100%,\s*320px\),\s*1fr\)\);/.test(styles)) {
     throw new Error("Samira saved-note grid is no longer wide enough to avoid skinny text towers.");
   }
-  if (!/\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*minmax\(320px,\s*460px\)\s+minmax\(360px,\s*1fr\);[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;/.test(styles)) {
+  if (!/\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*minmax\(280px,\s*390px\)\s+minmax\(0,\s*1fr\);[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;/.test(styles)) {
     throw new Error("Samira intake still uses a big enclosing card instead of a compact work layout.");
   }
-  if (!/\.samira-head\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1;/.test(styles)) {
-    throw new Error("Samira heading is not separated from the composer/current-read row.");
+  if (!/id="samira-rank-trend"/.test(html) || !/\.samira-rank-trend\s*\{[\s\S]*?grid-column:\s*2;[\s\S]*?grid-row:\s*2;/.test(styles)) {
+    throw new Error("Samira rank-over-time chart is missing from the compact intake header.");
   }
-  if (!/\.samira-main-takeaway\s*\{[\s\S]*?align-self:\s*start;[\s\S]*?min-height:\s*0;/.test(styles) || /\.samira-main-takeaway\s*\{[\s\S]*?grid-row:\s*1\s*\/\s*span\s*2;/.test(styles)) {
+  if (!/\.samira-main-takeaway\s*\{[\s\S]*?align-self:\s*stretch;[\s\S]*?min-height:\s*0;/.test(styles) || /\.samira-main-takeaway\s*\{[\s\S]*?grid-row:\s*1\s*\/\s*span\s*2;/.test(styles)) {
     throw new Error("Samira current read is stretched across the heading/composer block.");
   }
-  if (!/\.samira-main-takeaway\s*\{[\s\S]*?font-size:\s*clamp\(20px,\s*1\.45vw,\s*26px\);/.test(styles)) {
-    throw new Error("Samira current read is still styled like tiny caption text.");
+  if (!/\.samira-main-takeaway\s*\{[\s\S]*?font-size:\s*clamp\(18px,\s*1\.25vw,\s*22px\);/.test(styles)) {
+    throw new Error("Samira current read is not scaled as the primary read.");
+  }
+  if (!/function\s+renderSamiraRankTrend\s*\(/.test(appSource) || !/rankTrendSvg\(points,\s*\{\s*compact:\s*true\s*\}\)/.test(appSource)) {
+    throw new Error("Samira rank chart is not rendered from the source-bound rank trend.");
+  }
+  if (!/@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*1fr;/.test(styles)) {
+    throw new Error("Samira intake does not collapse before the chart lane becomes cramped.");
   }
   if (!/\.samira-pdf-main\s*\{[\s\S]*?grid-template-rows:\s*auto\s+auto\s+auto;/.test(styles)) {
     throw new Error("Samira note cards still stretch short notes into empty towers.");

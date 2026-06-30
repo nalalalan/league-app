@@ -1714,8 +1714,8 @@ summary {
 
 .samira-intake {
   display: grid;
-  grid-template-columns: minmax(320px, 460px) minmax(360px, 1fr);
-  gap: 12px 18px;
+  grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+  gap: 10px 14px;
   align-items: start;
   width: 100%;
   margin: 0 auto;
@@ -1725,8 +1725,9 @@ summary {
 }
 
 .samira-head {
-  grid-column: 1 / -1;
-  align-self: end;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
   margin: 0;
 }
 
@@ -1762,11 +1763,12 @@ summary {
 .samira-note-form {
   display: grid;
   grid-column: 1;
+  grid-row: 2;
   gap: 8px;
   align-self: start;
   justify-self: stretch;
   width: 100%;
-  max-width: 460px;
+  max-width: 390px;
   margin: 0;
   border: 1px solid rgba(104, 87, 68, .18);
   border-radius: 8px;
@@ -1786,8 +1788,8 @@ summary {
 
 .samira-note-form textarea {
   width: 100%;
-  height: 44px;
-  min-height: 44px;
+  height: 38px;
+  min-height: 38px;
   max-height: min(22vh, 124px);
   overflow: auto;
   resize: vertical;
@@ -1823,25 +1825,29 @@ summary {
 }
 
 .samira-note-status {
-  min-height: 18px;
   margin: 0;
   color: var(--muted);
   font-size: 13px;
 }
 
+.samira-note-status:empty {
+  display: none;
+}
+
 .samira-main-takeaway {
   grid-column: 2;
-  align-self: start;
+  grid-row: 1;
+  align-self: stretch;
   display: flex;
   align-items: center;
   min-height: 0;
   margin: 0;
   border: 1px solid rgba(104, 87, 68, .16);
   border-radius: 8px;
-  padding: 18px 20px;
+  padding: 12px 15px;
   background: rgba(255, 253, 248, .78);
   color: #2f2824;
-  font-size: clamp(20px, 1.45vw, 26px);
+  font-size: clamp(18px, 1.25vw, 22px);
   font-weight: 400;
   line-height: 1.2;
   text-wrap: balance;
@@ -1850,6 +1856,42 @@ summary {
 .samira-main-takeaway:empty,
 .samira-main-takeaway[hidden] {
   display: none;
+}
+
+.samira-rank-trend {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+  border: 1px solid rgba(104, 87, 68, .16);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, .9), rgba(250, 245, 236, .78));
+  box-shadow: 0 10px 24px rgba(52, 42, 32, .04);
+}
+
+.samira-rank-trend .rank-trend-head {
+  margin-bottom: 5px;
+}
+
+.samira-rank-trend h2 {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.samira-rank-trend .rank-trend-head p,
+.samira-rank-trend .rank-trend-latest,
+.samira-rank-trend .rank-trend-empty {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.samira-rank-trend .rank-trend-chart {
+  padding-top: 0;
+}
+
+.samira-rank-trend svg {
+  height: clamp(150px, 13vw, 190px);
 }
 
 .samira-note-list {
@@ -4192,6 +4234,29 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .page-intake {
+    width: min(100%, calc(100vw - 22px));
+  }
+
+  .samira-intake {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    gap: 12px;
+  }
+
+  .samira-head,
+  .samira-note-form,
+  .samira-main-takeaway,
+  .samira-rank-trend,
+  .samira-note-list {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .samira-note-form {
+    max-width: 100%;
+  }
+
   .overall-state .recording-main {
     padding: 13px 0 0;
     border-left: 0;
@@ -4301,6 +4366,7 @@ h1 {
   .samira-head,
   .samira-note-form,
   .samira-main-takeaway,
+  .samira-rank-trend,
   .samira-note-list {
     grid-column: 1;
     grid-row: auto;
@@ -4313,8 +4379,12 @@ h1 {
   .samira-main-takeaway {
     min-height: 0;
     align-items: center;
-    padding: 14px 15px;
-    font-size: 18px;
+    padding: 12px 13px;
+    font-size: 17px;
+  }
+
+  .samira-rank-trend {
+    padding: 10px;
   }
 
   .samira-note-actions {
@@ -4351,8 +4421,8 @@ h1 {
   }
 
   .samira-note-form textarea {
-    height: 44px;
-    min-height: 44px;
+    height: 38px;
+    min-height: 38px;
     max-height: 92px;
   }
 
