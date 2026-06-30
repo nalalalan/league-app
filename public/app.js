@@ -736,6 +736,14 @@ const recordingPreview = document.querySelector("#recording-preview");
 const recordingLiveStatus = document.querySelector("#recording-live-status");
 const recordingQueue = document.querySelector("#recording-queue");
 const rankTrend = document.querySelector("#rank-trend");
+const samiraRankRead = document.querySelector("#samira-rank-read");
+const samiraBoundary = document.querySelector("#samira-boundary");
+const samiraTipList = document.querySelector("#samira-tip-list");
+const samiraNoteForm = document.querySelector("#samira-note-form");
+const samiraNoteBody = document.querySelector("#samira-note-body");
+const samiraNoteToken = document.querySelector("#samira-note-token");
+const samiraNoteStatus = document.querySelector("#samira-note-status");
+const samiraNoteList = document.querySelector("#samira-note-list");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -6811,6 +6819,88 @@ async function hydratePublicNotes() {
   }
 }
 
+function renderSamiraState(data) {
+  if (!data?.ok) return;
+  const rank = data.rank_estimate || {};
+  if (samiraRankRead) {
+    const current = rank.currentRead && rank.currentRead !== rank.exactRank
+      ? ` / ${rank.currentRead} recent ceiling`
+      : "";
+    samiraRankRead.textContent = `approx rank read: ${rank.exactRank || "unrated"}${current}`;
+  }
+  if (samiraBoundary) {
+    samiraBoundary.textContent = rank.basis || data.source_boundary || "";
+  }
+  if (samiraTipList) {
+    const tips = Array.isArray(data.tips) ? data.tips : [];
+    samiraTipList.replaceChildren(...tips.map((tip) => {
+      const item = document.createElement("li");
+      item.textContent = tip;
+      return item;
+    }));
+  }
+  if (samiraNoteList) {
+    const notes = Array.isArray(data.notes) ? data.notes : [];
+    samiraNoteList.replaceChildren(...notes.slice(0, 6).map(noteNode));
+  }
+}
+
+async function hydrateSamiraState() {
+  if (!samiraRankRead && !samiraTipList && !samiraNoteList) return;
+  try {
+    const response = await fetch("/api/samira", { headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error("samira read unavailable");
+    renderSamiraState(await response.json());
+  } catch {
+    if (samiraRankRead) samiraRankRead.textContent = "Samira notes unavailable";
+    if (samiraBoundary) samiraBoundary.textContent = "Paste later when the note store is reachable.";
+  }
+}
+
+async function saveSamiraNote(event) {
+  event.preventDefault();
+  if (!samiraNoteBody || !samiraNoteStatus) return;
+  const body = samiraNoteBody.value.trim();
+  if (!body) {
+    samiraNoteStatus.textContent = "paste a note block first";
+    return;
+  }
+  const token = samiraNoteToken?.value.trim() || localStorage.getItem("leagueSamiraWriteKey") || "";
+  if (samiraNoteToken?.value.trim()) {
+    localStorage.setItem("leagueSamiraWriteKey", samiraNoteToken.value.trim());
+  }
+  samiraNoteStatus.textContent = "saving";
+  try {
+    const response = await fetch("/api/samira/notes", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ body })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      samiraNoteStatus.textContent = response.status === 401 ? "write key rejected" : (data.error || "save failed");
+      return;
+    }
+    samiraNoteBody.value = "";
+    samiraNoteStatus.textContent = "saved";
+    renderSamiraState(data.samira);
+    hydratePublicNotes();
+  } catch {
+    samiraNoteStatus.textContent = "save failed";
+  }
+}
+
+if (samiraNoteToken) {
+  samiraNoteToken.value = localStorage.getItem("leagueSamiraWriteKey") || "";
+}
+if (samiraNoteForm) {
+  samiraNoteForm.addEventListener("submit", saveSamiraNote);
+}
+
 document.addEventListener("click", (event) => {
   const button = event.target.closest?.(".recording-time-link");
   if (!button) return;
@@ -6823,6 +6913,7 @@ renderChampion(championIdFromLocation(), { animate: false, updateRoute: true, re
 hydrateRecordings();
 hydrateRecordingLiveStatus();
 window.setInterval(hydrateRecordingLiveStatus, 15000);
+hydrateSamiraState();
 hydratePublicNotes();
 window.addEventListener("popstate", () => {
   renderChampion(championIdFromLocation(), { animate: true });

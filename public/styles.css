@@ -1664,6 +1664,118 @@ summary {
   transform-origin: 50% 18%;
 }
 
+.samira-intake {
+  display: grid;
+  gap: 14px;
+  width: min(960px, 100%);
+  margin: 24px auto 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: clamp(16px, 2vw, 22px);
+  background: rgba(255, 253, 248, .84);
+}
+
+.samira-head {
+  margin: 0;
+}
+
+.samira-head h2 {
+  margin: 0;
+  color: #2b2521;
+  font-size: clamp(22px, 2.4vw, 32px);
+  letter-spacing: 0;
+}
+
+.samira-head p {
+  margin: 4px 0 0;
+  color: #51453d;
+}
+
+.samira-boundary {
+  max-width: 360px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.samira-tip-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 22px;
+  color: #332d29;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.samira-note-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.samira-note-form label {
+  color: #3b332e;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+.samira-note-form textarea {
+  width: 100%;
+  min-height: 180px;
+  resize: vertical;
+  border: 1px solid rgba(104, 87, 68, .24);
+  border-radius: 8px;
+  padding: 12px;
+  background: #fffdf8;
+  color: #2f2824;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.samira-note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.samira-note-actions input {
+  min-width: min(260px, 100%);
+  flex: 1 1 220px;
+  border: 1px solid rgba(104, 87, 68, .24);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fffdf8;
+  color: #2f2824;
+  font: inherit;
+}
+
+.samira-note-actions button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #2f2824;
+  color: #fff9ef;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.samira-note-status {
+  min-height: 18px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.samira-note-list {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid rgba(104, 87, 68, .14);
+  padding-top: 12px;
+}
+
 .selected-champion::before {
   position: absolute;
   inset: 0;
@@ -2906,6 +3018,7 @@ h1 {
 .note p {
   margin: 0;
   color: #4b403a;
+  white-space: pre-wrap;
 }
 
 .notice {
@@ -3968,6 +4081,25 @@ h1 {
     padding-top: 16px;
   }
 
+  .samira-intake {
+    gap: 12px;
+    padding: 14px 12px;
+  }
+
+  .samira-note-actions {
+    display: grid;
+  }
+
+  .samira-note-actions input,
+  .samira-note-actions button {
+    width: 100%;
+  }
+
+  .note {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
   .rank-state-card {
     padding: 12px 10px;
   }
@@ -4383,18 +4515,23 @@ h1 {
 
   .recording-head {
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 3;
     margin-top: 6px;
   }
 
   .recording-queue {
     grid-column: 1 / -1;
-    grid-row: 3;
+    grid-row: 4;
   }
 
   .recording-grid {
     grid-column: 1 / -1;
-    grid-row: 4;
+    grid-row: 5;
+  }
+
+  .samira-intake {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 
   .recording-focus,
@@ -4410,6 +4547,7 @@ h1 {
   }
 
   .situations,
+  .samira-intake,
   .notes-panel,
   .notice {
     grid-column: 1 / -1;

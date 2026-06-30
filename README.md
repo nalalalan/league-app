@@ -2,7 +2,7 @@
 
 Single-page public review room for `league.aolabs.io`.
 
-The page distills Alan's League practice arc into a calm AO Labs surface: pre-game review cards, situation rules, champion-fit cards, public notes, and a downloadable paper.
+The page distills Alan's League practice arc into a calm AO Labs surface: Samira note intake, approximate rank read, recording review, archived situation rules, public notes, and a downloadable paper.
 
 ## Run Locally
 
@@ -15,6 +15,8 @@ Open `http://localhost:3000`.
 ## Runtime
 
 - `GET /api/health` reports app, storage, and AI readiness without exposing secrets.
+- `GET /api/samira` returns the Samira note/rank/tip read used by the page and morning queue.
+- `POST /api/samira/notes` stores a long pasted Samira note block. In Railway, set `LEAGUE_WRITE_TOKEN` before enabling writes.
 - `GET /api/logs` returns public notes.
 - `POST /api/logs` appends a public note. In Railway, set `LEAGUE_WRITE_TOKEN` before enabling writes.
 - `LEAGUE_DATA_DIR` or `RAILWAY_VOLUME_MOUNT_PATH` controls persistent note storage.
@@ -45,9 +47,11 @@ npm run publish:recordings
 
 The publish command skips work when the source folder has not changed. When new recordings exist, it syncs them, commits `public/recordings`, pushes `main`, and starts a Railway deploy. Cached fallback notes are kept during normal automatic publishes so old clips do not slow down the post-game update; set `LEAGUE_RETRY_FALLBACK=1` for an explicit retry pass.
 
-The live recorder is intended to run without Codex in the loop. It watches for the League game process and the local League Client gameflow state, captures the League window region at low priority at 2 FPS by default, writes a sidecar next to each auto clip, rejects incomplete, black-screen, or broken captures before publish, then lets the queued publisher analyze, sync, verify, and deploy one post-game review at a time while the next game can continue recording. The first 12 minutes can be captured at 8 FPS by default through `LEAGUE_EARLY_MICRO_FPS` / `LEAGUE_EARLY_MICRO_SECONDS`; that bounded early-lane window feeds a separate micro pass for lane spacing, support/body line, CC timing, auto/Q/W/E evidence, all-in legality, and the Samira lane drill `auto/Q - back click - re-check` while the normal whole-game review stays cheap and low-lag. Future visible reviews now render as a two-column mistake table only: `Time` and `Mistake`, five rows max, with no rank explanation or paragraph. Samira reviews still audit green-light discipline first: E toward champions is allowed only when W is ready, HP is above half, and an ally is on screen or close enough; otherwise the row marks red light, names the failed condition or uncertain condition, names the wrong E/forward input, and gives the correct Q/auto-back, kite, farm, or wait input. If the recorder restarts mid-game, it ignores that partial game and waits for the next full one. Offline checks handle capture validity and media prep; low-motion captures are allowed to be small as long as the segments are real video. OpenAI is used only after the clip passes those checks.
+The live recorder is intended to run without Codex in the loop. It watches for the League game process and the local League Client gameflow state, captures the League window region at low priority at 2 FPS by default, writes a sidecar next to each auto clip, rejects incomplete, black-screen, or broken captures before publish, then lets the queued publisher analyze, sync, verify, and deploy one post-game review at a time while the next game can continue recording. The first 12 minutes can be captured at 8 FPS by default through `LEAGUE_EARLY_MICRO_FPS` / `LEAGUE_EARLY_MICRO_SECONDS`; that bounded early-lane window feeds a separate micro pass for lane spacing, support/body line, CC timing, auto/Q/W/E evidence, all-in legality, and the Samira lane drill `auto/Q - back click - re-check` while the normal whole-game review stays cheap and low-lag. Future visible reviews now render as a two-column mistake table only: `Time` and `Mistake`, five rows max, with no rank explanation or paragraph. Samira reviews still audit green-light discipline first: E toward champions is allowed only when W is ready, HP is above half, and an ally is on screen or close enough; otherwise the row marks red light, names the failed condition or uncertain condition, names the wrong E/forward input, and gives the correct Q/auto-back, kite, farm, or wait input. The Samira intake stores long pasted notes beside those recording reads and exposes a source-bounded rank estimate for practice review, not Riot MMR. If the recorder restarts mid-game, it ignores that partial game and waits for the next full one. Offline checks handle capture validity and media prep; low-motion captures are allowed to be small as long as the segments are real video. OpenAI is used only after the clip passes those checks.
 
 The site exposes a compact recorder heartbeat at `/api/recording-status`. The local recorder and publisher post `watching`, `recording`, `processing`, `publishing`, `published`, `blocked`, or `error`, plus queue rows, per-stage ETAs, ready-time estimates, and a coarse progress value, so the recordings header can show whether a game is being captured, waiting, analyzed, deployed, or live before the final review appears. Long sync/analysis steps keep posting heartbeats so a normal post-game publish does not look stale. Automatic captures with a recorder sidecar are accepted when the sidecar proves enough real segment coverage.
+
+Budget guardrails: set `LEAGUE_API_BUDGET_PAUSED=1` to stop scheduled/automatic AI publish before analysis, or set `LEAGUE_POST_GAME_QUEUE_PAUSED=1` to keep capture status visible while stopping only automatic post-game AI review. Automatic feedback retries are capped by `LEAGUE_MAX_FEEDBACK_RETRIES` and default to `3`; clips that hit the cap move to `_recording-analysis/post-game-paused-queue.json` instead of retrying indefinitely.
 
 Run:
 

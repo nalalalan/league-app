@@ -7,6 +7,7 @@ const root = path.join(__dirname, "public");
 const port = Number(process.env.PORT || 3000);
 const dataRoot = process.env.LEAGUE_DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, "data");
 const notesPath = path.join(dataRoot, "public-notes.json");
+const recordingsPath = path.join(root, "recordings", "recordings.json");
 const writeToken = (process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const isRailway = Boolean(process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_SERVICE_ID);
 const recordingMediaBase = (process.env.LEAGUE_RECORDING_MEDIA_BASE || "").replace(/\/+$/, "");
@@ -82,12 +83,12 @@ function sendJson(res, status, body) {
   send(res, status, JSON.stringify(body, null, 2), "application/json; charset=utf-8");
 }
 
-async function readJsonBody(req) {
+async function readJsonBody(req, maxBytes = 12000) {
   const chunks = [];
   let length = 0;
   for await (const chunk of req) {
     length += chunk.length;
-    if (length > 12000) throw new Error("Request body too large");
+    if (length > maxBytes) throw new Error("Request body too large");
     chunks.push(chunk);
   }
   if (!chunks.length) return {};
@@ -115,6 +116,10 @@ async function readJsonFile(filePath, fallback = null) {
   } catch {
     return fallback;
   }
+}
+
+async function loadRecordingReview() {
+  return readJsonFile(recordingsPath, {});
 }
 
 function statusUpdatedMs(raw) {
@@ -167,6 +172,135 @@ async function saveRecordingStatus(status) {
 
 function cleanText(value, maxLength) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
+function cleanParagraphText(value, maxLength) {
+  return String(value || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{4,}/g, "\n\n\n")
+    .trim()
+    .slice(0, maxLength);
+}
+
+const samiraRankScale = [
+  "Iron IV", "Iron III", "Iron II", "Iron I",
+  "Bronze IV", "Bronze III", "Bronze II", "Bronze I",
+  "Silver IV", "Silver III", "Silver II", "Silver I",
+  "Gold IV", "Gold III", "Gold II", "Gold I",
+  "Platinum IV", "Platinum III", "Platinum II", "Platinum I",
+  "Emerald IV", "Emerald III", "Emerald II", "Emerald I",
+  "Diamond IV", "Diamond III", "Diamond II", "Diamond I",
+  "Master", "Grandmaster", "Challenger"
+];
+const samiraRankValueByName = new Map(samiraRankScale.map((rank, index) => [rank.toLowerCase(), index]));
+
+function samiraRecordingTime(item = {}) {
+  const matchTime = Number(item.matchTimeMs);
+  if (Number.isFinite(matchTime) && matchTime > 0) return matchTime;
+  const parsed = Date.parse(item.gameHappenedAt || item.recordedAt || item.updatedAt || "");
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function samiraRecordingRank(item = {}) {
+  const estimate = item.performanceRank || item.rankEstimate || {};
+  const exactRank = cleanText(estimate.exactRank || estimate.mostLikelyRank || estimate.rank || estimate.label, 32);
+  const mapped = samiraRankValueByName.get(exactRank.toLowerCase());
+  const exactValue = Number(estimate.exactRankValue);
+  return exactRank
+    ? {
+        rank: exactRank,
+        value: Number.isFinite(exactValue) ? exactValue : (Number.isFinite(mapped) ? mapped : null),
+        queueClass: cleanText(estimate.queueClass || item.rankEstimate?.queueClass, 40),
+        confidence: cleanText(estimate.rankedTransferConfidence || estimate.confidence || item.rankEstimate?.confidence, 40),
+        reason: cleanText(estimate.reason || item.rankEstimate?.reason, 220)
+      }
+    : null;
+}
+
+function samiraRecordings(review = {}) {
+  return (Array.isArray(review.recordings) ? review.recordings : [])
+    .filter((item) => String(item.champion || "").toLowerCase().includes("samira"))
+    .filter((item) => String(item.kind || "").toLowerCase().includes("full") || item.rankEstimate || item.performanceRank)
+    .sort((a, b) => samiraRecordingTime(b) - samiraRecordingTime(a));
+}
+
+function parseRankPhrase(text, label) {
+  const match = String(text || "").match(new RegExp(`${label}\\s+([^;,.]+)`, "i"));
+  return match ? cleanText(match[1], 48) : "";
+}
+
+function isSamiraNote(note = {}) {
+  const haystack = `${note.title || ""} ${note.body || ""} ${note.source || ""}`.toLowerCase();
+  return haystack.includes("samira") || haystack.includes("e key") || haystack.includes("w/hp/ally") || haystack.includes("inferno trigger");
+}
+
+function sentenceStart(text, maxLength) {
+  const sentence = String(text || "").split(/(?<=[.!?])\s+/)[0] || "";
+  return cleanText(sentence, maxLength);
+}
+
+function samiraRankEstimate(notes, review = {}) {
+  const focus = review.mainFeedback?.focus || "";
+  const newestRead = parseRankPhrase(focus, "newest full-game read");
+  const currentRead = parseRankPhrase(focus, "current 3-game read");
+  const archiveRead = parseRankPhrase(focus, "archive median");
+  const recordings = samiraRecordings(review);
+  const newest = recordings[0] || null;
+  const newestRank = newest ? samiraRecordingRank(newest) : null;
+  const exactRank = newestRead || newestRank?.rank || currentRead || archiveRead || "unrated";
+  const range = currentRead && currentRead !== exactRank ? `${exactRank} to ${currentRead}` : exactRank;
+  const newestLine = newest
+    ? `${cleanText(newest.title || "newest Samira recording", 80)}${newestRank?.rank ? `, ${newestRank.rank}` : ""}`
+    : "";
+  return {
+    exactRank,
+    range,
+    currentRead,
+    archiveRead,
+    confidence: currentRead ? "medium-high" : "medium",
+    basis: cleanText(`recordings.json full-game reviews plus ${notes.length} Samira notes; not Riot MMR`, 160),
+    reason: cleanText(review.mainFeedback?.rule || newestRank?.reason || "No full-game Samira rank reason is available yet.", 260),
+    newestRecording: newestLine
+  };
+}
+
+function samiraTips(notes, review = {}) {
+  const noteText = notes.map((note) => `${note.title || ""} ${note.body || ""}`).join(" ").toLowerCase();
+  const tips = [
+    "Before E, call W ready / HP above half / ally close.",
+    "Red light means Q/auto while backing up.",
+    "S loaded means R is available, not required.",
+    "After a kill, take wave, plate, objective, or reset."
+  ];
+  if (noteText.includes("fog") || noteText.includes("bush") || String(review.mainFeedback?.rule || "").includes("forward click")) {
+    tips.push("Fog chase becomes wave or objective unless next enemy is known.");
+  }
+  return tips.slice(0, 5);
+}
+
+async function samiraState(extraNotes = []) {
+  const notes = [...extraNotes, ...(await loadNotes())]
+    .filter(isSamiraNote)
+    .sort((a, b) => (Date.parse(b.created_at || "") || 0) - (Date.parse(a.created_at || "") || 0));
+  const review = await loadRecordingReview();
+  const newestNote = notes[0] || null;
+  return {
+    ok: true,
+    note_count: notes.length,
+    latest_note: newestNote
+      ? {
+          title: newestNote.title || "Samira note",
+          created_at: newestNote.created_at || "",
+          preview: sentenceStart(newestNote.body, 180)
+        }
+      : null,
+    rank_estimate: samiraRankEstimate(notes, review),
+    tips: samiraTips(notes, review),
+    source_boundary: "Approximate rank read from saved notes and recording reviews, not Riot MMR.",
+    notes: notes.slice(0, 12)
+  };
 }
 
 function cleanStatus(value) {
@@ -328,8 +462,15 @@ async function handleApi(req, res, url) {
       app: "league",
       storage: "file",
       persistent_storage_ready: Boolean(process.env.LEAGUE_DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT_PATH),
-      ai_ready: Boolean(process.env.OPENAI_API_KEY)
+      ai_ready: Boolean(process.env.OPENAI_API_KEY),
+      samira_api_ready: true,
+      write_token_configured: Boolean(writeToken)
     });
+    return true;
+  }
+
+  if (url.pathname === "/api/samira" && req.method === "GET") {
+    sendJson(res, 200, await samiraState());
     return true;
   }
 
@@ -349,9 +490,9 @@ async function handleApi(req, res, url) {
       sendJson(res, 401, { error: "Unauthorized" });
       return true;
     }
-    const payload = await readJsonBody(req);
+    const payload = await readJsonBody(req, 140000);
     const title = cleanText(payload.title, 80);
-    const body = cleanText(payload.body, 700);
+    const body = cleanParagraphText(payload.body, 120000);
     if (!title || !body) {
       sendJson(res, 400, { error: "title and body are required" });
       return true;
@@ -365,6 +506,36 @@ async function handleApi(req, res, url) {
     const notes = [note, ...(await loadNotes())].slice(0, 200);
     await saveNotes(notes);
     sendJson(res, 201, { note });
+    return true;
+  }
+
+  if (url.pathname === "/api/samira/notes" && req.method === "POST") {
+    if (isRailway && !writeToken) {
+      sendJson(res, 503, { error: "Write token is not configured" });
+      return true;
+    }
+    const headerToken = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "") || String(req.headers["x-league-write-token"] || "");
+    if (writeToken && headerToken !== writeToken) {
+      sendJson(res, 401, { error: "Unauthorized" });
+      return true;
+    }
+    const payload = await readJsonBody(req, 160000);
+    const body = cleanParagraphText(payload.body, 140000);
+    const title = cleanText(payload.title, 80) || cleanText(body.split("\n")[0], 80) || "Samira note";
+    if (!body) {
+      sendJson(res, 400, { error: "body is required" });
+      return true;
+    }
+    const note = {
+      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      created_at: new Date().toISOString(),
+      title,
+      body,
+      source: "samira-intake"
+    };
+    const notes = [note, ...(await loadNotes())].slice(0, 200);
+    await saveNotes(notes);
+    sendJson(res, 201, { note, samira: await samiraState() });
     return true;
   }
 
