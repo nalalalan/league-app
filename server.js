@@ -382,6 +382,40 @@ function publicSamiraNote(note = {}, overallRank = {}) {
   };
 }
 
+function localDateKey(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date);
+  const byType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${byType.year}-${byType.month}-${byType.day}`;
+}
+
+function samiraNoteDedupeKey(note = {}) {
+  return cleanParagraphText(note.body || note.title || "", 2000)
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function visibleSamiraNotes(notes = [], now = new Date()) {
+  const todayKey = localDateKey(now);
+  const seen = new Set();
+  return notes
+    .filter((note) => localDateKey(note.created_at) === todayKey)
+    .filter((note) => {
+      const key = samiraNoteDedupeKey(note);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 1);
+}
+
 async function samiraState(extraNotes = []) {
   const notes = [...extraNotes, ...(await loadNotes())]
     .filter(isSamiraNote)
@@ -389,9 +423,12 @@ async function samiraState(extraNotes = []) {
   const review = await loadRecordingReview();
   const newestNote = notes[0] || null;
   const rankEstimate = samiraRankEstimate(notes, review);
+  const visibleNotes = visibleSamiraNotes(notes);
   return {
     ok: true,
     note_count: notes.length,
+    visible_note_count: visibleNotes.length,
+    archived_note_count: Math.max(0, notes.length - visibleNotes.length),
     latest_note: newestNote
       ? {
           title: newestNote.title || "Samira note",
@@ -402,7 +439,7 @@ async function samiraState(extraNotes = []) {
     rank_estimate: rankEstimate,
     tips: samiraTips(notes, review),
     source_boundary: "Approximate rank read from saved notes and recording reviews, not Riot MMR.",
-    notes: notes.slice(0, 12).map((note) => publicSamiraNote(note, rankEstimate))
+    notes: visibleNotes.map((note) => publicSamiraNote(note, rankEstimate))
   };
 }
 
