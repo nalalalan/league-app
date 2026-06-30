@@ -4630,6 +4630,13 @@ h1 {
     overflow: hidden;
   }
 
+  .paper-strip-compact {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+    justify-content: stretch;
+  }
+
   .paper-button {
     justify-self: start;
   }
@@ -4695,6 +4702,11 @@ h1 {
     max-width: 29ch;
     font-size: 16px;
     line-height: 1.18;
+  }
+
+  .paper-strip-compact strong {
+    max-width: none;
+    font-size: 14px;
   }
 
   .recording-main {
