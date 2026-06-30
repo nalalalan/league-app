@@ -1,0 +1,12 @@
+.git
+node_modules
+data
+_recording-analysis
+_verification
+_licensed-audio
+.playwright-cli
+tmp-*
+*.log
+_local*.log
+public/recordings/*.mp4
+public/recordings/*.webm
