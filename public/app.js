@@ -6806,11 +6806,22 @@ function noteNode(note) {
   return article;
 }
 
+function compactSamiraTitle(title = "Samira note", limit = 48) {
+  const cleanTitle = String(title || "Samira note").replace(/\s+/g, " ").trim();
+  if (cleanTitle.length <= limit) return cleanTitle;
+  const cut = cleanTitle.slice(0, limit + 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  const clipped = cleanTitle.slice(0, lastSpace > 36 ? lastSpace : limit).trim();
+  return `${clipped}...`;
+}
+
 function samiraPdfCard(note) {
   const article = document.createElement("article");
   article.className = "samira-pdf-card";
   const pdfUrl = note.pdf_url || (note.id ? `/api/samira/notes/${encodeURIComponent(note.id)}.pdf` : "");
   const rank = note.rank_read || {};
+  const fullTitle = note.title || "Samira note";
+  const displayTitle = compactSamiraTitle(fullTitle);
 
   const thumb = document.createElement(pdfUrl ? "a" : "div");
   thumb.className = "samira-pdf-thumb";
@@ -6818,7 +6829,7 @@ function samiraPdfCard(note) {
     thumb.href = pdfUrl;
     thumb.target = "_blank";
     thumb.rel = "noopener";
-    thumb.setAttribute("aria-label", `Open PDF for ${note.title || "Samira note"}`);
+    thumb.setAttribute("aria-label", `Open PDF for ${fullTitle}`);
   }
 
   const sheet = document.createElement("div");
@@ -6827,7 +6838,8 @@ function samiraPdfCard(note) {
   pdfMark.className = "samira-pdf-mark";
   pdfMark.textContent = "PDF";
   const sheetTitle = document.createElement("strong");
-  sheetTitle.textContent = note.title || "Samira note";
+  sheetTitle.textContent = compactSamiraTitle(fullTitle, 46);
+  sheetTitle.title = fullTitle;
   const sheetRank = document.createElement("em");
   sheetRank.textContent = rank.exactRank || "unrated";
   const sheetPreview = document.createElement("p");
@@ -6841,7 +6853,8 @@ function samiraPdfCard(note) {
   time.dateTime = note.created_at || "";
   time.textContent = formatDate(note.created_at);
   const title = document.createElement("h3");
-  title.textContent = note.title || "Samira note";
+  title.textContent = displayTitle;
+  title.title = fullTitle;
   const rankLine = document.createElement("p");
   rankLine.className = "samira-pdf-rank";
   const rankValue = document.createElement("strong");

@@ -4271,8 +4271,11 @@ h1 {
   }
 
   .samira-intake {
+    width: 100%;
+    max-width: 100%;
     gap: 12px;
     padding: 14px 12px;
+    overflow: hidden;
   }
 
   .samira-note-actions {
@@ -4289,13 +4292,39 @@ h1 {
   }
 
   .samira-pdf-card {
+    width: 100%;
+    max-width: 100%;
     grid-template-columns: minmax(0, 1fr);
     gap: 10px;
     padding: 9px;
+    overflow: hidden;
   }
 
   .samira-pdf-thumb {
     width: min(170px, 100%);
+  }
+
+  .samira-pdf-main {
+    width: 100%;
+    max-width: calc(100vw - 68px);
+    overflow: hidden;
+  }
+
+  .samira-pdf-main h3,
+  .samira-pdf-sheet strong {
+    width: 100%;
+    min-width: 0;
+    max-width: calc(100vw - 68px);
+    white-space: normal;
+    text-wrap: wrap;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  .samira-pdf-rank,
+  .samira-pdf-reason,
+  .samira-pdf-boundary {
+    max-width: calc(100vw - 68px);
   }
 
   .samira-pdf-sheet {
