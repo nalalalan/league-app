@@ -1,8 +1,8 @@
 # League
 
-Single-page public review room for `league.aolabs.io`.
+Single-page public Samira note intake for `league.aolabs.io`.
 
-The page distills Alan's League practice arc into a calm AO Labs surface: Samira note intake, approximate rank read, recording review, archived situation rules, public notes, and a downloadable paper.
+The page is intentionally simple: one Samira note textarea, a write key, save status, and a downloadable paper. The backend still keeps Samira tips, approximate rank read, recording data, and public notes available for the API and morning queue, but the home page no longer shows champion selection, recordings, or other-champion material by default.
 
 ## Run Locally
 
@@ -35,7 +35,7 @@ Run:
 npm run sync:recordings
 ```
 
-The sync copies small recordings into `public/recordings/`, compresses large recordings into deployable `.mp4` files, extracts poster frames, and writes `public/recordings/recordings.json`. The page loads that manifest so new recordings can appear without editing `app.js`.
+The sync copies small recordings into `public/recordings/`, compresses large recordings into deployable `.mp4` files, extracts poster frames, and writes `public/recordings/recordings.json`. The home page does not load that manifest by default; recordings remain a backend/archive source for the Samira read, paper, and future review work.
 
 Recording order is source-modified-time order. The sync preserves that order for analysis, but the public page stays focused on one queue plan plus one feedback item per recording. Each feedback item carries a `whyTrust` rationale plus a collapsed full read with pattern, Diamond rule, queue rep, visible evidence, nuance, and review limit.
 

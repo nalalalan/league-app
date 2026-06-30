@@ -125,6 +125,42 @@ summary {
   font-weight: 650;
 }
 
+.paper-strip-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.paper-strip-compact > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.paper-strip-compact *,
+.paper-strip-compact strong {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.paper-strip-compact strong {
+  max-width: none;
+  font-size: 14px;
+  line-height: 1.2;
+  text-wrap: auto;
+}
+
+.paper-strip-compact p {
+  margin-top: 2px;
+  font-size: 11px;
+}
+
+.paper-strip-compact .paper-button {
+  flex: 0 0 auto;
+}
+
 .paper-button {
   display: inline-flex;
   align-items: center;
@@ -148,6 +184,11 @@ summary {
   width: min(1480px, calc(100vw - 24px));
   margin: 0 auto;
   padding: 20px 0 54px;
+}
+
+.page-intake {
+  width: min(760px, calc(100vw - 24px));
+  padding-top: 22px;
 }
 
 .page::before,
@@ -1667,7 +1708,7 @@ summary {
 .samira-intake {
   display: grid;
   gap: 14px;
-  width: min(960px, 100%);
+  width: min(760px, 100%);
   margin: 24px auto 0;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1682,7 +1723,7 @@ summary {
 .samira-head h2 {
   margin: 0;
   color: #2b2521;
-  font-size: clamp(22px, 2.4vw, 32px);
+  font-size: 24px;
   letter-spacing: 0;
 }
 
@@ -1722,7 +1763,7 @@ summary {
 
 .samira-note-form textarea {
   width: 100%;
-  min-height: 180px;
+  min-height: min(44vh, 360px);
   resize: vertical;
   border: 1px solid rgba(104, 87, 68, .24);
   border-radius: 8px;
@@ -1774,6 +1815,12 @@ summary {
   gap: 10px;
   border-top: 1px solid rgba(104, 87, 68, .14);
   padding-top: 12px;
+}
+
+.page-intake .notice {
+  margin-top: 18px;
+  font-size: 11px;
+  line-height: 1.35;
 }
 
 .selected-champion::before {
@@ -4478,6 +4525,10 @@ h1 {
     align-items: stretch;
   }
 
+  .page-intake {
+    display: block;
+  }
+
   .champion-overview {
     grid-column: 1 / -1;
     grid-row: 1;
@@ -4551,6 +4602,12 @@ h1 {
   .notes-panel,
   .notice {
     grid-column: 1 / -1;
+  }
+
+  .page-intake .samira-intake,
+  .page-intake .notice {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 

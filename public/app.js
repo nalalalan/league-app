@@ -6716,6 +6716,7 @@ function renderChampion(championId, options = {}) {
 }
 
 function renderPicker() {
+  if (!championPicker) return;
   championPicker.replaceChildren(...pageChampions.map((champion, index) => {
     const button = document.createElement("button");
     button.className = "portrait-button";
@@ -6894,6 +6895,13 @@ async function saveSamiraNote(event) {
   }
 }
 
+const hasChampionSurface = Boolean(championPicker && championPanel);
+const hasRecordingSurface = Boolean(recordingsSection && recordingSummary && recordingFocus && recordingGrid);
+
+if (page) {
+  applyFxProfileVars(page, fxProfileFor("samira"));
+}
+
 if (samiraNoteToken) {
   samiraNoteToken.value = localStorage.getItem("leagueSamiraWriteKey") || "";
 }
@@ -6908,17 +6916,25 @@ document.addEventListener("click", (event) => {
   seekRecordingVideo(button);
 });
 
-renderPicker();
-renderChampion(championIdFromLocation(), { animate: false, updateRoute: true, replaceRoute: true });
-hydrateRecordings();
-hydrateRecordingLiveStatus();
-window.setInterval(hydrateRecordingLiveStatus, 15000);
+if (hasChampionSurface) {
+  renderPicker();
+  renderChampion(championIdFromLocation(), { animate: false, updateRoute: true, replaceRoute: true });
+}
+
+if (hasRecordingSurface) {
+  hydrateRecordings();
+  hydrateRecordingLiveStatus();
+  window.setInterval(hydrateRecordingLiveStatus, 15000);
+}
+
 hydrateSamiraState();
 hydratePublicNotes();
-window.addEventListener("popstate", () => {
-  renderChampion(championIdFromLocation(), { animate: true });
-});
-if (!motionQuery.matches) {
+if (hasChampionSurface) {
+  window.addEventListener("popstate", () => {
+    renderChampion(championIdFromLocation(), { animate: true });
+  });
+}
+if (hasChampionSurface && !motionQuery.matches) {
   window.setTimeout(primeCinematicAssets, 220);
   if ("requestIdleCallback" in window) {
     window.requestIdleCallback(primeCinematicAssets, { timeout: 1600 });

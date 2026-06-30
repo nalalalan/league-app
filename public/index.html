@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#eee7dd">
   <title>league.aolabs.io</title>
-    <meta name="description" content="A public AO Labs Samira note intake, rank read, and recording review room.">
+    <meta name="description" content="A public AO Labs Samira note intake.">
     <link rel="canonical" href="https://league.aolabs.io/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AO Labs">
   <meta property="og:title" content="league">
-  <meta property="og:description" content="Samira note intake, rank read, and recording review room.">
+  <meta property="og:description" content="Samira note intake.">
   <meta property="og:url" content="https://league.aolabs.io/">
   <meta property="og:image" content="https://aolabs.io/previews/league-20260612.png">
   <meta property="og:image:secure_url" content="https://aolabs.io/previews/league-20260612.png">
@@ -20,7 +20,7 @@
   <meta property="og:image:alt" content="league preview card.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="league">
-  <meta name="twitter:description" content="Samira note intake, rank read, and recording review room.">
+  <meta name="twitter:description" content="Samira note intake.">
   <meta name="twitter:image" content="https://aolabs.io/previews/league-20260612.png">
   <meta name="twitter:image:alt" content="league preview card.">
   <link rel="icon" href="/icon.svg?v=20260517-league-mark2" type="image/svg+xml">
@@ -31,8 +31,8 @@
     <link rel="stylesheet" href="https://aolabs.io/suite-header.css?v=20260516-suite-bloom">
     <link rel="modulepreload" href="/vfx3d.js?v=20260518-world-vfx24">
     <link rel="modulepreload" href="/vendor/three.module.min.js">
-    <link rel="stylesheet" href="/styles.css?v=20260630-samira-intake1">
-    <script src="/app.js?v=20260630-samira-intake1" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=20260630-samira-input3">
+    <script src="/app.js?v=20260630-samira-input3" defer></script>
   </head>
   <body>
     <header class="suite-topbar" aria-label="league navigation">
@@ -47,7 +47,7 @@
       </div>
     </header>
 
-    <header class="paper-strip" aria-label="League paper">
+    <header class="paper-strip paper-strip-compact" aria-label="League paper">
       <div>
         <strong>A low-threat practice-room interface for neurodivergent game learning</strong>
         <p>Personal case study. No clinical claim.</p>
@@ -55,34 +55,13 @@
       <a class="paper-button" href="/league-practice-room.pdf" download>Open PDF</a>
     </header>
 
-    <main class="page">
-      <section class="champion-overview" aria-label="champion and rank state">
-        <section class="champion-picker" aria-label="champion">
-          <div class="portrait-row" id="champion-picker"></div>
-        </section>
-        <section class="rank-state-card" aria-label="rank trend and latest synced state">
-          <aside class="rank-trend" id="rank-trend" aria-live="polite"></aside>
-          <aside class="recording-focus overall-state" id="recording-focus"></aside>
-        </section>
-      </section>
-
-      <section class="selected-champion" id="champion-panel" aria-live="polite">
-        <div class="selected-copy">
-          <h1 id="champion-name">Samira</h1>
-          <p id="champion-focus"></p>
-          <p id="champion-note"></p>
-        </div>
-      </section>
-
+    <main class="page page-intake">
       <section class="samira-intake" id="samira-intake" aria-labelledby="samira-title">
         <div class="plain-head samira-head">
           <div>
-            <h2 id="samira-title">samira</h2>
-            <p id="samira-rank-read">checking saved notes and full-game reads</p>
+            <h2 id="samira-title">samira notes</h2>
           </div>
-          <p class="samira-boundary" id="samira-boundary"></p>
         </div>
-        <ul class="samira-tip-list" id="samira-tip-list" aria-label="Samira tips"></ul>
         <form class="samira-note-form" id="samira-note-form">
           <label for="samira-note-body">paste note block</label>
           <textarea id="samira-note-body" name="body" rows="8" spellcheck="true"></textarea>
@@ -92,49 +71,7 @@
           </div>
           <p class="samira-note-status" id="samira-note-status" role="status"></p>
         </form>
-        <div class="samira-note-list" id="samira-note-list"></div>
       </section>
-
-      <section class="recordings" id="recordings" aria-labelledby="recordings-title">
-        <div class="plain-head recording-head">
-          <div class="recording-head-title">
-            <h2 id="recordings-title">recordings</h2>
-            <p id="recording-summary"></p>
-          </div>
-          <div class="recording-live-status is-unknown" id="recording-live-status" hidden>
-            <span class="recording-live-dot" aria-hidden="true"></span>
-            <span class="recording-live-copy">
-              <strong>recorder status</strong>
-              <span>checking</span>
-              <span class="recording-live-progress" aria-hidden="true"><i></i></span>
-            </span>
-          </div>
-        </div>
-        <div class="recording-queue" id="recording-queue" aria-live="polite"></div>
-        <div class="recording-grid" id="recording-grid"></div>
-      </section>
-
-      <details class="situations situations-archive">
-        <summary>archived situations</summary>
-        <div class="plain-head">
-          <h2 id="situations-title">situations</h2>
-          <p id="situation-count"></p>
-        </div>
-        <div class="situation-list" id="situation-list"></div>
-      </details>
-
-      <details class="notes-panel">
-        <summary>public notes</summary>
-        <div class="notes" id="notes-stream">
-          <article class="note">
-            <time datetime="2026-05-17">May 17, 2026</time>
-            <div>
-              <h3>seed arc imported</h3>
-              <p>The first page comes from the long League chat arc: farm-and-survive, sensory control, camera stability, Samira commit rules, Caitlyn comfort, death exposure, and bot-ladder practice.</p>
-            </div>
-          </article>
-        </div>
-      </details>
 
       <p class="notice">
         league.aolabs.io is an unofficial review room. It is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, League of Legends, and associated properties are trademarks or registered trademarks of Riot Games, Inc.
