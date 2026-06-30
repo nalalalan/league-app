@@ -1812,9 +1812,151 @@ summary {
 
 .samira-note-list {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  gap: 14px;
   border-top: 1px solid rgba(104, 87, 68, .14);
-  padding-top: 12px;
+  padding-top: 14px;
+}
+
+.samira-note-list:empty {
+  display: none;
+}
+
+.samira-pdf-card {
+  display: grid;
+  grid-template-columns: minmax(108px, 132px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  min-width: 0;
+  border: 1px solid rgba(104, 87, 68, .18);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 252, 246, .92);
+}
+
+.samira-pdf-thumb {
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.samira-pdf-sheet {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  aspect-ratio: 8.5 / 11;
+  min-height: 176px;
+  border: 1px solid rgba(104, 87, 68, .22);
+  border-radius: 6px;
+  padding: 12px 10px;
+  background: #fffefb;
+  box-shadow: 0 10px 22px rgba(61, 49, 36, .08);
+  overflow: hidden;
+}
+
+.samira-pdf-mark {
+  width: max-content;
+  border-bottom: 2px solid #2f2824;
+  color: #2f2824;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.samira-pdf-sheet strong {
+  color: #2f2824;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.14;
+  overflow-wrap: break-word;
+}
+
+.samira-pdf-sheet em {
+  color: #835339;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 950;
+  line-height: .95;
+}
+
+.samira-pdf-sheet p {
+  margin: 0;
+  color: #5d514a;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.28;
+  overflow: hidden;
+}
+
+.samira-pdf-main {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.samira-pdf-main time {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.samira-pdf-main h3 {
+  margin: 0;
+  color: #2f2824;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.18;
+  overflow-wrap: break-word;
+}
+
+.samira-pdf-rank {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 2px 0 0;
+}
+
+.samira-pdf-rank strong {
+  color: #835339;
+  font-size: 20px;
+  font-weight: 950;
+  line-height: .95;
+}
+
+.samira-pdf-rank span,
+.samira-pdf-reason,
+.samira-pdf-boundary {
+  max-width: 100%;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.28;
+  overflow-wrap: break-word;
+}
+
+.samira-pdf-rank span {
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.samira-pdf-action {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 4px;
+  border: 1px solid rgba(104, 87, 68, .22);
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: #2f2824;
+  color: #fff9ef;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1;
+  text-decoration: none;
 }
 
 .page-intake .notice {
@@ -4140,6 +4282,29 @@ h1 {
   .samira-note-actions input,
   .samira-note-actions button {
     width: 100%;
+  }
+
+  .samira-note-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .samira-pdf-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 9px;
+  }
+
+  .samira-pdf-thumb {
+    width: min(170px, 100%);
+  }
+
+  .samira-pdf-sheet {
+    min-height: 156px;
+    padding: 10px 8px;
+  }
+
+  .samira-pdf-rank strong {
+    font-size: 18px;
   }
 
   .note {

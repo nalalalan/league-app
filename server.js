@@ -196,6 +196,18 @@ const samiraRankScale = [
 ];
 const samiraRankValueByName = new Map(samiraRankScale.map((rank, index) => [rank.toLowerCase(), index]));
 
+function samiraRankNameForValue(value) {
+  const number = Number(value);
+  const index = Number.isFinite(number) ? Math.round(number) : 0;
+  return samiraRankScale[Math.max(0, Math.min(samiraRankScale.length - 1, index))] || "unrated";
+}
+
+function samiraRankValueFromText(value) {
+  const text = String(value || "").toLowerCase();
+  const match = samiraRankScale.find((rank) => text.includes(rank.toLowerCase()));
+  return match ? samiraRankValueByName.get(match.toLowerCase()) : null;
+}
+
 function samiraRecordingTime(item = {}) {
   const matchTime = Number(item.matchTimeMs);
   if (Number.isFinite(matchTime) && matchTime > 0) return matchTime;
@@ -280,12 +292,97 @@ function samiraTips(notes, review = {}) {
   return tips.slice(0, 5);
 }
 
+function countSamiraMatches(text, patterns) {
+  return patterns.reduce((total, pattern) => total + (text.match(pattern) || []).length, 0);
+}
+
+function samiraNoteRankRead(note = {}, overallRank = {}) {
+  const text = `${note.title || ""}\n${note.body || ""}`.toLowerCase();
+  const explicit = samiraRankValueFromText(text);
+  const baseline = samiraRankValueFromText(overallRank.exactRank || overallRank.currentRead || "") ?? 3;
+  const greenLight = countSamiraMatches(text, [
+    /\bw ready\b/g,
+    /\bhp above half\b/g,
+    /\bally close\b/g,
+    /\bgreen light\b/g,
+    /\bq before e\b/g,
+    /\bauto(?:\/| and )?q\b/g,
+    /\bback click\b/g,
+    /\breset spacing\b/g
+  ]);
+  const conversion = countSamiraMatches(text, [
+    /\btake wave\b/g,
+    /\bplate\b/g,
+    /\bobjective\b/g,
+    /\brecall\b/g,
+    /\bgroup\b/g,
+    /\bexit\b/g,
+    /\bwait\b/g,
+    /\bkite\b/g
+  ]);
+  const leak = countSamiraMatches(text, [
+    /\bred light\b/g,
+    /\bpanic\b/g,
+    /\bgreed\b/g,
+    /\bchase\b/g,
+    /\bfog\b/g,
+    /\bw down\b/g,
+    /\blow hp\b/g,
+    /\bno ally\b/g,
+    /\bsecond fight\b/g,
+    /\billegal e\b/g,
+    /\bunspent\b/g,
+    /\btilt\b/g
+  ]);
+  const words = text.split(/\s+/).filter(Boolean).length;
+  let delta = 0;
+  if (greenLight + conversion >= 6 && leak <= 3) delta += 2;
+  else if (greenLight + conversion >= 3 && leak <= 5) delta += 1;
+  if (leak >= 6) delta -= 1;
+  if (words < 35) delta -= 1;
+  const value = explicit ?? Math.max(0, Math.min(samiraRankScale.length - 1, baseline + delta));
+  const exactRank = samiraRankNameForValue(value);
+  const reason = leak > greenLight + conversion
+    ? "Red-light commits, chase pressure, or exit leaks dominate."
+    : greenLight + conversion > 0
+      ? "Green-light checks, exits, or value conversion show up."
+      : "Limited ranked-habit evidence beyond baseline.";
+  return {
+    exactRank,
+    range: `${samiraRankNameForValue(value - 1)} to ${samiraRankNameForValue(value + 1)}`,
+    confidence: words >= 120 ? "medium" : "low",
+    reason: cleanText(reason, 180),
+    basis: "saved note + current Samira baseline; not Riot MMR",
+    signals: {
+      greenLight,
+      conversion,
+      leak
+    }
+  };
+}
+
+function publicSamiraNote(note = {}, overallRank = {}) {
+  const id = cleanText(note.id, 120);
+  const rankRead = samiraNoteRankRead(note, overallRank);
+  return {
+    id,
+    title: cleanText(note.title || "Samira note", 90),
+    created_at: note.created_at || "",
+    source: cleanText(note.source || "", 40),
+    body: cleanParagraphText(note.body || "", 140000),
+    preview: sentenceStart(note.body, 260),
+    pdf_url: id ? `/api/samira/notes/${encodeURIComponent(id)}.pdf` : "",
+    rank_read: rankRead
+  };
+}
+
 async function samiraState(extraNotes = []) {
   const notes = [...extraNotes, ...(await loadNotes())]
     .filter(isSamiraNote)
     .sort((a, b) => (Date.parse(b.created_at || "") || 0) - (Date.parse(a.created_at || "") || 0));
   const review = await loadRecordingReview();
   const newestNote = notes[0] || null;
+  const rankEstimate = samiraRankEstimate(notes, review);
   return {
     ok: true,
     note_count: notes.length,
@@ -296,11 +393,141 @@ async function samiraState(extraNotes = []) {
           preview: sentenceStart(newestNote.body, 180)
         }
       : null,
-    rank_estimate: samiraRankEstimate(notes, review),
+    rank_estimate: rankEstimate,
     tips: samiraTips(notes, review),
     source_boundary: "Approximate rank read from saved notes and recording reviews, not Riot MMR.",
-    notes: notes.slice(0, 12)
+    notes: notes.slice(0, 12).map((note) => publicSamiraNote(note, rankEstimate))
   };
+}
+
+function pdfText(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[^\x09\x0a\x0d\x20-\x7e]/g, " ")
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)");
+}
+
+function wrapPdfText(value, maxChars = 84) {
+  const lines = [];
+  for (const rawLine of String(value || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")) {
+    const words = rawLine.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) {
+      lines.push("");
+      continue;
+    }
+    let current = "";
+    for (const word of words) {
+      const next = current ? `${current} ${word}` : word;
+      if (next.length > maxChars && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = next;
+      }
+    }
+    if (current) lines.push(current);
+  }
+  return lines;
+}
+
+function samiraNotePdfLines(note = {}, rankRead = {}) {
+  const body = cleanParagraphText(note.body || "", 140000);
+  const lines = [
+    { text: cleanText(note.title || "Samira note", 90), font: "F2", size: 16, leading: 22 },
+    { text: `approx rank: ${rankRead.exactRank || "unrated"}`, font: "F2", size: 12, leading: 17 },
+    { text: rankRead.basis || "saved note language; not Riot MMR", font: "F1", size: 9, leading: 14 },
+    { text: `created: ${cleanText(note.created_at || "", 48)}`, font: "F1", size: 9, leading: 20 },
+    { text: "note", font: "F2", size: 11, leading: 16 }
+  ];
+  for (const line of wrapPdfText(body, 88)) {
+    lines.push({ text: line, font: "F1", size: 10, leading: line ? 13 : 10 });
+  }
+  return lines;
+}
+
+function paginatePdfLines(lines) {
+  const pages = [];
+  let page = [];
+  let y = 736;
+  for (const line of lines) {
+    const leading = line.leading || 13;
+    if (page.length && y - leading < 58) {
+      pages.push(page);
+      page = [];
+      y = 736;
+    }
+    page.push(line);
+    y -= leading;
+  }
+  if (page.length) pages.push(page);
+  return pages;
+}
+
+function pdfContentStream(lines, pageIndex, pageCount) {
+  let y = 736;
+  const commands = [];
+  for (const line of lines) {
+    const font = line.font || "F1";
+    const size = line.size || 10;
+    commands.push(`BT /${font} ${size} Tf 54 ${y} Td (${pdfText(line.text)}) Tj ET`);
+    y -= line.leading || 13;
+  }
+  commands.push(`BT /F1 8 Tf 54 34 Td (${pdfText(`league.aolabs.io / Samira note PDF / ${pageIndex + 1} of ${pageCount}`)}) Tj ET`);
+  return commands.join("\n");
+}
+
+function serializePdf(objects) {
+  const chunks = [];
+  const offsets = [0];
+  let offset = 0;
+  const push = (value) => {
+    const buffer = Buffer.from(value, "binary");
+    chunks.push(buffer);
+    offset += buffer.length;
+  };
+  push("%PDF-1.4\n%\xff\xff\xff\xff\n");
+  for (let index = 1; index < objects.length; index += 1) {
+    offsets[index] = offset;
+    push(`${index} 0 obj\n${objects[index]}\nendobj\n`);
+  }
+  const xrefOffset = offset;
+  push(`xref\n0 ${objects.length}\n0000000000 65535 f \n`);
+  for (let index = 1; index < objects.length; index += 1) {
+    push(`${String(offsets[index]).padStart(10, "0")} 00000 n \n`);
+  }
+  push(`trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
+  return Buffer.concat(chunks);
+}
+
+function buildSamiraNotePdf(note = {}, rankRead = {}) {
+  const pages = paginatePdfLines(samiraNotePdfLines(note, rankRead));
+  const objects = [];
+  objects[1] = "<< /Type /Catalog /Pages 2 0 R >>";
+  objects[3] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
+  objects[4] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>";
+  const kids = [];
+  let nextObject = 5;
+  pages.forEach((pageLines, pageIndex) => {
+    const pageObject = nextObject;
+    const contentObject = nextObject + 1;
+    nextObject += 2;
+    kids.push(`${pageObject} 0 R`);
+    const stream = pdfContentStream(pageLines, pageIndex, pages.length);
+    objects[pageObject] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObject} 0 R >>`;
+    objects[contentObject] = `<< /Length ${Buffer.byteLength(stream, "binary")} >>\nstream\n${stream}\nendstream`;
+  });
+  objects[2] = `<< /Type /Pages /Count ${pages.length} /Kids [${kids.join(" ")}] >>`;
+  return serializePdf(objects);
+}
+
+function pdfFilenameForNote(note = {}) {
+  const slug = cleanText(note.title || note.id || "samira-note", 70)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "samira-note";
+  return `${slug}.pdf`;
 }
 
 function cleanStatus(value) {
@@ -471,6 +698,28 @@ async function handleApi(req, res, url) {
 
   if (url.pathname === "/api/samira" && req.method === "GET") {
     sendJson(res, 200, await samiraState());
+    return true;
+  }
+
+  const samiraPdfMatch = url.pathname.match(/^\/api\/samira\/notes\/([^/]+)\.pdf$/);
+  if (samiraPdfMatch && req.method === "GET") {
+    const id = decodeURIComponent(samiraPdfMatch[1] || "");
+    const notes = (await loadNotes()).filter(isSamiraNote);
+    const note = notes.find((item) => item.id === id);
+    if (!note) {
+      sendJson(res, 404, { error: "Samira note PDF not found" });
+      return true;
+    }
+    const review = await loadRecordingReview();
+    const rankEstimate = samiraRankEstimate(notes, review);
+    const rankRead = samiraNoteRankRead(note, rankEstimate);
+    const pdf = buildSamiraNotePdf(note, rankRead);
+    res.writeHead(200, {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="${pdfFilenameForNote(note)}"`,
+      "Cache-Control": "no-store"
+    });
+    res.end(pdf);
     return true;
   }
 

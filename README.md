@@ -2,7 +2,7 @@
 
 Single-page public Samira note intake for `league.aolabs.io`.
 
-The page is intentionally simple: one Samira note textarea, a write key, save status, and a downloadable paper. The backend still keeps Samira tips, approximate rank read, recording data, and public notes available for the API and morning queue, but the home page no longer shows champion selection, recordings, or other-champion material by default.
+The page is intentionally simple: one Samira note textarea, a write key, save status, saved note PDF cards, approximate rank reads for those notes, and a downloadable paper. The backend still keeps Samira tips, aggregate rank read, recording data, and public notes available for the API and morning queue, but the home page no longer shows champion selection, recordings, or other-champion material by default.
 
 ## Run Locally
 
@@ -17,6 +17,7 @@ Open `http://localhost:3000`.
 - `GET /api/health` reports app, storage, and AI readiness without exposing secrets.
 - `GET /api/samira` returns the Samira note/rank/tip read used by the page and morning queue.
 - `POST /api/samira/notes` stores a long pasted Samira note block. In Railway, set `LEAGUE_WRITE_TOKEN` before enabling writes.
+- `GET /api/samira/notes/:id.pdf` returns the saved note as a public PDF with the source-bounded approximate rank read.
 - `GET /api/logs` returns public notes.
 - `POST /api/logs` appends a public note. In Railway, set `LEAGUE_WRITE_TOKEN` before enabling writes.
 - `LEAGUE_DATA_DIR` or `RAILWAY_VOLUME_MOUNT_PATH` controls persistent note storage.
