@@ -183,6 +183,9 @@ try {
   if (!/\.samira-main-takeaway\s*\{[\s\S]*?align-self:\s*start;[\s\S]*?min-height:\s*0;/.test(styles) || /\.samira-main-takeaway\s*\{[\s\S]*?grid-row:\s*1\s*\/\s*span\s*2;/.test(styles)) {
     throw new Error("Samira current read is stretched across the heading/composer block.");
   }
+  if (!/\.samira-main-takeaway\s*\{[\s\S]*?font-size:\s*clamp\(20px,\s*1\.45vw,\s*26px\);/.test(styles)) {
+    throw new Error("Samira current read is still styled like tiny caption text.");
+  }
   if (!/\.samira-pdf-main\s*\{[\s\S]*?grid-template-rows:\s*auto\s+auto\s+auto;/.test(styles)) {
     throw new Error("Samira note cards still stretch short notes into empty towers.");
   }
