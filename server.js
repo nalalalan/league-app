@@ -204,7 +204,13 @@ function samiraRankNameForValue(value) {
 
 function samiraRankValueFromText(value) {
   const text = String(value || "").toLowerCase();
-  const match = samiraRankScale.find((rank) => text.includes(rank.toLowerCase()));
+  const match = samiraRankScale.find((rank) => {
+    const parts = rank.toLowerCase().split(/\s+/);
+    const pattern = parts.length === 2
+      ? new RegExp(`\\b${parts[0]}\\s+${parts[1]}\\b`, "i")
+      : new RegExp(`\\b${parts[0]}\\b`, "i");
+    return pattern.test(text);
+  });
   return match ? samiraRankValueByName.get(match.toLowerCase()) : null;
 }
 
