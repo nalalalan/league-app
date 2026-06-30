@@ -134,6 +134,17 @@ try {
   if (sourceOffenders.length) {
     throw new Error(`League source still contains visible role-prefix text:\n${sourceOffenders.join("\n")}`);
   }
+  const styles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
+  const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+  if (!/\.samira-note-form\s*\{[\s\S]*?width:\s*min\(520px,\s*100%\);[\s\S]*?max-width:\s*520px;/.test(styles)) {
+    throw new Error("Samira note composer is not capped independently from the saved-note grid.");
+  }
+  if (!/<textarea[^>]+id="samira-note-body"[^>]+rows="1"/.test(html) || !/\.samira-note-form textarea\s*\{[\s\S]*?height:\s*42px;[\s\S]*?overflow:\s*auto;/.test(styles)) {
+    throw new Error("Samira note composer is not a compact one-row scrolling paste box.");
+  }
+  if (!/\.samira-note-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(auto-fill,\s*minmax\(min\(100%,\s*215px\),\s*1fr\)\);/.test(styles)) {
+    throw new Error("Samira saved-note grid is no longer dense/multi-column.");
+  }
   console.log("Samira generated copy has no role-prefix labels, useless signal counters, or template card prose.");
 } finally {
   server.kill();

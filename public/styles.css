@@ -1759,6 +1759,9 @@ summary {
 .samira-note-form {
   display: grid;
   gap: 10px;
+  justify-self: start;
+  width: min(520px, 100%);
+  max-width: 520px;
   margin-top: 2px;
 }
 
@@ -1771,8 +1774,10 @@ summary {
 
 .samira-note-form textarea {
   width: 100%;
-  min-height: 48px;
-  max-height: min(22vh, 120px);
+  height: 42px;
+  min-height: 40px;
+  max-height: min(18vh, 96px);
+  overflow: auto;
   resize: vertical;
   border: 1px solid rgba(104, 87, 68, .24);
   border-radius: 8px;
@@ -4267,8 +4272,9 @@ h1 {
   }
 
   .samira-note-form textarea {
-    min-height: 46px;
-    max-height: 108px;
+    height: 42px;
+    min-height: 40px;
+    max-height: 92px;
   }
 
   .note {
