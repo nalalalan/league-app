@@ -523,8 +523,7 @@ function visibleSamiraNotes(notes = [], now = new Date()) {
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
-    })
-    .slice(0, 1);
+    });
 }
 
 async function samiraState(extraNotes = []) {

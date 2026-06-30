@@ -6887,7 +6887,7 @@ function renderSamiraState(data) {
   }
   if (samiraNoteList) {
     const notes = Array.isArray(data.notes) ? data.notes : [];
-    samiraNoteList.replaceChildren(...notes.slice(0, 1).map(samiraPdfCard));
+    samiraNoteList.replaceChildren(...notes.map(samiraPdfCard));
   }
 }
 
