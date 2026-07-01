@@ -180,8 +180,8 @@ try {
   if (!/\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*minmax\(280px,\s*390px\)\s+minmax\(0,\s*1fr\);[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;/.test(styles)) {
     throw new Error("Samira intake still uses a big enclosing card instead of a compact work layout.");
   }
-  if (!/id="samira-rank-trend"/.test(html) || !/\.samira-rank-trend\s*\{[\s\S]*?grid-column:\s*2;[\s\S]*?grid-row:\s*2;/.test(styles)) {
-    throw new Error("Samira rank-over-time chart is missing from the compact intake header.");
+  if (!/id="samira-rank-trend"/.test(html) || !/\.samira-rank-trend\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1;[\s\S]*?grid-row:\s*3;/.test(styles)) {
+    throw new Error("Samira rank-over-time chart is not filling the full intake row.");
   }
   if (!/\.samira-main-takeaway\s*\{[\s\S]*?align-self:\s*stretch;[\s\S]*?min-height:\s*0;/.test(styles) || /\.samira-main-takeaway\s*\{[\s\S]*?grid-row:\s*1\s*\/\s*span\s*2;/.test(styles)) {
     throw new Error("Samira current read is stretched across the heading/composer block.");
@@ -191,6 +191,9 @@ try {
   }
   if (!/function\s+renderSamiraRankTrend\s*\(/.test(appSource) || !/rankTrendSvg\(points,\s*\{\s*compact:\s*true\s*\}\)/.test(appSource)) {
     throw new Error("Samira rank chart is not rendered from the source-bound rank trend.");
+  }
+  if (!/\.samira-rank-trend svg\s*\{[\s\S]*?height:\s*clamp\(180px,\s*14vw,\s*220px\);/.test(styles)) {
+    throw new Error("Samira rank chart is not large enough to carry the current-read row.");
   }
   if (!/@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*1fr;/.test(styles)) {
     throw new Error("Samira intake does not collapse before the chart lane becomes cramped.");

@@ -1725,9 +1725,9 @@ summary {
 }
 
 .samira-head {
-  grid-column: 1;
+  grid-column: 1 / -1;
   grid-row: 1;
-  align-self: center;
+  align-self: end;
   margin: 0;
 }
 
@@ -1836,7 +1836,7 @@ summary {
 
 .samira-main-takeaway {
   grid-column: 2;
-  grid-row: 1;
+  grid-row: 2;
   align-self: stretch;
   display: flex;
   align-items: center;
@@ -1859,8 +1859,8 @@ summary {
 }
 
 .samira-rank-trend {
-  grid-column: 2;
-  grid-row: 2;
+  grid-column: 1 / -1;
+  grid-row: 3;
   align-self: start;
   border: 1px solid rgba(104, 87, 68, .16);
   border-radius: 8px;
@@ -1891,7 +1891,7 @@ summary {
 }
 
 .samira-rank-trend svg {
-  height: clamp(150px, 13vw, 190px);
+  height: clamp(180px, 14vw, 220px);
 }
 
 .samira-note-list {
