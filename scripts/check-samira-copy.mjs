@@ -78,6 +78,10 @@ try {
   if (!Array.isArray(saved?.samira?.rank_trend?.points) || saved.samira.rank_trend.points.length < 2) {
     throw new Error("Samira API does not expose source-bound rank-over-time points.");
   }
+  const june30Start = Date.parse("2026-06-30T00:00:00-04:00");
+  if (saved.samira.rank_trend.points.some((point) => Number(point.time_ms) < june30Start)) {
+    throw new Error("Samira rank trend includes notes or recordings before June 30.");
+  }
   const sampleNote = sampleNotes[0];
   if (!/ranked solo/i.test(sampleNote.game_meta_line || "") || !/6\/11\/2/.test(sampleNote.game_meta_line || "") || !/174 CS/.test(sampleNote.game_meta_line || "")) {
     throw new Error(`Samira sample note did not expose game facts: ${sampleNote.game_meta_line || ""}`);

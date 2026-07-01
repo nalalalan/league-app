@@ -195,6 +195,7 @@ const samiraRankScale = [
   "Master", "Grandmaster", "Challenger"
 ];
 const samiraRankValueByName = new Map(samiraRankScale.map((rank, index) => [rank.toLowerCase(), index]));
+const samiraCurrentWindowStartMs = Date.parse("2026-06-30T00:00:00-04:00");
 const samiraRankTrendDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
   month: "numeric",
@@ -226,6 +227,18 @@ function samiraRecordingTime(item = {}) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function samiraInCurrentWindow(timeMs) {
+  return Number.isFinite(timeMs) && timeMs >= samiraCurrentWindowStartMs;
+}
+
+function samiraNoteInCurrentWindow(note = {}) {
+  return samiraInCurrentWindow(Date.parse(note.created_at || ""));
+}
+
+function samiraRecordingInCurrentWindow(item = {}) {
+  return samiraInCurrentWindow(samiraRecordingTime(item));
+}
+
 function samiraRecordingRank(item = {}) {
   const estimate = item.performanceRank || item.rankEstimate || {};
   const exactRank = cleanText(estimate.exactRank || estimate.mostLikelyRank || estimate.rank || estimate.label, 32);
@@ -246,6 +259,7 @@ function samiraRecordings(review = {}) {
   return (Array.isArray(review.recordings) ? review.recordings : [])
     .filter((item) => String(item.champion || "").toLowerCase().includes("samira"))
     .filter((item) => String(item.kind || "").toLowerCase().includes("full") || item.rankEstimate || item.performanceRank)
+    .filter(samiraRecordingInCurrentWindow)
     .sort((a, b) => samiraRecordingTime(b) - samiraRecordingTime(a));
 }
 
@@ -320,15 +334,15 @@ function sentenceStart(text, maxLength) {
 }
 
 function samiraRankEstimate(notes, review = {}) {
-  const focus = review.mainFeedback?.focus || "";
-  const newestRead = parseRankPhrase(focus, "newest full-game read");
-  const currentRead = parseRankPhrase(focus, "current 3-game read");
-  const archiveRead = parseRankPhrase(focus, "archive median");
   const recordings = samiraRecordings(review);
   const newest = recordings[0] || null;
   const newestRank = newest ? samiraRecordingRank(newest) : null;
-  const exactRank = newestRead || newestRank?.rank || currentRead || archiveRead || "unrated";
-  const range = currentRead && currentRead !== exactRank ? `${exactRank} to ${currentRead}` : exactRank;
+  const currentNoteReads = notes.map((note) => samiraNoteRankRead(note, { exactRank: "Iron II" }));
+  const newestNoteRank = currentNoteReads[0] || null;
+  const exactRank = newestRank?.rank || newestNoteRank?.exactRank || "unrated";
+  const currentRead = newestNoteRank?.exactRank || "";
+  const archiveRead = "";
+  const range = newestNoteRank?.range || exactRank;
   const newestLine = newest
     ? `${cleanText(newest.title || "newest Samira recording", 80)}${newestRank?.rank ? `, ${newestRank.rank}` : ""}`
     : "";
@@ -337,9 +351,9 @@ function samiraRankEstimate(notes, review = {}) {
     range,
     currentRead,
     archiveRead,
-    confidence: currentRead ? "medium-high" : "medium",
-    basis: cleanText(`recordings.json full-game reviews plus ${notes.length} Samira notes; not Riot MMR`, 160),
-    reason: cleanText(review.mainFeedback?.rule || newestRank?.reason || "No full-game Samira rank reason is available yet.", 260),
+    confidence: notes.length >= 3 ? "medium" : (notes.length ? "low" : "none"),
+    basis: cleanText(`June 30 onward Samira notes plus current-window full-game reviews; not Riot MMR`, 160),
+    reason: cleanText(newestRank?.reason || newestNoteRank?.reason || "No June 30 onward Samira rank source is available yet.", 260),
     newestRecording: newestLine
   };
 }
@@ -394,19 +408,23 @@ function samiraRankTrend(notes = [], review = {}, overallRank = {}) {
     .slice(-80);
   return {
     points,
-    basis: "saved Samira notes plus full-game review rank reads; not Riot MMR"
+    basis: "June 30 onward saved Samira notes plus current-window full-game rank reads; not Riot MMR"
   };
 }
 
 function samiraTips(notes, review = {}) {
   const noteText = notes.map((note) => `${note.title || ""} ${note.body || ""}`).join(" ").toLowerCase();
+  const currentRecordingText = samiraRecordings(review)
+    .map((item) => `${item.title || ""} ${item.review || ""} ${item.mainTakeaway || ""} ${item.notes || ""}`)
+    .join(" ")
+    .toLowerCase();
   const tips = [
     "Before E, call W ready / HP above half / ally close.",
     "Red light means Q/auto while backing up.",
     "S loaded means R is available, not required.",
     "After a kill, take wave, plate, objective, or reset."
   ];
-  if (noteText.includes("fog") || noteText.includes("bush") || String(review.mainFeedback?.rule || "").includes("forward click")) {
+  if (noteText.includes("fog") || noteText.includes("bush") || currentRecordingText.includes("fog") || currentRecordingText.includes("forward click")) {
     tips.push("Fog chase becomes wave or objective unless next enemy is known.");
   }
   return tips.slice(0, 5);
@@ -705,6 +723,7 @@ function visibleSamiraNotes(notes = [], now = new Date()) {
   const seen = new Set();
   return notes
     .filter((note) => note.source === "samira-intake")
+    .filter(samiraNoteInCurrentWindow)
     .filter((note) => {
       const key = samiraNoteDedupeKey(note);
       if (!key || seen.has(key)) return false;
@@ -717,6 +736,7 @@ function visibleSamiraNotes(notes = [], now = new Date()) {
 async function samiraState(extraNotes = []) {
   const notes = [...extraNotes, ...(await loadNotes())]
     .filter(isSamiraNote)
+    .filter(samiraNoteInCurrentWindow)
     .sort((a, b) => (Date.parse(b.created_at || "") || 0) - (Date.parse(a.created_at || "") || 0));
   const review = await loadRecordingReview();
   const newestNote = notes[0] || null;
@@ -738,7 +758,7 @@ async function samiraState(extraNotes = []) {
     rank_estimate: rankEstimate,
     rank_trend: samiraRankTrend(visibleNotes, review, rankEstimate),
     tips: samiraTips(notes, review),
-    source_boundary: "Approximate rank read from saved notes and recording reviews, not Riot MMR.",
+    source_boundary: "Approximate rank read from June 30 onward Samira notes and current-window reviews, not Riot MMR.",
     notes: visibleNotes.map((note) => publicSamiraNote(note, rankEstimate))
   };
 }
