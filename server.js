@@ -18,7 +18,7 @@ const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "h
 const statusToken = (process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const samiraAnalysisModel = (process.env.LEAGUE_ANALYSIS_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini").trim();
 const samiraAiDisabled = /^(1|true|yes)$/i.test(process.env.LEAGUE_DISABLE_AI || "");
-const samiraAnalysisPromptVersion = 4;
+const samiraAnalysisPromptVersion = 5;
 const recordingStatusPath = path.join(dataRoot, "recording-status.json");
 const localAnalysisRoot = path.join(__dirname, "_recording-analysis");
 const localRecordingStatusPath = path.join(localAnalysisRoot, "recording-status.json");
@@ -251,7 +251,7 @@ function sentenceBoundedText(value, maxLength = 430, maxWords = 72) {
 
 function samiraAiCopyRejected(text) {
   const value = cleanText(text, 1000);
-  return samiraTextLooksCutOff(value) || /\b(?:improve overall performance|win chances|strategic play|showcas(?:e|ing)|critical decision leak|decision leak|potential success|achieved|secured|faltered|undermined|playing Teemo support|while playing Teemo|Alan played Teemo|in this (?:swiftplay|ranked|game)|gameplay relies|unfavorable|strategy|strategic|prioriti[sz]e|focus on|maintain|capitalize|impactful plays|challenging matchup|despite the|breakdown in strategy|hinder success|overall performance|your stats show potential|execution needs refinement|keep pushing|find your openings|focus on bigger fights|turn the game around|maintain chase pressure|controlled|stable|safe entry|overextending|prematurely|risky engagements|initial impact|red-light commits?|must adopt|must be|playstyle|approach|engage(?:ment)?|clear entry|exit patterns?|main failure|main mistake|biggest mistake|classic .* mistake|failure to|stabiliz(?:e|ing)|mental overload|poor positioning|poor fight endings|fundamental|mechanical and decision|decision flaws?|the note (?:clearly )?(?:defines|identifies|emphasizes|highlights)|highlighting that|aligns with|iron [ivx]+ level mistakes?|ranked-habit evidence|source-bounded note analysis|limited ranked|beyond baseline|ranked-level|decision depth|basic fight timing|opportunit(?:y|ies)|show enough|climb yet|red flags?|avoid(?:s|ing)?)\b/i.test(value);
+  return samiraTextLooksCutOff(value) || /\b(?:improve overall performance|win chances|strategic play|showcas(?:e|ing)|critical decision leak|decision leak|potential success|achieved|secured|faltered|undermined|playing Teemo support|while playing Teemo|Alan played Teemo|in this (?:swiftplay|ranked|game)|gameplay relies|unfavorable|strategy|strategic|prioriti[sz]e|focus on|maintain|capitalize|impactful plays|challenging matchup|despite the|breakdown in strategy|hinder success|overall performance|your stats show potential|execution needs refinement|keep pushing|find your openings|focus on bigger fights|turn the game around|maintain chase pressure|controlled|stable|safe entry|overextending|prematurely|risky engagements|initial impact|red-light commits?|must adopt|must be|playstyle|approach|engage(?:ment)?|clear entry|exit patterns?|main failure|main mistake|biggest mistake|classic .* (?:mistake|behavior)|at this level|you understand|you know the entry and payout|failure to|stabiliz(?:e|ing)|mental overload|poor positioning|poor fight endings|fundamental|mechanical and decision|decision flaws?|the note (?:clearly )?(?:defines|identifies|emphasizes|highlights)|highlighting that|aligns with|iron [ivx]+ level mistakes?|ranked-habit evidence|source-bounded note analysis|limited ranked|beyond baseline|ranked-level|decision depth|basic fight timing|opportunit(?:y|ies)|show enough|climb yet|red flags?|avoid(?:s|ing)?)\b/i.test(value);
 }
 
 function samiraAiDescriptionRejected(text) {
@@ -889,7 +889,7 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
     "No labels, prefixes, assistant scaffolding, generic note summaries, or signal counts.",
     "Do not write generic coaching phrases about performance, strategy, potential, success, or improvement.",
     "Do not use professional recap verbs like achieved, secured, showcasing, faltered, or undermined.",
-    "Do not write prioritize, focus on, avoid, maintain, controlled, stable, safe entry, overextending, prematurely, risky engagements, red-light, red flag, initial impact, adopt, must be, playstyle, approach, engage, main failure, main mistake, stabilizing, mental overload, fundamental, decision flaw, opportunity, ranked-level, decision depth, basic fight timing, show enough, or climb yet.",
+    "Do not write prioritize, focus on, avoid, maintain, controlled, stable, safe entry, overextending, prematurely, risky engagements, red-light, red flag, initial impact, adopt, must be, playstyle, approach, engage, main failure, main mistake, stabilizing, mental overload, fundamental, decision flaw, opportunity, ranked-level, decision depth, basic fight timing, show enough, climb yet, You understand, at this level, or classic Iron behavior.",
     "Do not write The note defines, the note identifies, highlighting, aligns with, emphasizes, level mistakes, or limited evidence.",
     "Do not start with In this game, In this ranked game, In this Swiftplay, Despite, or The game.",
     "Do not invert Alan's critique. If the note says bigger fights, panic defense, fog chase, or staying in middle caused the problem, name that behavior as the mistake.",
@@ -922,7 +922,7 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
         content: [
           "Rewrite the description only. The previous output was rejected because it sounded generic, polite, inverted, or assistant-shaped.",
           "Use 2 to 4 short direct sentences. Name the note-specific stat, game type, champion context, or decision pattern.",
-          "No prioritize/focus/avoid/strategy/performance/potential/controlled/stable/overextending/adopt/must be/playstyle/approach/engage/main failure/main mistake/stabilizing/opportunity/ranked-level/decision depth language.",
+          "No prioritize/focus/avoid/strategy/performance/potential/controlled/stable/overextending/adopt/must be/playstyle/approach/engage/main failure/main mistake/stabilizing/opportunity/ranked-level/decision depth/You understand/at this level/classic behavior language.",
           "Return JSON with keys: description, rank, rank_reason."
         ].join(" ")
       }
