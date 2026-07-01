@@ -1302,7 +1302,7 @@ function samiraNotePdfLines(note = {}, rankRead = {}, description = "") {
     ...(gameMeta.line ? [{ text: gameMeta.line, font: "F1", size: 10, leading: 15 }] : []),
     { text: rankRead.basis || "saved note language; not Riot MMR", font: "F1", size: 9, leading: 14 },
     { text: `created: ${cleanText(note.created_at || "", 48)}`, font: "F1", size: 9, leading: 18 },
-    ...(description ? pdfParagraphLineObjects(description, { font: "F2", size: 10, leading: 14, justify: true }) : []),
+    ...(description ? pdfParagraphLineObjects(description, { font: "F1", size: 10, leading: 14, justify: true }) : []),
     { text: "note", font: "F2", size: 11, leading: 16 }
   ];
   lines.push(...pdfParagraphLineObjects(body, { font: "F1", size: 10, leading: 13, justify: true }));
