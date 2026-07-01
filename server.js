@@ -18,7 +18,7 @@ const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "h
 const statusToken = (process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const samiraAnalysisModel = (process.env.LEAGUE_ANALYSIS_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini").trim();
 const samiraAiDisabled = /^(1|true|yes)$/i.test(process.env.LEAGUE_DISABLE_AI || "");
-const samiraAnalysisPromptVersion = 2;
+const samiraAnalysisPromptVersion = 3;
 const recordingStatusPath = path.join(dataRoot, "recording-status.json");
 const localAnalysisRoot = path.join(__dirname, "_recording-analysis");
 const localRecordingStatusPath = path.join(localAnalysisRoot, "recording-status.json");
@@ -245,12 +245,25 @@ function sentenceBoundedText(value, maxLength = 430, maxWords = 72) {
 
 function samiraAiCopyRejected(text) {
   const value = cleanText(text, 1000);
-  return /\b(?:improve overall performance|win chances|strategic play|showcas(?:e|ing)|critical decision leak|decision leak|potential success|achieved|secured|faltered|undermined|playing Teemo support|while playing Teemo|Alan played Teemo|in this (?:swiftplay|ranked|game)|gameplay relies|unfavorable|strategy|strategic|prioriti[sz]e|focus on|maintain|capitalize|impactful plays|challenging matchup|despite the|breakdown in strategy|hinder success|overall performance|your stats show potential|execution needs refinement|keep pushing|find your openings|focus on bigger fights|turn the game around|maintain chase pressure|controlled|stable|safe entry|overextending|prematurely|risky engagements|initial impact|red-light commits?|must adopt|playstyle|avoid)\b/i.test(value);
+  return /\b(?:improve overall performance|win chances|strategic play|showcas(?:e|ing)|critical decision leak|decision leak|potential success|achieved|secured|faltered|undermined|playing Teemo support|while playing Teemo|Alan played Teemo|in this (?:swiftplay|ranked|game)|gameplay relies|unfavorable|strategy|strategic|prioriti[sz]e|focus on|maintain|capitalize|impactful plays|challenging matchup|despite the|breakdown in strategy|hinder success|overall performance|your stats show potential|execution needs refinement|keep pushing|find your openings|focus on bigger fights|turn the game around|maintain chase pressure|controlled|stable|safe entry|overextending|prematurely|risky engagements|initial impact|red-light commits?|must adopt|playstyle|approach|engage(?:ment)?|clear entry|exit patterns?|main failure|failure to|stabiliz(?:e|ing)|mental overload|poor positioning|poor fight endings|fundamental|mechanical and decision|decision flaws?|the note (?:clearly )?(?:defines|identifies|emphasizes|highlights)|highlighting that|aligns with|iron [ivx]+ level mistakes?|ranked-habit evidence|source-bounded note analysis|limited ranked|beyond baseline|ranked-level|decision depth|basic fight timing|opportunit(?:y|ies)|show enough|climb yet|red flags?|avoid(?:s|ing)?)\b/i.test(value);
 }
 
 function samiraAiDescriptionRejected(text) {
   const value = cleanText(text, 1000);
   return !value || value.length < 45 || value.length > 430 || wordCount(value) > 72 || samiraAiCopyRejected(value);
+}
+
+function samiraAiReasonRejected(text) {
+  const value = cleanText(text, 500);
+  return !value || value.length < 12 || value.length > 170 || wordCount(value) > 26 || samiraAiCopyRejected(value);
+}
+
+function naturalRankReason(value, fallback = "") {
+  const candidate = sentenceBoundedText(stripAssistantScaffold(value, 260), 170, 26);
+  if (!samiraAiReasonRejected(candidate)) return candidate;
+  const fallbackText = sentenceBoundedText(stripAssistantScaffold(fallback, 260), 170, 24);
+  if (!samiraAiReasonRejected(fallbackText)) return fallbackText;
+  return "Your rank read stays low because the same fights still need cleaner exits.";
 }
 
 function parseJsonObject(text) {
@@ -654,10 +667,10 @@ function samiraNoteRankRead(note = {}, overallRank = {}) {
   const value = explicit ?? Math.max(0, Math.min(samiraRankScale.length - 1, baseline + delta));
   const exactRank = samiraRankNameForValue(value);
   const reason = leak > greenLight + conversion
-    ? "Red-light commits, chase pressure, or exit leaks dominate."
+    ? "Too many fights still become chase, low-HP stays, or no-exit deaths."
     : greenLight + conversion > 0
-      ? "The note names when to enter and how to cash out."
-      : "Limited ranked-habit evidence beyond baseline.";
+      ? "You name the entry gate and the cash-out, but it still has to become clicks."
+      : "There is not enough ranked behavior here to move the read much.";
   return {
     exactRank,
     range: `${samiraRankNameForValue(value - 1)} to ${samiraRankNameForValue(value + 1)}`,
@@ -728,10 +741,10 @@ function samiraCorpusMainTakeaway(notes = [], review = {}, overallRank = {}) {
     /\bstay\b/g
   ]);
   if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i])) {
-    return "Play boom-and-zoom Samira: edge, dive, damage, climb out, re-check.";
+    return "Edge first. Dive for damage, climb out, then re-check.";
   }
   if (exits >= 5 && leaks >= 5) {
-    return "You have damage. Your problem is payout discipline: kill, step out, buy.";
+    return "You already have damage. Kill, step out, buy, then fight again.";
   }
   if (greenLight >= 4 && leaks >= 4) {
     return "Your E needs a gate. W ready, HP above half, ally close, then go.";
@@ -774,7 +787,7 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
     pieces.push("Narrow the next note until the next game proves one changed click.");
   }
   if ((signals.leak || 0) >= (signals.greenLight || 0) + 5 && !/\bfog\b|\bchase\b/.test(text)) {
-    pieces.push("Too much of the paragraph is still panic language; make the next game prove the check.");
+    pieces.push("The next game has to prove one calmer check.");
   }
   return cleanText(pieces.join(" "), 300);
 }
@@ -783,10 +796,10 @@ function samiraSourceSpecificSentence(note = {}) {
   const text = samiraNoteAnalysisText(note);
   const gameMeta = samiraNoteGameMeta(note).line;
   if (/swiftplay|2\/0\/0|15 cs|4,?492 gold|panic defense|win condition/.test(text) || /Swiftplay/i.test(gameMeta)) {
-    return "The Swiftplay line says survival was not the problem; panic defense after first value was.";
+    return "Survival was not the problem. Panic defense after first value was.";
   }
   if (/6\/11\/2|8,?279 damage|11,?077 gold|teemo support|pyke lane|309\/720/.test(text)) {
-    return "The 6/11/2 ranked line says the lane was ugly, but eleven deaths made the comeback attempt worse.";
+    return "The lane was ugly, but eleven deaths made the comeback attempt worse.";
   }
   if (/16\/6\/9|yasuo|47,?199 damage/.test(text)) {
     return "Yasuo was the real carry signal, so Samira needed cleaner value conversion, not more pride fights.";
@@ -798,7 +811,7 @@ function samiraSourceSpecificSentence(note = {}) {
     return "ARAM hides the lane problem, but it still exposes the five seconds after aggression works.";
   }
   if (/ranked solo \/ win|ranked solo queue win|win\b/.test(`${text} ${gameMeta.toLowerCase()}`)) {
-    return "The win note is useful only if the same exit rule survives when the game is not already working.";
+    return "The exit rule has to survive games that are not already working.";
   }
   return "";
 }
@@ -862,18 +875,21 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
     "Do actual game-model analysis from the pasted note. Do not summarize the title.",
     "Alan is the Samira player unless the note explicitly says otherwise. Teemo support, Nami, Lily, Yasuo, Pyke, and enemy names are other players or context, not Alan's champion.",
     "Write the paragraph as the sentence Alan should read before queueing, not as a match recap.",
-    "Use direct second-person or direct Alan language. Prefer short commands and hard reads. Be mean and concrete, not polite.",
+    "Use natural direct second-person or direct Alan language. Prefer short commands and hard reads. Be mean and concrete, not polite.",
+    "Sound like a blunt teammate who understood the note, not a coach report, rank audit, or AI summary.",
     "Pick the one useful pre-game read. Do not inventory every fact in a huge note.",
     "Use the note's own model: entry gate, first damage pass, climb-out, payout, reset, fog chase, bad support, panic defense, value conversion.",
     "Use 2 to 4 short sentences for description, 24 to 65 words.",
     "No labels, prefixes, assistant scaffolding, generic note summaries, or signal counts.",
     "Do not write generic coaching phrases about performance, strategy, potential, success, or improvement.",
     "Do not use professional recap verbs like achieved, secured, showcasing, faltered, or undermined.",
-    "Do not write prioritize, focus on, avoid, maintain, controlled, stable, safe entry, overextending, prematurely, risky engagements, red-light, initial impact, adopt, or playstyle.",
+    "Do not write prioritize, focus on, avoid, maintain, controlled, stable, safe entry, overextending, prematurely, risky engagements, red-light, red flag, initial impact, adopt, playstyle, approach, engage, main failure, stabilizing, mental overload, fundamental, decision flaw, opportunity, ranked-level, decision depth, basic fight timing, show enough, or climb yet.",
+    "Do not write The note defines, the note identifies, highlighting, aligns with, emphasizes, level mistakes, or limited evidence.",
     "Do not start with In this game, In this ranked game, In this Swiftplay, Despite, or The game.",
     "Do not invert Alan's critique. If the note says bigger fights, panic defense, fog chase, or staying in middle caused the problem, name that behavior as the mistake.",
     "Never recommend bigger fights, maintaining chase pressure, pushing through chaos, or finding openings when the note says exit, reset, payout, or climb out.",
     "Do not reuse boilerplate across notes. Mention the note-specific pattern, stats, matchup, game type, or decision leak when present.",
+    "rank_reason must also sound natural: one short sentence about the rank read, not a report about the note.",
     "Good style examples, only if the evidence matches: 'You had 309/720 HP. That is not a comeback window. Shrink the lane, take small farm, or reset; bigger fights made the bad lane bigger.' 'S loaded is not a green light. W, HP, and ally position are the green light; R is the reward.' 'Fog is second-fight bait. Take wave, plate, objective, or reset unless vision and ally position are already true.'",
     "Allowed ranks: Iron IV, Iron III, Iron II, Iron I, Bronze IV."
   ].join(" ");
@@ -900,7 +916,7 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
         content: [
           "Rewrite the description only. The previous output was rejected because it sounded generic, polite, inverted, or assistant-shaped.",
           "Use 2 to 4 short direct sentences. Name the note-specific stat, game type, champion context, or decision pattern.",
-          "No prioritize/focus/avoid/strategy/performance/potential/controlled/stable/overextending/adopt/playstyle language.",
+          "No prioritize/focus/avoid/strategy/performance/potential/controlled/stable/overextending/adopt/playstyle/approach/engage/main failure/stabilizing/opportunity/ranked-level/decision depth language.",
           "Return JSON with keys: description, rank, rank_reason."
         ].join(" ")
       }
@@ -920,7 +936,7 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
       ...rankRead,
       exactRank,
       range: `${samiraRankNameForValue(value - 1)} to ${samiraRankNameForValue(value + 1)}`,
-      reason: samiraAiCopyRejected(parsed?.rank_reason) ? rankRead.reason : stripAssistantScaffold(parsed?.rank_reason || rankRead.reason || "Source-bounded note analysis.", 180),
+      reason: naturalRankReason(parsed?.rank_reason, rankRead.reason),
       basis: "AI analysis of June 30 onward Samira note; not Riot MMR",
       confidence: rankRead.confidence || "medium"
     }
@@ -945,7 +961,8 @@ async function analyzeSamiraCorpusWithAi(notes = [], rankEstimate = {}) {
         "The takeaway must be one direct sentence or two very short sentences, 8 to 20 words total, no label, no colon-prefix, no generic motivation.",
         "Use the recurring gameplay model across the notes, not a copied title.",
         "Do not write generic phrases about performance, strategic play, strategy, win chances, potential, success, or improvement.",
-        "Do not write Alan must adopt, playstyle, prioritize, focus on, or avoid.",
+        "Do not write Alan must adopt, playstyle, approach, engage, prioritize, focus on, avoid, opportunity, ranked-level, or decision depth.",
+        "Sound natural, like a short thought Alan would actually remember.",
         "Write the sentence as a direct Samira rule Alan can use before queueing. Start with Stop, Take, Leave, Wait, Hold, or Name when possible."
       ].join(" ")
     },
