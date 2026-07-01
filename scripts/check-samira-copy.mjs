@@ -48,6 +48,12 @@ try {
   await waitForServer();
   const sampleBodies = [
     [
+      "Normal Swiftplay Victory. Team 1 won 42/23/55 with 98,163 gold against Team 2's 23/42/29 with 84,823 gold.",
+      "Alan's Samira finished 16/6/5, 40,565 damage, 22,994 gold, and 923 gold/min.",
+      "At 24:02 Alan was 12/6/5 with 172 CS and 2,904 gold, then the final fight moved him to 16/6/5.",
+      "The useful Samira rule is still edge, dive, damage, climb out, then buy or reset."
+    ].join(" "),
+    [
       "Ranked solo queue loss. K/D/A 6/11/2. 174 CS. 21,209 damage. 12,004 gold. 412 gold/min.",
       "Alan's Samira game shows fixed flight pattern and boom-and-zoom.",
       "Edge is altitude. E is the dive. Return to edge is the climb.",
@@ -88,8 +94,15 @@ try {
     throw new Error("Samira rank trend includes notes or recordings before June 30.");
   }
   const sampleNote = sampleNotes[0];
-  if (!/ranked solo/i.test(sampleNote.game_meta_line || "") || !/6\/11\/2/.test(sampleNote.game_meta_line || "") || !/174 CS/.test(sampleNote.game_meta_line || "")) {
-    throw new Error(`Samira sample note did not expose game facts: ${sampleNote.game_meta_line || ""}`);
+  if (!/Swiftplay/i.test(sampleNote.game_meta_line || "") || !/16\/6\/5/.test(sampleNote.game_meta_line || "") || !/172 CS/.test(sampleNote.game_meta_line || "") || !/40,565 damage/.test(sampleNote.game_meta_line || "") || !/22,994 gold/.test(sampleNote.game_meta_line || "")) {
+    throw new Error(`Samira team-score sample did not expose Alan/Samira facts: ${sampleNote.game_meta_line || ""}`);
+  }
+  if (/42\/23\/55|98,163 gold/.test(sampleNote.game_meta_line || "")) {
+    throw new Error(`Samira team-score sample leaked team stats into card metadata: ${sampleNote.game_meta_line || ""}`);
+  }
+  const rankedSampleNote = sampleNotes[1];
+  if (!/ranked solo/i.test(rankedSampleNote.game_meta_line || "") || !/6\/11\/2/.test(rankedSampleNote.game_meta_line || "") || !/174 CS/.test(rankedSampleNote.game_meta_line || "")) {
+    throw new Error(`Samira sample note did not expose game facts: ${rankedSampleNote.game_meta_line || ""}`);
   }
   for (const note of sampleNotes) {
     const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(note.id)}`, {

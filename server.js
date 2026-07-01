@@ -18,7 +18,7 @@ const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "h
 const statusToken = (process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const samiraAnalysisModel = (process.env.LEAGUE_ANALYSIS_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini").trim();
 const samiraAiDisabled = /^(1|true|yes)$/i.test(process.env.LEAGUE_DISABLE_AI || "");
-const samiraAnalysisPromptVersion = 6;
+const samiraAnalysisPromptVersion = 7;
 const recordingStatusPath = path.join(dataRoot, "recording-status.json");
 const localAnalysisRoot = path.join(__dirname, "_recording-analysis");
 const localRecordingStatusPath = path.join(localAnalysisRoot, "recording-status.json");
@@ -420,24 +420,83 @@ function normalizedGameType(text) {
   return patterns.find((item) => item.re.test(source))?.label || "";
 }
 
+function samiraStatCandidateScore(text, index) {
+  const before = text.slice(Math.max(0, index - 90), index);
+  const around = text.slice(Math.max(0, index - 140), Math.min(text.length, index + 180));
+  let score = 0;
+  if (/\bAlan(?:'s|’s)?\s+Samira\b/i.test(around)) score += 10;
+  if (/\bAlan\b/i.test(around)) score += 6;
+  if (/\bSamira\b/i.test(around)) score += 5;
+  if (/\bK\/?D\/?A\b/i.test(around)) score += 5;
+  if (/\b(?:user-supplied|finished|went|final screen|post-game scoreboard)\b/i.test(around)) score += 2;
+  if (/\b(?:Team\s*\d|team score|enemy team)\b[^.;,\n]{0,45}$/i.test(before)) score -= 12;
+  if (/\b(?:Yernar|Lily|Nami|Katarina|Alistar|Kayn|Heimerdinger|Kindred|Lux|Swain|Pyke)(?:'s|’s)?\b[^.;,\n]{0,70}$/i.test(before)) score -= 9;
+  return score;
+}
+
+function bestSamiraKdaMatch(text) {
+  const explicitPatterns = [
+    /\b(?:Alan(?:'s|’s)?\s+Samira|Alan)\s+(?:finished|went|ended|ends?|was|is|reached|reaches)\s+(?:at|with)?\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/ig,
+    /\bK\/?D\/?A\s*:?\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/ig,
+    /\buser-supplied[^.;:\n]{0,60}(?:result|score)\s*:?\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/ig
+  ];
+  for (const pattern of explicitPatterns) {
+    const matches = [...text.matchAll(pattern)];
+    if (matches.length) {
+      const match = matches
+        .map((item) => ({ item, score: samiraStatCandidateScore(text, item.index || 0) }))
+        .sort((a, b) => b.score - a.score || (a.item.index || 0) - (b.item.index || 0))[0].item;
+      return { match, index: match.index || 0, value: `${match[1]}/${match[2]}/${match[3]}` };
+    }
+  }
+  const candidates = [...text.matchAll(/\b(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/g)]
+    .map((match) => ({ match, index: match.index || 0, value: `${match[1]}/${match[2]}/${match[3]}`, score: samiraStatCandidateScore(text, match.index || 0) }))
+    .filter((item) => item.score > -4);
+  if (!candidates.length) return null;
+  return candidates.sort((a, b) => b.score - a.score || a.index - b.index)[0];
+}
+
+function firstMetricAfter(text, startIndex, regex, formatter) {
+  if (!Number.isFinite(startIndex)) return "";
+  const segment = text.slice(startIndex, Math.min(text.length, startIndex + 220));
+  const match = segment.match(regex);
+  return match ? formatter(match) : "";
+}
+
+function bestSamiraMetric(text, regex, formatter, options = {}) {
+  const candidates = [...text.matchAll(regex)]
+    .map((match) => {
+      const value = Number(String(match[1] || "").replace(/[^\d]/g, ""));
+      return { match, index: match.index || 0, score: samiraStatCandidateScore(text, match.index || 0), value };
+    })
+    .filter((item) => item.score > -4);
+  if (!candidates.length) return "";
+  candidates.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    if (options.preferHighest) return b.value - a.value;
+    return a.index - b.index;
+  });
+  return formatter(candidates[0].match);
+}
+
 function samiraNoteGameMeta(note = {}) {
   const text = `${note.title || ""}\n${note.body || ""}`;
   const resultMatch = text.match(/\b(victory|defeat|won|win|lost|loss)\b/i);
   const result = resultMatch
     ? (/victory|won|win/i.test(resultMatch[1]) ? "win" : "loss")
     : "";
-  const kdaMatch = text.match(/\b(?:k\/?d\/?a|score|went|finished|ending)?\s*:?\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/i);
-  const csMatch = text.match(/\b(?:cs|creep\s+score|farm)\s*[:=]?\s*(\d{2,4})\b/i) ||
-    text.match(/\b(\d{2,4})\s*(?:cs|creep\s+score)\b/i);
-  const damageMatch = text.match(/\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*(?:damage|dmg)\b/i);
-  const goldMatch = text.match(/\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*gold\b/i);
-  const goldPerMinuteMatch = text.match(/\b(\d{2,4})\s*(?:gold\/min|gpm)\b/i);
+  const kdaMatch = bestSamiraKdaMatch(text);
+  const afterKda = kdaMatch?.index ?? Number.NaN;
   const gameType = normalizedGameType(text);
-  const kda = kdaMatch ? `${kdaMatch[1]}/${kdaMatch[2]}/${kdaMatch[3]}` : "";
-  const cs = csMatch ? `${csMatch[1]} CS` : "";
-  const damage = damageMatch ? `${numberWithCommas(damageMatch[1])} damage` : "";
-  const gold = goldMatch ? `${numberWithCommas(goldMatch[1])} gold` : "";
-  const gpm = goldPerMinuteMatch ? `${goldPerMinuteMatch[1]} gold/min` : "";
+  const kda = kdaMatch?.value || "";
+  const cs = firstMetricAfter(text, afterKda, /\b(\d{2,4})\s*(?:CS|creep\s+score)\b/i, (match) => `${match[1]} CS`) ||
+    bestSamiraMetric(text, /\b(\d{2,4})\s*(?:CS|creep\s+score)\b/ig, (match) => `${match[1]} CS`, { preferHighest: true });
+  const damage = firstMetricAfter(text, afterKda, /\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*(?:damage|dmg)\b/i, (match) => `${numberWithCommas(match[1])} damage`) ||
+    bestSamiraMetric(text, /\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*(?:damage|dmg)\b/ig, (match) => `${numberWithCommas(match[1])} damage`);
+  const gold = firstMetricAfter(text, afterKda, /\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*gold\b/i, (match) => `${numberWithCommas(match[1])} gold`) ||
+    bestSamiraMetric(text, /\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*gold\b/ig, (match) => `${numberWithCommas(match[1])} gold`);
+  const gpm = firstMetricAfter(text, afterKda, /\b(\d{2,4})\s*(?:gold\/min|gpm)\b/i, (match) => `${match[1]} gold/min`) ||
+    bestSamiraMetric(text, /\b(\d{2,4})\s*(?:gold\/min|gpm)\b/ig, (match) => `${match[1]} gold/min`);
   const parts = [gameType, result, kda, cs, damage, gold, gpm].filter(Boolean);
   return {
     game_type: gameType,
