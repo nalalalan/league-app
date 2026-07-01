@@ -18,6 +18,7 @@ const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "h
 const statusToken = (process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const samiraAnalysisModel = (process.env.LEAGUE_ANALYSIS_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini").trim();
 const samiraAiDisabled = /^(1|true|yes)$/i.test(process.env.LEAGUE_DISABLE_AI || "");
+const samiraAnalysisPromptVersion = 2;
 const recordingStatusPath = path.join(dataRoot, "recording-status.json");
 const localAnalysisRoot = path.join(__dirname, "_recording-analysis");
 const localRecordingStatusPath = path.join(localAnalysisRoot, "recording-status.json");
@@ -221,9 +222,35 @@ function stripAssistantScaffold(value, maxLength = 430) {
   return text.slice(0, maxLength);
 }
 
+function wordCount(value) {
+  return cleanText(value, 2000).split(/\s+/).filter(Boolean).length;
+}
+
+function sentenceBoundedText(value, maxLength = 430, maxWords = 72) {
+  const text = cleanText(value, 1200);
+  if (!text) return "";
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+  let result = "";
+  for (const sentence of sentences) {
+    const next = cleanText(`${result} ${sentence}`, maxLength + 120);
+    if (next.length > maxLength || wordCount(next) > maxWords) break;
+    result = next;
+  }
+  if (!result) {
+    const words = text.split(/\s+/).filter(Boolean).slice(0, maxWords);
+    result = words.join(" ");
+  }
+  return result.replace(/[,:;/-]*$/, "").trim();
+}
+
 function samiraAiCopyRejected(text) {
   const value = cleanText(text, 1000);
-  return /\b(?:improve overall performance|win chances|strategic play|showcas(?:e|ing)|critical decision leak|decision leak|potential success|achieved|secured|faltered|undermined|playing Teemo support|while playing Teemo|Alan played Teemo|in this (?:swiftplay|ranked|game)|gameplay relies|unfavorable|strategy|strategic|prioriti[sz]e|focus on|maintain|capitalize|impactful plays|challenging matchup|despite the|breakdown in strategy|hinder success|overall performance|your stats show potential|execution needs refinement|keep pushing|find your openings|focus on bigger fights|turn the game around|maintain chase pressure|controlled|stable|safe entry|overextending|prematurely|risky engagements|initial impact|red-light commits?)\b/i.test(value);
+  return /\b(?:improve overall performance|win chances|strategic play|showcas(?:e|ing)|critical decision leak|decision leak|potential success|achieved|secured|faltered|undermined|playing Teemo support|while playing Teemo|Alan played Teemo|in this (?:swiftplay|ranked|game)|gameplay relies|unfavorable|strategy|strategic|prioriti[sz]e|focus on|maintain|capitalize|impactful plays|challenging matchup|despite the|breakdown in strategy|hinder success|overall performance|your stats show potential|execution needs refinement|keep pushing|find your openings|focus on bigger fights|turn the game around|maintain chase pressure|controlled|stable|safe entry|overextending|prematurely|risky engagements|initial impact|red-light commits?|must adopt|playstyle|avoid)\b/i.test(value);
+}
+
+function samiraAiDescriptionRejected(text) {
+  const value = cleanText(text, 1000);
+  return !value || value.length < 45 || value.length > 430 || wordCount(value) > 72 || samiraAiCopyRejected(value);
 }
 
 function parseJsonObject(text) {
@@ -819,6 +846,7 @@ function normalizeAiRank(value, fallback = "Iron III") {
 function fallbackSamiraAnalysis(note = {}, rankRead = {}, overallRank = {}) {
   return {
     engine: "fallback",
+    prompt_version: samiraAnalysisPromptVersion,
     body_hash: hashText(`${note.title || ""}\n${note.body || ""}`),
     description: samiraNoteDescription(note, rankRead, overallRank),
     rank_read: rankRead
@@ -835,12 +863,13 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
     "Alan is the Samira player unless the note explicitly says otherwise. Teemo support, Nami, Lily, Yasuo, Pyke, and enemy names are other players or context, not Alan's champion.",
     "Write the paragraph as the sentence Alan should read before queueing, not as a match recap.",
     "Use direct second-person or direct Alan language. Prefer short commands and hard reads. Be mean and concrete, not polite.",
+    "Pick the one useful pre-game read. Do not inventory every fact in a huge note.",
     "Use the note's own model: entry gate, first damage pass, climb-out, payout, reset, fog chase, bad support, panic defense, value conversion.",
-    "Use one paragraph for description, 24 to 55 words.",
+    "Use 2 to 4 short sentences for description, 24 to 65 words.",
     "No labels, prefixes, assistant scaffolding, generic note summaries, or signal counts.",
     "Do not write generic coaching phrases about performance, strategy, potential, success, or improvement.",
     "Do not use professional recap verbs like achieved, secured, showcasing, faltered, or undermined.",
-    "Do not write prioritize, focus on, avoid, maintain, controlled, stable, safe entry, overextending, prematurely, risky engagements, red-light, or initial impact.",
+    "Do not write prioritize, focus on, avoid, maintain, controlled, stable, safe entry, overextending, prematurely, risky engagements, red-light, initial impact, adopt, or playstyle.",
     "Do not start with In this game, In this ranked game, In this Swiftplay, Despite, or The game.",
     "Do not invert Alan's critique. If the note says bigger fights, panic defense, fog chase, or staying in middle caused the problem, name that behavior as the mistake.",
     "Never recommend bigger fights, maintaining chase pressure, pushing through chaos, or finding openings when the note says exit, reset, payout, or climb out.",
@@ -861,8 +890,8 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
     { role: "user", content: user }
   ];
   let parsed = await openAiJson(messages, 340);
-  let description = stripAssistantScaffold(parsed?.description, 520);
-  if (description && samiraAiCopyRejected(description)) {
+  let description = sentenceBoundedText(stripAssistantScaffold(parsed?.description, 700));
+  if (description && samiraAiDescriptionRejected(description)) {
     parsed = await openAiJson([
       ...messages,
       { role: "assistant", content: JSON.stringify(parsed || {}) },
@@ -871,19 +900,20 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
         content: [
           "Rewrite the description only. The previous output was rejected because it sounded generic, polite, inverted, or assistant-shaped.",
           "Use 2 to 4 short direct sentences. Name the note-specific stat, game type, champion context, or decision pattern.",
-          "No prioritize/focus/avoid/strategy/performance/potential/controlled/stable/overextending language.",
+          "No prioritize/focus/avoid/strategy/performance/potential/controlled/stable/overextending/adopt/playstyle language.",
           "Return JSON with keys: description, rank, rank_reason."
         ].join(" ")
       }
     ], 300);
-    description = stripAssistantScaffold(parsed?.description, 520);
+    description = sentenceBoundedText(stripAssistantScaffold(parsed?.description, 700));
   }
-  if (!description || description.length < 45 || samiraAiCopyRejected(description)) return null;
+  if (samiraAiDescriptionRejected(description)) return null;
   const exactRank = normalizeAiRank(parsed?.rank, rankRead.exactRank || overallRank.exactRank || "Iron III");
   const value = samiraRankValueFromText(exactRank) ?? samiraRankValueFromText(rankRead.exactRank) ?? 1;
   return {
     engine: "openai",
     model: samiraAnalysisModel,
+    prompt_version: samiraAnalysisPromptVersion,
     body_hash: hashText(`${note.title || ""}\n${note.body || ""}`),
     description,
     rank_read: {
@@ -912,10 +942,11 @@ async function analyzeSamiraCorpusWithAi(notes = [], rankEstimate = {}) {
       content: [
         "You analyze Alan's current saved Samira notes as one corpus.",
         "Return JSON only with key main_takeaway.",
-        "The takeaway must be one direct sentence, 12 to 22 words, no label, no colon-prefix, no generic motivation.",
+        "The takeaway must be one direct sentence or two very short sentences, 8 to 20 words total, no label, no colon-prefix, no generic motivation.",
         "Use the recurring gameplay model across the notes, not a copied title.",
         "Do not write generic phrases about performance, strategic play, strategy, win chances, potential, success, or improvement.",
-        "Write the sentence as a direct Samira rule Alan can use before queueing."
+        "Do not write Alan must adopt, playstyle, prioritize, focus on, or avoid.",
+        "Write the sentence as a direct Samira rule Alan can use before queueing. Start with Stop, Take, Leave, Wait, Hold, or Name when possible."
       ].join(" ")
     },
     {
@@ -923,7 +954,7 @@ async function analyzeSamiraCorpusWithAi(notes = [], rankEstimate = {}) {
       content: `Current rank read: ${rankEstimate.exactRank || "unrated"}\nCurrent June 30 onward notes:\n${currentNotes}`
     }
   ], 120);
-  const mainTakeaway = stripAssistantScaffold(parsed?.main_takeaway, 150);
+  const mainTakeaway = sentenceBoundedText(stripAssistantScaffold(parsed?.main_takeaway, 150), 150, 20);
   return mainTakeaway && mainTakeaway.length >= 20 && !samiraAiCopyRejected(mainTakeaway) ? mainTakeaway : "";
 }
 
@@ -936,7 +967,7 @@ async function samiraAiAnalysesForNotes(notes = [], rankEstimate = {}) {
     const bodyHash = hashText(`${note.title || ""}\n${note.body || ""}`);
     const fallbackRank = samiraNoteRankRead(note, rankEstimate);
     const cached = cache.noteAnalyses[key];
-    if (cached?.body_hash === bodyHash && cached?.description && (!samiraAiReady() || cached.engine === "openai")) {
+    if (cached?.body_hash === bodyHash && cached?.prompt_version === samiraAnalysisPromptVersion && cached?.description && (!samiraAiReady() || cached.engine === "openai")) {
       notesById[key] = cached;
       continue;
     }
@@ -952,7 +983,7 @@ async function samiraAiAnalysesForNotes(notes = [], rankEstimate = {}) {
     changed = true;
   }
   const corpusKey = corpusCacheKey(notes);
-  let mainTakeaway = cache.corpusAnalyses[corpusKey]?.main_takeaway || "";
+  let mainTakeaway = cache.corpusAnalyses[corpusKey]?.prompt_version === samiraAnalysisPromptVersion ? cache.corpusAnalyses[corpusKey]?.main_takeaway || "" : "";
   if (!mainTakeaway) {
     try {
       mainTakeaway = await analyzeSamiraCorpusWithAi(notes, rankEstimate);
@@ -963,6 +994,7 @@ async function samiraAiAnalysesForNotes(notes = [], rankEstimate = {}) {
       cache.corpusAnalyses[corpusKey] = {
         engine: "openai",
         model: samiraAnalysisModel,
+        prompt_version: samiraAnalysisPromptVersion,
         main_takeaway: mainTakeaway,
         created_at: new Date().toISOString()
       };
