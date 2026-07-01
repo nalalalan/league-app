@@ -149,10 +149,15 @@ try {
   if (prefaceOffending.length) {
     throw new Error(`Generated Samira copy still uses assistant preface stems:\n${prefaceOffending.join("\n")}`);
   }
-  const roboticSummaryCopy = /\b(?:The note (?:clearly )?(?:defines|identifies|emphasizes|highlights)|highlighting that|aligns with|your main failure|main failure|mental overload|poor fight endings|mechanical and decision flaws?|fundamental .* flaws?|ranked-habit evidence|limited ranked|beyond baseline|source-bounded note analysis|must adopt|playstyle|approach|clear entry|exit patterns?|failure to|ranked-level|decision depth|basic fight timing|opportunit(?:y|ies)|show enough|climb yet|red flags?|avoid(?:s|ing)?)\b/i;
+  const roboticSummaryCopy = /\b(?:The note (?:clearly )?(?:defines|identifies|emphasizes|highlights)|highlighting that|aligns with|your main failure|main failure|main mistake|biggest mistake|classic .* mistake|mental overload|poor fight endings|mechanical and decision flaws?|fundamental .* flaws?|ranked-habit evidence|limited ranked|beyond baseline|source-bounded note analysis|must adopt|must be|playstyle|approach|clear entry|exit patterns?|failure to|ranked-level|decision depth|basic fight timing|opportunit(?:y|ies)|show enough|climb yet|red flags?|avoid(?:s|ing)?)\b/i;
   const roboticOffending = generatedSamiraStrings(data).filter((text) => roboticSummaryCopy.test(text));
   if (roboticOffending.length) {
     throw new Error(`Generated Samira copy still sounds like a robotic summary:\n${roboticOffending.join("\n")}`);
+  }
+  const cutoffOffending = generatedSamiraStrings(data)
+    .filter((text) => text.length > 24 && !/[.!?]$/.test(text) && !/^(?:Iron|Bronze|Silver|Gold|Platinum|Emerald|Diamond|Master|Grandmaster|Challenger)\b/.test(text));
+  if (cutoffOffending.length) {
+    throw new Error(`Generated Samira copy looks cut off:\n${cutoffOffending.join("\n")}`);
   }
   const sourceFiles = ["server.js", "public/league-practice-room.tex"];
   const sourceOnlyBanned = [
