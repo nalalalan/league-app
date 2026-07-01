@@ -50,6 +50,7 @@ try {
     [
       "Normal Swiftplay Victory. Team 1 won 42/23/55 with 98,163 gold against Team 2's 23/42/29 with 84,823 gold.",
       "Alan's Samira finished 16/6/5, 40,565 damage, 22,994 gold, and 923 gold/min.",
+      "Don't drop Samira’s punctuation; Lily’s climb-out sentence should stay readable.",
       "At 24:02 Alan was 12/6/5 with 172 CS and 2,904 gold, then the final fight moved him to 16/6/5.",
       "The useful Samira rule is still edge, dive, damage, climb out, then buy or reset."
     ].join(" "),
@@ -99,6 +100,22 @@ try {
   }
   if (/42\/23\/55|98,163 gold/.test(sampleNote.game_meta_line || "")) {
     throw new Error(`Samira team-score sample leaked team stats into card metadata: ${sampleNote.game_meta_line || ""}`);
+  }
+  const pdfResponse = await fetch(`http://127.0.0.1:${port}${sampleNote.pdf_url}`, {
+    headers: { Accept: "application/pdf" }
+  });
+  if (!pdfResponse.ok) {
+    throw new Error(`Samira note PDF did not render: ${pdfResponse.status}`);
+  }
+  const pdfBody = Buffer.from(await pdfResponse.arrayBuffer()).toString("latin1");
+  if (!pdfBody.includes("Alan's Samira") || !pdfBody.includes("Don't drop Samira\x92s punctuation") || !pdfBody.includes("Lily\x92s climb-out")) {
+    throw new Error("Samira note PDF does not preserve apostrophe punctuation in existing note text.");
+  }
+  if (/Alan s Samira|Don t drop|Samira s punctuation|Lily s climb-out/.test(pdfBody)) {
+    throw new Error("Samira note PDF still converts apostrophes into gaps.");
+  }
+  if (!/\b\d+(?:\.\d+)? Tw\b/.test(pdfBody)) {
+    throw new Error("Samira note PDF paragraphs are not using justified word spacing.");
   }
   const rankedSampleNote = sampleNotes[1];
   if (!/ranked solo/i.test(rankedSampleNote.game_meta_line || "") || !/6\/11\/2/.test(rankedSampleNote.game_meta_line || "") || !/174 CS/.test(rankedSampleNote.game_meta_line || "")) {

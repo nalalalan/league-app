@@ -1174,19 +1174,77 @@ async function samiraState(extraNotes = []) {
   };
 }
 
-function pdfText(value) {
+const PDF_PAGE_WIDTH = 612;
+const PDF_MARGIN_X = 54;
+const PDF_TEXT_WIDTH = PDF_PAGE_WIDTH - (PDF_MARGIN_X * 2);
+const PDF_HELVETICA_WIDTHS = {
+  " ": 278, "!": 278, "\"": 355, "#": 556, "$": 556, "%": 889, "&": 667, "'": 191,
+  "(": 333, ")": 333, "*": 389, "+": 584, ",": 278, "-": 333, ".": 278, "/": 278,
+  "0": 556, "1": 556, "2": 556, "3": 556, "4": 556, "5": 556, "6": 556, "7": 556, "8": 556, "9": 556,
+  ":": 278, ";": 278, "<": 584, "=": 584, ">": 584, "?": 556, "@": 1015,
+  A: 667, B: 667, C: 722, D: 722, E: 667, F: 611, G: 778, H: 722, I: 278, J: 500,
+  K: 667, L: 556, M: 833, N: 722, O: 778, P: 667, Q: 778, R: 722, S: 667, T: 611,
+  U: 722, V: 667, W: 944, X: 667, Y: 667, Z: 611,
+  "[": 278, "\\": 278, "]": 278, "^": 469, "_": 556, "`": 333,
+  a: 556, b: 556, c: 500, d: 556, e: 556, f: 278, g: 556, h: 556, i: 222, j: 222,
+  k: 500, l: 222, m: 833, n: 556, o: 556, p: 556, q: 556, r: 333, s: 500, t: 278,
+  u: 556, v: 500, w: 722, x: 500, y: 500, z: 500,
+  "{": 334, "|": 260, "}": 334, "~": 584
+};
+
+function normalizePdfText(value) {
   return String(value || "")
-    .normalize("NFKD")
+    .replace(/[\u2018\u2019\u201b\u2032]/g, "'")
+    .replace(/[\u201c\u201d\u201f\u2033]/g, "\"")
+    .replace(/[\u2013\u2014\u2212]/g, "-")
+    .replace(/\u2026/g, "...")
+    .replace(/[\u00a0\u202f]/g, " ")
     .replace(/[^\x09\x0a\x0d\x20-\x7e]/g, " ")
+    .replace(/[ \t]+/g, " ");
+}
+
+function pdfSourceText(value) {
+  return String(value || "")
+    .replace(/[\u00a0\u202f]/g, " ")
+    .replace(/[ \t]+/g, " ");
+}
+
+function pdfEncodedText(value) {
+  return pdfSourceText(value)
+    .replace(/\u2018/g, "\x91")
+    .replace(/[\u2019\u201b\u2032]/g, "\x92")
+    .replace(/\u201c/g, "\x93")
+    .replace(/[\u201d\u201f\u2033]/g, "\x94")
+    .replace(/\u2026/g, "\x85")
+    .replace(/\u2013/g, "\x96")
+    .replace(/[\u2014\u2212]/g, "\x97")
+    .replace(/[^\x09\x0a\x0d\x20-\x7e\x80-\xff]/g, " ");
+}
+
+function pdfText(value) {
+  return pdfEncodedText(value)
     .replace(/\\/g, "\\\\")
     .replace(/\(/g, "\\(")
     .replace(/\)/g, "\\)");
 }
 
-function wrapPdfText(value, maxChars = 84) {
+function pdfTextWidth(value, size = 10) {
+  return Array.from(normalizePdfText(value)).reduce((total, char) => {
+    return total + ((PDF_HELVETICA_WIDTHS[char] || 556) * size / 1000);
+  }, 0);
+}
+
+function formatPdfNumber(value) {
+  return Number(value).toFixed(2).replace(/\.?0+$/, "");
+}
+
+function wrapPdfText(value, options = {}) {
+  const maxChars = typeof options === "number" ? options : null;
+  const width = typeof options === "object" && Number.isFinite(options.width) ? options.width : null;
+  const size = typeof options === "object" && Number.isFinite(options.size) ? options.size : 10;
   const lines = [];
   for (const rawLine of String(value || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")) {
-    const words = rawLine.trim().split(/\s+/).filter(Boolean);
+    const words = pdfSourceText(rawLine).trim().split(/\s+/).filter(Boolean);
     if (!words.length) {
       lines.push("");
       continue;
@@ -1194,7 +1252,8 @@ function wrapPdfText(value, maxChars = 84) {
     let current = "";
     for (const word of words) {
       const next = current ? `${current} ${word}` : word;
-      if (next.length > maxChars && current) {
+      const overLimit = width ? pdfTextWidth(next, size) > width : next.length > maxChars;
+      if (overLimit && current) {
         lines.push(current);
         current = word;
       } else {
@@ -1206,21 +1265,47 @@ function wrapPdfText(value, maxChars = 84) {
   return lines;
 }
 
+function pdfParagraphLineObjects(value, options = {}) {
+  const font = options.font || "F1";
+  const size = options.size || 10;
+  const leading = options.leading || 13;
+  const blankLeading = options.blankLeading || 10;
+  const width = options.width || PDF_TEXT_WIDTH;
+  const justify = Boolean(options.justify);
+  const objects = [];
+  for (const rawLine of String(value || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")) {
+    if (!rawLine.trim()) {
+      objects.push({ text: "", font, size, leading: blankLeading });
+      continue;
+    }
+    const lines = wrapPdfText(rawLine, { width, size });
+    lines.forEach((text, index) => {
+      objects.push({
+        text,
+        font,
+        size,
+        leading,
+        width,
+        justify: justify && index < lines.length - 1
+      });
+    });
+  }
+  return objects;
+}
+
 function samiraNotePdfLines(note = {}, rankRead = {}, description = "") {
   const body = cleanParagraphText(note.body || "", 140000);
   const gameMeta = samiraNoteGameMeta(note);
   const lines = [
-    { text: cleanText(note.title || "Samira note", 90), font: "F2", size: 16, leading: 22 },
+    ...pdfParagraphLineObjects(cleanText(note.title || "Samira note", 90), { font: "F2", size: 16, leading: 22 }),
     { text: `approx rank: ${rankRead.exactRank || "unrated"}`, font: "F2", size: 12, leading: 17 },
     ...(gameMeta.line ? [{ text: gameMeta.line, font: "F1", size: 10, leading: 15 }] : []),
     { text: rankRead.basis || "saved note language; not Riot MMR", font: "F1", size: 9, leading: 14 },
     { text: `created: ${cleanText(note.created_at || "", 48)}`, font: "F1", size: 9, leading: 18 },
-    ...(description ? wrapPdfText(description, 88).map((line) => ({ text: line, font: "F2", size: 10, leading: line ? 14 : 10 })) : []),
+    ...(description ? pdfParagraphLineObjects(description, { font: "F2", size: 10, leading: 14, justify: true }) : []),
     { text: "note", font: "F2", size: 11, leading: 16 }
   ];
-  for (const line of wrapPdfText(body, 88)) {
-    lines.push({ text: line, font: "F1", size: 10, leading: line ? 13 : 10 });
-  }
+  lines.push(...pdfParagraphLineObjects(body, { font: "F1", size: 10, leading: 13, justify: true }));
   return lines;
 }
 
@@ -1248,7 +1333,20 @@ function pdfContentStream(lines, pageIndex, pageCount) {
   for (const line of lines) {
     const font = line.font || "F1";
     const size = line.size || 10;
-    commands.push(`BT /${font} ${size} Tf 54 ${y} Td (${pdfText(line.text)}) Tj ET`);
+    const text = pdfSourceText(line.text).trimEnd();
+    const spaceCount = (text.match(/ /g) || []).length;
+    const naturalWidth = pdfTextWidth(text, size);
+    const canJustify = line.justify
+      && line.width
+      && spaceCount > 0
+      && naturalWidth > line.width * 0.7
+      && naturalWidth < line.width;
+    if (canJustify) {
+      const wordSpacing = Math.min(8, Math.max(0, (line.width - naturalWidth) / spaceCount));
+      commands.push(`BT /${font} ${size} Tf ${formatPdfNumber(wordSpacing)} Tw 54 ${y} Td (${pdfText(text)}) Tj 0 Tw ET`);
+    } else {
+      commands.push(`BT /${font} ${size} Tf 54 ${y} Td (${pdfText(text)}) Tj ET`);
+    }
     y -= line.leading || 13;
   }
   commands.push(`BT /F1 8 Tf 54 34 Td (${pdfText(`league.aolabs.io / Samira note PDF / ${pageIndex + 1} of ${pageCount}`)}) Tj ET`);
@@ -1282,8 +1380,8 @@ function buildSamiraNotePdf(note = {}, rankRead = {}, description = "") {
   const pages = paginatePdfLines(samiraNotePdfLines(note, rankRead, description));
   const objects = [];
   objects[1] = "<< /Type /Catalog /Pages 2 0 R >>";
-  objects[3] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
-  objects[4] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>";
+  objects[3] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>";
+  objects[4] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>";
   const kids = [];
   let nextObject = 5;
   pages.forEach((pageLines, pageIndex) => {
