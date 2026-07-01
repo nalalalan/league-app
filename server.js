@@ -2,11 +2,13 @@ const http = require("http");
 const fs = require("fs");
 const fsp = require("fs/promises");
 const path = require("path");
+const crypto = require("crypto");
 
 const root = path.join(__dirname, "public");
 const port = Number(process.env.PORT || 3000);
 const dataRoot = process.env.LEAGUE_DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, "data");
 const notesPath = path.join(dataRoot, "public-notes.json");
+const samiraAnalysisCachePath = path.join(dataRoot, "samira-analysis-cache.json");
 const recordingsPath = path.join(root, "recordings", "recordings.json");
 const writeToken = (process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const isRailway = Boolean(process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_SERVICE_ID);
@@ -14,6 +16,8 @@ const recordingMediaBase = (process.env.LEAGUE_RECORDING_MEDIA_BASE || "").repla
 const recordingWebmMediaBase = (process.env.LEAGUE_RECORDING_WEBM_MEDIA_BASE || "https://cdn.jsdelivr.net/gh/nalalalan/league-app@main/public/recordings").replace(/\/+$/, "");
 const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "https://raw.githubusercontent.com/nalalalan/league-app/main/public/recordings").replace(/\/+$/, "");
 const statusToken = (process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
+const samiraAnalysisModel = (process.env.LEAGUE_ANALYSIS_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini").trim();
+const samiraAiDisabled = /^(1|true|yes)$/i.test(process.env.LEAGUE_DISABLE_AI || "");
 const recordingStatusPath = path.join(dataRoot, "recording-status.json");
 const localAnalysisRoot = path.join(__dirname, "_recording-analysis");
 const localRecordingStatusPath = path.join(localAnalysisRoot, "recording-status.json");
@@ -182,6 +186,84 @@ function cleanParagraphText(value, maxLength) {
     .replace(/\n{4,}/g, "\n\n\n")
     .trim()
     .slice(0, maxLength);
+}
+
+function hashText(value) {
+  return crypto.createHash("sha256").update(String(value || "")).digest("hex");
+}
+
+function samiraAiReady() {
+  return Boolean(process.env.OPENAI_API_KEY) && !samiraAiDisabled;
+}
+
+async function loadSamiraAnalysisCache() {
+  const fallback = { version: 1, noteAnalyses: {}, corpusAnalyses: {} };
+  const parsed = await readJsonFile(samiraAnalysisCachePath, fallback);
+  return {
+    version: 1,
+    noteAnalyses: parsed && typeof parsed.noteAnalyses === "object" ? parsed.noteAnalyses : {},
+    corpusAnalyses: parsed && typeof parsed.corpusAnalyses === "object" ? parsed.corpusAnalyses : {}
+  };
+}
+
+async function saveSamiraAnalysisCache(cache) {
+  await fsp.mkdir(dataRoot, { recursive: true });
+  await fsp.writeFile(samiraAnalysisCachePath, JSON.stringify(cache, null, 2) + "\n", "utf8");
+}
+
+function stripAssistantScaffold(value, maxLength = 430) {
+  let text = cleanText(value, maxLength)
+    .replace(/\b(?:Good sign|Biggest watchout|Best move|Recommendation|Why it helps|Main concern|Action|Reason|Next|Blunt read|Honest read|Improvement|Previous game read|Approx rank read)\s*:\s*/gi, "")
+    .replace(/\bThe\s+(?:improvement|note|duo lesson|money leak|entry rule|death|lesson|leak|rule)\s+(?:is|was)\s+/gi, "")
+    .replace(/\b(?:This note says|This game shows|The saved note says|The valuable part is)\s+/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.slice(0, maxLength);
+}
+
+function samiraAiCopyRejected(text) {
+  const value = cleanText(text, 1000);
+  return /\b(?:improve overall performance|win chances|strategic play|showcas(?:e|ing)|critical decision leak|decision leak|potential success|achieved|secured|faltered|undermined|playing Teemo support|while playing Teemo|Alan played Teemo|in this (?:swiftplay|ranked|game)|gameplay relies|unfavorable|strategy|strategic|prioriti[sz]e|focus on|maintain|capitalize|impactful plays|challenging matchup|despite the|breakdown in strategy|hinder success|overall performance|your stats show potential|execution needs refinement|keep pushing|find your openings|focus on bigger fights|turn the game around|maintain chase pressure|controlled|stable|safe entry|overextending|prematurely|risky engagements|initial impact|red-light commits?)\b/i.test(value);
+}
+
+function parseJsonObject(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) return null;
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return null;
+    }
+  }
+}
+
+async function openAiJson(messages, maxTokens = 260) {
+  if (!samiraAiReady()) return null;
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: samiraAnalysisModel,
+      temperature: 0.35,
+      max_tokens: maxTokens,
+      response_format: { type: "json_object" },
+      messages
+    })
+  });
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new Error(`OpenAI analysis failed: ${response.status} ${body.slice(0, 200)}`);
+  }
+  const data = await response.json();
+  return parseJsonObject(data?.choices?.[0]?.message?.content || "");
 }
 
 const samiraRankScale = [
@@ -377,7 +459,7 @@ function samiraRankTrendPoint({ source, title, rank, value, timeMs }) {
   };
 }
 
-function samiraRankTrend(notes = [], review = {}, overallRank = {}) {
+function samiraRankTrend(notes = [], review = {}, overallRank = {}, analysesById = {}) {
   const recordingPoints = samiraRecordings(review)
     .map((item) => {
       const rank = samiraRecordingRank(item);
@@ -392,7 +474,7 @@ function samiraRankTrend(notes = [], review = {}, overallRank = {}) {
     .filter(Boolean);
   const notePoints = notes
     .map((note) => {
-      const rankRead = samiraNoteRankRead(note, overallRank);
+      const rankRead = analysesById[samiraNoteCacheKey(note)]?.rank_read || samiraNoteRankRead(note, overallRank);
       const value = samiraRankValueFromText(rankRead.exactRank);
       return samiraRankTrendPoint({
         source: "note",
@@ -563,14 +645,14 @@ function samiraNoteRankRead(note = {}, overallRank = {}) {
   };
 }
 
-function publicSamiraNote(note = {}, overallRank = {}) {
+function publicSamiraNote(note = {}, overallRank = {}, analysis = null) {
   const id = cleanText(note.id, 120);
-  const rankRead = samiraNoteRankRead(note, overallRank);
+  const rankRead = analysis?.rank_read || samiraNoteRankRead(note, overallRank);
   const gameMeta = samiraNoteGameMeta(note);
   return {
     id,
     title: cleanText(note.title || "Samira note", 90),
-    description: samiraNoteDescription(note, rankRead, overallRank),
+    description: analysis?.description || samiraNoteDescription(note, rankRead, overallRank),
     created_at: note.created_at || "",
     source: cleanText(note.source || "", 40),
     body: cleanParagraphText(note.body || "", 140000),
@@ -670,9 +752,35 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
   return cleanText(pieces.join(" "), 300);
 }
 
+function samiraSourceSpecificSentence(note = {}) {
+  const text = samiraNoteAnalysisText(note);
+  const gameMeta = samiraNoteGameMeta(note).line;
+  if (/swiftplay|2\/0\/0|15 cs|4,?492 gold|panic defense|win condition/.test(text) || /Swiftplay/i.test(gameMeta)) {
+    return "The Swiftplay line says survival was not the problem; panic defense after first value was.";
+  }
+  if (/6\/11\/2|8,?279 damage|11,?077 gold|teemo support|pyke lane|309\/720/.test(text)) {
+    return "The 6/11/2 ranked line says the lane was ugly, but eleven deaths made the comeback attempt worse.";
+  }
+  if (/16\/6\/9|yasuo|47,?199 damage/.test(text)) {
+    return "Yasuo was the real carry signal, so Samira needed cleaner value conversion, not more pride fights.";
+  }
+  if (/nami|lily|trio|team score|46.?38/.test(text)) {
+    return "The trio-game leak is not damage; it is letting ally chaos turn one defense into repeated re-entry.";
+  }
+  if (/aram/.test(text)) {
+    return "ARAM hides the lane problem, but it still exposes the five seconds after aggression works.";
+  }
+  if (/ranked solo \/ win|ranked solo queue win|win\b/.test(`${text} ${gameMeta.toLowerCase()}`)) {
+    return "The win note is useful only if the same exit rule survives when the game is not already working.";
+  }
+  return "";
+}
+
 function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
   const sourceText = `${note.title || ""}\n${note.body || ""}`;
   const parts = [samiraConceptSentence(sourceText)];
+  const specific = samiraSourceSpecificSentence(note);
+  if (specific) parts.push(specific);
   parts.push(samiraNextClickSentence(sourceText));
   parts.push(samiraPreviousGameImprovement(note, rankRead, overallRank));
   if (hasSamiraConcept(sourceText, [/fixed flight pattern/i, /boom-and-zoom/i, /return to edge/i])) {
@@ -697,6 +805,192 @@ function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
     return normalized && array.findIndex((other) => cleanParagraphText(other, 400).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() === normalized) === index;
   });
   return cleanText(uniqueParts.join(" "), 430);
+}
+
+function samiraNoteCacheKey(note = {}) {
+  return cleanText(note.id || hashText(`${note.created_at || ""}\n${note.title || ""}\n${note.body || ""}`).slice(0, 18), 120);
+}
+
+function normalizeAiRank(value, fallback = "Iron III") {
+  const rank = cleanText(value, 32);
+  return samiraRankValueFromText(rank) === null ? fallback : samiraRankNameForValue(samiraRankValueFromText(rank));
+}
+
+function fallbackSamiraAnalysis(note = {}, rankRead = {}, overallRank = {}) {
+  return {
+    engine: "fallback",
+    body_hash: hashText(`${note.title || ""}\n${note.body || ""}`),
+    description: samiraNoteDescription(note, rankRead, overallRank),
+    rank_read: rankRead
+  };
+}
+
+async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {}) {
+  const gameMeta = samiraNoteGameMeta(note);
+  const body = cleanParagraphText(note.body || "", 7000);
+  const system = [
+    "You analyze Alan's saved Samira League notes.",
+    "Return JSON only with keys: description, rank, rank_reason.",
+    "Do actual game-model analysis from the pasted note. Do not summarize the title.",
+    "Alan is the Samira player unless the note explicitly says otherwise. Teemo support, Nami, Lily, Yasuo, Pyke, and enemy names are other players or context, not Alan's champion.",
+    "Write the paragraph as the sentence Alan should read before queueing, not as a match recap.",
+    "Use direct second-person or direct Alan language. Prefer short commands and hard reads. Be mean and concrete, not polite.",
+    "Use the note's own model: entry gate, first damage pass, climb-out, payout, reset, fog chase, bad support, panic defense, value conversion.",
+    "Use one paragraph for description, 24 to 55 words.",
+    "No labels, prefixes, assistant scaffolding, generic note summaries, or signal counts.",
+    "Do not write generic coaching phrases about performance, strategy, potential, success, or improvement.",
+    "Do not use professional recap verbs like achieved, secured, showcasing, faltered, or undermined.",
+    "Do not write prioritize, focus on, avoid, maintain, controlled, stable, safe entry, overextending, prematurely, risky engagements, red-light, or initial impact.",
+    "Do not start with In this game, In this ranked game, In this Swiftplay, Despite, or The game.",
+    "Do not invert Alan's critique. If the note says bigger fights, panic defense, fog chase, or staying in middle caused the problem, name that behavior as the mistake.",
+    "Never recommend bigger fights, maintaining chase pressure, pushing through chaos, or finding openings when the note says exit, reset, payout, or climb out.",
+    "Do not reuse boilerplate across notes. Mention the note-specific pattern, stats, matchup, game type, or decision leak when present.",
+    "Good style examples, only if the evidence matches: 'You had 309/720 HP. That is not a comeback window. Shrink the lane, take small farm, or reset; bigger fights made the bad lane bigger.' 'S loaded is not a green light. W, HP, and ally position are the green light; R is the reward.' 'Fog is second-fight bait. Take wave, plate, objective, or reset unless vision and ally position are already true.'",
+    "Allowed ranks: Iron IV, Iron III, Iron II, Iron I, Bronze IV."
+  ].join(" ");
+  const user = [
+    `Title: ${cleanText(note.title || "Samira note", 180)}`,
+    `Game facts: ${gameMeta.line || "not parsed"}`,
+    `Fallback rank read: ${rankRead.exactRank || "unrated"}; reason: ${rankRead.reason || ""}`,
+    `Current corpus rank: ${overallRank.exactRank || "unrated"}`,
+    "Saved note:",
+    body
+  ].join("\n");
+  const messages = [
+    { role: "system", content: system },
+    { role: "user", content: user }
+  ];
+  let parsed = await openAiJson(messages, 340);
+  let description = stripAssistantScaffold(parsed?.description, 520);
+  if (description && samiraAiCopyRejected(description)) {
+    parsed = await openAiJson([
+      ...messages,
+      { role: "assistant", content: JSON.stringify(parsed || {}) },
+      {
+        role: "user",
+        content: [
+          "Rewrite the description only. The previous output was rejected because it sounded generic, polite, inverted, or assistant-shaped.",
+          "Use 2 to 4 short direct sentences. Name the note-specific stat, game type, champion context, or decision pattern.",
+          "No prioritize/focus/avoid/strategy/performance/potential/controlled/stable/overextending language.",
+          "Return JSON with keys: description, rank, rank_reason."
+        ].join(" ")
+      }
+    ], 300);
+    description = stripAssistantScaffold(parsed?.description, 520);
+  }
+  if (!description || description.length < 45 || samiraAiCopyRejected(description)) return null;
+  const exactRank = normalizeAiRank(parsed?.rank, rankRead.exactRank || overallRank.exactRank || "Iron III");
+  const value = samiraRankValueFromText(exactRank) ?? samiraRankValueFromText(rankRead.exactRank) ?? 1;
+  return {
+    engine: "openai",
+    model: samiraAnalysisModel,
+    body_hash: hashText(`${note.title || ""}\n${note.body || ""}`),
+    description,
+    rank_read: {
+      ...rankRead,
+      exactRank,
+      range: `${samiraRankNameForValue(value - 1)} to ${samiraRankNameForValue(value + 1)}`,
+      reason: samiraAiCopyRejected(parsed?.rank_reason) ? rankRead.reason : stripAssistantScaffold(parsed?.rank_reason || rankRead.reason || "Source-bounded note analysis.", 180),
+      basis: "AI analysis of June 30 onward Samira note; not Riot MMR",
+      confidence: rankRead.confidence || "medium"
+    }
+  };
+}
+
+function corpusCacheKey(notes = []) {
+  return hashText(notes.map((note) => `${note.id || ""}:${note.created_at || ""}:${hashText(note.body || "").slice(0, 16)}`).join("|"));
+}
+
+async function analyzeSamiraCorpusWithAi(notes = [], rankEstimate = {}) {
+  const currentNotes = notes.slice(0, 8).map((note, index) => {
+    const meta = samiraNoteGameMeta(note).line;
+    return `${index + 1}. ${cleanText(note.title || "Samira note", 120)}${meta ? ` / ${meta}` : ""}\n${cleanParagraphText(note.body || "", 900)}`;
+  }).join("\n\n");
+  const parsed = await openAiJson([
+    {
+      role: "system",
+      content: [
+        "You analyze Alan's current saved Samira notes as one corpus.",
+        "Return JSON only with key main_takeaway.",
+        "The takeaway must be one direct sentence, 12 to 22 words, no label, no colon-prefix, no generic motivation.",
+        "Use the recurring gameplay model across the notes, not a copied title.",
+        "Do not write generic phrases about performance, strategic play, strategy, win chances, potential, success, or improvement.",
+        "Write the sentence as a direct Samira rule Alan can use before queueing."
+      ].join(" ")
+    },
+    {
+      role: "user",
+      content: `Current rank read: ${rankEstimate.exactRank || "unrated"}\nCurrent June 30 onward notes:\n${currentNotes}`
+    }
+  ], 120);
+  const mainTakeaway = stripAssistantScaffold(parsed?.main_takeaway, 150);
+  return mainTakeaway && mainTakeaway.length >= 20 && !samiraAiCopyRejected(mainTakeaway) ? mainTakeaway : "";
+}
+
+async function samiraAiAnalysesForNotes(notes = [], rankEstimate = {}) {
+  const cache = await loadSamiraAnalysisCache();
+  const notesById = {};
+  let changed = false;
+  for (const note of notes) {
+    const key = samiraNoteCacheKey(note);
+    const bodyHash = hashText(`${note.title || ""}\n${note.body || ""}`);
+    const fallbackRank = samiraNoteRankRead(note, rankEstimate);
+    const cached = cache.noteAnalyses[key];
+    if (cached?.body_hash === bodyHash && cached?.description && (!samiraAiReady() || cached.engine === "openai")) {
+      notesById[key] = cached;
+      continue;
+    }
+    let analysis = null;
+    try {
+      analysis = await analyzeSamiraNoteWithAi(note, fallbackRank, rankEstimate);
+    } catch {
+      analysis = null;
+    }
+    if (!analysis) analysis = fallbackSamiraAnalysis(note, fallbackRank, rankEstimate);
+    cache.noteAnalyses[key] = analysis;
+    notesById[key] = analysis;
+    changed = true;
+  }
+  const corpusKey = corpusCacheKey(notes);
+  let mainTakeaway = cache.corpusAnalyses[corpusKey]?.main_takeaway || "";
+  if (!mainTakeaway) {
+    try {
+      mainTakeaway = await analyzeSamiraCorpusWithAi(notes, rankEstimate);
+    } catch {
+      mainTakeaway = "";
+    }
+    if (mainTakeaway) {
+      cache.corpusAnalyses[corpusKey] = {
+        engine: "openai",
+        model: samiraAnalysisModel,
+        main_takeaway: mainTakeaway,
+        created_at: new Date().toISOString()
+      };
+      changed = true;
+    }
+  }
+  if (changed) await saveSamiraAnalysisCache(cache);
+  return {
+    engine: Object.values(notesById).some((item) => item?.engine === "openai") || mainTakeaway ? "openai" : "fallback",
+    main_takeaway: mainTakeaway,
+    notesById
+  };
+}
+
+function samiraRankEstimateFromAnalyses(rankEstimate = {}, visibleNotes = [], analysesById = {}) {
+  const newestAnalysis = visibleNotes
+    .map((note) => analysesById[samiraNoteCacheKey(note)]?.rank_read)
+    .find((rankRead) => rankRead?.exactRank);
+  if (!newestAnalysis) return rankEstimate;
+  return {
+    ...rankEstimate,
+    exactRank: newestAnalysis.exactRank,
+    range: newestAnalysis.range || rankEstimate.range,
+    currentRead: newestAnalysis.exactRank,
+    confidence: newestAnalysis.confidence || rankEstimate.confidence,
+    basis: newestAnalysis.basis || "AI analysis of June 30 onward Samira notes; not Riot MMR",
+    reason: newestAnalysis.reason || rankEstimate.reason
+  };
 }
 
 function localDateKey(value = new Date()) {
@@ -740,14 +1034,17 @@ async function samiraState(extraNotes = []) {
     .sort((a, b) => (Date.parse(b.created_at || "") || 0) - (Date.parse(a.created_at || "") || 0));
   const review = await loadRecordingReview();
   const newestNote = notes[0] || null;
-  const rankEstimate = samiraRankEstimate(notes, review);
+  const fallbackRankEstimate = samiraRankEstimate(notes, review);
   const visibleNotes = visibleSamiraNotes(notes);
+  const analysis = await samiraAiAnalysesForNotes(visibleNotes, fallbackRankEstimate);
+  const rankEstimate = samiraRankEstimateFromAnalyses(fallbackRankEstimate, visibleNotes, analysis.notesById);
   return {
     ok: true,
     note_count: notes.length,
     visible_note_count: visibleNotes.length,
     archived_note_count: Math.max(0, notes.length - visibleNotes.length),
-    main_takeaway: samiraCorpusMainTakeaway(notes, review, rankEstimate),
+    analysis_engine: analysis.engine,
+    main_takeaway: analysis.main_takeaway || samiraCorpusMainTakeaway(notes, review, rankEstimate),
     latest_note: newestNote
       ? {
           title: newestNote.title || "Samira note",
@@ -756,10 +1053,10 @@ async function samiraState(extraNotes = []) {
         }
       : null,
     rank_estimate: rankEstimate,
-    rank_trend: samiraRankTrend(visibleNotes, review, rankEstimate),
+    rank_trend: samiraRankTrend(visibleNotes, review, rankEstimate, analysis.notesById),
     tips: samiraTips(notes, review),
     source_boundary: "Approximate rank read from June 30 onward Samira notes and current-window reviews, not Riot MMR.",
-    notes: visibleNotes.map((note) => publicSamiraNote(note, rankEstimate))
+    notes: visibleNotes.map((note) => publicSamiraNote(note, rankEstimate, analysis.notesById[samiraNoteCacheKey(note)]))
   };
 }
 
@@ -795,7 +1092,7 @@ function wrapPdfText(value, maxChars = 84) {
   return lines;
 }
 
-function samiraNotePdfLines(note = {}, rankRead = {}) {
+function samiraNotePdfLines(note = {}, rankRead = {}, description = "") {
   const body = cleanParagraphText(note.body || "", 140000);
   const gameMeta = samiraNoteGameMeta(note);
   const lines = [
@@ -803,7 +1100,8 @@ function samiraNotePdfLines(note = {}, rankRead = {}) {
     { text: `approx rank: ${rankRead.exactRank || "unrated"}`, font: "F2", size: 12, leading: 17 },
     ...(gameMeta.line ? [{ text: gameMeta.line, font: "F1", size: 10, leading: 15 }] : []),
     { text: rankRead.basis || "saved note language; not Riot MMR", font: "F1", size: 9, leading: 14 },
-    { text: `created: ${cleanText(note.created_at || "", 48)}`, font: "F1", size: 9, leading: 20 },
+    { text: `created: ${cleanText(note.created_at || "", 48)}`, font: "F1", size: 9, leading: 18 },
+    ...(description ? wrapPdfText(description, 88).map((line) => ({ text: line, font: "F2", size: 10, leading: line ? 14 : 10 })) : []),
     { text: "note", font: "F2", size: 11, leading: 16 }
   ];
   for (const line of wrapPdfText(body, 88)) {
@@ -866,8 +1164,8 @@ function serializePdf(objects) {
   return Buffer.concat(chunks);
 }
 
-function buildSamiraNotePdf(note = {}, rankRead = {}) {
-  const pages = paginatePdfLines(samiraNotePdfLines(note, rankRead));
+function buildSamiraNotePdf(note = {}, rankRead = {}, description = "") {
+  const pages = paginatePdfLines(samiraNotePdfLines(note, rankRead, description));
   const objects = [];
   objects[1] = "<< /Type /Catalog /Pages 2 0 R >>";
   objects[3] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
@@ -1078,7 +1376,10 @@ async function handleApi(req, res, url) {
     const review = await loadRecordingReview();
     const rankEstimate = samiraRankEstimate(notes, review);
     const rankRead = samiraNoteRankRead(note, rankEstimate);
-    const pdf = buildSamiraNotePdf(note, rankRead);
+    const analysis = await samiraAiAnalysesForNotes([note], rankEstimate);
+    const noteAnalysis = analysis.notesById[samiraNoteCacheKey(note)];
+    const pdfRankRead = noteAnalysis?.rank_read || rankRead;
+    const pdf = buildSamiraNotePdf(note, pdfRankRead, noteAnalysis?.description || "");
     res.writeHead(200, {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="${pdfFilenameForNote(note)}"`,

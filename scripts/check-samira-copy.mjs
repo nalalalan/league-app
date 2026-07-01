@@ -7,7 +7,7 @@ const port = String(4300 + Math.floor(Math.random() * 400));
 const dataDir = await mkdtemp(join(tmpdir(), "league-samira-copy-"));
 const server = spawn(process.execPath, ["server.js"], {
   cwd: new URL("..", import.meta.url),
-  env: { ...process.env, PORT: port, LEAGUE_DATA_DIR: dataDir },
+  env: { ...process.env, PORT: port, LEAGUE_DATA_DIR: dataDir, LEAGUE_DISABLE_AI: "1" },
   stdio: ["ignore", "pipe", "pipe"]
 });
 
@@ -54,6 +54,11 @@ try {
       "W ready, HP above half, ally close is the gate.",
       "The game got bad when I stayed in the middle after damage instead of leaving."
     ].join(" "),
+    [
+      "Swiftplay loss. K/D/A 2/0/0. 15 CS. 4,492 gold.",
+      "Alan was the win condition but kept treating the defense like one more chance to stand in the middle.",
+      "The useful model is still boom-and-zoom, but the actual leak was defending panic after value."
+    ].join(" "),
     "Ranked solo queue. S loaded and S rank appeared, but R was only availability, not permission to R.",
     "Ranked solo queue. Fog chase turned into one more fight instead of wave, reset, or objective.",
     "Ranked solo queue. Teemo support, Pyke lane, 309/720 HP, 6/11/2. Make the bad lane smaller.",
@@ -96,6 +101,13 @@ try {
     }
   }
   const data = saved.samira;
+  const descriptions = (Array.isArray(data?.notes) ? data.notes : [])
+    .map((note) => String(note?.description || "").replace(/\s+/g, " ").trim().toLowerCase())
+    .filter(Boolean);
+  const repeatedDescriptions = descriptions.filter((description, index) => descriptions.indexOf(description) !== index);
+  if (repeatedDescriptions.length) {
+    throw new Error(`Generated Samira copy reused the same description across different notes:\n${repeatedDescriptions.join("\n")}`);
+  }
   const bannedLabels = [
     "Good sign",
     "Biggest watchout",
