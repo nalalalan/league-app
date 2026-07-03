@@ -399,6 +399,8 @@ summary {
 }
 
 .rank-trend-chart {
+  min-width: 0;
+  max-width: 100%;
   width: 100%;
   overflow: hidden;
   padding: 1px 0 0;
@@ -406,6 +408,8 @@ summary {
 
 .rank-trend svg {
   display: block;
+  min-width: 0;
+  max-width: 100%;
   width: 100%;
   height: auto;
   font-family: inherit;
@@ -1838,8 +1842,10 @@ summary {
   grid-column: 2;
   grid-row: 2;
   align-self: stretch;
-  display: flex;
+  display: grid;
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
   min-height: 0;
   margin: 0;
   border: 1px solid rgba(104, 87, 68, .16);
@@ -1851,6 +1857,8 @@ summary {
   font-weight: 400;
   line-height: 1.2;
   text-wrap: balance;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .samira-main-takeaway:empty,
@@ -1862,6 +1870,9 @@ summary {
   grid-column: 1 / -1;
   grid-row: 3;
   align-self: start;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   border: 1px solid rgba(104, 87, 68, .16);
   border-radius: 8px;
   padding: 10px 12px;
@@ -4356,11 +4367,16 @@ h1 {
 
   .samira-intake {
     grid-template-columns: 1fr;
-    width: 100%;
-    max-width: 100%;
+    width: calc(100vw - 22px);
+    max-width: calc(100vw - 22px);
     gap: 12px;
     padding: 0;
     overflow: visible;
+  }
+
+  .samira-intake > * {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .samira-head,
@@ -4373,10 +4389,16 @@ h1 {
   }
 
   .samira-note-form {
-    max-width: 100%;
+    width: calc(100vw - 22px);
+    max-width: calc(100vw - 22px);
   }
 
   .samira-main-takeaway {
+    display: block;
+    width: calc(100vw - 22px);
+    max-width: calc(100vw - 22px);
+    white-space: normal;
+    text-wrap: wrap;
     min-height: 0;
     align-items: center;
     padding: 12px 13px;
@@ -4384,6 +4406,9 @@ h1 {
   }
 
   .samira-rank-trend {
+    width: calc(100vw - 22px);
+    max-width: calc(100vw - 22px);
+    justify-self: stretch;
     padding: 10px;
   }
 
