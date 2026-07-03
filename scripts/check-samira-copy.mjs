@@ -48,6 +48,7 @@ try {
   await waitForServer();
   const sampleBodies = [
     [
+      "Game date/time: 6/30/2026 at 9:24 PM.",
       "Normal Swiftplay Victory. Team 1 won 42/23/55 with 98,163 gold against Team 2's 23/42/29 with 84,823 gold.",
       "Alan's Samira finished 16/6/5, 40,565 damage, 22,994 gold, and 923 gold/min.",
       "Don't drop Samira’s punctuation; Lily’s climb-out sentence should stay readable.",
@@ -55,6 +56,7 @@ try {
       "The useful Samira rule is still edge, dive, damage, climb out, then buy or reset."
     ].join(" "),
     [
+      "Game date/time: June 30, 2026 at 10:11 PM.",
       "Ranked solo queue loss. K/D/A 6/11/2. 174 CS. 21,209 damage. 12,004 gold. 412 gold/min.",
       "Alan's Samira game shows fixed flight pattern and boom-and-zoom.",
       "Edge is altitude. E is the dive. Return to edge is the climb.",
@@ -95,6 +97,17 @@ try {
     throw new Error("Samira rank trend includes notes or recordings before June 30.");
   }
   const sampleNote = sampleNotes[0];
+  const expectedFirstGameTime = Date.parse("2026-07-01T01:24:00.000Z");
+  if (sampleNote.game_time !== "2026-07-01T01:24:00.000Z" || !/Jun 30, 2026, 9:24 PM/.test(sampleNote.game_time_label || "")) {
+    throw new Error(`Samira sample note did not expose parsed game date/time: ${sampleNote.game_time || ""} / ${sampleNote.game_time_label || ""}`);
+  }
+  if (Number(sampleNote.game_meta?.game_time_ms) !== expectedFirstGameTime) {
+    throw new Error(`Samira game metadata did not carry exact parsed timestamp: ${sampleNote.game_meta?.game_time_ms || ""}`);
+  }
+  const firstTrendPoint = saved.samira.rank_trend.points.find((point) => point.source === "note" && point.title === sampleNote.title);
+  if (!firstTrendPoint || Number(firstTrendPoint.time_ms) !== expectedFirstGameTime || !/6\/30.*9:24 PM/.test(firstTrendPoint.date_label || "")) {
+    throw new Error(`Samira rank trend did not use the pasted game time: ${JSON.stringify(firstTrendPoint)}`);
+  }
   if (!/Swiftplay/i.test(sampleNote.game_meta_line || "") || !/16\/6\/5/.test(sampleNote.game_meta_line || "") || !/172 CS/.test(sampleNote.game_meta_line || "") || !/40,565 damage/.test(sampleNote.game_meta_line || "") || !/22,994 gold/.test(sampleNote.game_meta_line || "")) {
     throw new Error(`Samira team-score sample did not expose Alan/Samira facts: ${sampleNote.game_meta_line || ""}`);
   }
@@ -111,6 +124,9 @@ try {
   if (!pdfBody.includes("Alan's Samira") || !pdfBody.includes("Don't drop Samira\x92s punctuation") || !pdfBody.includes("Lily\x92s climb-out")) {
     throw new Error("Samira note PDF does not preserve apostrophe punctuation in existing note text.");
   }
+  if (!pdfBody.includes("Jun 30, 2026, 9:24 PM")) {
+    throw new Error("Samira note PDF does not include the parsed game date/time.");
+  }
   if (/Alan s Samira|Don t drop|Samira s punctuation|Lily s climb-out/.test(pdfBody)) {
     throw new Error("Samira note PDF still converts apostrophes into gaps.");
   }
@@ -118,6 +134,9 @@ try {
     throw new Error("Samira note PDF paragraphs are not using justified word spacing.");
   }
   const rankedSampleNote = sampleNotes[1];
+  if (rankedSampleNote.game_time !== "2026-07-01T02:11:00.000Z" || !/Jun 30, 2026, 10:11 PM/.test(rankedSampleNote.game_time_label || "")) {
+    throw new Error(`Ranked Samira note did not expose parsed game date/time: ${rankedSampleNote.game_time || ""} / ${rankedSampleNote.game_time_label || ""}`);
+  }
   if (!/ranked solo/i.test(rankedSampleNote.game_meta_line || "") || !/6\/11\/2/.test(rankedSampleNote.game_meta_line || "") || !/174 CS/.test(rankedSampleNote.game_meta_line || "")) {
     throw new Error(`Samira sample note did not expose game facts: ${rankedSampleNote.game_meta_line || ""}`);
   }
@@ -221,6 +240,9 @@ try {
   const appSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
   if (!/function\s+directVisibleCopy\s*\(/.test(appSource) || !/descriptionText\.textContent\s*=\s*directVisibleCopy\(description\)/.test(appSource)) {
     throw new Error("Samira note-card descriptions do not pass through the direct visible-copy sanitizer.");
+  }
+  if (!/note\.game_time_label\s*\|\|\s*note\.game_meta\?\.game_time_label/.test(appSource)) {
+    throw new Error("Samira note cards do not prefer parsed game date/time over save date.");
   }
   const styles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
   const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");

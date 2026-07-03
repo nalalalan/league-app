@@ -327,7 +327,17 @@ const samiraCurrentWindowStartMs = Date.parse("2026-06-30T00:00:00-04:00");
 const samiraRankTrendDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
   month: "numeric",
-  day: "numeric"
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
+});
+const samiraGameTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
 });
 
 function samiraRankNameForValue(value) {
@@ -355,12 +365,132 @@ function samiraRecordingTime(item = {}) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+const samiraMonthByName = new Map([
+  ["jan", 1], ["january", 1],
+  ["feb", 2], ["february", 2],
+  ["mar", 3], ["march", 3],
+  ["apr", 4], ["april", 4],
+  ["may", 5],
+  ["jun", 6], ["june", 6],
+  ["jul", 7], ["july", 7],
+  ["aug", 8], ["august", 8],
+  ["sep", 9], ["sept", 9], ["september", 9],
+  ["oct", 10], ["october", 10],
+  ["nov", 11], ["november", 11],
+  ["dec", 12], ["december", 12]
+]);
+
+function normalizeSamiraYear(value, fallbackYear) {
+  if (!value) return fallbackYear;
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallbackYear;
+  if (number >= 0 && number < 100) return 2000 + number;
+  return number;
+}
+
+function validSamiraDate(year, month, day) {
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+function nthSundayUtc(year, month, nth) {
+  const first = new Date(Date.UTC(year, month - 1, 1));
+  const dayOffset = (7 - first.getUTCDay()) % 7;
+  return 1 + dayOffset + ((nth - 1) * 7);
+}
+
+function samiraNewYorkOffsetHours(year, month, day) {
+  const dateKey = Date.UTC(year, month - 1, day);
+  const dstStart = Date.UTC(year, 2, nthSundayUtc(year, 3, 2));
+  const dstEnd = Date.UTC(year, 10, nthSundayUtc(year, 11, 1));
+  return dateKey >= dstStart && dateKey < dstEnd ? -4 : -5;
+}
+
+function samiraLocalDateTimeMs(year, month, day, hour, minute) {
+  if (!validSamiraDate(year, month, day)) return 0;
+  if (!Number.isFinite(hour) || !Number.isFinite(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) return 0;
+  const offset = samiraNewYorkOffsetHours(year, month, day);
+  return Date.UTC(year, month - 1, day, hour - offset, minute);
+}
+
+function samiraClockHour(hourText, meridiem = "") {
+  let hour = Number(hourText);
+  if (!Number.isFinite(hour)) return Number.NaN;
+  const suffix = String(meridiem || "").toLowerCase();
+  if (suffix) {
+    if (hour < 1 || hour > 12) return Number.NaN;
+    if (suffix === "pm" && hour !== 12) hour += 12;
+    if (suffix === "am" && hour === 12) hour = 0;
+  }
+  return hour;
+}
+
+function samiraNoteFallbackYear(note = {}) {
+  const parsed = Date.parse(note.created_at || "");
+  return Number.isFinite(parsed) ? new Date(parsed).getUTCFullYear() : 2026;
+}
+
+function parsedSamiraGameTime(year, month, day, hourText, minuteText, meridiem, fallbackYear) {
+  const normalizedYear = normalizeSamiraYear(year, fallbackYear);
+  const normalizedMonth = Number(month);
+  const normalizedDay = Number(day);
+  const hour = samiraClockHour(hourText, meridiem);
+  const minute = Number(minuteText || 0);
+  const timeMs = samiraLocalDateTimeMs(normalizedYear, normalizedMonth, normalizedDay, hour, minute);
+  if (!timeMs) return null;
+  const date = new Date(timeMs);
+  return {
+    timeMs,
+    iso: date.toISOString(),
+    label: samiraGameTimeFormatter.format(date)
+  };
+}
+
+function samiraGameTimeFromText(text, fallbackYear = 2026) {
+  const source = String(text || "").replace(/\s+/g, " ");
+  const monthPattern = "jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?";
+  const monthNamePattern = new RegExp(`\\b(${monthPattern})\\.?\\s+(\\d{1,2})(?:st|nd|rd|th)?(?:,?\\s+(20\\d{2}|\\d{2}))?\\s*(?:,?\\s*(?:at|around|@)?\\s*)(\\d{1,2})(?::(\\d{2}))?\\s*(am|pm)\\b`, "i");
+  const monthName = source.match(monthNamePattern);
+  if (monthName) {
+    const month = samiraMonthByName.get(String(monthName[1] || "").toLowerCase().replace(".", ""));
+    const parsed = parsedSamiraGameTime(monthName[3], month, monthName[2], monthName[4], monthName[5] || "0", monthName[6], fallbackYear);
+    if (parsed) return parsed;
+  }
+  const numericWithMeridiem = source.match(/\b(\d{1,2})[/-](\d{1,2})(?:[/-](20\d{2}|\d{2}))?\s*(?:,?\s*(?:at|around|@)?\s*)(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i);
+  if (numericWithMeridiem) {
+    const parsed = parsedSamiraGameTime(numericWithMeridiem[3], numericWithMeridiem[1], numericWithMeridiem[2], numericWithMeridiem[4], numericWithMeridiem[5] || "0", numericWithMeridiem[6], fallbackYear);
+    if (parsed) return parsed;
+  }
+  const isoLike = source.match(/\b(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})\s*(?:,?\s*(?:at|around|@)?\s*)(\d{1,2}):(\d{2})\s*(am|pm)?\b/i);
+  if (isoLike) {
+    const parsed = parsedSamiraGameTime(isoLike[1], isoLike[2], isoLike[3], isoLike[4], isoLike[5], isoLike[6] || "", fallbackYear);
+    if (parsed) return parsed;
+  }
+  const explicitGameTime = source.match(/\b(?:game|match|played|recording|vod)(?:\s+(?:date|time|datetime|timestamp))?\s*(?:on|at|:)?\s*(\d{1,2})[/-](\d{1,2})(?:[/-](20\d{2}|\d{2}))?\s+(?:at\s*)?(\d{1,2}):(\d{2})\b/i);
+  if (explicitGameTime) {
+    const parsed = parsedSamiraGameTime(explicitGameTime[3], explicitGameTime[1], explicitGameTime[2], explicitGameTime[4], explicitGameTime[5], "", fallbackYear);
+    if (parsed) return parsed;
+  }
+  return null;
+}
+
+function samiraNoteGameTime(note = {}) {
+  return samiraGameTimeFromText(`${note.title || ""}\n${note.body || ""}`, samiraNoteFallbackYear(note));
+}
+
+function samiraNoteTime(note = {}) {
+  const gameTime = samiraNoteGameTime(note);
+  if (gameTime?.timeMs) return gameTime.timeMs;
+  const parsed = Date.parse(note.created_at || "");
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 function samiraInCurrentWindow(timeMs) {
   return Number.isFinite(timeMs) && timeMs >= samiraCurrentWindowStartMs;
 }
 
 function samiraNoteInCurrentWindow(note = {}) {
-  return samiraInCurrentWindow(Date.parse(note.created_at || ""));
+  return samiraInCurrentWindow(samiraNoteTime(note));
 }
 
 function samiraRecordingInCurrentWindow(item = {}) {
@@ -481,6 +611,7 @@ function bestSamiraMetric(text, regex, formatter, options = {}) {
 
 function samiraNoteGameMeta(note = {}) {
   const text = `${note.title || ""}\n${note.body || ""}`;
+  const gameTime = samiraNoteGameTime(note);
   const resultMatch = text.match(/\b(victory|defeat|won|win|lost|loss)\b/i);
   const result = resultMatch
     ? (/victory|won|win/i.test(resultMatch[1]) ? "win" : "loss")
@@ -499,6 +630,9 @@ function samiraNoteGameMeta(note = {}) {
     bestSamiraMetric(text, /\b(\d{2,4})\s*(?:gold\/min|gpm)\b/ig, (match) => `${match[1]} gold/min`);
   const parts = [gameType, result, kda, cs, damage, gold, gpm].filter(Boolean);
   return {
+    game_time: gameTime?.iso || "",
+    game_time_ms: gameTime?.timeMs || 0,
+    game_time_label: gameTime?.label || "",
     game_type: gameType,
     result,
     kda,
@@ -506,7 +640,7 @@ function samiraNoteGameMeta(note = {}) {
     damage,
     gold,
     gold_per_minute: gpm,
-    line: cleanText(parts.join(" / "), 160)
+    line: cleanText(parts.join(" / "), 180)
   };
 }
 
@@ -586,7 +720,7 @@ function samiraRankTrend(notes = [], review = {}, overallRank = {}, analysesById
         title: note.title || "Samira note",
         rank: rankRead.exactRank,
         value,
-        timeMs: Date.parse(note.created_at || "")
+        timeMs: samiraNoteTime(note)
       });
     })
     .filter(Boolean);
@@ -759,6 +893,8 @@ function publicSamiraNote(note = {}, overallRank = {}, analysis = null) {
     title: cleanText(note.title || "Samira note", 90),
     description: analysis?.description || samiraNoteDescription(note, rankRead, overallRank),
     created_at: note.created_at || "",
+    game_time: gameMeta.game_time,
+    game_time_label: gameMeta.game_time_label,
     source: cleanText(note.source || "", 40),
     body: cleanParagraphText(note.body || "", 140000),
     preview: sentenceStart(note.body, 260),
@@ -1145,7 +1281,7 @@ async function samiraState(extraNotes = []) {
   const notes = [...extraNotes, ...(await loadNotes())]
     .filter(isSamiraNote)
     .filter(samiraNoteInCurrentWindow)
-    .sort((a, b) => (Date.parse(b.created_at || "") || 0) - (Date.parse(a.created_at || "") || 0));
+    .sort((a, b) => samiraNoteTime(b) - samiraNoteTime(a));
   const review = await loadRecordingReview();
   const newestNote = notes[0] || null;
   const fallbackRankEstimate = samiraRankEstimate(notes, review);
@@ -1163,6 +1299,8 @@ async function samiraState(extraNotes = []) {
       ? {
           title: newestNote.title || "Samira note",
           created_at: newestNote.created_at || "",
+          game_time: samiraNoteGameMeta(newestNote).game_time,
+          game_time_label: samiraNoteGameMeta(newestNote).game_time_label,
           preview: sentenceStart(newestNote.body, 180)
         }
       : null,
@@ -1299,6 +1437,7 @@ function samiraNotePdfLines(note = {}, rankRead = {}, description = "") {
   const lines = [
     ...pdfParagraphLineObjects(cleanText(note.title || "Samira note", 90), { font: "F2", size: 16, leading: 22 }),
     { text: `approx rank: ${rankRead.exactRank || "unrated"}`, font: "F2", size: 12, leading: 17 },
+    ...(gameMeta.game_time_label ? [{ text: gameMeta.game_time_label, font: "F1", size: 10, leading: 15 }] : []),
     ...(gameMeta.line ? [{ text: gameMeta.line, font: "F1", size: 10, leading: 15 }] : []),
     { text: rankRead.basis || "saved note language; not Riot MMR", font: "F1", size: 9, leading: 14 },
     { text: `created: ${cleanText(note.created_at || "", 48)}`, font: "F1", size: 9, leading: 18 },

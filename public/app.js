@@ -1598,7 +1598,9 @@ const rankTrendValueByName = new Map(rankTrendScale.map((rank, index) => [rank.t
 const rankTrendMonthFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
   month: "numeric",
-  day: "numeric"
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
 });
 
 function compactRecordingDate(item) {
@@ -6872,8 +6874,10 @@ function samiraPdfCard(note) {
   const meta = document.createElement("div");
   meta.className = "samira-card-meta";
   const time = document.createElement("time");
-  time.dateTime = note.created_at || "";
-  time.textContent = formatDate(note.created_at);
+  const gameTime = note.game_time || note.game_meta?.game_time || note.created_at || "";
+  const gameTimeLabel = note.game_time_label || note.game_meta?.game_time_label || formatDate(note.created_at);
+  time.dateTime = gameTime;
+  time.textContent = gameTimeLabel;
   const rankLine = document.createElement("span");
   rankLine.className = "samira-pdf-rank";
   rankLine.textContent = rank.exactRank || "unrated";
