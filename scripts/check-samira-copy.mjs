@@ -64,6 +64,18 @@ try {
       "The game got bad when I stayed in the middle after damage instead of leaving."
     ].join(" "),
     [
+      "Recording timestamp: 12:22 AM, 7/3/2026.",
+      "This Swiftplay-style Victory ending around 19:30 had a final visible scoreboard where Alan's Samira was at 12/2/11 with 106 CS and about 2,054 gold.",
+      "At 8:28, Alan was 3/0/4 with 45 CS, but that was an interim scoreboard, not the final Samira score.",
+      "Q everything until the game breaks, then buy so the next Q matters more."
+    ].join(" "),
+    [
+      "Recording timestamp: 7/1/2026; exact time not readable from the visible bottom-right capture.",
+      "Normal Swiftplay defeat. Alan's Samira ended 3/8/1 with about 130 CS and 725 gold/min.",
+      "Master Yi was the real team carry at 12/5/2, but that champion name is not Alan's rank.",
+      "This game shows the Q engine surviving a bad game, but the deaths still pull the read down."
+    ].join(" "),
+    [
       "Swiftplay loss. K/D/A 2/0/0. 15 CS. 4,492 gold.",
       "Alan was the win condition but kept treating the defense like one more chance to stand in the middle.",
       "The useful model is still boom-and-zoom, but the actual leak was defending panic after value."
@@ -91,6 +103,12 @@ try {
   if (sampleNotes.some((note) => !note)) throw new Error("Saved Samira sample notes were not all visible in /api/samira.");
   if (!Array.isArray(saved?.samira?.rank_trend?.points) || saved.samira.rank_trend.points.length < 2) {
     throw new Error("Samira API does not expose source-bound rank-over-time points.");
+  }
+  if (/^Iron\b/i.test(saved?.samira?.rank_estimate?.exactRank || "")) {
+    throw new Error(`Samira aggregate rank read still collapses to Iron: ${saved.samira.rank_estimate.exactRank}`);
+  }
+  if (saved.samira.rank_trend.points.some((point) => /^Master\b/i.test(point.rank || ""))) {
+    throw new Error(`Samira rank trend still includes a Master point from free text: ${JSON.stringify(saved.samira.rank_trend.points)}`);
   }
   const june30Start = Date.parse("2026-06-30T00:00:00-04:00");
   if (saved.samira.rank_trend.points.some((point) => Number(point.time_ms) < june30Start)) {
@@ -139,6 +157,36 @@ try {
   }
   if (!/ranked solo/i.test(rankedSampleNote.game_meta_line || "") || !/6\/11\/2/.test(rankedSampleNote.game_meta_line || "") || !/174 CS/.test(rankedSampleNote.game_meta_line || "")) {
     throw new Error(`Samira sample note did not expose game facts: ${rankedSampleNote.game_meta_line || ""}`);
+  }
+  if (/^Iron\b/i.test(rankedSampleNote.rank_read?.exactRank || "")) {
+    throw new Error(`Death-heavy ranked note should not automatically become Iron: ${rankedSampleNote.rank_read?.exactRank}`);
+  }
+  const clockFirstNote = sampleNotes[2];
+  if (clockFirstNote.game_time !== "2026-07-03T04:22:00.000Z" || !/Jul 3, 2026, 12:22 AM/.test(clockFirstNote.game_time_label || "")) {
+    throw new Error(`Clock-first timestamp note did not expose parsed game date/time: ${clockFirstNote.game_time || ""} / ${clockFirstNote.game_time_label || ""}`);
+  }
+  if (!/12\/2\/11/.test(clockFirstNote.game_meta_line || "") || !/106 CS/.test(clockFirstNote.game_meta_line || "") || /3\/0\/4/.test(clockFirstNote.game_meta_line || "")) {
+    throw new Error(`Clock-first note did not prefer the final Alan/Samira scoreboard over an interim score: ${clockFirstNote.game_meta_line || ""}`);
+  }
+  if (/^Iron\b/i.test(clockFirstNote.rank_read?.exactRank || "")) {
+    throw new Error(`Strong Swiftplay Samira note should not be scored as Iron: ${clockFirstNote.rank_read?.exactRank}`);
+  }
+  const masterYiNote = sampleNotes[3];
+  if (!/Jul 1, 2026 \(time not readable\)/.test(masterYiNote.game_time_label || "")) {
+    throw new Error(`Date-only note did not show a time-not-readable boundary: ${masterYiNote.game_time_label || ""}`);
+  }
+  if (/^Master\b/i.test(masterYiNote.rank_read?.exactRank || "")) {
+    throw new Error(`Master Yi champion text leaked into the Samira rank read: ${masterYiNote.rank_read?.exactRank}`);
+  }
+  if (/^Iron\b/i.test(masterYiNote.rank_read?.exactRank || "")) {
+    throw new Error(`Master Yi note should not be scored as Iron from a death-heavy note alone: ${masterYiNote.rank_read?.exactRank}`);
+  }
+  if (/89,490 gold|80,624 gold/.test(masterYiNote.game_meta_line || "")) {
+    throw new Error(`Master Yi note leaked team/enemy gold into Samira card metadata: ${masterYiNote.game_meta_line || ""}`);
+  }
+  const masterYiTrendPoint = saved.samira.rank_trend.points.find((point) => point.title === masterYiNote.title);
+  if (!masterYiTrendPoint || !/Jul 1, 2026 \(time not readable\)/.test(masterYiTrendPoint.date_label || "")) {
+    throw new Error(`Date-only rank trend point did not preserve the time-not-readable boundary: ${JSON.stringify(masterYiTrendPoint)}`);
   }
   for (const note of sampleNotes) {
     const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(note.id)}`, {
