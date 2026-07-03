@@ -1595,12 +1595,23 @@ const rankTrendScale = [
 ];
 
 const rankTrendValueByName = new Map(rankTrendScale.map((rank, index) => [rank.toLowerCase(), index]));
-const rankTrendMonthFormatter = new Intl.DateTimeFormat("en-US", {
+const rankTrendPointDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
   month: "numeric",
   day: "numeric",
   hour: "numeric",
   minute: "2-digit"
+});
+const rankTrendAxisDateFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  month: "numeric",
+  day: "numeric"
+});
+const rankTrendAxisDatePartsFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
 });
 
 function compactRecordingDate(item) {
@@ -2589,7 +2600,59 @@ function svgNode(name, attributes = {}) {
 
 function rankTrendDateLabel(time) {
   const date = new Date(time);
-  return rankTrendMonthFormatter.format(date);
+  return rankTrendPointDateFormatter.format(date);
+}
+
+function rankTrendLocalDateParts(time) {
+  const date = new Date(time);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = Object.fromEntries(
+    rankTrendAxisDatePartsFormatter.formatToParts(date)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value])
+  );
+  const year = Number(parts.year);
+  const month = Number(parts.month);
+  const day = Number(parts.day);
+  return Number.isFinite(year) && Number.isFinite(month) && Number.isFinite(day)
+    ? { year, month, day }
+    : null;
+}
+
+function rankTrendDateKey(parts) {
+  return `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
+}
+
+function rankTrendNextDateParts(parts) {
+  const next = new Date(Date.UTC(parts.year, parts.month - 1, parts.day + 1, 12));
+  return {
+    year: next.getUTCFullYear(),
+    month: next.getUTCMonth() + 1,
+    day: next.getUTCDate()
+  };
+}
+
+function rankTrendAxisTickTime(parts) {
+  return Date.UTC(parts.year, parts.month - 1, parts.day, 16);
+}
+
+function rankTrendAxisDateTicks(timeMin, timeMax, compact = false) {
+  const start = rankTrendLocalDateParts(timeMin);
+  const end = rankTrendLocalDateParts(timeMax);
+  if (!start || !end) return [];
+  const endKey = rankTrendDateKey(end);
+  const days = [];
+  for (let cursor = start, guard = 0; rankTrendDateKey(cursor) <= endKey && guard < 370; cursor = rankTrendNextDateParts(cursor), guard += 1) {
+    const tickTime = rankTrendAxisTickTime(cursor);
+    days.push({
+      time: tickTime,
+      label: rankTrendAxisDateFormatter.format(new Date(tickTime))
+    });
+  }
+  const maxTicks = compact ? 7 : 9;
+  if (days.length <= maxTicks) return days;
+  const interval = Math.ceil((days.length - 1) / (maxTicks - 1));
+  return days.filter((_, index) => index === 0 || index === days.length - 1 || index % interval === 0);
 }
 
 function rankTrendSvg(points, options = {}) {
@@ -2662,16 +2725,16 @@ function rankTrendSvg(points, options = {}) {
     class: "rank-trend-axis"
   }));
 
-  const tickIndexes = [...new Set([0, Math.floor((points.length - 1) / 2), points.length - 1])];
-  for (const index of tickIndexes) {
-    const point = points[index];
+  const xTicks = rankTrendAxisDateTicks(timeMin, timeMax, compact);
+  for (const tick of xTicks) {
+    const x = Math.max(margin.left, Math.min(margin.left + plotWidth, xScale(tick.time)));
     const text = svgNode("text", {
-      x: xScale(point.time),
+      x,
       y: height - 10,
       class: "rank-trend-x-label",
-      "text-anchor": index === 0 ? "start" : (index === points.length - 1 ? "end" : "middle")
+      "text-anchor": x <= margin.left + 8 ? "start" : (x >= margin.left + plotWidth - 8 ? "end" : "middle")
     });
-    text.textContent = rankTrendDateLabel(point.time);
+    text.textContent = tick.label;
     svg.append(text);
   }
 

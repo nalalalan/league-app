@@ -318,6 +318,12 @@ try {
   if (!/function\s+renderSamiraRankTrend\s*\(/.test(appSource) || !/rankTrendSvg\(points,\s*\{\s*compact:\s*true\s*\}\)/.test(appSource)) {
     throw new Error("Samira rank chart is not rendered from the source-bound rank trend.");
   }
+  if (!/rankTrendAxisDateFormatter/.test(appSource) || !/rankTrendAxisDateTicks/.test(appSource) || /const\s+tickIndexes\s*=/.test(appSource)) {
+    throw new Error("Samira rank chart x-axis is still using raw point timestamp labels instead of date-only day ticks.");
+  }
+  if (/rankTrendAxisDateFormatter[\s\S]{0,180}\bhour\s*:/.test(appSource) || /rankTrendAxisDateFormatter[\s\S]{0,220}\bminute\s*:/.test(appSource)) {
+    throw new Error("Samira rank chart x-axis formatter still includes time fields.");
+  }
   if (!/\.samira-rank-trend svg\s*\{[\s\S]*?height:\s*clamp\(180px,\s*14vw,\s*220px\);/.test(styles)) {
     throw new Error("Samira rank chart is not large enough to carry the current-read row.");
   }
