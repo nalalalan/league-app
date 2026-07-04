@@ -346,6 +346,13 @@ try {
     throw new Error(`League source still contains visible role-prefix text:\n${sourceOffenders.join("\n")}`);
   }
   const appSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
+  const serverSource = await readFile(new URL("../server.js", import.meta.url), "utf8");
+  if (!/function\s+cleanSamiraVisibleDescription\s*\(/.test(serverSource) || !/replace\(\s*\/\\b\(\\d\+\)\\\.\\s\+\(\\d\+\)\\s\*k\\b\/gi,\s*"\$1\.\$2k"\s*\)/.test(serverSource)) {
+    throw new Error("Samira visible descriptions do not normalize compact gold text such as 3.5k.");
+  }
+  if (!/const\s+pdfDescription\s*=\s*samiraPublicNoteDescription\(note,\s*pdfRankRead,\s*rankEstimate,\s*noteAnalysis\);/.test(serverSource) || /buildSamiraNotePdf\(note,\s*pdfRankRead,\s*noteAnalysis\?\.description\s*\|\|\s*""\)/.test(serverSource)) {
+    throw new Error("Samira note PDFs can still bypass the public description sanitizer.");
+  }
   if (!/function\s+directVisibleCopy\s*\(/.test(appSource) || !/descriptionText\.textContent\s*=\s*directVisibleCopy\(description\)/.test(appSource)) {
     throw new Error("Samira note-card descriptions do not pass through the direct visible-copy sanitizer.");
   }

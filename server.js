@@ -179,6 +179,12 @@ function cleanText(value, maxLength) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
+function cleanSamiraVisibleDescription(value, maxLength = 1000) {
+  return cleanText(value, maxLength)
+    .replace(/\b(\d+)\.\s+(\d+)\s*k\b/gi, "$1.$2k")
+    .replace(/\b(\d+),\s+(\d{3})\b/g, "$1,$2");
+}
+
 function cleanParagraphText(value, maxLength) {
   return String(value || "")
     .replace(/\r\n/g, "\n")
@@ -1177,9 +1183,9 @@ function samiraRankReadForNote(note = {}, overallRank = {}, analysis = null) {
 }
 
 function samiraPublicNoteDescription(note = {}, rankRead = {}, overallRank = {}, analysis = null) {
-  const description = cleanText(analysis?.description || "", 1000);
+  const description = cleanSamiraVisibleDescription(analysis?.description || "", 1000);
   if (description && !samiraAiDescriptionRejected(description)) return description;
-  return samiraNoteDescription(note, rankRead, overallRank);
+  return cleanSamiraVisibleDescription(samiraNoteDescription(note, rankRead, overallRank), 430);
 }
 
 function publicSamiraNote(note = {}, overallRank = {}, analysis = null) {
@@ -2068,7 +2074,8 @@ async function handleApi(req, res, url) {
     const analysis = await samiraAiAnalysesForNotes([note], rankEstimate);
     const noteAnalysis = analysis.notesById[samiraNoteCacheKey(note)];
     const pdfRankRead = noteAnalysis?.rank_read || rankRead;
-    const pdf = buildSamiraNotePdf(note, pdfRankRead, noteAnalysis?.description || "");
+    const pdfDescription = samiraPublicNoteDescription(note, pdfRankRead, rankEstimate, noteAnalysis);
+    const pdf = buildSamiraNotePdf(note, pdfRankRead, pdfDescription);
     res.writeHead(200, {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="${pdfFilenameForNote(note)}"`,
