@@ -52,6 +52,7 @@ try {
       "Normal Swiftplay Victory. Team 1 won 42/23/55 with 98,163 gold against Team 2's 23/42/29 with 84,823 gold.",
       "Alan's Samira finished 16/6/5, 40,565 damage, 22,994 gold, and 923 gold/min.",
       "CS@10: 65.",
+      "Approximate rank: Platinum IV.",
       "Don't drop Samira’s punctuation; Lily’s climb-out sentence should stay readable.",
       "At 24:02 Alan was 12/6/5 with 172 CS and 2,904 gold, then the final fight moved him to 16/6/5.",
       "The useful Samira rule is still edge, dive, damage, climb out, then buy or reset."
@@ -60,6 +61,7 @@ try {
       "Game date/time: June 30, 2026 at 10:11 PM.",
       "Ranked solo queue loss. K/D/A 6/11/2. 174 CS. 21,209 damage. 12,004 gold. 412 gold/min.",
       "CS@10: 52.",
+      "Approx rank: Gold IV.",
       "Alan's Samira game shows fixed flight pattern and boom-and-zoom.",
       "Edge is altitude. E is the dive. Return to edge is the climb.",
       "W ready, HP above half, ally close is the gate.",
@@ -137,8 +139,14 @@ try {
   if (sampleNote.game_meta?.cs_at_10 !== "65 CS@10" || Number(sampleNote.game_meta?.cs_at_10_value) !== 65) {
     throw new Error(`Samira sample note did not expose CS@10 metadata: ${JSON.stringify(sampleNote.game_meta)}`);
   }
+  if (sampleNote.rank_read?.exactRank !== "Platinum IV") {
+    throw new Error(`Explicit approximate rank in note did not override derived rank: ${JSON.stringify(sampleNote.rank_read)}`);
+  }
   if (!firstTrendPoint || firstTrendPoint.cs_at_10 !== "65 CS@10" || Number(firstTrendPoint.cs_at_10_value) !== 65) {
     throw new Error(`Samira rank trend point did not carry CS@10: ${JSON.stringify(firstTrendPoint)}`);
+  }
+  if (!firstTrendPoint || firstTrendPoint.rank !== "Platinum IV") {
+    throw new Error(`Samira rank trend point did not use explicit approximate rank: ${JSON.stringify(firstTrendPoint)}`);
   }
   if (/42\/23\/55|98,163 gold/.test(sampleNote.game_meta_line || "")) {
     throw new Error(`Samira team-score sample leaked team stats into card metadata: ${sampleNote.game_meta_line || ""}`);
@@ -171,6 +179,9 @@ try {
   }
   if (/^Iron\b/i.test(rankedSampleNote.rank_read?.exactRank || "")) {
     throw new Error(`Death-heavy ranked note should not automatically become Iron: ${rankedSampleNote.rank_read?.exactRank}`);
+  }
+  if (rankedSampleNote.rank_read?.exactRank !== "Gold IV") {
+    throw new Error(`Death-heavy ranked note did not keep its explicit approximate rank: ${JSON.stringify(rankedSampleNote.rank_read)}`);
   }
   const clockFirstNote = sampleNotes[2];
   if (clockFirstNote.game_time !== "2026-07-03T04:22:00.000Z" || !/Jul 3, 2026, 12:22 AM/.test(clockFirstNote.game_time_label || "")) {
@@ -327,8 +338,11 @@ try {
   if (!/\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*minmax\(280px,\s*390px\)\s+minmax\(0,\s*1fr\);[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;/.test(styles)) {
     throw new Error("Samira intake still uses a big enclosing card instead of a compact work layout.");
   }
-  if (!/id="samira-rank-trend"/.test(html) || !/\.samira-rank-trend\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1;[\s\S]*?grid-row:\s*3;/.test(styles)) {
+  if (!/id="samira-rank-trend"/.test(html) || !/\.samira-rank-trend\s*\{[\s\S]*?grid-row:\s*3;/.test(styles)) {
     throw new Error("Samira rank-over-time chart is not filling the full intake row.");
+  }
+  if (!/id="samira-cs-trend"/.test(html) || !/\.samira-cs-trend\s*\{[\s\S]*?grid-row:\s*4;/.test(styles)) {
+    throw new Error("Samira CS@10 chart is not rendered as a separate full-width row.");
   }
   if (!/\.samira-main-takeaway\s*\{[\s\S]*?align-self:\s*stretch;[\s\S]*?min-height:\s*0;/.test(styles) || /\.samira-main-takeaway\s*\{[\s\S]*?grid-row:\s*1\s*\/\s*span\s*2;/.test(styles)) {
     throw new Error("Samira current read is stretched across the heading/composer block.");
@@ -339,20 +353,27 @@ try {
   if (!/function\s+renderSamiraRankTrend\s*\(/.test(appSource) || !/rankTrendSvg\(points,\s*\{\s*compact:\s*true\s*\}\)/.test(appSource)) {
     throw new Error("Samira rank chart is not rendered from the source-bound rank trend.");
   }
+  if (!/function\s+renderSamiraCsTrend\s*\(/.test(appSource) || !/csAtTenTrendSvg\(points,\s*\{\s*compact:\s*true\s*\}\)/.test(appSource)) {
+    throw new Error("Samira CS@10 chart is not rendered from the source-bound note points.");
+  }
   if (!/rankTrendAxisDateFormatter/.test(appSource) || !/rankTrendAxisDateTicks/.test(appSource) || /const\s+tickIndexes\s*=/.test(appSource)) {
     throw new Error("Samira rank chart x-axis is still using raw point timestamp labels instead of date-only day ticks.");
   }
   if (/rankTrendAxisDateFormatter[\s\S]{0,180}\bhour\s*:/.test(appSource) || /rankTrendAxisDateFormatter[\s\S]{0,220}\bminute\s*:/.test(appSource)) {
     throw new Error("Samira rank chart x-axis formatter still includes time fields.");
   }
+  const rankTrendSvgBody = appSource.slice(appSource.indexOf("function rankTrendSvg"), appSource.indexOf("function csAtTenTrendSvg"));
+  if (/rank-trend-cs-line|rank-trend-cs-point|rankTrendCsValue|CS at 10/.test(rankTrendSvgBody)) {
+    throw new Error("Samira rank chart still mixes CS@10 into the rank plot.");
+  }
   if (!/rankTrendCsValue/.test(appSource) || !/rankTrendCsTicks/.test(appSource) || !/rank-trend-cs-line/.test(appSource) || !/rank-trend-cs-y-label/.test(appSource)) {
-    throw new Error("Samira rank chart does not render a right-side CS@10 axis from source-bound note points.");
+    throw new Error("Samira CS@10 chart does not render from source-bound note points.");
   }
   if (!/\.rank-trend-cs-line\s*\{/.test(styles) || !/\.rank-trend-cs-y-label\s*\{/.test(styles)) {
-    throw new Error("Samira CS@10 chart line and right-axis labels are not styled.");
+    throw new Error("Samira CS@10 chart line and labels are not styled.");
   }
-  if (!/\.samira-rank-trend svg\s*\{[\s\S]*?height:\s*clamp\(180px,\s*14vw,\s*220px\);/.test(styles)) {
-    throw new Error("Samira rank chart is not large enough to carry the current-read row.");
+  if (!/\.samira-rank-trend svg,\s*[\r\n]+\.samira-cs-trend svg\s*\{[\s\S]*?height:\s*clamp\(180px,\s*14vw,\s*220px\);/.test(styles)) {
+    throw new Error("Samira rank and CS charts are not large enough to carry the current-read rows.");
   }
   if (!/@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*1fr;/.test(styles)) {
     throw new Error("Samira intake does not collapse before the chart lane becomes cramped.");

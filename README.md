@@ -2,7 +2,7 @@
 
 Single-page public Samira note intake for `league.aolabs.io`.
 
-The page is intentionally simple: one Samira note textarea, save status, saved note PDF cards, approximate rank reads for those notes, a notes-only rank chart with CS@10 on the right axis, and a downloadable paper. The rank read comes from parsed Samira-owned game facts, CS@10 when present, and explicit rank phrases, not from model guesses, champion names, or recording archive points. The backend still keeps Samira tips, aggregate rank read, recording data, and public notes available for the API and morning queue, but the home page no longer shows champion selection, recordings, or other-champion material by default.
+The page is intentionally simple: one Samira note textarea, save status, saved note PDF cards, approximate rank reads for those notes, a notes-only rank chart, a separate CS@10 chart, and a downloadable paper. The rank read comes from explicit rank phrases first, then parsed Samira-owned game facts and note language, not from CS@10, model guesses, champion names, or recording archive points. The backend still keeps Samira tips, aggregate rank read, recording data, and public notes available for the API and morning queue, but the home page no longer shows champion selection, recordings, or other-champion material by default.
 
 ## Run Locally
 

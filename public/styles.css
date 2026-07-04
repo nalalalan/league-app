@@ -1892,9 +1892,9 @@ summary {
   display: none;
 }
 
-.samira-rank-trend {
+.samira-rank-trend,
+.samira-cs-trend {
   grid-column: 1 / -1;
-  grid-row: 3;
   align-self: start;
   min-width: 0;
   max-width: 100%;
@@ -1907,27 +1907,42 @@ summary {
   box-shadow: 0 10px 24px rgba(52, 42, 32, .04);
 }
 
-.samira-rank-trend .rank-trend-head {
+.samira-rank-trend {
+  grid-row: 3;
+}
+
+.samira-cs-trend {
+  grid-row: 4;
+}
+
+.samira-rank-trend .rank-trend-head,
+.samira-cs-trend .rank-trend-head {
   margin-bottom: 5px;
 }
 
-.samira-rank-trend h2 {
+.samira-rank-trend h2,
+.samira-cs-trend h2 {
   font-size: 14px;
   font-weight: 500;
 }
 
 .samira-rank-trend .rank-trend-head p,
 .samira-rank-trend .rank-trend-latest,
-.samira-rank-trend .rank-trend-empty {
+.samira-rank-trend .rank-trend-empty,
+.samira-cs-trend .rank-trend-head p,
+.samira-cs-trend .rank-trend-latest,
+.samira-cs-trend .rank-trend-empty {
   font-size: 11px;
   font-weight: 400;
 }
 
-.samira-rank-trend .rank-trend-chart {
+.samira-rank-trend .rank-trend-chart,
+.samira-cs-trend .rank-trend-chart {
   padding-top: 0;
 }
 
-.samira-rank-trend svg {
+.samira-rank-trend svg,
+.samira-cs-trend svg {
   height: clamp(180px, 14vw, 220px);
 }
 
@@ -4285,6 +4300,7 @@ h1 {
   .samira-note-form,
   .samira-main-takeaway,
   .samira-rank-trend,
+  .samira-cs-trend,
   .samira-note-list {
     grid-column: 1;
     grid-row: auto;
@@ -4409,6 +4425,7 @@ h1 {
   .samira-note-form,
   .samira-main-takeaway,
   .samira-rank-trend,
+  .samira-cs-trend,
   .samira-note-list {
     grid-column: 1;
     grid-row: auto;
@@ -4431,7 +4448,8 @@ h1 {
     font-size: 17px;
   }
 
-  .samira-rank-trend {
+  .samira-rank-trend,
+  .samira-cs-trend {
     width: calc(100vw - 22px);
     max-width: calc(100vw - 22px);
     justify-self: stretch;

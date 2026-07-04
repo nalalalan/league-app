@@ -744,6 +744,7 @@ const samiraNoteBody = document.querySelector("#samira-note-body");
 const samiraNoteStatus = document.querySelector("#samira-note-status");
 const samiraMainTakeaway = document.querySelector("#samira-main-takeaway");
 const samiraRankTrend = document.querySelector("#samira-rank-trend");
+const samiraCsTrend = document.querySelector("#samira-cs-trend");
 const samiraNoteList = document.querySelector("#samira-note-list");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -2680,13 +2681,11 @@ function rankTrendAxisDateTicks(timeMin, timeMax, compact = false) {
 
 function rankTrendSvg(points, options = {}) {
   const compact = options.compact === true;
-  const csValues = points.map(rankTrendCsValue).filter((value) => value !== null);
-  const hasCsAxis = csValues.length > 0;
   const width = 640;
   const height = compact ? 210 : 274;
   const margin = compact
-    ? { top: 14, right: hasCsAxis ? 48 : 18, bottom: 30, left: 68 }
-    : { top: 18, right: hasCsAxis ? 54 : 22, bottom: 34, left: 74 };
+    ? { top: 14, right: 18, bottom: 30, left: 68 }
+    : { top: 18, right: 22, bottom: 34, left: 74 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
   const values = points.map((point) => point.value);
@@ -2707,18 +2706,13 @@ function rankTrendSvg(points, options = {}) {
     return margin.left + ((time - paddedTimeMin) / (paddedTimeMax - paddedTimeMin)) * plotWidth;
   };
   const yScale = (value) => margin.top + plotHeight - ((value - minValue) / yRange) * plotHeight;
-  const csTicks = rankTrendCsTicks(csValues, compact);
-  const csMin = csTicks.length ? Math.min(...csTicks) : 0;
-  const csMax = csTicks.length ? Math.max(...csTicks) : 1;
-  const csRange = Math.max(1, csMax - csMin);
-  const csYScale = (value) => margin.top + plotHeight - ((value - csMin) / csRange) * plotHeight;
   const axisRight = margin.left + plotWidth;
 
   const svg = svgNode("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
     preserveAspectRatio: "xMidYMid meet",
-    "aria-label": hasCsAxis ? "Exact estimated rank and CS at 10 over time" : "Exact estimated rank over time"
+    "aria-label": "Exact estimated rank over time"
   });
 
   const ticks = rankTrendTickValues(points, minValue, maxValue);
@@ -2741,27 +2735,6 @@ function rankTrendSvg(points, options = {}) {
     svg.append(text);
   }
 
-  if (hasCsAxis) {
-    for (const tick of csTicks) {
-      const y = csYScale(tick);
-      svg.append(svgNode("line", {
-        x1: axisRight,
-        x2: axisRight + 4,
-        y1: y,
-        y2: y,
-        class: "rank-trend-cs-tick"
-      }));
-      const text = svgNode("text", {
-        x: axisRight + 8,
-        y: y + 3,
-        class: "rank-trend-cs-y-label",
-        "text-anchor": "start"
-      });
-      text.textContent = `${tick}`;
-      svg.append(text);
-    }
-  }
-
   svg.append(svgNode("line", {
     x1: margin.left,
     x2: margin.left,
@@ -2776,15 +2749,6 @@ function rankTrendSvg(points, options = {}) {
     y2: margin.top + plotHeight,
     class: "rank-trend-axis"
   }));
-  if (hasCsAxis) {
-    svg.append(svgNode("line", {
-      x1: axisRight,
-      x2: axisRight,
-      y1: margin.top,
-      y2: margin.top + plotHeight,
-      class: "rank-trend-cs-axis"
-    }));
-  }
 
   const xTicks = rankTrendAxisDateTicks(timeMin, timeMax, compact);
   for (const tick of xTicks) {
@@ -2800,26 +2764,14 @@ function rankTrendSvg(points, options = {}) {
   }
 
   const linePoints = points.map((point) => `${xScale(point.time).toFixed(1)},${yScale(point.value).toFixed(1)}`).join(" ");
-  const csLinePoints = points
-    .map((point) => ({ point, value: rankTrendCsValue(point) }))
-    .filter((item) => item.value !== null)
-    .map((item) => `${xScale(item.point.time).toFixed(1)},${csYScale(item.value).toFixed(1)}`)
-    .join(" ");
   if (points.length > 1) {
     svg.append(svgNode("polyline", {
       points: linePoints,
       class: "rank-trend-line"
     }));
   }
-  if (hasCsAxis && csLinePoints.split(" ").filter(Boolean).length > 1) {
-    svg.append(svgNode("polyline", {
-      points: csLinePoints,
-      class: "rank-trend-cs-line"
-    }));
-  }
 
   for (const point of points) {
-    const csAtTen = rankTrendCsValue(point);
     const circle = svgNode("circle", {
       cx: xScale(point.time),
       cy: yScale(point.value),
@@ -2827,21 +2779,115 @@ function rankTrendSvg(points, options = {}) {
       class: "rank-trend-point"
     });
     const title = svgNode("title");
-    title.textContent = `${point.dateLabel}: ${point.rank}${csAtTen ? ` / ${point.csAtTenLabel || `${csAtTen} CS@10`}` : ""}`;
+    title.textContent = `${point.dateLabel}: ${point.rank}`;
     circle.append(title);
     svg.append(circle);
-    if (hasCsAxis && csAtTen) {
-      const csCircle = svgNode("circle", {
-        cx: xScale(point.time),
-        cy: csYScale(csAtTen),
-        r: compact ? 3 : 3.4,
-        class: "rank-trend-cs-point"
-      });
-      const csTitle = svgNode("title");
-      csTitle.textContent = `${point.dateLabel}: ${point.csAtTenLabel || `${csAtTen} CS@10`}`;
-      csCircle.append(csTitle);
-      svg.append(csCircle);
-    }
+  }
+
+  return svg;
+}
+
+function csAtTenTrendSvg(points, options = {}) {
+  const compact = options.compact === true;
+  const csPoints = points
+    .map((point) => ({ ...point, csValue: rankTrendCsValue(point) }))
+    .filter((point) => point.csValue !== null);
+  const width = 640;
+  const height = compact ? 174 : 222;
+  const margin = compact
+    ? { top: 12, right: 18, bottom: 30, left: 52 }
+    : { top: 16, right: 22, bottom: 34, left: 58 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const values = csPoints.map((point) => point.csValue);
+  const ticks = rankTrendCsTicks(values, compact);
+  const minValue = ticks.length ? Math.min(...ticks) : Math.max(0, Math.floor(Math.min(...values) - 5));
+  const maxValue = ticks.length ? Math.max(...ticks) : Math.ceil(Math.max(...values) + 5);
+  const range = Math.max(1, maxValue - minValue);
+  const timeMin = Math.min(...csPoints.map((point) => point.time));
+  const timeMax = Math.max(...csPoints.map((point) => point.time));
+  const timePadding = timeMax === timeMin ? 0 : (timeMax - timeMin) * 0.035;
+  const paddedTimeMin = timeMin - timePadding;
+  const paddedTimeMax = timeMax + timePadding;
+  const axisRight = margin.left + plotWidth;
+  const xScale = (time) => {
+    if (timeMax === timeMin) return margin.left + plotWidth / 2;
+    return margin.left + ((time - paddedTimeMin) / (paddedTimeMax - paddedTimeMin)) * plotWidth;
+  };
+  const yScale = (value) => margin.top + plotHeight - ((value - minValue) / range) * plotHeight;
+  const svg = svgNode("svg", {
+    viewBox: `0 0 ${width} ${height}`,
+    role: "img",
+    preserveAspectRatio: "xMidYMid meet",
+    "aria-label": "CS at 10 over time"
+  });
+
+  for (const tick of ticks) {
+    const y = yScale(tick);
+    svg.append(svgNode("line", {
+      x1: margin.left,
+      x2: axisRight,
+      y1: y,
+      y2: y,
+      class: "rank-trend-grid"
+    }));
+    const text = svgNode("text", {
+      x: margin.left - 8,
+      y: y + 3,
+      class: "rank-trend-cs-y-label",
+      "text-anchor": "end"
+    });
+    text.textContent = `${tick}`;
+    svg.append(text);
+  }
+
+  svg.append(svgNode("line", {
+    x1: margin.left,
+    x2: margin.left,
+    y1: margin.top,
+    y2: margin.top + plotHeight,
+    class: "rank-trend-cs-axis"
+  }));
+  svg.append(svgNode("line", {
+    x1: margin.left,
+    x2: axisRight,
+    y1: margin.top + plotHeight,
+    y2: margin.top + plotHeight,
+    class: "rank-trend-axis"
+  }));
+
+  const xTicks = rankTrendAxisDateTicks(timeMin, timeMax, compact);
+  for (const tick of xTicks) {
+    const x = Math.max(margin.left, Math.min(axisRight, xScale(tick.time)));
+    const text = svgNode("text", {
+      x,
+      y: height - 10,
+      class: "rank-trend-x-label",
+      "text-anchor": x <= margin.left + 8 ? "start" : (x >= axisRight - 8 ? "end" : "middle")
+    });
+    text.textContent = tick.label;
+    svg.append(text);
+  }
+
+  const linePoints = csPoints.map((point) => `${xScale(point.time).toFixed(1)},${yScale(point.csValue).toFixed(1)}`).join(" ");
+  if (csPoints.length > 1) {
+    svg.append(svgNode("polyline", {
+      points: linePoints,
+      class: "rank-trend-cs-line"
+    }));
+  }
+
+  for (const point of csPoints) {
+    const circle = svgNode("circle", {
+      cx: xScale(point.time),
+      cy: yScale(point.csValue),
+      r: compact ? 3.6 : 4,
+      class: "rank-trend-cs-point"
+    });
+    const title = svgNode("title");
+    title.textContent = `${point.dateLabel}: ${point.csAtTenLabel || `${point.csValue} CS@10`}`;
+    circle.append(title);
+    svg.append(circle);
   }
 
   return svg;
@@ -7114,8 +7160,37 @@ function renderSamiraRankTrend(data) {
   chart.append(rankTrendSvg(points, { compact: true }));
   const latestLine = document.createElement("p");
   latestLine.className = "rank-trend-latest";
-  latestLine.textContent = `${latest.rank}${latest.csAtTenLabel ? ` / ${latest.csAtTenLabel}` : ""} / ${latest.dateLabel}`;
+  latestLine.textContent = `${latest.rank} / ${latest.dateLabel}`;
   samiraRankTrend.replaceChildren(heading, chart, latestLine);
+}
+
+function renderSamiraCsTrend(data) {
+  if (!samiraCsTrend) return;
+  const points = samiraRankTrendPoints(data).filter((point) => rankTrendCsValue(point) !== null);
+  const heading = document.createElement("div");
+  heading.className = "rank-trend-head";
+  const title = document.createElement("h2");
+  title.textContent = "cs@10 vs time";
+  const meta = document.createElement("p");
+  meta.textContent = points.length ? `${points.length} CS@10 reads` : "no CS@10 reads";
+  heading.append(title, meta);
+
+  if (!points.length) {
+    const empty = document.createElement("p");
+    empty.className = "rank-trend-empty";
+    empty.textContent = "Paste one note with CS@10 first.";
+    samiraCsTrend.replaceChildren(heading, empty);
+    return;
+  }
+
+  const latest = points.at(-1);
+  const chart = document.createElement("div");
+  chart.className = "rank-trend-chart";
+  chart.append(csAtTenTrendSvg(points, { compact: true }));
+  const latestLine = document.createElement("p");
+  latestLine.className = "rank-trend-latest";
+  latestLine.textContent = `${latest.csAtTenLabel || `${latest.csAtTen} CS@10`} / ${latest.dateLabel}`;
+  samiraCsTrend.replaceChildren(heading, chart, latestLine);
 }
 
 async function hydratePublicNotes() {
@@ -7149,6 +7224,7 @@ function renderSamiraState(data) {
     samiraMainTakeaway.hidden = !data.main_takeaway;
   }
   renderSamiraRankTrend(data);
+  renderSamiraCsTrend(data);
   if (samiraTipList) {
     const tips = Array.isArray(data.tips) ? data.tips : [];
     samiraTipList.replaceChildren(...tips.map((tip) => {
@@ -7164,7 +7240,7 @@ function renderSamiraState(data) {
 }
 
 async function hydrateSamiraState() {
-  if (!samiraRankRead && !samiraTipList && !samiraNoteList && !samiraMainTakeaway) return;
+  if (!samiraRankRead && !samiraTipList && !samiraNoteList && !samiraMainTakeaway && !samiraRankTrend && !samiraCsTrend) return;
   try {
     const response = await fetch("/api/samira", { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error("samira read unavailable");

@@ -352,8 +352,15 @@ function samiraRankNameForValue(value) {
   return samiraRankScale[Math.max(0, Math.min(samiraRankScale.length - 1, index))] || "unrated";
 }
 
+function samiraCanonicalRankText(value) {
+  return String(value || "").toLowerCase().replace(
+    /\b(iron|bronze|silver|gold|platinum|emerald|diamond)\s+(1|2|3|4)\b/g,
+    (_, tier, division) => `${tier} ${["", "i", "ii", "iii", "iv"][Number(division)] || division}`
+  );
+}
+
 function samiraRankValueFromText(value) {
-  const text = String(value || "").toLowerCase();
+  const text = samiraCanonicalRankText(value);
   const match = samiraRankScale.find((rank) => {
     const parts = rank.toLowerCase().split(/\s+/);
     const pattern = parts.length === 2
@@ -364,10 +371,28 @@ function samiraRankValueFromText(value) {
   return match ? samiraRankValueByName.get(match.toLowerCase()) : null;
 }
 
-function samiraRankValueFromExplicitText(value) {
+function samiraExplicitRankFromText(value) {
   const text = String(value || "");
-  const explicit = text.match(/\b(?:approx(?:imate)?\s+rank|rank\s+read|ranked\s+read|estimated\s+rank|rank\s+estimate|mmr\s+read|elo\s+read|current\s+rank)\s*(?::|is|=|-)?\s*((?:iron|bronze|silver|gold|platinum|emerald|diamond)\s+[ivx]+|master|grandmaster|challenger)\b/i);
-  return explicit ? samiraRankValueFromText(explicit[1]) : null;
+  const rankPattern = "((?:iron|bronze|silver|gold|platinum|emerald|diamond)\\s+(?:iv|iii|ii|i|[1-4])|master|grandmaster|challenger)";
+  const patterns = [
+    new RegExp(`\\b(?:approx(?:imate(?:ly)?)?|estimated|estimate)\\s+(?:rank|ranked|rank\\s+read|read|elo)?\\s*(?:is|=|:|-|around|as)?\\s*${rankPattern}\\b`, "ig"),
+    new RegExp(`\\b(?:rank(?:ed)?\\s*(?:read|estimate)?|current\\s+rank|rank\\s+equivalent|mmr\\s+read|elo\\s+read)\\s*(?:is|=|:|-|around|as)?\\s*${rankPattern}\\b`, "ig"),
+    new RegExp(`\\b${rankPattern}\\s+(?:approx(?:imate)?\\s+rank|rank\\s+read|rank\\s+estimate)\\b`, "ig")
+  ];
+  for (const pattern of patterns) {
+    for (const match of text.matchAll(pattern)) {
+      const rawRank = match[1] || "";
+      const after = text.slice((match.index || 0) + match[0].length, (match.index || 0) + match[0].length + 16).toLowerCase();
+      if (/^master\b/i.test(rawRank) && /^\s*(yi|elo\s+game|game)/i.test(after)) continue;
+      const value = samiraRankValueFromText(rawRank);
+      if (value !== null) return { rank: samiraRankNameForValue(value), value };
+    }
+  }
+  return null;
+}
+
+function samiraRankValueFromExplicitText(value) {
+  return samiraExplicitRankFromText(value)?.value ?? null;
 }
 
 function samiraRecordingTime(item = {}) {
@@ -832,7 +857,7 @@ function samiraRankTrendPoint({ source, title, rank, value, timeMs, dateLabel = 
 function samiraRankTrend(notes = [], review = {}, overallRank = {}, analysesById = {}) {
   const notePoints = notes
     .map((note) => {
-      const rankRead = analysesById[samiraNoteCacheKey(note)]?.rank_read || samiraNoteRankRead(note, overallRank);
+      const rankRead = samiraRankReadForNote(note, overallRank, analysesById[samiraNoteCacheKey(note)]);
       const value = samiraRankValueFromText(rankRead.exactRank);
       const gameTime = samiraNoteGameTime(note);
       const gameMeta = samiraNoteGameMeta(note);
@@ -1003,9 +1028,6 @@ function samiraRankValueFromFacts(facts = {}, text = "") {
   if (facts.gpmValue >= 900 && facts.deaths <= 7) value = Math.max(value, samiraRankValueByName.get("gold iii"));
   if (facts.damageValue >= 35000 && facts.deaths <= 7) value = Math.max(value, samiraRankValueByName.get("gold iii"));
   if (facts.csValue >= 120 && facts.deaths <= 8) value += 1;
-  if (facts.csAtTenValue >= 70 && facts.deaths <= 6) value += 2;
-  else if (facts.csAtTenValue >= 60 && facts.deaths <= 8) value += 1;
-  else if (facts.csAtTenValue > 0 && facts.csAtTenValue < 45 && participation < 10) value -= 1;
   if (facts.result === "win" && participation >= 8 && facts.deaths <= 3) value += 1;
   if (facts.result === "loss" && facts.deaths >= 8) value -= 1;
   if (/\bteemo support\b|\bpyke lane\b|\b309\/720\b/i.test(text) && facts.deaths >= 8) value -= 1;
@@ -1027,7 +1049,6 @@ function samiraRankReasonFromFacts(facts = {}, exactRank = "") {
   const bits = [
     facts.kills !== undefined ? `${facts.kills}/${facts.deaths}/${facts.assists}` : "",
     facts.cs ? facts.cs : "",
-    facts.cs_at_10 ? facts.cs_at_10 : "",
     facts.damage ? facts.damage : "",
     facts.gold_per_minute ? facts.gold_per_minute : ""
   ].filter(Boolean).slice(0, 4);
@@ -1043,7 +1064,8 @@ function samiraRankReasonFromFacts(facts = {}, exactRank = "") {
 
 function samiraNoteRankRead(note = {}, overallRank = {}) {
   const text = samiraNoteAnalysisText(note);
-  const explicit = samiraRankValueFromExplicitText(text);
+  const explicitRank = samiraExplicitRankFromText(text);
+  const explicit = explicitRank?.value ?? null;
   const greenLight = countSamiraMatches(text, [
     /\bw ready\b/g,
     /\bhp above half\b/g,
@@ -1085,19 +1107,21 @@ function samiraNoteRankRead(note = {}, overallRank = {}) {
   const conceptValue = samiraRankValueFromConcepts(text, signals, words);
   const value = explicit ?? factValue ?? conceptValue;
   const exactRank = samiraRankNameForValue(value);
-  const reason = factValue !== null
-    ? samiraRankReasonFromFacts(facts, exactRank)
-    : leak > greenLight + conversion
-      ? `The note has more leak language than conversion language, so it sits around ${exactRank} until the next saved game proves cleaner exits.`
-      : greenLight + conversion > 0
-        ? `The note names useful entry and payout checks, so it sits around ${exactRank} until game facts move it.`
-        : `There is not enough game evidence here to move the read beyond ${exactRank}.`;
+  const reason = explicitRank
+    ? `Saved note gives ${explicitRank.rank}; parsed game facts stay secondary.`
+    : factValue !== null
+      ? samiraRankReasonFromFacts(facts, exactRank)
+      : leak > greenLight + conversion
+        ? `The note has more leak language than conversion language, so it sits around ${exactRank} until the next saved game proves cleaner exits.`
+        : greenLight + conversion > 0
+          ? `The note names useful entry and payout checks, so it sits around ${exactRank} until game facts move it.`
+          : `There is not enough game evidence here to move the read beyond ${exactRank}.`;
   return {
     exactRank,
     range: `${samiraRankNameForValue(value - 1)} to ${samiraRankNameForValue(value + 1)}`,
-    confidence: words >= 120 ? "medium" : "low",
+    confidence: explicitRank ? "medium" : (words >= 120 ? "medium" : "low"),
     reason: cleanText(reason, 180),
-    basis: "saved Samira game facts and note language; not Riot MMR",
+    basis: explicitRank ? "explicit saved-note rank phrase; not Riot MMR" : "saved Samira game facts and note language; not Riot MMR",
     signals: {
       greenLight,
       conversion,
@@ -1106,9 +1130,14 @@ function samiraNoteRankRead(note = {}, overallRank = {}) {
   };
 }
 
+function samiraRankReadForNote(note = {}, overallRank = {}, analysis = null) {
+  if (samiraExplicitRankFromText(samiraNoteAnalysisText(note))) return samiraNoteRankRead(note, overallRank);
+  return analysis?.rank_read?.exactRank ? analysis.rank_read : samiraNoteRankRead(note, overallRank);
+}
+
 function publicSamiraNote(note = {}, overallRank = {}, analysis = null) {
   const id = cleanText(note.id, 120);
-  const rankRead = analysis?.rank_read || samiraNoteRankRead(note, overallRank);
+  const rankRead = samiraRankReadForNote(note, overallRank, analysis);
   const gameMeta = samiraNoteGameMeta(note);
   return {
     id,
@@ -1450,16 +1479,16 @@ async function samiraAiAnalysesForNotes(notes = [], rankEstimate = {}) {
 }
 
 function samiraRankEstimateFromAnalyses(rankEstimate = {}, visibleNotes = [], analysesById = {}) {
-  const newestAnalysis = visibleNotes
-    .map((note) => analysesById[samiraNoteCacheKey(note)]?.rank_read)
+  const newestRead = visibleNotes
+    .map((note) => samiraRankReadForNote(note, rankEstimate, analysesById[samiraNoteCacheKey(note)]))
     .find((rankRead) => rankRead?.exactRank);
-  if (!newestAnalysis) return rankEstimate;
+  if (!newestRead) return rankEstimate;
   return {
     ...rankEstimate,
-    currentRead: newestAnalysis.exactRank,
-    confidence: rankEstimate.confidence || newestAnalysis.confidence,
+    currentRead: newestRead.exactRank,
+    confidence: rankEstimate.confidence || newestRead.confidence,
     basis: rankEstimate.basis || "June 30 onward saved Samira notes and parsed game facts; not Riot MMR",
-    reason: rankEstimate.reason || newestAnalysis.reason
+    reason: rankEstimate.reason || newestRead.reason
   };
 }
 
