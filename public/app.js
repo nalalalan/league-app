@@ -2679,6 +2679,17 @@ function rankTrendAxisDateTicks(timeMin, timeMax, compact = false) {
   return days.filter((_, index) => index === 0 || index === days.length - 1 || index % interval === 0);
 }
 
+function rankTrendTimeDomain(points = []) {
+  const times = points
+    .map((point) => Number(point.time))
+    .filter((time) => Number.isFinite(time) && time > 0);
+  if (!times.length) return null;
+  return {
+    timeMin: Math.min(...times),
+    timeMax: Math.max(...times)
+  };
+}
+
 function rankTrendSvg(points, options = {}) {
   const compact = options.compact === true;
   const width = 640;
@@ -2695,8 +2706,9 @@ function rankTrendSvg(points, options = {}) {
     if (minValue > 0) minValue -= 1;
     if (maxValue < rankTrendScale.length - 1) maxValue += 1;
   }
-  const timeMin = Math.min(...points.map((point) => point.time));
-  const timeMax = Math.max(...points.map((point) => point.time));
+  const timeDomain = options.timeDomain || rankTrendTimeDomain(points);
+  const timeMin = timeDomain?.timeMin ?? Math.min(...points.map((point) => point.time));
+  const timeMax = timeDomain?.timeMax ?? Math.max(...points.map((point) => point.time));
   const timePadding = timeMax === timeMin ? 0 : (timeMax - timeMin) * 0.035;
   const paddedTimeMin = timeMin - timePadding;
   const paddedTimeMax = timeMax + timePadding;
@@ -2793,10 +2805,10 @@ function csAtTenTrendSvg(points, options = {}) {
     .map((point) => ({ ...point, csValue: rankTrendCsValue(point) }))
     .filter((point) => point.csValue !== null);
   const width = 640;
-  const height = compact ? 174 : 222;
+  const height = compact ? 210 : 274;
   const margin = compact
-    ? { top: 12, right: 18, bottom: 30, left: 52 }
-    : { top: 16, right: 22, bottom: 34, left: 58 };
+    ? { top: 14, right: 18, bottom: 30, left: 68 }
+    : { top: 18, right: 22, bottom: 34, left: 74 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
   const values = csPoints.map((point) => point.csValue);
@@ -2804,8 +2816,9 @@ function csAtTenTrendSvg(points, options = {}) {
   const minValue = ticks.length ? Math.min(...ticks) : Math.max(0, Math.floor(Math.min(...values) - 5));
   const maxValue = ticks.length ? Math.max(...ticks) : Math.ceil(Math.max(...values) + 5);
   const range = Math.max(1, maxValue - minValue);
-  const timeMin = Math.min(...csPoints.map((point) => point.time));
-  const timeMax = Math.max(...csPoints.map((point) => point.time));
+  const timeDomain = options.timeDomain || rankTrendTimeDomain(points);
+  const timeMin = timeDomain?.timeMin ?? Math.min(...csPoints.map((point) => point.time));
+  const timeMax = timeDomain?.timeMax ?? Math.max(...csPoints.map((point) => point.time));
   const timePadding = timeMax === timeMin ? 0 : (timeMax - timeMin) * 0.035;
   const paddedTimeMin = timeMin - timePadding;
   const paddedTimeMax = timeMax + timePadding;
@@ -7138,6 +7151,7 @@ function samiraRankTrendPoints(data) {
 function renderSamiraRankTrend(data) {
   if (!samiraRankTrend) return;
   const points = samiraRankTrendPoints(data);
+  const timeDomain = rankTrendTimeDomain(points);
   const heading = document.createElement("div");
   heading.className = "rank-trend-head";
   const title = document.createElement("h2");
@@ -7157,7 +7171,7 @@ function renderSamiraRankTrend(data) {
   const latest = points.at(-1);
   const chart = document.createElement("div");
   chart.className = "rank-trend-chart";
-  chart.append(rankTrendSvg(points, { compact: true }));
+  chart.append(rankTrendSvg(points, { compact: true, timeDomain }));
   const latestLine = document.createElement("p");
   latestLine.className = "rank-trend-latest";
   latestLine.textContent = `${latest.rank} / ${latest.dateLabel}`;
@@ -7166,7 +7180,9 @@ function renderSamiraRankTrend(data) {
 
 function renderSamiraCsTrend(data) {
   if (!samiraCsTrend) return;
-  const points = samiraRankTrendPoints(data).filter((point) => rankTrendCsValue(point) !== null);
+  const allPoints = samiraRankTrendPoints(data);
+  const timeDomain = rankTrendTimeDomain(allPoints);
+  const points = allPoints.filter((point) => rankTrendCsValue(point) !== null);
   const heading = document.createElement("div");
   heading.className = "rank-trend-head";
   const title = document.createElement("h2");
@@ -7186,7 +7202,7 @@ function renderSamiraCsTrend(data) {
   const latest = points.at(-1);
   const chart = document.createElement("div");
   chart.className = "rank-trend-chart";
-  chart.append(csAtTenTrendSvg(points, { compact: true }));
+  chart.append(csAtTenTrendSvg(allPoints, { compact: true, timeDomain }));
   const latestLine = document.createElement("p");
   latestLine.className = "rank-trend-latest";
   latestLine.textContent = `${latest.csAtTenLabel || `${latest.csAtTen} CS@10`} / ${latest.dateLabel}`;

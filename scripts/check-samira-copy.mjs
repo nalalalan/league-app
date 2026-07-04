@@ -385,11 +385,17 @@ try {
   if (!/\.samira-main-takeaway\s*\{[\s\S]*?font-size:\s*clamp\(18px,\s*1\.25vw,\s*22px\);/.test(styles)) {
     throw new Error("Samira current read is not scaled as the primary read.");
   }
-  if (!/function\s+renderSamiraRankTrend\s*\(/.test(appSource) || !/rankTrendSvg\(points,\s*\{\s*compact:\s*true\s*\}\)/.test(appSource)) {
+  if (!/function\s+rankTrendTimeDomain\s*\(/.test(appSource)) {
+    throw new Error("Samira charts do not share a reusable rank-trend time domain.");
+  }
+  if (!/function\s+renderSamiraRankTrend\s*\(/.test(appSource) || !/const\s+timeDomain\s*=\s*rankTrendTimeDomain\(points\)/.test(appSource) || !/rankTrendSvg\(points,\s*\{\s*compact:\s*true,\s*timeDomain\s*\}\)/.test(appSource)) {
     throw new Error("Samira rank chart is not rendered from the source-bound rank trend.");
   }
-  if (!/function\s+renderSamiraCsTrend\s*\(/.test(appSource) || !/csAtTenTrendSvg\(points,\s*\{\s*compact:\s*true\s*\}\)/.test(appSource)) {
+  if (!/function\s+renderSamiraCsTrend\s*\(/.test(appSource) || !/const\s+allPoints\s*=\s*samiraRankTrendPoints\(data\)/.test(appSource) || !/const\s+timeDomain\s*=\s*rankTrendTimeDomain\(allPoints\)/.test(appSource) || !/csAtTenTrendSvg\(allPoints,\s*\{\s*compact:\s*true,\s*timeDomain\s*\}\)/.test(appSource)) {
     throw new Error("Samira CS@10 chart is not rendered from the source-bound note points.");
+  }
+  if (!/function\s+csAtTenTrendSvg[\s\S]*?const\s+height\s*=\s*compact\s*\?\s*210\s*:\s*274;[\s\S]*?\?\s*\{\s*top:\s*14,\s*right:\s*18,\s*bottom:\s*30,\s*left:\s*68\s*\}/.test(appSource)) {
+    throw new Error("Samira CS@10 chart does not use the same compact plot geometry as the rank chart.");
   }
   if (!/rankTrendAxisDateFormatter/.test(appSource) || !/rankTrendAxisDateTicks/.test(appSource) || /const\s+tickIndexes\s*=/.test(appSource)) {
     throw new Error("Samira rank chart x-axis is still using raw point timestamp labels instead of date-only day ticks.");
