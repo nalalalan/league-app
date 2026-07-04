@@ -51,6 +51,7 @@ try {
       "Game date/time: 6/30/2026 at 9:24 PM.",
       "Normal Swiftplay Victory. Team 1 won 42/23/55 with 98,163 gold against Team 2's 23/42/29 with 84,823 gold.",
       "Alan's Samira finished 16/6/5, 40,565 damage, 22,994 gold, and 923 gold/min.",
+      "CS@10: 65.",
       "Don't drop Samira’s punctuation; Lily’s climb-out sentence should stay readable.",
       "At 24:02 Alan was 12/6/5 with 172 CS and 2,904 gold, then the final fight moved him to 16/6/5.",
       "The useful Samira rule is still edge, dive, damage, climb out, then buy or reset."
@@ -58,6 +59,7 @@ try {
     [
       "Game date/time: June 30, 2026 at 10:11 PM.",
       "Ranked solo queue loss. K/D/A 6/11/2. 174 CS. 21,209 damage. 12,004 gold. 412 gold/min.",
+      "CS@10: 52.",
       "Alan's Samira game shows fixed flight pattern and boom-and-zoom.",
       "Edge is altitude. E is the dive. Return to edge is the climb.",
       "W ready, HP above half, ally close is the gate.",
@@ -66,17 +68,20 @@ try {
     [
       "Recording timestamp: 12:22 AM, 7/3/2026.",
       "This Swiftplay-style Victory ending around 19:30 had a final visible scoreboard where Alan's Samira was at 12/2/11 with 106 CS and about 2,054 gold.",
+      "CS@10: 57.",
       "At 8:28, Alan was 3/0/4 with 45 CS, but that was an interim scoreboard, not the final Samira score.",
       "Q everything until the game breaks, then buy so the next Q matters more."
     ].join(" "),
     [
       "Recording timestamp: 7/1/2026; exact time not readable from the visible bottom-right capture.",
       "Normal Swiftplay defeat. Alan's Samira ended 3/8/1 with about 130 CS and 725 gold/min.",
+      "CS@10: 48.",
       "Master Yi was the real team carry at 12/5/2, but that champion name is not Alan's rank.",
       "This game shows the Q engine surviving a bad game, but the deaths still pull the read down."
     ].join(" "),
     [
-      "Swiftplay loss. K/D/A 2/0/0. 15 CS. 4,492 gold.",
+      "Swiftplay loss. K/D/A 2/0/0. Samira CS: 15. 4,492 gold.",
+      "CS@10: unavailable because the clip starts after the ten-minute window.",
       "Alan was the win condition but kept treating the defense like one more chance to stand in the middle.",
       "The useful model is still boom-and-zoom, but the actual leak was defending panic after value."
     ].join(" "),
@@ -126,8 +131,14 @@ try {
   if (!firstTrendPoint || Number(firstTrendPoint.time_ms) !== expectedFirstGameTime || !/6\/30.*9:24 PM/.test(firstTrendPoint.date_label || "")) {
     throw new Error(`Samira rank trend did not use the pasted game time: ${JSON.stringify(firstTrendPoint)}`);
   }
-  if (!/Swiftplay/i.test(sampleNote.game_meta_line || "") || !/16\/6\/5/.test(sampleNote.game_meta_line || "") || !/172 CS/.test(sampleNote.game_meta_line || "") || !/40,565 damage/.test(sampleNote.game_meta_line || "") || !/22,994 gold/.test(sampleNote.game_meta_line || "")) {
+  if (!/Swiftplay/i.test(sampleNote.game_meta_line || "") || !/16\/6\/5/.test(sampleNote.game_meta_line || "") || !/172 CS/.test(sampleNote.game_meta_line || "") || !/65 CS@10/.test(sampleNote.game_meta_line || "") || !/40,565 damage/.test(sampleNote.game_meta_line || "") || !/22,994 gold/.test(sampleNote.game_meta_line || "")) {
     throw new Error(`Samira team-score sample did not expose Alan/Samira facts: ${sampleNote.game_meta_line || ""}`);
+  }
+  if (sampleNote.game_meta?.cs_at_10 !== "65 CS@10" || Number(sampleNote.game_meta?.cs_at_10_value) !== 65) {
+    throw new Error(`Samira sample note did not expose CS@10 metadata: ${JSON.stringify(sampleNote.game_meta)}`);
+  }
+  if (!firstTrendPoint || firstTrendPoint.cs_at_10 !== "65 CS@10" || Number(firstTrendPoint.cs_at_10_value) !== 65) {
+    throw new Error(`Samira rank trend point did not carry CS@10: ${JSON.stringify(firstTrendPoint)}`);
   }
   if (/42\/23\/55|98,163 gold/.test(sampleNote.game_meta_line || "")) {
     throw new Error(`Samira team-score sample leaked team stats into card metadata: ${sampleNote.game_meta_line || ""}`);
@@ -155,7 +166,7 @@ try {
   if (rankedSampleNote.game_time !== "2026-07-01T02:11:00.000Z" || !/Jun 30, 2026, 10:11 PM/.test(rankedSampleNote.game_time_label || "")) {
     throw new Error(`Ranked Samira note did not expose parsed game date/time: ${rankedSampleNote.game_time || ""} / ${rankedSampleNote.game_time_label || ""}`);
   }
-  if (!/ranked solo/i.test(rankedSampleNote.game_meta_line || "") || !/6\/11\/2/.test(rankedSampleNote.game_meta_line || "") || !/174 CS/.test(rankedSampleNote.game_meta_line || "")) {
+  if (!/ranked solo/i.test(rankedSampleNote.game_meta_line || "") || !/6\/11\/2/.test(rankedSampleNote.game_meta_line || "") || !/174 CS/.test(rankedSampleNote.game_meta_line || "") || !/52 CS@10/.test(rankedSampleNote.game_meta_line || "")) {
     throw new Error(`Samira sample note did not expose game facts: ${rankedSampleNote.game_meta_line || ""}`);
   }
   if (/^Iron\b/i.test(rankedSampleNote.rank_read?.exactRank || "")) {
@@ -165,7 +176,7 @@ try {
   if (clockFirstNote.game_time !== "2026-07-03T04:22:00.000Z" || !/Jul 3, 2026, 12:22 AM/.test(clockFirstNote.game_time_label || "")) {
     throw new Error(`Clock-first timestamp note did not expose parsed game date/time: ${clockFirstNote.game_time || ""} / ${clockFirstNote.game_time_label || ""}`);
   }
-  if (!/12\/2\/11/.test(clockFirstNote.game_meta_line || "") || !/106 CS/.test(clockFirstNote.game_meta_line || "") || /3\/0\/4/.test(clockFirstNote.game_meta_line || "")) {
+  if (!/12\/2\/11/.test(clockFirstNote.game_meta_line || "") || !/106 CS/.test(clockFirstNote.game_meta_line || "") || !/57 CS@10/.test(clockFirstNote.game_meta_line || "") || /3\/0\/4/.test(clockFirstNote.game_meta_line || "")) {
     throw new Error(`Clock-first note did not prefer the final Alan/Samira scoreboard over an interim score: ${clockFirstNote.game_meta_line || ""}`);
   }
   if (/^Iron\b/i.test(clockFirstNote.rank_read?.exactRank || "")) {
@@ -184,9 +195,19 @@ try {
   if (/89,490 gold|80,624 gold/.test(masterYiNote.game_meta_line || "")) {
     throw new Error(`Master Yi note leaked team/enemy gold into Samira card metadata: ${masterYiNote.game_meta_line || ""}`);
   }
+  if (!/48 CS@10/.test(masterYiNote.game_meta_line || "")) {
+    throw new Error(`Master Yi note did not expose CS@10 from the pasted paragraph: ${masterYiNote.game_meta_line || ""}`);
+  }
   const masterYiTrendPoint = saved.samira.rank_trend.points.find((point) => point.title === masterYiNote.title);
   if (!masterYiTrendPoint || !/Jul 1, 2026 \(time not readable\)/.test(masterYiTrendPoint.date_label || "")) {
     throw new Error(`Date-only rank trend point did not preserve the time-not-readable boundary: ${JSON.stringify(masterYiTrendPoint)}`);
+  }
+  const unavailableCsNote = sampleNotes[4];
+  if (/CS@10/.test(unavailableCsNote.game_meta_line || "") || Number(unavailableCsNote.game_meta?.cs_at_10_value || 0) !== 0) {
+    throw new Error(`Unavailable CS@10 should not become visible card metadata: ${unavailableCsNote.game_meta_line || ""}`);
+  }
+  if (!/15 CS/.test(unavailableCsNote.game_meta_line || "")) {
+    throw new Error(`Samira CS label should still become visible card metadata: ${unavailableCsNote.game_meta_line || ""}`);
   }
   for (const note of sampleNotes) {
     const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(note.id)}`, {
@@ -323,6 +344,12 @@ try {
   }
   if (/rankTrendAxisDateFormatter[\s\S]{0,180}\bhour\s*:/.test(appSource) || /rankTrendAxisDateFormatter[\s\S]{0,220}\bminute\s*:/.test(appSource)) {
     throw new Error("Samira rank chart x-axis formatter still includes time fields.");
+  }
+  if (!/rankTrendCsValue/.test(appSource) || !/rankTrendCsTicks/.test(appSource) || !/rank-trend-cs-line/.test(appSource) || !/rank-trend-cs-y-label/.test(appSource)) {
+    throw new Error("Samira rank chart does not render a right-side CS@10 axis from source-bound note points.");
+  }
+  if (!/\.rank-trend-cs-line\s*\{/.test(styles) || !/\.rank-trend-cs-y-label\s*\{/.test(styles)) {
+    throw new Error("Samira CS@10 chart line and right-axis labels are not styled.");
   }
   if (!/\.samira-rank-trend svg\s*\{[\s\S]*?height:\s*clamp\(180px,\s*14vw,\s*220px\);/.test(styles)) {
     throw new Error("Samira rank chart is not large enough to carry the current-read row.");

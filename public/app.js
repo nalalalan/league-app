@@ -2590,6 +2590,29 @@ function rankTrendTickValues(points, minValue, maxValue) {
     : filtered;
 }
 
+function rankTrendCsValue(point = {}) {
+  const value = Number(point.csAtTen);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function rankTrendCsTicks(values = [], compact = false) {
+  const cleanValues = values.filter((value) => Number.isFinite(value) && value > 0);
+  if (!cleanValues.length) return [];
+  let minValue = Math.floor((Math.min(...cleanValues) - 4) / 10) * 10;
+  let maxValue = Math.ceil((Math.max(...cleanValues) + 4) / 10) * 10;
+  minValue = Math.max(0, minValue);
+  if (maxValue - minValue < 20) {
+    minValue = Math.max(0, minValue - 10);
+    maxValue += 10;
+  }
+  const maxTicks = compact ? 4 : 5;
+  let step = 10;
+  while (((maxValue - minValue) / step) + 1 > maxTicks) step += 10;
+  const ticks = [];
+  for (let value = minValue; value <= maxValue; value += step) ticks.push(value);
+  return ticks;
+}
+
 function svgNode(name, attributes = {}) {
   const node = document.createElementNS("http://www.w3.org/2000/svg", name);
   for (const [key, value] of Object.entries(attributes)) {
@@ -2657,11 +2680,13 @@ function rankTrendAxisDateTicks(timeMin, timeMax, compact = false) {
 
 function rankTrendSvg(points, options = {}) {
   const compact = options.compact === true;
+  const csValues = points.map(rankTrendCsValue).filter((value) => value !== null);
+  const hasCsAxis = csValues.length > 0;
   const width = 640;
   const height = compact ? 210 : 274;
   const margin = compact
-    ? { top: 14, right: 18, bottom: 30, left: 68 }
-    : { top: 18, right: 22, bottom: 34, left: 74 };
+    ? { top: 14, right: hasCsAxis ? 48 : 18, bottom: 30, left: 68 }
+    : { top: 18, right: hasCsAxis ? 54 : 22, bottom: 34, left: 74 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
   const values = points.map((point) => point.value);
@@ -2682,12 +2707,18 @@ function rankTrendSvg(points, options = {}) {
     return margin.left + ((time - paddedTimeMin) / (paddedTimeMax - paddedTimeMin)) * plotWidth;
   };
   const yScale = (value) => margin.top + plotHeight - ((value - minValue) / yRange) * plotHeight;
+  const csTicks = rankTrendCsTicks(csValues, compact);
+  const csMin = csTicks.length ? Math.min(...csTicks) : 0;
+  const csMax = csTicks.length ? Math.max(...csTicks) : 1;
+  const csRange = Math.max(1, csMax - csMin);
+  const csYScale = (value) => margin.top + plotHeight - ((value - csMin) / csRange) * plotHeight;
+  const axisRight = margin.left + plotWidth;
 
   const svg = svgNode("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
     preserveAspectRatio: "xMidYMid meet",
-    "aria-label": "Exact estimated rank over time"
+    "aria-label": hasCsAxis ? "Exact estimated rank and CS at 10 over time" : "Exact estimated rank over time"
   });
 
   const ticks = rankTrendTickValues(points, minValue, maxValue);
@@ -2695,7 +2726,7 @@ function rankTrendSvg(points, options = {}) {
     const y = yScale(tick.value);
     svg.append(svgNode("line", {
       x1: margin.left,
-      x2: margin.left + plotWidth,
+      x2: axisRight,
       y1: y,
       y2: y,
       class: "rank-trend-grid"
@@ -2710,6 +2741,27 @@ function rankTrendSvg(points, options = {}) {
     svg.append(text);
   }
 
+  if (hasCsAxis) {
+    for (const tick of csTicks) {
+      const y = csYScale(tick);
+      svg.append(svgNode("line", {
+        x1: axisRight,
+        x2: axisRight + 4,
+        y1: y,
+        y2: y,
+        class: "rank-trend-cs-tick"
+      }));
+      const text = svgNode("text", {
+        x: axisRight + 8,
+        y: y + 3,
+        class: "rank-trend-cs-y-label",
+        "text-anchor": "start"
+      });
+      text.textContent = `${tick}`;
+      svg.append(text);
+    }
+  }
+
   svg.append(svgNode("line", {
     x1: margin.left,
     x2: margin.left,
@@ -2719,34 +2771,55 @@ function rankTrendSvg(points, options = {}) {
   }));
   svg.append(svgNode("line", {
     x1: margin.left,
-    x2: margin.left + plotWidth,
+    x2: axisRight,
     y1: margin.top + plotHeight,
     y2: margin.top + plotHeight,
     class: "rank-trend-axis"
   }));
+  if (hasCsAxis) {
+    svg.append(svgNode("line", {
+      x1: axisRight,
+      x2: axisRight,
+      y1: margin.top,
+      y2: margin.top + plotHeight,
+      class: "rank-trend-cs-axis"
+    }));
+  }
 
   const xTicks = rankTrendAxisDateTicks(timeMin, timeMax, compact);
   for (const tick of xTicks) {
-    const x = Math.max(margin.left, Math.min(margin.left + plotWidth, xScale(tick.time)));
+    const x = Math.max(margin.left, Math.min(axisRight, xScale(tick.time)));
     const text = svgNode("text", {
       x,
       y: height - 10,
       class: "rank-trend-x-label",
-      "text-anchor": x <= margin.left + 8 ? "start" : (x >= margin.left + plotWidth - 8 ? "end" : "middle")
+      "text-anchor": x <= margin.left + 8 ? "start" : (x >= axisRight - 8 ? "end" : "middle")
     });
     text.textContent = tick.label;
     svg.append(text);
   }
 
   const linePoints = points.map((point) => `${xScale(point.time).toFixed(1)},${yScale(point.value).toFixed(1)}`).join(" ");
+  const csLinePoints = points
+    .map((point) => ({ point, value: rankTrendCsValue(point) }))
+    .filter((item) => item.value !== null)
+    .map((item) => `${xScale(item.point.time).toFixed(1)},${csYScale(item.value).toFixed(1)}`)
+    .join(" ");
   if (points.length > 1) {
     svg.append(svgNode("polyline", {
       points: linePoints,
       class: "rank-trend-line"
     }));
   }
+  if (hasCsAxis && csLinePoints.split(" ").filter(Boolean).length > 1) {
+    svg.append(svgNode("polyline", {
+      points: csLinePoints,
+      class: "rank-trend-cs-line"
+    }));
+  }
 
   for (const point of points) {
+    const csAtTen = rankTrendCsValue(point);
     const circle = svgNode("circle", {
       cx: xScale(point.time),
       cy: yScale(point.value),
@@ -2754,9 +2827,21 @@ function rankTrendSvg(points, options = {}) {
       class: "rank-trend-point"
     });
     const title = svgNode("title");
-    title.textContent = `${point.dateLabel}: ${point.rank}`;
+    title.textContent = `${point.dateLabel}: ${point.rank}${csAtTen ? ` / ${point.csAtTenLabel || `${csAtTen} CS@10`}` : ""}`;
     circle.append(title);
     svg.append(circle);
+    if (hasCsAxis && csAtTen) {
+      const csCircle = svgNode("circle", {
+        cx: xScale(point.time),
+        cy: csYScale(csAtTen),
+        r: compact ? 3 : 3.4,
+        class: "rank-trend-cs-point"
+      });
+      const csTitle = svgNode("title");
+      csTitle.textContent = `${point.dateLabel}: ${point.csAtTenLabel || `${csAtTen} CS@10`}`;
+      csCircle.append(csTitle);
+      svg.append(csCircle);
+    }
   }
 
   return svg;
@@ -6988,12 +7073,15 @@ function samiraRankTrendPoints(data) {
       const rank = String(point.rank || "").trim();
       const mappedValue = rankTrendValueByName.get(rank.toLowerCase());
       const value = Number.isFinite(Number(point.value)) ? Number(point.value) : mappedValue;
+      const csAtTen = Number(point.cs_at_10_value || point.cs_at_10 || 0);
       if (!rank || !Number.isFinite(value) || !Number.isFinite(time) || time <= 0) return null;
       return {
         rank,
         value,
         time,
         dateLabel: point.date_label || rankTrendDateLabel(time),
+        csAtTen: Number.isFinite(csAtTen) && csAtTen > 0 ? csAtTen : null,
+        csAtTenLabel: point.cs_at_10 || (Number.isFinite(csAtTen) && csAtTen > 0 ? `${Math.round(csAtTen)} CS@10` : ""),
         source: point.source || ""
       };
     })
@@ -7026,7 +7114,7 @@ function renderSamiraRankTrend(data) {
   chart.append(rankTrendSvg(points, { compact: true }));
   const latestLine = document.createElement("p");
   latestLine.className = "rank-trend-latest";
-  latestLine.textContent = `${latest.rank} / ${latest.dateLabel}`;
+  latestLine.textContent = `${latest.rank}${latest.csAtTenLabel ? ` / ${latest.csAtTenLabel}` : ""} / ${latest.dateLabel}`;
   samiraRankTrend.replaceChildren(heading, chart, latestLine);
 }
 

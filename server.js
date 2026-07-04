@@ -664,6 +664,62 @@ function bestSamiraMetric(text, regex, formatter, options = {}) {
   return formatter(candidates[0].match);
 }
 
+function samiraCsAtTenFromText(text = "") {
+  const source = String(text || "");
+  if (/\bcs\s*@?\s*10\b[^.:\n]{0,36}\b(?:unavailable|not\s+available|not\s+readable|unknown|no\s+read)\b/i.test(source)) {
+    return { text: "", value: 0 };
+  }
+  const patterns = [
+    /\bCS\s*@\s*10\s*:?\s*(~|around|about|approximately|approx\.?)?\s*(\d{1,3})(?:\.\d+)?\b/i,
+    /\bCS\s*(?:by|at)\s*(?:10|ten)(?:\s*minutes?|\s*min)?\s*:?\s*(~|around|about|approximately|approx\.?)?\s*(\d{1,3})(?:\.\d+)?\b/i,
+    /\b(~|around|about|approximately|approx\.?)?\s*(\d{1,3})(?:\.\d+)?\s*CS\s*@\s*10\b/i,
+    /\b(~|around|about|approximately|approx\.?)?\s*(\d{1,3})(?:\.\d+)?\s*CS\s*(?:at|by)\s*(?:10|ten)(?:\s*minutes?|\s*min)?\b/i,
+    /\b(?:at|around|by)\s*(?:9:\d{2}|10:\d{2})[^.\n]{0,80}?\b(~|around|about|approximately|approx\.?)?\s*(\d{1,3})(?:\.\d+)?\s*CS\b/i,
+    /\b(~|around|about|approximately|approx\.?)?\s*(\d{1,3})(?:\.\d+)?\s*CS[^.\n]{0,70}?\b(?:at|around|by)\s*(?:9:\d{2}|10:\d{2})\b/i
+  ];
+  for (const pattern of patterns) {
+    const match = source.match(pattern);
+    if (!match) continue;
+    const approx = Boolean(match[1]);
+    const value = Number(match[2]);
+    if (!Number.isFinite(value) || value <= 0 || value > 400) continue;
+    return {
+      text: `${approx ? "~" : ""}${Math.round(value)} CS@10`,
+      value: Math.round(value)
+    };
+  }
+  return { text: "", value: 0 };
+}
+
+function samiraTotalCsFromText(text = "", afterKda = Number.NaN) {
+  const source = String(text || "");
+  const patterns = [
+    /\b(?:Alan(?:'s|’s|Ã¢â‚¬â„¢s)?\s+Samira\s+)?(?:CS|creep\s+score)\s*:?\s*(\d{1,4})(?:\.\d+)?\b/ig,
+    /\b(\d{2,4})(?:\.\d+)?\s*(?:CS|creep\s+score)\b(?!\s*@?\s*10)/ig
+  ];
+  const candidates = [];
+  for (const regex of patterns) {
+    for (const match of source.matchAll(regex)) {
+      const value = Number(String(match[1] || "").replace(/[^\d]/g, ""));
+      if (!Number.isFinite(value) || value <= 0 || value > 900) continue;
+      const index = match.index || 0;
+      if (/\bCS\s*@?\s*10\b/i.test(match[0])) continue;
+      const distanceScore = Number.isFinite(afterKda) ? Math.max(0, 30 - Math.floor(Math.abs(index - afterKda) / 20)) : 0;
+      candidates.push({
+        value,
+        index,
+        score: samiraStatCandidateScore(source, index) + distanceScore
+      });
+    }
+  }
+  if (!candidates.length) return "";
+  candidates.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.index - b.index;
+  });
+  return `${Math.round(candidates[0].value)} CS`;
+}
+
 function samiraNoteGameMeta(note = {}) {
   const text = `${note.title || ""}\n${note.body || ""}`;
   const gameTime = samiraNoteGameTime(note);
@@ -675,14 +731,14 @@ function samiraNoteGameMeta(note = {}) {
   const afterKda = kdaMatch?.index ?? Number.NaN;
   const gameType = normalizedGameType(text);
   const kda = kdaMatch?.value || "";
-  const cs = firstMetricAfter(text, afterKda, /\b(\d{2,4})\s*(?:CS|creep\s+score)\b/i, (match) => `${match[1]} CS`) ||
-    bestSamiraMetric(text, /\b(\d{2,4})\s*(?:CS|creep\s+score)\b/ig, (match) => `${match[1]} CS`, { preferHighest: true });
+  const cs = samiraTotalCsFromText(text, afterKda);
   const damage = firstMetricAfter(text, afterKda, /\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*(?:damage|dmg)\b/i, (match) => `${numberWithCommas(match[1])} damage`) ||
     bestSamiraMetric(text, /\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*(?:damage|dmg)\b/ig, (match) => `${numberWithCommas(match[1])} damage`);
   const gold = firstMetricAfter(text, afterKda, /\b(\d{1,3}(?:,\d{3})+|\d{4,6})\s*gold\b/i, (match) => `${numberWithCommas(match[1])} gold`);
   const gpm = firstMetricAfter(text, afterKda, /\b(\d{2,4})\s*(?:gold\/min|gpm)\b/i, (match) => `${match[1]} gold/min`) ||
     bestSamiraMetric(text, /\b(\d{2,4})\s*(?:gold\/min|gpm)\b/ig, (match) => `${match[1]} gold/min`);
-  const parts = [gameType, result, kda, cs, damage, gold, gpm].filter(Boolean);
+  const csAtTen = samiraCsAtTenFromText(text);
+  const parts = [gameType, result, kda, cs, csAtTen.text, damage, gold, gpm].filter(Boolean);
   return {
     game_time: gameTime?.iso || "",
     game_time_ms: gameTime?.timeMs || 0,
@@ -692,6 +748,8 @@ function samiraNoteGameMeta(note = {}) {
     result,
     kda,
     cs,
+    cs_at_10: csAtTen.text,
+    cs_at_10_value: csAtTen.value,
     damage,
     gold,
     gold_per_minute: gpm,
@@ -755,8 +813,9 @@ function samiraRankTrendDateLabel(timeMs) {
   return samiraRankTrendDateFormatter.format(date);
 }
 
-function samiraRankTrendPoint({ source, title, rank, value, timeMs, dateLabel = "" }) {
+function samiraRankTrendPoint({ source, title, rank, value, timeMs, dateLabel = "", csAtTen = "" }) {
   if (!rank || !Number.isFinite(value) || !Number.isFinite(timeMs) || timeMs <= 0) return null;
+  const csAtTenValue = samiraMetricNumber(csAtTen);
   return {
     source: cleanText(source, 24),
     title: cleanText(title, 100),
@@ -764,7 +823,9 @@ function samiraRankTrendPoint({ source, title, rank, value, timeMs, dateLabel = 
     value,
     time_ms: timeMs,
     created_at: new Date(timeMs).toISOString(),
-    date_label: cleanText(dateLabel, 80) || samiraRankTrendDateLabel(timeMs)
+    date_label: cleanText(dateLabel, 80) || samiraRankTrendDateLabel(timeMs),
+    cs_at_10: cleanText(csAtTen, 32),
+    cs_at_10_value: csAtTenValue
   };
 }
 
@@ -774,13 +835,15 @@ function samiraRankTrend(notes = [], review = {}, overallRank = {}, analysesById
       const rankRead = analysesById[samiraNoteCacheKey(note)]?.rank_read || samiraNoteRankRead(note, overallRank);
       const value = samiraRankValueFromText(rankRead.exactRank);
       const gameTime = samiraNoteGameTime(note);
+      const gameMeta = samiraNoteGameMeta(note);
       return samiraRankTrendPoint({
         source: "note",
         title: note.title || "Samira note",
         rank: rankRead.exactRank,
         value,
         timeMs: samiraNoteTime(note),
-        dateLabel: gameTime?.precision === "date" ? gameTime.label : ""
+        dateLabel: gameTime?.precision === "date" ? gameTime.label : "",
+        csAtTen: gameMeta.cs_at_10
       });
     })
     .filter(Boolean);
@@ -903,6 +966,7 @@ function samiraRankFacts(note = {}) {
     ...meta,
     ...(kda || {}),
     csValue: samiraMetricNumber(meta.cs),
+    csAtTenValue: samiraMetricNumber(meta.cs_at_10),
     damageValue: samiraMetricNumber(meta.damage),
     goldValue: samiraMetricNumber(meta.gold),
     gpmValue: samiraMetricNumber(meta.gold_per_minute)
@@ -939,6 +1003,9 @@ function samiraRankValueFromFacts(facts = {}, text = "") {
   if (facts.gpmValue >= 900 && facts.deaths <= 7) value = Math.max(value, samiraRankValueByName.get("gold iii"));
   if (facts.damageValue >= 35000 && facts.deaths <= 7) value = Math.max(value, samiraRankValueByName.get("gold iii"));
   if (facts.csValue >= 120 && facts.deaths <= 8) value += 1;
+  if (facts.csAtTenValue >= 70 && facts.deaths <= 6) value += 2;
+  else if (facts.csAtTenValue >= 60 && facts.deaths <= 8) value += 1;
+  else if (facts.csAtTenValue > 0 && facts.csAtTenValue < 45 && participation < 10) value -= 1;
   if (facts.result === "win" && participation >= 8 && facts.deaths <= 3) value += 1;
   if (facts.result === "loss" && facts.deaths >= 8) value -= 1;
   if (/\bteemo support\b|\bpyke lane\b|\b309\/720\b/i.test(text) && facts.deaths >= 8) value -= 1;
@@ -960,6 +1027,7 @@ function samiraRankReasonFromFacts(facts = {}, exactRank = "") {
   const bits = [
     facts.kills !== undefined ? `${facts.kills}/${facts.deaths}/${facts.assists}` : "",
     facts.cs ? facts.cs : "",
+    facts.cs_at_10 ? facts.cs_at_10 : "",
     facts.damage ? facts.damage : "",
     facts.gold_per_minute ? facts.gold_per_minute : ""
   ].filter(Boolean).slice(0, 4);

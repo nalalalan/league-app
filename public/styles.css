@@ -425,6 +425,12 @@ summary {
   stroke-width: .95;
 }
 
+.rank-trend-cs-axis,
+.rank-trend-cs-tick {
+  stroke: rgba(131, 83, 57, .42);
+  stroke-width: .9;
+}
+
 .rank-trend-line {
   fill: none;
   stroke: #24211e;
@@ -433,18 +439,38 @@ summary {
   stroke-width: 1.9;
 }
 
+.rank-trend-cs-line {
+  fill: none;
+  stroke: #835339;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+  stroke-dasharray: 4 4;
+}
+
 .rank-trend-point {
   fill: #fffdf8;
   stroke: #24211e;
   stroke-width: 1.45;
 }
 
+.rank-trend-cs-point {
+  fill: #fff9ef;
+  stroke: #835339;
+  stroke-width: 1.2;
+}
+
 .rank-trend-y-label,
+.rank-trend-cs-y-label,
 .rank-trend-x-label,
 .rank-trend-point-label {
   fill: #5b5149;
   font-size: 10px;
   font-weight: 760;
+}
+
+.rank-trend-cs-y-label {
+  fill: #835339;
 }
 
 .rank-trend-point-label {
