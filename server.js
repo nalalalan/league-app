@@ -18,7 +18,7 @@ const recordingMp4MediaBase = (process.env.LEAGUE_RECORDING_MP4_MEDIA_BASE || "h
 const statusToken = (process.env.LEAGUE_STATUS_TOKEN || process.env.LEAGUE_WRITE_TOKEN || "").trim();
 const samiraAnalysisModel = (process.env.LEAGUE_ANALYSIS_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini").trim();
 const samiraAiDisabled = /^(1|true|yes)$/i.test(process.env.LEAGUE_DISABLE_AI || "");
-const samiraAnalysisPromptVersion = 8;
+const samiraAnalysisPromptVersion = 9;
 const recordingStatusPath = path.join(dataRoot, "recording-status.json");
 const localAnalysisRoot = path.join(__dirname, "_recording-analysis");
 const localRecordingStatusPath = path.join(localAnalysisRoot, "recording-status.json");
@@ -254,9 +254,18 @@ function samiraAiCopyRejected(text) {
   return samiraTextLooksCutOff(value) || /\b(?:remember:|improve overall performance|win chances|strategic play|showcas(?:e|ing)|critical decision leak|decision leak|potential success|achieved|secured|faltered|undermined|playing Teemo support|while playing Teemo|Alan played Teemo|in this (?:swiftplay|ranked|game)|gameplay relies|unfavorable|strategy|strategic|prioriti[sz]e|focus on|maintain|capitalize|impactful plays|challenging matchup|despite the|breakdown in strategy|hinder success|overall performance|your stats show potential|execution needs refinement|keep pushing|find your openings|focus on bigger fights|turn the game around|maintain chase pressure|controlled|stable|safe entry|overextending|prematurely|risky engagements|initial impact|red-light commits?|must adopt|must be|playstyle|approach|engage(?:ment)?|clear entry|exit patterns?|main failure|biggest failure|main mistake|biggest mistake|classic .* (?:mistake|behavior)|at this level|you understand|you know the entry and payout|failure to|stabiliz(?:e|ing)|mental overload|poor positioning|poor fight endings|fundamental|mechanical and decision|decision flaws?|the note (?:clearly )?(?:defines|identifies|emphasizes|highlights)|highlighting that|aligns with|iron [ivx]+ level mistakes?|ranked-habit evidence|source-bounded note analysis|limited ranked|beyond baseline|ranked-level|decision depth|basic fight timing|opportunit(?:y|ies)|show enough|climb yet|red flags?|avoid(?:s|ing)?)\b/i.test(value);
 }
 
+function samiraDescriptionLeaksRankTier(text) {
+  const value = cleanText(text, 1000);
+  if (!value) return false;
+  return /\b(?:iron|bronze|silver|gold|platinum|emerald|diamond)\s+(?:iv|iii|ii|i|[1-4])\b/i.test(value) ||
+    /\b(?:iron|bronze|silver|platinum|plat|emerald|diamond|master|grandmaster|challenger)\s*(?:-| )?(?:level|rank|read)\b/i.test(value) ||
+    /\b(?:platinum|plat|emerald|diamond|grandmaster|challenger)\b/i.test(value) ||
+    /\bstuck\s+in\s+(?:iron|bronze|silver|gold|platinum|emerald|diamond)\b/i.test(value);
+}
+
 function samiraAiDescriptionRejected(text) {
   const value = cleanText(text, 1000);
-  return !value || value.length < 45 || value.length > 430 || wordCount(value) > 72 || samiraAiCopyRejected(value);
+  return !value || value.length < 45 || value.length > 430 || wordCount(value) > 72 || samiraAiCopyRejected(value) || samiraDescriptionLeaksRankTier(value);
 }
 
 function samiraAiReasonRejected(text) {
@@ -376,6 +385,8 @@ function samiraExplicitRankFromText(value) {
   const rankPattern = "((?:iron|bronze|silver|gold|platinum|emerald|diamond)\\s+(?:iv|iii|ii|i|[1-4])|master|grandmaster|challenger)";
   const patterns = [
     new RegExp(`\\b(?:approx(?:imate(?:ly)?)?|estimated|estimate)\\s+(?:rank|ranked|rank\\s+read|read|elo)?\\s*(?:is|=|:|-|around|as)?\\s*${rankPattern}\\b`, "ig"),
+    new RegExp(`\\b(?:estimated|estimate|rated|read(?:s)?|look(?:s|ed)?|ranked?)\\s+(?:as\\s+)?(?:a\\s+)?${rankPattern}(?:\\s*|-)?level\\b`, "ig"),
+    new RegExp(`\\b${rankPattern}(?:\\s*|-)?level\\s+(?:samira\\s+)?(?:fight|game|moment|read)\\b`, "ig"),
     new RegExp(`\\b(?:rank(?:ed)?\\s*(?:read|estimate)?|current\\s+rank|rank\\s+equivalent|mmr\\s+read|elo\\s+read)\\s*(?:is|=|:|-|around|as)?\\s*${rankPattern}\\b`, "ig"),
     new RegExp(`\\b${rankPattern}\\s+(?:approx(?:imate)?\\s+rank|rank\\s+read|rank\\s+estimate)\\b`, "ig")
   ];
@@ -630,12 +641,13 @@ function samiraStatCandidateScore(text, index) {
   const before = text.slice(Math.max(0, index - 90), index);
   const around = text.slice(Math.max(0, index - 140), Math.min(text.length, index + 180));
   let score = 0;
+  if (/\bAlan\s*\/\s*Samira\b/i.test(around)) score += 14;
   if (/\bAlan(?:'s|’s)?\s+Samira\b/i.test(around)) score += 10;
   if (/\bAlan\b/i.test(around)) score += 6;
   if (/\bSamira\b/i.test(around)) score += 5;
   if (/\bK\/?D\/?A\b/i.test(around)) score += 5;
   if (/\b(?:final visible scoreboard|last visible scoreboard|final scoreboard|last scoreboard|post-game scoreboard|postgame|finished|ended|ends|ending|final screen)\b/i.test(around)) score += 12;
-  if (/\b(?:by|at|around)\s+\d{1,2}:\d{2}\b/i.test(before) && !/\b(?:final|last|postgame|post-game|ending|ended|finished)\b/i.test(around)) score -= 5;
+  if (/\b(?:by|at|around)\s+\d{1,2}:\d{2}\b(?!\s*(?:am|pm)\b)/i.test(before) && !/\b(?:final|last|postgame|post-game|ending|ended|finished)\b/i.test(around)) score -= 5;
   if (/\b(?:user-supplied|finished|went|final screen|post-game scoreboard)\b/i.test(around)) score += 2;
   if (/\b(?:Team\s*\d|team score|enemy team)\b[^.;,\n]{0,45}$/i.test(before)) score -= 12;
   if (/\b(?:Yernar|Lily|Nami|Katarina|Alistar|Kayn|Heimerdinger|Kindred|Lux|Swain|Pyke)(?:'s|’s)?\b[^.;,\n]{0,70}$/i.test(before)) score -= 9;
@@ -643,7 +655,16 @@ function samiraStatCandidateScore(text, index) {
 }
 
 function bestSamiraKdaMatch(text) {
+  const transitionPattern = /\bAlan\s*\/\s*Samira\s*:\s*[^.;\n]{0,100}?(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*(?:→|->|to)\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/ig;
+  const transitionMatches = [...text.matchAll(transitionPattern)];
+  if (transitionMatches.length) {
+    const match = transitionMatches
+      .map((item) => ({ item, score: samiraStatCandidateScore(text, item.index || 0) }))
+      .sort((a, b) => b.score - a.score || (a.item.index || 0) - (b.item.index || 0))[0].item;
+    return { match, index: match.index || 0, value: `${match[4]}/${match[5]}/${match[6]}` };
+  }
   const explicitPatterns = [
+    /\bAlan\s*\/\s*Samira\s*:\s*[^.;\n]{0,120}?(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/ig,
     /\b(?:final visible scoreboard|last visible scoreboard|final scoreboard|last scoreboard|post-game scoreboard|postgame)[^.;:\n]{0,150}\bAlan(?:'s|’s|â€™s)?\s+Samira\s+(?:finished|went|ended|ends?|was|is|reached|reaches|at|with|had)?\s*(?:at|with)?\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/ig,
     /\b(?:Alan(?:'s|’s|â€™s)?\s+Samira|Alan)\s+(?:finished|went|ended|ends?|was|is|reached|reaches|at)\s+(?:at|with)?\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/ig,
     /\b(?:Alan(?:'s|’s)?\s+Samira|Alan)\s+(?:finished|went|ended|ends?|was|is|reached|reaches)\s+(?:at|with)?\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\b/ig,
@@ -668,7 +689,11 @@ function bestSamiraKdaMatch(text) {
 
 function firstMetricAfter(text, startIndex, regex, formatter) {
   if (!Number.isFinite(startIndex)) return "";
-  const segment = text.slice(startIndex, Math.min(text.length, startIndex + 220));
+  const maxEnd = Math.min(text.length, startIndex + 220);
+  const boundaries = [text.indexOf(".", startIndex), text.indexOf("\n", startIndex)]
+    .filter((index) => index > startIndex && index <= maxEnd);
+  const end = boundaries.length ? Math.min(...boundaries) : maxEnd;
+  const segment = text.slice(startIndex, end);
   const match = segment.match(regex);
   return match ? formatter(match) : "";
 }
@@ -729,6 +754,10 @@ function samiraTotalCsFromText(text = "", afterKda = Number.NaN) {
       if (!Number.isFinite(value) || value <= 0 || value > 900) continue;
       const index = match.index || 0;
       if (/\bCS\s*@?\s*10\b/i.test(match[0])) continue;
+      const around = source.slice(Math.max(0, index - 100), Math.min(source.length, index + 80));
+      if (/\b(?:at|around|by)\s+\d{1,2}:\d{2}\b(?!\s*(?:am|pm)\b)/i.test(around) && !/\b(?:final|last|postgame|post-game|ending|ended|finished|Alan\s*\/\s*Samira|Samira\s+CS|Alan(?:'s|â€™s)?\s+Samira)\b/i.test(around)) {
+        continue;
+      }
       const distanceScore = Number.isFinite(afterKda) ? Math.max(0, 30 - Math.floor(Math.abs(index - afterKda) / 20)) : 0;
       candidates.push({
         value,
@@ -912,6 +941,12 @@ function hasSamiraConcept(text, patterns) {
 }
 
 function samiraConceptSentence(text) {
+  if (hasSamiraConcept(text, [/pentakill/i, /q resets?/i])) {
+    return "Cash the pentakill. Recall on the huge buy window.";
+  }
+  if (hasSamiraConcept(text, [/q engine/i, /q rhythm/i, /q everything/i, /q-to-gold/i, /q farming/i, /cs@10/i, /farm/i])) {
+    return "Farm with Q, buy, then fight when the next Q is stronger.";
+  }
   if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i, /death as the fight-ending/i])) {
     return "Use the flight pattern: edge, dive, damage, climb out.";
   }
@@ -924,7 +959,7 @@ function samiraConceptSentence(text) {
   if (hasSamiraConcept(text, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
     return "Make ugly lane smaller. Bad support and early HP loss do not make a bigger fight correct.";
   }
-  if (hasSamiraConcept(text, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
+  if (hasSamiraConcept(text, [/short commands/i, /behind me/i, /peel me/i, /calm commands/i, /duo comm/i])) {
     return "Use one short duo call, then play the fight.";
   }
   if (hasSamiraConcept(text, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i])) {
@@ -940,6 +975,12 @@ function samiraConceptSentence(text) {
 }
 
 function samiraNextClickSentence(text) {
+  if (hasSamiraConcept(text, [/pentakill/i, /q resets?/i])) {
+    return "After the big fight, recall and spend before the next throw can start.";
+  }
+  if (hasSamiraConcept(text, [/q engine/i, /q rhythm/i, /q everything/i, /q-to-gold/i, /q farming/i, /cs@10/i, /farm/i])) {
+    return "Keep Q on wave and enemy, then turn the bought item into the next fight.";
+  }
   if (hasSamiraConcept(text, [/fixed flight pattern/i, /boom-and-zoom/i, /edge is altitude/i, /return to edge/i, /death as the fight-ending/i])) {
     return "Play edge, dive, damage, out. If you are still in the middle after the pass, you are already wrong.";
   }
@@ -952,7 +993,7 @@ function samiraNextClickSentence(text) {
   if (hasSamiraConcept(text, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
     return "When support or lane is bad, stabilize first. Farm, recall, stop trying to win the lane back through another fight.";
   }
-  if (hasSamiraConcept(text, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
+  if (hasSamiraConcept(text, [/short commands/i, /behind me/i, /peel me/i, /calm commands/i, /duo comm/i])) {
     return "Say the command once, then spend attention on spacing instead of talking.";
   }
   if (hasSamiraConcept(text, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i])) {
@@ -1135,6 +1176,12 @@ function samiraRankReadForNote(note = {}, overallRank = {}, analysis = null) {
   return analysis?.rank_read?.exactRank ? analysis.rank_read : samiraNoteRankRead(note, overallRank);
 }
 
+function samiraPublicNoteDescription(note = {}, rankRead = {}, overallRank = {}, analysis = null) {
+  const description = cleanText(analysis?.description || "", 1000);
+  if (description && !samiraAiDescriptionRejected(description)) return description;
+  return samiraNoteDescription(note, rankRead, overallRank);
+}
+
 function publicSamiraNote(note = {}, overallRank = {}, analysis = null) {
   const id = cleanText(note.id, 120);
   const rankRead = samiraRankReadForNote(note, overallRank, analysis);
@@ -1142,7 +1189,7 @@ function publicSamiraNote(note = {}, overallRank = {}, analysis = null) {
   return {
     id,
     title: cleanText(note.title || "Samira note", 90),
-    description: analysis?.description || samiraNoteDescription(note, rankRead, overallRank),
+    description: samiraPublicNoteDescription(note, rankRead, overallRank, analysis),
     created_at: note.created_at || "",
     game_time: gameMeta.game_time,
     game_time_label: gameMeta.game_time_label,
@@ -1229,7 +1276,7 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
     pieces.push("See the chase as a map-choice leak, not a mechanics problem.");
   } else if (/teemo support|pyke lane|stabil|309\/720|6\/11\/2/.test(text)) {
     pieces.push("Give bad lane a boring response: farm, recall, stop forcing.");
-  } else if (/quiet fight|short call|behind me|peel me|bubble diver|calm commands|lily/.test(text)) {
+  } else if (/quiet fight|short call|behind me|peel me|bubble diver|calm commands|duo comm/.test(text)) {
     pieces.push("Shrink duo comms into one command before the fight starts.");
   } else if (signals.conversion >= 4 || /exit|reset|recall|buy|wave|objective|step out|plate/.test(text)) {
     pieces.push("Name where the value goes after the kill.");
@@ -1247,7 +1294,16 @@ function samiraPreviousGameImprovement(note = {}, rankRead = {}, overallRank = {
 function samiraSourceSpecificSentence(note = {}) {
   const text = samiraNoteAnalysisText(note);
   const gameMeta = samiraNoteGameMeta(note).line;
-  if (/swiftplay|2\/0\/0|15 cs|4,?492 gold|panic defense|win condition/.test(text) || /Swiftplay/i.test(gameMeta)) {
+  if (/pentakill|17\/5\/4|elder/.test(text)) {
+    return "The fight worked; the throw risk starts after the buy window opens.";
+  }
+  if (/diana/.test(text)) {
+    return "The resource base was fine; the question was where you could apply it safely.";
+  }
+  if (/q engine|q rhythm|q everything|q-to-gold|cs@10|farm/.test(text)) {
+    return "The useful signal is the Q economy, not a prettier recap of the fight.";
+  }
+  if (/2\/0\/0|15 cs|4,?492 gold|panic defense|win condition/.test(text)) {
     return "Survival was not the problem. Panic defense after first value was.";
   }
   if (/6\/11\/2|8,?279 damage|11,?077 gold|teemo support|pyke lane|309\/720/.test(text)) {
@@ -1256,7 +1312,7 @@ function samiraSourceSpecificSentence(note = {}) {
   if (/16\/6\/9|yasuo|47,?199 damage/.test(text)) {
     return "Yasuo was the real carry signal, so Samira needed cleaner value conversion, not more pride fights.";
   }
-  if (/nami|lily|trio|team score|46.?38/.test(text)) {
+  if (/short commands|behind me|peel me|calm commands|duo comm/.test(text)) {
     return "The trio-game leak is not damage; it is letting ally chaos turn one defense into repeated re-entry.";
   }
   if (/aram/.test(text)) {
@@ -1270,6 +1326,38 @@ function samiraSourceSpecificSentence(note = {}) {
 
 function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
   const sourceText = `${note.title || ""}\n${note.body || ""}`;
+  const gameMeta = samiraNoteGameMeta(note);
+  const kda = samiraKdaParts(gameMeta.kda);
+  const factBits = [
+    gameMeta.kda,
+    gameMeta.cs_at_10 || gameMeta.cs,
+    gameMeta.damage,
+    gameMeta.gold_per_minute
+  ].filter(Boolean).slice(0, 3).join(" / ");
+  if (/pentakill|17\/5\/4|elder/i.test(sourceText)) {
+    return cleanText(`${factBits || "The pentakill"} is the payoff. Recall on the buy window; the next mistake is replaying the fight after it already paid.`, 430);
+  }
+  if (hasSamiraConcept(sourceText, [/\bfog\b/i, /\bchase\b/i])) {
+    return cleanText(`${factBits || "The saved game"} turns fog chase into the leak. Take wave, plate, objective, or reset unless vision and ally position are already true.`, 430);
+  }
+  if (hasSamiraConcept(sourceText, [/teemo support/i, /pyke lane/i, /309\/720/i, /6\/11\/2/i])) {
+    return cleanText(`${factBits || "The lane"} was already ugly. Make the game smaller with farm, recall, and fewer forced comeback fights.`, 430);
+  }
+  if (/diana/i.test(sourceText)) {
+    return cleanText(`${factBits || "The resource base"} was fine; Diana changed where you could safely spend it. Build power, then choose the fight instead of proving the lead in the wrong spot.`, 430);
+  }
+  if (hasSamiraConcept(sourceText, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i])) {
+    return cleanText(`${factBits || "The lead"} is only useful after it becomes items or map payout. Spend the kill before hunting again: wave, plate, objective, buy, or reset.`, 430);
+  }
+  if (hasSamiraConcept(sourceText, [/q engine/i, /q rhythm/i, /q everything/i, /q-to-gold/i, /q farming/i, /cs@10/i, /farm/i])) {
+    if (kda && kda.deaths >= 8) {
+      return cleanText(`${factBits || gameMeta.kda || "The game"} says Q farming is alive, but deaths broke the conversion. Keep Q running; stop making the next fight bigger.`, 430);
+    }
+    if (gameMeta.result === "win") {
+      return cleanText(`${factBits || gameMeta.kda || "The win"} is the clean Q-economy version. Farm, buy, then make the next Q matter more.`, 430);
+    }
+    return cleanText(`${factBits || gameMeta.kda || "The loss"} still shows the Q economy. The next proof is cashing the lead before the game turns into another fight.`, 430);
+  }
   const parts = [samiraConceptSentence(sourceText)];
   const specific = samiraSourceSpecificSentence(note);
   if (specific) parts.push(specific);
@@ -1283,7 +1371,7 @@ function samiraNoteDescription(note = {}, rankRead = {}, overallRank = {}) {
     parts.push("Fog is not a slot machine. Convert first, chase second.");
   } else if (hasSamiraConcept(sourceText, [/teemo support/i, /pyke lane/i, /stabil/i, /309\/720/i, /6\/11\/2/i])) {
     parts.push("Bad lane gets smaller, not louder.");
-  } else if (hasSamiraConcept(sourceText, [/lily/i, /short commands/i, /behind me/i, /peel me/i, /calm commands/i])) {
+  } else if (hasSamiraConcept(sourceText, [/short commands/i, /behind me/i, /peel me/i, /calm commands/i, /duo comm/i])) {
     parts.push("One calm command is enough.");
   } else if (hasSamiraConcept(sourceText, [/unspent gold/i, /shutdown/i, /buy/i, /reset/i, /spending/i, /\bplate\b/i])) {
     parts.push("Do not donate the shutdown back.");
@@ -1341,6 +1429,7 @@ async function analyzeSamiraNoteWithAi(note = {}, rankRead = {}, overallRank = {
     "Do not invert Alan's critique. If the note says bigger fights, panic defense, fog chase, or staying in middle caused the problem, name that behavior as the mistake.",
     "Never recommend bigger fights, maintaining chase pressure, pushing through chaos, or finding openings when the note says exit, reset, payout, or climb out.",
     "Do not reuse boilerplate across notes. Mention the note-specific pattern, stats, matchup, game type, or decision leak when present.",
+    "Do not put rank-tier words in description. The card already has the rank field. If the source says Platinum IV-level, keep that only in rank_reason, not the description.",
     "rank_reason must also sound natural: one short sentence about why this saved game does or does not move the source-bounded rank read.",
     "Good style examples, only if the evidence matches: 'You had 309/720 HP. That is not a comeback window. Shrink the lane, take small farm, or reset; bigger fights made the bad lane bigger.' 'S loaded is not a green light. W, HP, and ally position are the green light; R is the reward.' 'Fog is second-fight bait. Take wave, plate, objective, or reset unless vision and ally position are already true.'",
     "Do not choose a rank. The server computes rank from parsed Samira facts. Never call a note Iron unless the saved text explicitly says Alan's rank is Iron."
@@ -1436,7 +1525,7 @@ async function samiraAiAnalysesForNotes(notes = [], rankEstimate = {}) {
     const bodyHash = hashText(`${note.title || ""}\n${note.body || ""}`);
     const fallbackRank = samiraNoteRankRead(note, rankEstimate);
     const cached = cache.noteAnalyses[key];
-    if (cached?.body_hash === bodyHash && cached?.prompt_version === samiraAnalysisPromptVersion && cached?.description && (!samiraAiReady() || cached.engine === "openai")) {
+    if (cached?.body_hash === bodyHash && cached?.prompt_version === samiraAnalysisPromptVersion && cached?.description && !samiraAiDescriptionRejected(cached.description) && (!samiraAiReady() || cached.engine === "openai")) {
       notesById[key] = cached;
       continue;
     }

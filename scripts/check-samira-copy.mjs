@@ -87,6 +87,15 @@ try {
       "Alan was the win condition but kept treating the defense like one more chance to stand in the middle.",
       "The useful model is still boom-and-zoom, but the actual leak was defending panic after value."
     ].join(" "),
+    [
+      "Date/time: assigned 2026-07-03 00:45 because it appears after the 12:22 AM 7/3 game.",
+      "Mode/result: 35-second late-game pentakill clip.",
+      "Alan/Samira: 12/5/4 -> 17/5/4.",
+      "CS@10: unavailable because the clip starts around 18:02.",
+      "This cannot be ranked as a full game, but the fight itself is estimated as a Platinum IV-level Samira fight moment.",
+      "Alan had 112 CS before the pentakill and about 3.5k gold after it.",
+      "The useful command is Q through the setup, cash the pentakill, recall, and do not donate the gold back."
+    ].join(" "),
     "Ranked solo queue. S loaded and S rank appeared, but R was only availability, not permission to R.",
     "Ranked solo queue. Fog chase turned into one more fight instead of wave, reset, or objective.",
     "Ranked solo queue. Teemo support, Pyke lane, 309/720 HP, 6/11/2. Make the bad lane smaller.",
@@ -220,6 +229,19 @@ try {
   if (!/15 CS/.test(unavailableCsNote.game_meta_line || "")) {
     throw new Error(`Samira CS label should still become visible card metadata: ${unavailableCsNote.game_meta_line || ""}`);
   }
+  const fightMomentNote = sampleNotes[5];
+  if (fightMomentNote.rank_read?.exactRank !== "Platinum IV") {
+    throw new Error(`Platinum IV-level source phrase did not become the rank read: ${JSON.stringify(fightMomentNote.rank_read)}`);
+  }
+  if (!/17\/5\/4/.test(fightMomentNote.game_meta_line || "") || /12\/5\/4/.test(fightMomentNote.game_meta_line || "")) {
+    throw new Error(`Samira transition note did not prefer the post-pentakill KDA: ${fightMomentNote.game_meta_line || ""}`);
+  }
+  if (!/112 CS/.test(fightMomentNote.game_meta_line || "")) {
+    throw new Error(`Samira transition note did not keep the source CS value: ${fightMomentNote.game_meta_line || ""}`);
+  }
+  if (/\b(?:Platinum|plat|Silver\s+[IVX]+|Gold\s+[IVX]+|Iron\s+[IVX]+)\b/i.test(fightMomentNote.description || "")) {
+    throw new Error(`Samira description leaked rank-tier language instead of leaving it in the rank field: ${fightMomentNote.description || ""}`);
+  }
   for (const note of sampleNotes) {
     const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(note.id)}`, {
       method: "DELETE",
@@ -277,6 +299,12 @@ try {
   const prefaceOffending = generatedSamiraStrings(data).filter((text) => bannedPrefaceCopy.test(text));
   if (prefaceOffending.length) {
     throw new Error(`Generated Samira copy still uses assistant preface stems:\n${prefaceOffending.join("\n")}`);
+  }
+  const rankTierDescriptionOffending = (Array.isArray(data?.notes) ? data.notes : [])
+    .map((note) => String(note?.description || "").trim())
+    .filter((text) => /\b(?:iron|bronze|silver|gold|platinum|emerald|diamond)\s+(?:iv|iii|ii|i|[1-4])\b|\b(?:platinum|plat|emerald|diamond|grandmaster|challenger)\b|\bstuck\s+in\s+(?:iron|bronze|silver|gold|platinum|emerald|diamond)\b/i.test(text));
+  if (rankTierDescriptionOffending.length) {
+    throw new Error(`Samira descriptions leaked rank-tier text that belongs in the rank field:\n${rankTierDescriptionOffending.join("\n")}`);
   }
   const roboticSummaryCopy = /\b(?:remember:|The note (?:clearly )?(?:defines|identifies|emphasizes|highlights)|highlighting that|aligns with|your main failure|main failure|biggest failure|main mistake|biggest mistake|classic .* (?:mistake|behavior)|at this level|you understand|you know the entry and payout|mental overload|poor fight endings|mechanical and decision flaws?|fundamental .* flaws?|ranked-habit evidence|limited ranked|beyond baseline|source-bounded note analysis|must adopt|must be|playstyle|approach|clear entry|exit patterns?|failure to|ranked-level|decision depth|basic fight timing|opportunit(?:y|ies)|show enough|climb yet|red flags?|avoid(?:s|ing)?)\b/i;
   const roboticOffending = generatedSamiraStrings(data).filter((text) => roboticSummaryCopy.test(text));
