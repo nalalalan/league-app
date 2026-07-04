@@ -410,6 +410,9 @@ try {
   if (!/rankTrendCsValue/.test(appSource) || !/rankTrendCsTicks/.test(appSource) || !/rank-trend-cs-line/.test(appSource) || !/rank-trend-cs-y-label/.test(appSource)) {
     throw new Error("Samira CS@10 chart does not render from source-bound note points.");
   }
+  if (!/function\s+rankTrendCsValue[\s\S]*?value\s*>\s*0\s*\?\s*value\s*:\s*null/.test(appSource)) {
+    throw new Error("Samira CS@10 chart can still plot missing CS as zero.");
+  }
   if (!/\.rank-trend-cs-line\s*\{/.test(styles) || !/\.rank-trend-cs-y-label\s*\{/.test(styles)) {
     throw new Error("Samira CS@10 chart line and labels are not styled.");
   }
