@@ -96,6 +96,14 @@ try {
       "Alan had 112 CS before the pentakill and about 3.5k gold after it.",
       "The useful command is Q through the setup, cash the pentakill, recall, and do not donate the gold back."
     ].join(" "),
+    [
+      "Recording timestamp: best inferred around 1:35-1:51 AM, 7/4/2026.",
+      "Game type/result: Normal Swiftplay Victory.",
+      "Gameplay-estimated rank for Alan's Samira performance: Gold II.",
+      "Best specific CS@10 approximation: 62 CS at 10:00.",
+      "Final visible Alan/Samira result: 11/5/12, 154 CS at 23:01.",
+      "Alan kept Q-ing useful things through the rough start until the base fight turned into the pentakill."
+    ].join(" "),
     "Ranked solo queue. S loaded and S rank appeared, but R was only availability, not permission to R.",
     "Ranked solo queue. Fog chase turned into one more fight instead of wave, reset, or objective.",
     "Ranked solo queue. Teemo support, Pyke lane, 309/720 HP, 6/11/2. Make the bad lane smaller.",
@@ -241,6 +249,14 @@ try {
   }
   if (/\b(?:Platinum|plat|Silver\s+[IVX]+|Gold\s+[IVX]+|Iron\s+[IVX]+)\b/i.test(fightMomentNote.description || "")) {
     throw new Error(`Samira description leaked rank-tier language instead of leaving it in the rank field: ${fightMomentNote.description || ""}`);
+  }
+  const gameplayEstimatedRankNote = sampleNotes[6];
+  if (gameplayEstimatedRankNote.rank_read?.exactRank !== "Gold II") {
+    throw new Error(`Gameplay-estimated rank-for sentence did not override derived/AI rank: ${JSON.stringify(gameplayEstimatedRankNote.rank_read)}`);
+  }
+  const gameplayEstimatedTrendPoint = saved.samira.rank_trend.points.find((point) => point.title === gameplayEstimatedRankNote.title);
+  if (!gameplayEstimatedTrendPoint || gameplayEstimatedTrendPoint.rank !== "Gold II") {
+    throw new Error(`Samira rank trend ignored the gameplay-estimated rank-for sentence: ${JSON.stringify(gameplayEstimatedTrendPoint)}`);
   }
   for (const note of sampleNotes) {
     const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(note.id)}`, {

@@ -390,6 +390,7 @@ function samiraExplicitRankFromText(value) {
   const text = String(value || "");
   const rankPattern = "((?:iron|bronze|silver|gold|platinum|emerald|diamond)\\s+(?:iv|iii|ii|i|[1-4])|master|grandmaster|challenger)";
   const patterns = [
+    new RegExp(`\\b(?:gameplay(?:\\s*|-)?(?:estimated|estimate)|performance(?:\\s*|-)?(?:estimated|estimate)|approx(?:imate(?:ly)?)?|estimated|estimate)\\s+rank(?:\\s+(?:for|of)\\s+[^.;:\\n]{0,120})?\\s*(?:is|=|:|-|around|as)?\\s*${rankPattern}\\b`, "ig"),
     new RegExp(`\\b(?:approx(?:imate(?:ly)?)?|estimated|estimate)\\s+(?:rank|ranked|rank\\s+read|read|elo)?\\s*(?:is|=|:|-|around|as)?\\s*${rankPattern}\\b`, "ig"),
     new RegExp(`\\b(?:estimated|estimate|rated|read(?:s)?|look(?:s|ed)?|ranked?)\\s+(?:as\\s+)?(?:a\\s+)?${rankPattern}(?:\\s*|-)?level\\b`, "ig"),
     new RegExp(`\\b${rankPattern}(?:\\s*|-)?level\\s+(?:samira\\s+)?(?:fight|game|moment|read)\\b`, "ig"),
