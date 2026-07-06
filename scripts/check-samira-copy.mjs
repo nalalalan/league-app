@@ -258,6 +258,16 @@ try {
   if (!gameplayEstimatedTrendPoint || gameplayEstimatedTrendPoint.rank !== "Gold II") {
     throw new Error(`Samira rank trend ignored the gameplay-estimated rank-for sentence: ${JSON.stringify(gameplayEstimatedTrendPoint)}`);
   }
+  const gameplayEstimatedPdfResponse = await fetch(`http://127.0.0.1:${port}${gameplayEstimatedRankNote.pdf_url}`, {
+    headers: { Accept: "application/pdf" }
+  });
+  if (!gameplayEstimatedPdfResponse.ok) {
+    throw new Error(`Gameplay-estimated rank note PDF did not render: ${gameplayEstimatedPdfResponse.status}`);
+  }
+  const gameplayEstimatedPdfBody = Buffer.from(await gameplayEstimatedPdfResponse.arrayBuffer()).toString("latin1");
+  if (!gameplayEstimatedPdfBody.includes("approx rank: Gold II")) {
+    throw new Error("Samira note PDF ignored the gameplay-estimated rank-for sentence.");
+  }
   for (const note of sampleNotes) {
     const deleteResponse = await fetch(`http://127.0.0.1:${port}/api/samira/notes/${encodeURIComponent(note.id)}`, {
       method: "DELETE",
@@ -366,7 +376,7 @@ try {
   if (!/function\s+cleanSamiraVisibleDescription\s*\(/.test(serverSource) || !/replace\(\s*\/\\b\(\\d\+\)\\\.\\s\+\(\\d\+\)\\s\*k\\b\/gi,\s*"\$1\.\$2k"\s*\)/.test(serverSource)) {
     throw new Error("Samira visible descriptions do not normalize compact gold text such as 3.5k.");
   }
-  if (!/const\s+pdfDescription\s*=\s*samiraPublicNoteDescription\(note,\s*pdfRankRead,\s*rankEstimate,\s*noteAnalysis\);/.test(serverSource) || /buildSamiraNotePdf\(note,\s*pdfRankRead,\s*noteAnalysis\?\.description\s*\|\|\s*""\)/.test(serverSource)) {
+  if (!/const\s+pdfRankRead\s*=\s*samiraRankReadForNote\(note,\s*rankEstimate,\s*noteAnalysis\);/.test(serverSource) || !/const\s+pdfDescription\s*=\s*samiraPublicNoteDescription\(note,\s*pdfRankRead,\s*rankEstimate,\s*noteAnalysis\);/.test(serverSource) || /buildSamiraNotePdf\(note,\s*pdfRankRead,\s*noteAnalysis\?\.description\s*\|\|\s*""\)/.test(serverSource)) {
     throw new Error("Samira note PDFs can still bypass the public description sanitizer.");
   }
   if (!/function\s+directVisibleCopy\s*\(/.test(appSource) || !/descriptionText\.textContent\s*=\s*directVisibleCopy\(description\)/.test(appSource)) {

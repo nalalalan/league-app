@@ -2071,10 +2071,9 @@ async function handleApi(req, res, url) {
     }
     const review = await loadRecordingReview();
     const rankEstimate = samiraRankEstimate(notes, review);
-    const rankRead = samiraNoteRankRead(note, rankEstimate);
     const analysis = await samiraAiAnalysesForNotes([note], rankEstimate);
     const noteAnalysis = analysis.notesById[samiraNoteCacheKey(note)];
-    const pdfRankRead = noteAnalysis?.rank_read || rankRead;
+    const pdfRankRead = samiraRankReadForNote(note, rankEstimate, noteAnalysis);
     const pdfDescription = samiraPublicNoteDescription(note, pdfRankRead, rankEstimate, noteAnalysis);
     const pdf = buildSamiraNotePdf(note, pdfRankRead, pdfDescription);
     res.writeHead(200, {
