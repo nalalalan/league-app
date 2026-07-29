@@ -6,7 +6,10 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node scripts/check-samira-copy.mjs",
+    "test": "npm run test:copy && npm run test:backend && npm run test:ui",
+    "test:copy": "node scripts/check-samira-copy.mjs",
+    "test:backend": "node scripts/check-samira-backend.mjs && node scripts/check-samira-recovery.mjs && node scripts/check-samira-coach-ai.mjs",
+    "test:ui": "node scripts/check-samira-ui.mjs",
     "start": "node server.js",
     "sync:recordings": "node tools/sync-recordings.mjs",
     "publish:recordings": "node tools/publish-recordings.mjs",
@@ -17,5 +20,7 @@
     "audit:feedback": "node tools/audit-feedback-quality.mjs",
     "audit:ranks": "node tools/audit-ranks.mjs"
   },
-  "dependencies": {}
+  "dependencies": {
+    "sharp": "^0.35.3"
+  }
 }

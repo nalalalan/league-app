@@ -1,5 +1,27 @@
 const imageBase = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
 
+let samiraLayoutShiftValue = 0;
+const publishSamiraLayoutShift = () => {
+  document.documentElement.dataset.samiraCls = samiraLayoutShiftValue.toFixed(4);
+};
+publishSamiraLayoutShift();
+if ("PerformanceObserver" in window) {
+  try {
+    const samiraLayoutShiftObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!entry.hadRecentInput) {
+          samiraLayoutShiftValue += Number(entry.value || 0);
+          publishSamiraLayoutShift();
+        }
+      }
+    });
+    samiraLayoutShiftObserver.observe({ type: "layout-shift", buffered: true });
+  } catch {
+    // Layout-shift observation is optional in older browsers.
+  }
+}
+window.__samiraHydrationCls = () => Number(samiraLayoutShiftValue.toFixed(4));
+
 const defaultSoundProfile = {
   duration: 2.8,
   volume: 0.88,
@@ -746,6 +768,30 @@ const samiraMainTakeaway = document.querySelector("#samira-main-takeaway");
 const samiraRankTrend = document.querySelector("#samira-rank-trend");
 const samiraCsTrend = document.querySelector("#samira-cs-trend");
 const samiraNoteList = document.querySelector("#samira-note-list");
+const samiraNoteLibraryHead = document.querySelector("#samira-note-library-head");
+const samiraNoteViewAll = document.querySelector("#samira-note-view-all");
+const samiraCopyCoach = document.querySelector("#samira-copy-coach");
+const samiraCopyStatus = document.querySelector("#samira-copy-status");
+const samiraCoachMessageTemplate = document.querySelector("#samira-coach-message-template");
+const samiraCopyDialog = document.querySelector("#samira-copy-dialog");
+const samiraCopyFallback = document.querySelector("#samira-copy-fallback");
+const samiraEntryDialog = document.querySelector("#samira-entry-dialog");
+const samiraEntryDialogMeta = document.querySelector("#samira-entry-dialog-meta");
+const samiraEntryDialogCopy = document.querySelector("#samira-entry-dialog-copy");
+const samiraTipDropzone = document.querySelector("#samira-tip-dropzone");
+const samiraTipFileInput = document.querySelector("#samira-tip-file-input");
+const samiraTipStatus = document.querySelector("#samira-tip-status");
+const samiraTipUploadQueue = document.querySelector("#samira-tip-upload-queue");
+const samiraTipSummary = document.querySelector("#samira-tip-summary");
+const samiraTipSummaryList = document.querySelector("#samira-tip-summary-list");
+const samiraTipLibraryHead = document.querySelector("#samira-tip-library-head");
+const samiraTipImageList = document.querySelector("#samira-tip-image-list");
+const samiraTipViewAll = document.querySelector("#samira-tip-view-all");
+const samiraTipDialog = document.querySelector("#samira-tip-dialog");
+const samiraTipDialogMeta = document.querySelector("#samira-tip-dialog-meta");
+const samiraTipDialogImage = document.querySelector("#samira-tip-dialog-image");
+const samiraTipDialogCopy = document.querySelector("#samira-tip-dialog-copy");
+const samiraTipDialogActions = document.querySelector("#samira-tip-dialog-actions");
 const page = document.querySelector(".page");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -2660,7 +2706,7 @@ function rankTrendAxisTickTime(parts) {
   return Date.UTC(parts.year, parts.month - 1, parts.day, 16);
 }
 
-function rankTrendAxisDateTicks(timeMin, timeMax, compact = false) {
+function rankTrendAxisDateTicks(timeMin, timeMax, compact = false, maxTickOverride = 0) {
   const start = rankTrendLocalDateParts(timeMin);
   const end = rankTrendLocalDateParts(timeMax);
   if (!start || !end) return [];
@@ -2673,7 +2719,9 @@ function rankTrendAxisDateTicks(timeMin, timeMax, compact = false) {
       label: rankTrendAxisDateFormatter.format(new Date(tickTime))
     });
   }
-  const maxTicks = compact ? 7 : 9;
+  const maxTicks = Number.isFinite(maxTickOverride) && maxTickOverride > 1
+    ? Math.floor(maxTickOverride)
+    : (compact ? 7 : 9);
   if (days.length <= maxTicks) return days;
   const interval = Math.ceil((days.length - 1) / (maxTicks - 1));
   return days.filter((_, index) => index === 0 || index === days.length - 1 || index % interval === 0);
@@ -2690,12 +2738,24 @@ function rankTrendTimeDomain(points = []) {
   };
 }
 
+function rankTrendAxisRankLabel(rank, width) {
+  if (width >= 520) return rank;
+  return String(rank || "")
+    .replace(/^Platinum\b/i, "Plat")
+    .replace(/^Emerald\b/i, "Emer.")
+    .replace(/^Diamond\b/i, "Dia.")
+    .replace(/^Grandmaster\b/i, "GM")
+    .replace(/^Challenger\b/i, "Chall.");
+}
+
 function rankTrendSvg(points, options = {}) {
   const compact = options.compact === true;
-  const width = 640;
+  const width = Math.max(compact ? 300 : 480, Math.round(Number(options.width) || 640));
   const height = compact ? 210 : 274;
   const margin = compact
-    ? { top: 14, right: 18, bottom: 30, left: 68 }
+    ? (width < 430
+      ? { top: 14, right: 8, bottom: 30, left: 50 }
+      : { top: 14, right: 14, bottom: 30, left: 68 })
     : { top: 18, right: 22, bottom: 34, left: 74 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
@@ -2722,6 +2782,8 @@ function rankTrendSvg(points, options = {}) {
 
   const svg = svgNode("svg", {
     viewBox: `0 0 ${width} ${height}`,
+    width,
+    height,
     role: "img",
     preserveAspectRatio: "xMidYMid meet",
     "aria-label": "Exact estimated rank over time"
@@ -2743,7 +2805,7 @@ function rankTrendSvg(points, options = {}) {
       class: "rank-trend-y-label",
       "text-anchor": "end"
     });
-    text.textContent = tick.rank;
+    text.textContent = rankTrendAxisRankLabel(tick.rank, width);
     svg.append(text);
   }
 
@@ -2762,7 +2824,8 @@ function rankTrendSvg(points, options = {}) {
     class: "rank-trend-axis"
   }));
 
-  const xTicks = rankTrendAxisDateTicks(timeMin, timeMax, compact);
+  const maxDateTicks = compact ? (width < 400 ? 4 : (width < 520 ? 5 : 7)) : 9;
+  const xTicks = rankTrendAxisDateTicks(timeMin, timeMax, compact, maxDateTicks);
   for (const tick of xTicks) {
     const x = Math.max(margin.left, Math.min(axisRight, xScale(tick.time)));
     const text = svgNode("text", {
@@ -2804,10 +2867,12 @@ function csAtTenTrendSvg(points, options = {}) {
   const csPoints = points
     .map((point) => ({ ...point, csValue: rankTrendCsValue(point) }))
     .filter((point) => point.csValue !== null);
-  const width = 640;
+  const width = Math.max(compact ? 300 : 480, Math.round(Number(options.width) || 640));
   const height = compact ? 210 : 274;
   const margin = compact
-    ? { top: 14, right: 18, bottom: 30, left: 68 }
+    ? (width < 430
+      ? { top: 14, right: 8, bottom: 30, left: 50 }
+      : { top: 14, right: 14, bottom: 30, left: 68 })
     : { top: 18, right: 22, bottom: 34, left: 74 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
@@ -2830,6 +2895,8 @@ function csAtTenTrendSvg(points, options = {}) {
   const yScale = (value) => margin.top + plotHeight - ((value - minValue) / range) * plotHeight;
   const svg = svgNode("svg", {
     viewBox: `0 0 ${width} ${height}`,
+    width,
+    height,
     role: "img",
     preserveAspectRatio: "xMidYMid meet",
     "aria-label": "CS at 10 over time"
@@ -2869,7 +2936,8 @@ function csAtTenTrendSvg(points, options = {}) {
     class: "rank-trend-axis"
   }));
 
-  const xTicks = rankTrendAxisDateTicks(timeMin, timeMax, compact);
+  const maxDateTicks = compact ? (width < 400 ? 4 : (width < 520 ? 5 : 7)) : 9;
+  const xTicks = rankTrendAxisDateTicks(timeMin, timeMax, compact, maxDateTicks);
   for (const tick of xTicks) {
     const x = Math.max(margin.left, Math.min(axisRight, xScale(tick.time)));
     const text = svgNode("text", {
@@ -7068,6 +7136,183 @@ function noteNode(note) {
   return article;
 }
 
+let latestSamiraState = null;
+let samiraNotesExpanded = false;
+let samiraTipsExpanded = false;
+let samiraTipRecords = [];
+let samiraTipPollTimer = 0;
+let samiraTipPollStartedAt = 0;
+let samiraChartResizeTimer = 0;
+let samiraCopyResetTimer = 0;
+const samiraDialogReturnTargets = new WeakMap();
+
+function samiraCoachMessage() {
+  return String(samiraCoachMessageTemplate?.content?.textContent || "").trim();
+}
+
+function openSamiraDialog(dialog, returnTarget) {
+  if (!dialog) return;
+  if (returnTarget) samiraDialogReturnTargets.set(dialog, returnTarget);
+  if (typeof dialog.showModal === "function") {
+    if (!dialog.open) dialog.showModal();
+  } else {
+    dialog.setAttribute("open", "");
+  }
+}
+
+function closeSamiraDialog(dialog) {
+  if (!dialog) return;
+  if (typeof dialog.close === "function" && dialog.open) dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+function showCoachCopyFallback(message) {
+  if (!samiraCopyDialog || !samiraCopyFallback) return;
+  samiraCopyFallback.value = message;
+  openSamiraDialog(samiraCopyDialog, samiraCopyCoach);
+  window.requestAnimationFrame(() => {
+    samiraCopyFallback.focus({ preventScroll: true });
+    samiraCopyFallback.select();
+  });
+}
+
+async function copyCoachMessage() {
+  const message = samiraCoachMessage();
+  if (!message || !samiraCopyCoach) return;
+  const originalSelectionStart = samiraNoteBody?.selectionStart;
+  const originalSelectionEnd = samiraNoteBody?.selectionEnd;
+  const originalScrollTop = samiraNoteBody?.scrollTop;
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error("clipboard unavailable");
+    await navigator.clipboard.writeText(message);
+    window.clearTimeout(samiraCopyResetTimer);
+    samiraCopyCoach.textContent = "copied";
+    if (samiraCopyStatus) samiraCopyStatus.textContent = "Coach message copied. Attach it with your video.";
+    samiraCopyCoach.focus({ preventScroll: true });
+    samiraCopyResetTimer = window.setTimeout(() => {
+      samiraCopyCoach.textContent = "copy coach message";
+    }, 2000);
+  } catch {
+    if (samiraCopyStatus) samiraCopyStatus.textContent = "Clipboard access was unavailable. Copy the selected message.";
+    showCoachCopyFallback(message);
+  } finally {
+    if (samiraNoteBody && Number.isInteger(originalSelectionStart) && Number.isInteger(originalSelectionEnd)) {
+      samiraNoteBody.setSelectionRange(originalSelectionStart, originalSelectionEnd);
+      samiraNoteBody.scrollTop = originalScrollTop || 0;
+    }
+  }
+}
+
+function humanizeSamiraKey(key) {
+  return String(key || "")
+    .replace(/_/g, " ")
+    .replace(/\bcs\b/gi, "CS")
+    .replace(/\bkda\b/gi, "K/D/A")
+    .replace(/\bhp\b/gi, "HP");
+}
+
+function samiraStructuredValue(value) {
+  if (value === null || value === undefined || value === "") return null;
+  if (Array.isArray(value)) {
+    const list = document.createElement("ul");
+    for (const item of value) {
+      const node = samiraStructuredValue(item);
+      if (!node) continue;
+      const row = document.createElement("li");
+      row.append(node);
+      list.append(row);
+    }
+    return list.childElementCount ? list : null;
+  }
+  if (typeof value === "object") {
+    const list = document.createElement("dl");
+    for (const [key, childValue] of Object.entries(value)) {
+      const node = samiraStructuredValue(childValue);
+      if (!node) continue;
+      const term = document.createElement("dt");
+      term.textContent = humanizeSamiraKey(key);
+      const definition = document.createElement("dd");
+      definition.append(node);
+      list.append(term, definition);
+    }
+    return list.childElementCount ? list : null;
+  }
+  const text = document.createElement("span");
+  text.textContent = directVisibleCopy(String(value));
+  return text;
+}
+
+function appendSamiraEntrySection(container, title, value) {
+  const content = samiraStructuredValue(value);
+  if (!content) return;
+  const section = document.createElement("section");
+  section.className = "samira-entry-section";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.append(heading, content);
+  container.append(section);
+}
+
+function renderSamiraEntryDetail(payload) {
+  if (!samiraEntryDialogCopy || !samiraEntryDialogMeta) return;
+  const note = payload?.note || {};
+  const entry = payload?.coach_entry || payload?.entry || note.coach_entry || {};
+  samiraEntryDialogMeta.textContent = [note.game_time_label || formatDate(note.created_at), note.rank_read?.exactRank]
+    .filter(Boolean)
+    .join(" · ");
+  const fragment = document.createDocumentFragment();
+  if (entry.coverage) appendSamiraEntrySection(fragment, "coverage", entry.coverage);
+  appendSamiraEntrySection(fragment, "game facts", entry.facts);
+  appendSamiraEntrySection(fragment, "scoreboard", entry.scoreboard);
+  appendSamiraEntrySection(fragment, "rank and evidence", entry.rank_read);
+  appendSamiraEntrySection(fragment, "overall verdict", entry.overall_verdict || entry.domains?.overall_verdict || entry.domains?.overall);
+  appendSamiraEntrySection(fragment, "timeline", entry.timeline);
+  if (entry.domains && typeof entry.domains === "object") {
+    const { overall, overall_verdict: overallVerdict, ...domains } = entry.domains;
+    void overall;
+    void overallVerdict;
+    appendSamiraEntrySection(fragment, "complete analysis", domains);
+  }
+  appendSamiraEntrySection(fragment, "development plan", entry.development);
+  appendSamiraEntrySection(fragment, "uncertainties", entry.uncertainties);
+  const rawBody = String(note.body ?? entry.raw_text ?? "");
+  if (rawBody.trim()) {
+    const raw = document.createElement("details");
+    raw.className = "samira-entry-raw";
+    const summary = document.createElement("summary");
+    summary.textContent = "exact coach response";
+    const text = document.createElement("pre");
+    text.textContent = rawBody;
+    raw.append(summary, text);
+    fragment.append(raw);
+  }
+  if (!fragment.childNodes.length) {
+    const unavailable = document.createElement("p");
+    unavailable.className = "samira-dialog-message";
+    unavailable.textContent = "This entry is saved, but its structured view is not available yet.";
+    fragment.append(unavailable);
+  }
+  samiraEntryDialogCopy.replaceChildren(fragment);
+}
+
+async function openSamiraEntry(noteId, trigger) {
+  if (!noteId || !samiraEntryDialog || !samiraEntryDialogCopy) return;
+  samiraEntryDialogMeta.textContent = "";
+  const loading = document.createElement("p");
+  loading.className = "samira-dialog-message";
+  loading.textContent = "Loading the complete entry…";
+  samiraEntryDialogCopy.replaceChildren(loading);
+  openSamiraDialog(samiraEntryDialog, trigger);
+  try {
+    const response = await fetch(`/api/samira/notes/${encodeURIComponent(noteId)}`, { headers: { Accept: "application/json" } });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "entry unavailable");
+    renderSamiraEntryDetail(payload);
+  } catch {
+    loading.textContent = "The complete entry is unavailable. The saved PDF is still available from the card.";
+  }
+}
+
 function samiraPdfCard(note) {
   const article = document.createElement("article");
   article.className = "samira-pdf-card";
@@ -7105,23 +7350,294 @@ function samiraPdfCard(note) {
   action.href = pdfUrl || "#";
   action.target = "_blank";
   action.rel = "noopener";
-  action.textContent = "Open PDF";
+  action.textContent = "open PDF";
   if (!pdfUrl) action.setAttribute("aria-disabled", "true");
 
   const actions = document.createElement("div");
   actions.className = "samira-card-actions";
+  if (note.id) {
+    const openEntry = document.createElement("button");
+    openEntry.className = "samira-open-entry";
+    openEntry.type = "button";
+    openEntry.dataset.noteId = note.id;
+    openEntry.textContent = "open full entry";
+    actions.append(openEntry);
+  }
   actions.append(action);
   if (note.id) {
     const deleteButton = document.createElement("button");
     deleteButton.className = "samira-delete-note";
     deleteButton.type = "button";
     deleteButton.dataset.noteId = note.id;
-    deleteButton.textContent = "Delete";
+    deleteButton.textContent = "delete";
     actions.append(deleteButton);
   }
   main.append(meta, descriptionText, actions);
   article.append(main);
   return article;
+}
+
+function samiraTipTexts(record) {
+  return (Array.isArray(record?.tips) ? record.tips : [])
+    .map((tip) => typeof tip === "string" ? tip : tip?.text)
+    .map((tip) => directVisibleCopy(String(tip || "").trim()))
+    .filter(Boolean);
+}
+
+function samiraTipStatusLabel(record) {
+  const status = String(record?.status || "pending").toLowerCase();
+  if (status === "ready" && record?.morning_eligible === false) return "saved · excluded from email";
+  if (status === "ready") return "ready";
+  if (status === "unavailable") return "summary unavailable";
+  return "summarizing";
+}
+
+function samiraTipDimensions(record) {
+  const width = Number(record?.width);
+  const height = Number(record?.height);
+  return width > 0 && height > 0 ? `${Math.round(width)}×${Math.round(height)}` : "";
+}
+
+function samiraTipCard(record, index = 0) {
+  const article = document.createElement("article");
+  article.className = `samira-tip-card is-${String(record?.status || "pending").toLowerCase()}`;
+  article.dataset.tipId = record.id || "";
+
+  const media = document.createElement("button");
+  media.className = "samira-tip-media";
+  media.type = "button";
+  media.dataset.tipAction = "detail";
+  media.dataset.tipId = record.id || "";
+  media.setAttribute("aria-label", "Open screenshot details");
+  const image = document.createElement("img");
+  image.src = record.thumbnail_url || record.original_url || "";
+  image.alt = "Samira tip screenshot";
+  image.loading = index < 3 ? "eager" : "lazy";
+  image.decoding = "async";
+  media.append(image);
+
+  const body = document.createElement("div");
+  body.className = "samira-tip-card-body";
+  const meta = document.createElement("p");
+  meta.className = "samira-tip-card-meta";
+  meta.textContent = [samiraTipStatusLabel(record), formatDate(record.created_at)].filter(Boolean).join(" · ");
+
+  const summary = document.createElement("p");
+  summary.className = "samira-tip-card-summary";
+  summary.textContent = directVisibleCopy(record.summary || "");
+  if (!summary.textContent) summary.hidden = true;
+
+  const tips = samiraTipTexts(record).slice(0, 3);
+  const list = document.createElement("ul");
+  list.className = "samira-tip-card-tips";
+  for (const tip of tips) {
+    const item = document.createElement("li");
+    item.textContent = tip;
+    list.append(item);
+  }
+  let tipContent = list;
+  if (!tips.length) {
+    tipContent = document.createElement("p");
+    const state = tipContent;
+    state.className = "samira-tip-card-state";
+    state.textContent = String(record.status || "pending").toLowerCase() === "unavailable"
+      ? "The exact screenshot is saved. Retry the summary when needed."
+      : "The exact screenshot is saved while its tips are summarized.";
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "samira-card-actions";
+  const detail = document.createElement("button");
+  detail.className = "samira-tip-action";
+  detail.type = "button";
+  detail.dataset.tipAction = "detail";
+  detail.dataset.tipId = record.id || "";
+  detail.textContent = "open details";
+  actions.append(detail);
+  if (record.original_url) {
+    const original = document.createElement("a");
+    original.className = "samira-tip-action is-secondary";
+    original.href = record.original_url;
+    original.target = "_blank";
+    original.rel = "noopener";
+    original.textContent = "view original";
+    actions.append(original);
+  }
+  if (record.can_retry) {
+    const retry = document.createElement("button");
+    retry.className = "samira-tip-action is-secondary";
+    retry.type = "button";
+    retry.dataset.tipAction = "retry";
+    retry.dataset.tipId = record.id || "";
+    retry.textContent = "retry";
+    actions.append(retry);
+  }
+  const remove = document.createElement("button");
+  remove.className = "samira-tip-action is-danger";
+  remove.type = "button";
+  remove.dataset.tipAction = "delete";
+  remove.dataset.tipId = record.id || "";
+  remove.textContent = "delete";
+  actions.append(remove);
+
+  body.append(meta, summary);
+  body.append(tipContent);
+  body.append(actions);
+  article.append(media, body);
+  return article;
+}
+
+function renderSamiraTipSummary(tips = []) {
+  if (!samiraTipSummary || !samiraTipSummaryList) return;
+  const texts = (Array.isArray(tips) ? tips : [])
+    .map((tip) => typeof tip === "string" ? tip : tip?.text)
+    .map((tip) => directVisibleCopy(String(tip || "").trim()))
+    .filter(Boolean)
+    .slice(0, 3);
+  samiraTipSummary.hidden = texts.length < 2;
+  samiraTipSummaryList.replaceChildren(...texts.map((text) => {
+    const item = document.createElement("li");
+    item.textContent = text;
+    return item;
+  }));
+}
+
+function renderSamiraTipLibrary(records = samiraTipRecords) {
+  if (!samiraTipImageList || !samiraTipLibraryHead || !samiraTipViewAll) return;
+  samiraTipRecords = Array.isArray(records) ? records : [];
+  const visibleRecords = samiraTipsExpanded ? samiraTipRecords : samiraTipRecords.slice(0, 3);
+  samiraTipLibraryHead.hidden = samiraTipRecords.length === 0;
+  samiraTipViewAll.hidden = samiraTipRecords.length <= 3;
+  samiraTipViewAll.textContent = samiraTipsExpanded ? "show recent" : `view all ${samiraTipRecords.length}`;
+  samiraTipImageList.dataset.count = String(visibleRecords.length);
+  samiraTipImageList.replaceChildren(...visibleRecords.map(samiraTipCard));
+}
+
+function renderSamiraTipDialogRecord(record) {
+  if (!samiraTipDialog || !samiraTipDialogMeta || !samiraTipDialogImage || !samiraTipDialogCopy || !samiraTipDialogActions) return;
+  samiraTipDialog.dataset.tipId = record.id || "";
+  samiraTipDialogMeta.textContent = [samiraTipStatusLabel(record), formatDate(record.created_at), samiraTipDimensions(record)]
+    .filter(Boolean)
+    .join(" · ");
+  samiraTipDialogImage.src = record.original_url || record.thumbnail_url || "";
+  samiraTipDialogImage.hidden = !samiraTipDialogImage.src;
+  const fragment = document.createDocumentFragment();
+  if (record.summary) appendSamiraEntrySection(fragment, "source summary", record.summary);
+  const tipTexts = samiraTipTexts(record);
+  if (tipTexts.length) appendSamiraEntrySection(fragment, "extracted tips", tipTexts);
+  if (record.transcript) appendSamiraEntrySection(fragment, "transcript", record.transcript);
+  if (!fragment.childNodes.length) {
+    const state = document.createElement("p");
+    state.className = "samira-dialog-message";
+    state.textContent = String(record.status || "pending").toLowerCase() === "unavailable"
+      ? "The screenshot is saved, but a grounded summary is unavailable."
+      : "The screenshot is saved while its grounded summary is prepared.";
+    fragment.append(state);
+  }
+  samiraTipDialogCopy.replaceChildren(fragment);
+
+  const actions = document.createDocumentFragment();
+  if (record.original_url) {
+    const original = document.createElement("a");
+    original.className = "samira-tip-action";
+    original.href = record.original_url;
+    original.target = "_blank";
+    original.rel = "noopener";
+    original.textContent = "view original";
+    actions.append(original);
+  }
+  if (record.can_retry) {
+    const retry = document.createElement("button");
+    retry.className = "samira-tip-action is-secondary";
+    retry.type = "button";
+    retry.dataset.tipAction = "retry";
+    retry.dataset.tipId = record.id || "";
+    retry.textContent = "retry summary";
+    actions.append(retry);
+  }
+  const remove = document.createElement("button");
+  remove.className = "samira-tip-action is-danger";
+  remove.type = "button";
+  remove.dataset.tipAction = "delete";
+  remove.dataset.tipId = record.id || "";
+  remove.textContent = "delete";
+  actions.append(remove);
+  samiraTipDialogActions.replaceChildren(actions);
+}
+
+async function openSamiraTipDetail(tipId, trigger) {
+  if (!tipId || !samiraTipDialog) return;
+  const compactRecord = samiraTipRecords.find((record) => record.id === tipId);
+  if (compactRecord) renderSamiraTipDialogRecord(compactRecord);
+  openSamiraDialog(samiraTipDialog, trigger);
+  try {
+    const response = await fetch(`/api/samira/tip-images/${encodeURIComponent(tipId)}`, { headers: { Accept: "application/json" } });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "tip unavailable");
+    renderSamiraTipDialogRecord(payload.tip_image || payload.record || compactRecord || {});
+  } catch {
+    if (!compactRecord && samiraTipDialogCopy) {
+      const unavailable = document.createElement("p");
+      unavailable.className = "samira-dialog-message";
+      unavailable.textContent = "This screenshot is unavailable.";
+      samiraTipDialogCopy.replaceChildren(unavailable);
+    }
+  }
+}
+
+function armSamiraDelete(button) {
+  if (!button || button.dataset.confirming === "true") return true;
+  button.dataset.confirming = "true";
+  button.textContent = "confirm delete";
+  button.classList.add("is-confirming");
+  window.setTimeout(() => {
+    if (!button.isConnected) return;
+    button.dataset.confirming = "false";
+    button.textContent = "delete";
+    button.classList.remove("is-confirming");
+  }, 4000);
+  return false;
+}
+
+async function retrySamiraTip(tipId, button) {
+  if (!tipId || !button) return;
+  button.disabled = true;
+  if (samiraTipStatus) samiraTipStatus.textContent = "Retrying the screenshot summary…";
+  try {
+    const response = await fetch(`/api/samira/tip-images/${encodeURIComponent(tipId)}/retry`, {
+      method: "POST",
+      headers: { Accept: "application/json" }
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "retry unavailable");
+    if (samiraTipStatus) samiraTipStatus.textContent = "Summary retry started.";
+    const record = payload.tip_image || payload.record;
+    if (samiraTipDialog?.open && record) renderSamiraTipDialogRecord(record);
+    await hydrateSamiraTipLibrary({ restartPolling: true });
+  } catch (error) {
+    if (samiraTipStatus) samiraTipStatus.textContent = directVisibleCopy(error.message || "Retry unavailable.");
+    button.disabled = false;
+  }
+}
+
+async function deleteSamiraTip(tipId, button) {
+  if (!tipId || !button || !armSamiraDelete(button)) return;
+  button.disabled = true;
+  if (samiraTipStatus) samiraTipStatus.textContent = "Deleting screenshot…";
+  try {
+    const response = await fetch(`/api/samira/tip-images/${encodeURIComponent(tipId)}`, {
+      method: "DELETE",
+      headers: { Accept: "application/json" }
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "delete unavailable");
+    if (samiraTipStatus) samiraTipStatus.textContent = "Screenshot deleted.";
+    if (samiraTipDialog?.open && samiraTipDialog.dataset.tipId === tipId) closeSamiraDialog(samiraTipDialog);
+    await hydrateSamiraTipLibrary({ restartPolling: true });
+  } catch (error) {
+    if (samiraTipStatus) samiraTipStatus.textContent = directVisibleCopy(error.message || "Delete unavailable.");
+    button.disabled = false;
+  }
 }
 
 function samiraRankTrendPoints(data) {
@@ -7157,10 +7673,10 @@ function renderSamiraRankTrend(data) {
   const title = document.createElement("h2");
   title.textContent = "rank vs time";
   const meta = document.createElement("p");
-  meta.textContent = points.length ? `${points.length} reads` : "no rank reads";
-  heading.append(title, meta);
 
   if (!points.length) {
+    meta.textContent = "no rank reads";
+    heading.append(title, meta);
     const empty = document.createElement("p");
     empty.className = "rank-trend-empty";
     empty.textContent = "Paste one scored note first.";
@@ -7169,13 +7685,13 @@ function renderSamiraRankTrend(data) {
   }
 
   const latest = points.at(-1);
+  meta.textContent = `${latest.rank} · ${latest.dateLabel} · ${points.length} reads`;
+  heading.append(title, meta);
   const chart = document.createElement("div");
   chart.className = "rank-trend-chart";
-  chart.append(rankTrendSvg(points, { compact: true, timeDomain }));
-  const latestLine = document.createElement("p");
-  latestLine.className = "rank-trend-latest";
-  latestLine.textContent = `${latest.rank} / ${latest.dateLabel}`;
-  samiraRankTrend.replaceChildren(heading, chart, latestLine);
+  samiraRankTrend.replaceChildren(heading, chart);
+  const chartWidth = Math.floor(chart.getBoundingClientRect().width || samiraRankTrend.clientWidth - 24 || 640);
+  chart.append(rankTrendSvg(points, { compact: true, timeDomain, width: chartWidth }));
 }
 
 function renderSamiraCsTrend(data) {
@@ -7188,10 +7704,10 @@ function renderSamiraCsTrend(data) {
   const title = document.createElement("h2");
   title.textContent = "cs@10 vs time";
   const meta = document.createElement("p");
-  meta.textContent = points.length ? `${points.length} CS@10 reads` : "no CS@10 reads";
-  heading.append(title, meta);
 
   if (!points.length) {
+    meta.textContent = "no CS@10 reads";
+    heading.append(title, meta);
     const empty = document.createElement("p");
     empty.className = "rank-trend-empty";
     empty.textContent = "Paste one note with CS@10 first.";
@@ -7200,13 +7716,13 @@ function renderSamiraCsTrend(data) {
   }
 
   const latest = points.at(-1);
+  meta.textContent = `${latest.csAtTenLabel || `${latest.csAtTen} CS@10`} · ${latest.dateLabel} · ${points.length} reads`;
+  heading.append(title, meta);
   const chart = document.createElement("div");
   chart.className = "rank-trend-chart";
-  chart.append(csAtTenTrendSvg(allPoints, { compact: true, timeDomain }));
-  const latestLine = document.createElement("p");
-  latestLine.className = "rank-trend-latest";
-  latestLine.textContent = `${latest.csAtTenLabel || `${latest.csAtTen} CS@10`} / ${latest.dateLabel}`;
-  samiraCsTrend.replaceChildren(heading, chart, latestLine);
+  samiraCsTrend.replaceChildren(heading, chart);
+  const chartWidth = Math.floor(chart.getBoundingClientRect().width || samiraCsTrend.clientWidth - 24 || 640);
+  chart.append(csAtTenTrendSvg(allPoints, { compact: true, timeDomain, width: chartWidth }));
 }
 
 async function hydratePublicNotes() {
@@ -7223,8 +7739,150 @@ async function hydratePublicNotes() {
   }
 }
 
+function samiraTipPayloadRecords(payload) {
+  const records = payload?.tip_images || payload?.records || [];
+  return (Array.isArray(records) ? records : [])
+    .filter((record) => record && record.id)
+    .sort((a, b) => Date.parse(b.created_at || 0) - Date.parse(a.created_at || 0));
+}
+
+function scheduleSamiraTipPoll(records) {
+  window.clearTimeout(samiraTipPollTimer);
+  const pending = records.some((record) => String(record.status || "").toLowerCase() === "pending");
+  if (!pending || document.visibilityState !== "visible") return;
+  if (!samiraTipPollStartedAt) samiraTipPollStartedAt = Date.now();
+  if (Date.now() - samiraTipPollStartedAt >= 120000) return;
+  samiraTipPollTimer = window.setTimeout(() => hydrateSamiraTipLibrary(), 3000);
+}
+
+async function hydrateSamiraTipLibrary(options = {}) {
+  if (!samiraTipImageList) return;
+  if (options.restartPolling) samiraTipPollStartedAt = Date.now();
+  try {
+    const [libraryResponse, tipsResponse] = await Promise.all([
+      fetch("/api/samira/tip-images", { headers: { Accept: "application/json" }, cache: "no-store" }),
+      fetch("/api/samira/tips", { headers: { Accept: "application/json" }, cache: "no-store" })
+    ]);
+    if (!libraryResponse.ok) throw new Error("tip library unavailable");
+    const library = await libraryResponse.json();
+    const records = samiraTipPayloadRecords(library);
+    renderSamiraTipLibrary(records);
+    if (tipsResponse.ok) {
+      const tips = await tipsResponse.json();
+      renderSamiraTipSummary(tips.tips || []);
+    }
+    scheduleSamiraTipPoll(records);
+    if (samiraTipStatus?.textContent === "Loading screenshots…" || samiraTipStatus?.textContent === "Tip library unavailable.") {
+      samiraTipStatus.textContent = "";
+    }
+  } catch {
+    if (samiraTipStatus && !samiraTipRecords.length) samiraTipStatus.textContent = "Tip library unavailable.";
+  }
+}
+
+function samiraTipQueueRow(file) {
+  const row = document.createElement("article");
+  row.className = "samira-tip-upload-row";
+  const preview = document.createElement("img");
+  const objectUrl = URL.createObjectURL(file);
+  preview.src = objectUrl;
+  preview.alt = "Selected screenshot preview";
+  const copy = document.createElement("div");
+  const name = document.createElement("p");
+  name.textContent = directVisibleCopy(file.name || "screenshot");
+  const state = document.createElement("p");
+  state.className = "samira-tip-upload-state";
+  state.textContent = "waiting";
+  copy.append(name, state);
+  row.append(preview, copy);
+  row._samiraObjectUrl = objectUrl;
+  row._samiraState = state;
+  return row;
+}
+
+function retireSamiraTipQueueRow(row) {
+  window.setTimeout(() => {
+    if (row._samiraObjectUrl) URL.revokeObjectURL(row._samiraObjectUrl);
+    row.remove();
+  }, 4500);
+}
+
+async function uploadSamiraTipFile(file, row) {
+  row._samiraState.textContent = "uploading";
+  try {
+    const response = await fetch("/api/samira/tip-images", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": file.type || "application/octet-stream"
+      },
+      body: file
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "upload rejected");
+    row.classList.add("is-complete");
+    row._samiraState.textContent = payload.duplicate ? "already saved" : "saved · summarizing";
+    retireSamiraTipQueueRow(row);
+    return { ok: true, duplicate: payload.duplicate === true };
+  } catch (error) {
+    row.classList.add("is-error");
+    row._samiraState.textContent = directVisibleCopy(error.message || "upload failed");
+    return { ok: false, duplicate: false };
+  }
+}
+
+async function uploadSamiraTipFiles(fileList) {
+  if (!samiraTipUploadQueue || !samiraTipDropzone) return;
+  const allFiles = Array.from(fileList || []).filter((file) => file instanceof File);
+  const imageFiles = allFiles.filter((file) => ["image/png", "image/jpeg", "image/webp"].includes(String(file.type || "").toLowerCase()));
+  if (!imageFiles.length) {
+    if (samiraTipStatus) samiraTipStatus.textContent = "Choose PNG, JPEG, or WebP screenshots.";
+    return;
+  }
+  const files = imageFiles.slice(0, 5);
+  if (samiraTipStatus) {
+    samiraTipStatus.textContent = imageFiles.length > 5
+      ? "Uploading the first five screenshots."
+      : `Uploading ${files.length} screenshot${files.length === 1 ? "" : "s"}…`;
+  }
+  samiraTipDropzone.setAttribute("aria-busy", "true");
+  const queuedFiles = files.map((file) => {
+    const row = samiraTipQueueRow(file);
+    samiraTipUploadQueue.append(row);
+    return { file, row };
+  });
+  let saved = 0;
+  let duplicates = 0;
+  for (const { file, row } of queuedFiles) {
+    const result = await uploadSamiraTipFile(file, row);
+    if (result.ok) saved += 1;
+    if (result.duplicate) duplicates += 1;
+  }
+  samiraTipDropzone.removeAttribute("aria-busy");
+  if (samiraTipStatus) {
+    const duplicateCopy = duplicates ? ` ${duplicates} already existed.` : "";
+    samiraTipStatus.textContent = saved
+      ? `${saved} screenshot${saved === 1 ? "" : "s"} saved.${duplicateCopy}`
+      : "No screenshots were saved.";
+  }
+  if (saved) await hydrateSamiraTipLibrary({ restartPolling: true });
+}
+
+function pastedSamiraTipFiles(event) {
+  const items = Array.from(event.clipboardData?.items || []);
+  return items
+    .filter((item) => item.kind === "file" && String(item.type || "").startsWith("image/"))
+    .map((item) => item.getAsFile())
+    .filter(Boolean);
+}
+
+function isEditableSamiraPasteTarget(target) {
+  return Boolean(target?.closest?.("textarea, input:not([type='file']), select, [contenteditable='true']"));
+}
+
 function renderSamiraState(data) {
   if (!data?.ok) return;
+  latestSamiraState = data;
   const rank = data.rank_estimate || {};
   if (samiraRankRead) {
     const current = rank.currentRead && rank.currentRead !== rank.exactRank
@@ -7251,7 +7909,14 @@ function renderSamiraState(data) {
   }
   if (samiraNoteList) {
     const notes = Array.isArray(data.notes) ? data.notes : [];
-    samiraNoteList.replaceChildren(...notes.map(samiraPdfCard));
+    const visibleNotes = samiraNotesExpanded ? notes : notes.slice(0, 6);
+    samiraNoteList.dataset.count = String(visibleNotes.length);
+    samiraNoteList.replaceChildren(...visibleNotes.map(samiraPdfCard));
+    if (samiraNoteLibraryHead) samiraNoteLibraryHead.hidden = notes.length === 0;
+    if (samiraNoteViewAll) {
+      samiraNoteViewAll.hidden = notes.length <= 6;
+      samiraNoteViewAll.textContent = samiraNotesExpanded ? "show recent" : `view all ${notes.length}`;
+    }
   }
 }
 
@@ -7271,9 +7936,9 @@ async function hydrateSamiraState() {
 async function saveSamiraNote(event) {
   event.preventDefault();
   if (!samiraNoteBody || !samiraNoteStatus) return;
-  const body = samiraNoteBody.value.trim();
-  if (!body) {
-    samiraNoteStatus.textContent = "paste a note block first";
+  const body = samiraNoteBody.value;
+  if (!body.trim()) {
+    samiraNoteStatus.textContent = "paste the completed analysis first";
     return;
   }
   samiraNoteStatus.textContent = "saving";
@@ -7337,8 +8002,25 @@ if (samiraNoteForm) {
   samiraNoteForm.addEventListener("submit", saveSamiraNote);
 }
 
+if (samiraCopyCoach) {
+  samiraCopyCoach.addEventListener("click", copyCoachMessage);
+}
+
+if (samiraNoteViewAll) {
+  samiraNoteViewAll.addEventListener("click", () => {
+    samiraNotesExpanded = !samiraNotesExpanded;
+    if (latestSamiraState) renderSamiraState(latestSamiraState);
+  });
+}
+
 if (samiraNoteList) {
   samiraNoteList.addEventListener("click", (event) => {
+    const openButton = event.target.closest?.(".samira-open-entry");
+    if (openButton) {
+      event.preventDefault();
+      openSamiraEntry(openButton.dataset.noteId || "", openButton);
+      return;
+    }
     const button = event.target.closest?.(".samira-delete-note");
     if (!button) return;
     event.preventDefault();
@@ -7346,12 +8028,117 @@ if (samiraNoteList) {
   });
 }
 
+if (samiraTipViewAll) {
+  samiraTipViewAll.addEventListener("click", () => {
+    samiraTipsExpanded = !samiraTipsExpanded;
+    renderSamiraTipLibrary();
+  });
+}
+
+function handleSamiraTipAction(event) {
+  const button = event.target.closest?.("[data-tip-action]");
+  if (!button) return;
+  const tipId = button.dataset.tipId || "";
+  if (button.dataset.tipAction === "detail") openSamiraTipDetail(tipId, button);
+  if (button.dataset.tipAction === "retry") retrySamiraTip(tipId, button);
+  if (button.dataset.tipAction === "delete") deleteSamiraTip(tipId, button);
+}
+
+samiraTipImageList?.addEventListener("click", handleSamiraTipAction);
+samiraTipDialogActions?.addEventListener("click", handleSamiraTipAction);
+
+if (samiraTipFileInput) {
+  samiraTipFileInput.addEventListener("change", () => {
+    const files = Array.from(samiraTipFileInput.files || []);
+    samiraTipFileInput.value = "";
+    uploadSamiraTipFiles(files);
+  });
+}
+
+if (samiraTipDropzone) {
+  samiraTipDropzone.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    samiraTipFileInput?.click();
+  });
+  samiraTipDropzone.addEventListener("dragenter", (event) => {
+    event.preventDefault();
+    samiraTipDropzone.classList.add("is-dragging");
+  });
+  samiraTipDropzone.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
+    samiraTipDropzone.classList.add("is-dragging");
+  });
+  samiraTipDropzone.addEventListener("dragleave", (event) => {
+    if (!samiraTipDropzone.contains(event.relatedTarget)) samiraTipDropzone.classList.remove("is-dragging");
+  });
+  samiraTipDropzone.addEventListener("drop", (event) => {
+    event.preventDefault();
+    samiraTipDropzone.classList.remove("is-dragging");
+    uploadSamiraTipFiles(event.dataTransfer?.files || []);
+  });
+}
+
+document.addEventListener("paste", (event) => {
+  if (isEditableSamiraPasteTarget(event.target)) return;
+  const files = pastedSamiraTipFiles(event);
+  if (!files.length) return;
+  event.preventDefault();
+  uploadSamiraTipFiles(files);
+});
+
+for (const dialog of [samiraTipDialog, samiraEntryDialog, samiraCopyDialog].filter(Boolean)) {
+  dialog.addEventListener("close", () => {
+    const returnTarget = samiraDialogReturnTargets.get(dialog);
+    if (returnTarget?.isConnected) returnTarget.focus({ preventScroll: true });
+  });
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) closeSamiraDialog(dialog);
+  });
+}
+
+document.querySelectorAll("[data-close-dialog]").forEach((button) => {
+  button.addEventListener("click", () => closeSamiraDialog(document.querySelector(`#${button.dataset.closeDialog}`)));
+});
+
+window.addEventListener("resize", () => {
+  window.clearTimeout(samiraChartResizeTimer);
+  samiraChartResizeTimer = window.setTimeout(() => {
+    if (!latestSamiraState) return;
+    renderSamiraRankTrend(latestSamiraState);
+    renderSamiraCsTrend(latestSamiraState);
+  }, 120);
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && samiraTipRecords.some((record) => String(record.status || "").toLowerCase() === "pending")) {
+    hydrateSamiraTipLibrary();
+  }
+});
+
 document.addEventListener("click", (event) => {
   const button = event.target.closest?.(".recording-time-link");
   if (!button) return;
   event.preventDefault();
   seekRecordingVideo(button);
 });
+
+function samiraBootstrapPayload() {
+  const node = document.querySelector("#samira-bootstrap-state");
+  if (!node) return null;
+  try {
+    const payload = JSON.parse(node.textContent || "{}");
+    return payload && typeof payload === "object" ? payload : null;
+  } catch {
+    return null;
+  }
+}
+
+const initialSamiraPayload = samiraBootstrapPayload();
+if (initialSamiraPayload?.samira?.ok) renderSamiraState(initialSamiraPayload.samira);
+if (initialSamiraPayload?.tip_images) renderSamiraTipLibrary(samiraTipPayloadRecords(initialSamiraPayload.tip_images));
+if (initialSamiraPayload?.tips?.tips) renderSamiraTipSummary(initialSamiraPayload.tips.tips);
 
 if (hasChampionSurface) {
   renderPicker();
@@ -7365,6 +8152,7 @@ if (hasRecordingSurface) {
 }
 
 hydrateSamiraState();
+hydrateSamiraTipLibrary();
 hydratePublicNotes();
 if (hasChampionSurface) {
   window.addEventListener("popstate", () => {

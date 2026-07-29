@@ -386,42 +386,40 @@ try {
     throw new Error("Samira note cards do not prefer parsed game date/time over save date.");
   }
   const styles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
+  const samiraStyles = await readFile(new URL("../public/samira.css", import.meta.url), "utf8");
   const html = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
-  if (!/\.samira-note-form\s*\{[\s\S]*?max-width:\s*390px;/.test(styles)) {
-    throw new Error("Samira note composer is not capped independently from the saved-note grid.");
+  if (!/<textarea[^>]+id="samira-note-body"[^>]+rows="5"/.test(html) || !/paste your coach's completed analysis/.test(html)) {
+    throw new Error("Samira coach composer is not the visible completed-analysis intake.");
   }
-  if (!/<textarea[^>]+id="samira-note-body"[^>]+rows="1"/.test(html) || !/\.samira-note-form textarea\s*\{[\s\S]*?height:\s*38px;[\s\S]*?overflow:\s*auto;/.test(styles)) {
-    throw new Error("Samira note composer is not a compact one-row scrolling paste box.");
+  if (!/\.samira-coach-primary\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 4fr\) minmax\(0, 8fr\)/.test(samiraStyles)) {
+    throw new Error("Coach composer and takeaway no longer use the compact 4/8 desktop composition.");
   }
-  if (!/\.samira-note-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(auto-fill,\s*minmax\(min\(100%,\s*320px\),\s*1fr\)\);/.test(styles)) {
-    throw new Error("Samira saved-note grid is no longer wide enough to avoid skinny text towers.");
+  if (!/\.samira-note-list\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/.test(samiraStyles) || !/@media \(max-width: 1119px\)[\s\S]*?\.samira-note-list\s*\{[\s\S]*?repeat\(2, minmax\(0, 1fr\)\)/.test(samiraStyles)) {
+    throw new Error("Samira coach cards do not use the required 3/2/1 responsive grid.");
   }
-  if (!/\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*minmax\(280px,\s*390px\)\s+minmax\(0,\s*1fr\);[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;/.test(styles)) {
-    throw new Error("Samira intake still uses a big enclosing card instead of a compact work layout.");
+  if (!/id="samira-rank-trend"/.test(html) || !/id="samira-cs-trend"/.test(html) || !/\.samira-chart-grid\s*\{[\s\S]*?repeat\(2, minmax\(0, 1fr\)\)/.test(samiraStyles)) {
+    throw new Error("Rank and CS@10 charts are not paired in the same desktop row.");
   }
-  if (!/id="samira-rank-trend"/.test(html) || !/\.samira-rank-trend\s*\{[\s\S]*?grid-row:\s*3;/.test(styles)) {
-    throw new Error("Samira rank-over-time chart is not filling the full intake row.");
+  if (!/\.samira-rank-trend:empty,[\s\S]*?\.samira-cs-trend:empty[\s\S]*?display:\s*none\s*!important/.test(samiraStyles)) {
+    throw new Error("Empty Samira chart shells are visible before hydration.");
   }
-  if (!/id="samira-cs-trend"/.test(html) || !/\.samira-cs-trend\s*\{[\s\S]*?grid-row:\s*4;/.test(styles)) {
-    throw new Error("Samira CS@10 chart is not rendered as a separate full-width row.");
-  }
-  if (!/\.samira-main-takeaway\s*\{[\s\S]*?align-self:\s*stretch;[\s\S]*?min-height:\s*0;/.test(styles) || /\.samira-main-takeaway\s*\{[\s\S]*?grid-row:\s*1\s*\/\s*span\s*2;/.test(styles)) {
-    throw new Error("Samira current read is stretched across the heading/composer block.");
-  }
-  if (!/\.samira-main-takeaway\s*\{[\s\S]*?font-size:\s*clamp\(18px,\s*1\.25vw,\s*22px\);/.test(styles)) {
-    throw new Error("Samira current read is not scaled as the primary read.");
+  if (!/\.samira-main-takeaway\s*\{[\s\S]*?align-self:\s*start;[\s\S]*?min-height:\s*0;/.test(samiraStyles)) {
+    throw new Error("Samira current read is still stretched into unused height.");
   }
   if (!/function\s+rankTrendTimeDomain\s*\(/.test(appSource)) {
     throw new Error("Samira charts do not share a reusable rank-trend time domain.");
   }
-  if (!/function\s+renderSamiraRankTrend\s*\(/.test(appSource) || !/const\s+timeDomain\s*=\s*rankTrendTimeDomain\(points\)/.test(appSource) || !/rankTrendSvg\(points,\s*\{\s*compact:\s*true,\s*timeDomain\s*\}\)/.test(appSource)) {
+  if (!/function\s+renderSamiraRankTrend\s*\(/.test(appSource) || !/const\s+timeDomain\s*=\s*rankTrendTimeDomain\(points\)/.test(appSource) || !/rankTrendSvg\(points,\s*\{\s*compact:\s*true,\s*timeDomain,\s*width:\s*chartWidth\s*\}\)/.test(appSource)) {
     throw new Error("Samira rank chart is not rendered from the source-bound rank trend.");
   }
-  if (!/function\s+renderSamiraCsTrend\s*\(/.test(appSource) || !/const\s+allPoints\s*=\s*samiraRankTrendPoints\(data\)/.test(appSource) || !/const\s+timeDomain\s*=\s*rankTrendTimeDomain\(allPoints\)/.test(appSource) || !/csAtTenTrendSvg\(allPoints,\s*\{\s*compact:\s*true,\s*timeDomain\s*\}\)/.test(appSource)) {
+  if (!/function\s+renderSamiraCsTrend\s*\(/.test(appSource) || !/const\s+allPoints\s*=\s*samiraRankTrendPoints\(data\)/.test(appSource) || !/const\s+timeDomain\s*=\s*rankTrendTimeDomain\(allPoints\)/.test(appSource) || !/csAtTenTrendSvg\(allPoints,\s*\{\s*compact:\s*true,\s*timeDomain,\s*width:\s*chartWidth\s*\}\)/.test(appSource)) {
     throw new Error("Samira CS@10 chart is not rendered from the source-bound note points.");
   }
-  if (!/function\s+csAtTenTrendSvg[\s\S]*?const\s+height\s*=\s*compact\s*\?\s*210\s*:\s*274;[\s\S]*?\?\s*\{\s*top:\s*14,\s*right:\s*18,\s*bottom:\s*30,\s*left:\s*68\s*\}/.test(appSource)) {
-    throw new Error("Samira CS@10 chart does not use the same compact plot geometry as the rank chart.");
+  if (!/function\s+csAtTenTrendSvg[\s\S]*?Math\.round\(Number\(options\.width\)\s*\|\|\s*640\)/.test(appSource) || !/function\s+rankTrendSvg[\s\S]*?Math\.round\(Number\(options\.width\)\s*\|\|\s*640\)/.test(appSource)) {
+    throw new Error("Samira charts do not use their measured container width.");
+  }
+  if (!/width < 430[\s\S]*?right:\s*8,\s*bottom:\s*30,\s*left:\s*50/.test(appSource)) {
+    throw new Error("Samira mobile chart margins do not preserve at least 80% plot occupancy.");
   }
   if (!/rankTrendAxisDateFormatter/.test(appSource) || !/rankTrendAxisDateTicks/.test(appSource) || /const\s+tickIndexes\s*=/.test(appSource)) {
     throw new Error("Samira rank chart x-axis is still using raw point timestamp labels instead of date-only day ticks.");
@@ -442,17 +440,11 @@ try {
   if (!/\.rank-trend-cs-line\s*\{/.test(styles) || !/\.rank-trend-cs-y-label\s*\{/.test(styles)) {
     throw new Error("Samira CS@10 chart line and labels are not styled.");
   }
-  if (!/\.samira-rank-trend svg,\s*[\r\n]+\.samira-cs-trend svg\s*\{[\s\S]*?height:\s*clamp\(180px,\s*14vw,\s*220px\);/.test(styles)) {
-    throw new Error("Samira rank and CS charts are not large enough to carry the current-read rows.");
-  }
-  if (!/@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.samira-intake\s*\{[\s\S]*?grid-template-columns:\s*1fr;/.test(styles)) {
-    throw new Error("Samira intake does not collapse before the chart lane becomes cramped.");
-  }
-  if (!/\.samira-pdf-main\s*\{[\s\S]*?grid-template-rows:\s*auto\s+auto\s+auto;/.test(styles)) {
+  if (!/\.samira-note-list \.samira-pdf-main\s*\{[\s\S]*?grid-template-rows:\s*auto\s+auto\s+auto;/.test(samiraStyles)) {
     throw new Error("Samira note cards still stretch short notes into empty towers.");
   }
-  if (!/@media\s*\(max-width:\s*820px\)\s*\{[\s\S]*?\.paper-strip-compact\s*\{[\s\S]*?display:\s*flex;/.test(styles)) {
-    throw new Error("Samira mobile paper strip still uses a stacked layout.");
+  if (!/@media \(max-width: 1079px\)[\s\S]*?\.samira-chart-grid\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/.test(samiraStyles)) {
+    throw new Error("Samira charts do not stack before the desktop lane becomes cramped.");
   }
   console.log("Samira generated copy has no role-prefix labels, useless signal counters, or template card prose.");
 } finally {

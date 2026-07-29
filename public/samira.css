@@ -1,0 +1,1145 @@
+:root {
+  --samira-paper: #fffdf8;
+  --samira-paper-soft: #f8f2e9;
+  --samira-ink: #29231f;
+  --samira-muted: #6d6258;
+  --samira-line: rgba(98, 78, 61, 0.2);
+  --samira-line-strong: rgba(98, 78, 61, 0.34);
+  --samira-burgundy: #713f4a;
+  --samira-burgundy-dark: #56303a;
+  --samira-gold: #c89443;
+  --samira-focus: #704a87;
+}
+
+html,
+body {
+  min-width: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at 16% -12%, rgba(207, 155, 71, 0.16), transparent 30%),
+    linear-gradient(180deg, #eee7dd 0, #f8f4ed 38%, #fbf8f2 100%);
+}
+
+body::before {
+  opacity: 0.14;
+}
+
+.paper-strip-compact {
+  min-height: 43px;
+  padding: 5px max(16px, calc((100vw - 1280px) / 2));
+}
+
+.paper-strip-compact .paper-title {
+  font-size: 13px;
+  line-height: 1.18;
+}
+
+.paper-strip-compact p {
+  margin-top: 1px;
+  font-size: 10.5px;
+}
+
+.paper-strip-compact .paper-button {
+  min-height: 34px;
+  border-color: rgba(113, 63, 74, 0.24);
+  background: #e2bc82;
+}
+
+.samira-workspace.page-intake {
+  display: block;
+  width: min(1280px, calc(100% - 48px));
+  padding: 20px 0 40px;
+}
+
+.samira-tip-workspace,
+.samira-coach-workspace {
+  min-width: 0;
+}
+
+.samira-coach-workspace.samira-intake {
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--samira-line-strong);
+}
+
+.samira-workspace-head {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 14px;
+}
+
+.samira-workspace-head h1,
+.samira-workspace-head h2 {
+  margin: 0;
+  color: var(--samira-ink);
+  font-size: clamp(22px, 2vw, 26px);
+  font-weight: 560;
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+}
+
+.samira-workspace-head p {
+  margin: 4px 0 0;
+  color: var(--samira-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.samira-tip-primary {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.samira-tip-primary:has(.samira-tip-summary[hidden]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.samira-tip-intake {
+  min-width: 0;
+}
+
+.samira-tip-dropzone {
+  display: grid;
+  min-height: 104px;
+  place-content: center;
+  gap: 5px;
+  border: 1px dashed rgba(113, 63, 74, 0.46);
+  border-radius: 10px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(255, 253, 248, 0.97), rgba(247, 237, 224, 0.88));
+  color: var(--samira-ink);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+.samira-tip-dropzone:hover,
+.samira-tip-dropzone.is-dragging {
+  border-color: var(--samira-burgundy);
+  background: #fffaf1;
+}
+
+.samira-tip-dropzone.is-dragging {
+  transform: translateY(-1px);
+}
+
+.samira-tip-drop-title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.samira-tip-drop-copy {
+  color: var(--samira-muted);
+  font-size: 13px;
+}
+
+.samira-tip-choose {
+  color: var(--samira-burgundy);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.samira-tip-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.samira-tip-privacy,
+.samira-tip-status {
+  margin: 7px 1px 0;
+  color: var(--samira-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.samira-tip-status:empty,
+.samira-tip-upload-queue:empty,
+.samira-tip-image-list:empty,
+.samira-note-list:empty,
+.samira-rank-trend:empty,
+.samira-cs-trend:empty,
+[hidden] {
+  display: none !important;
+}
+
+.samira-tip-upload-queue {
+  display: grid;
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.samira-tip-upload-row {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  min-height: 58px;
+  border: 1px solid var(--samira-line);
+  border-radius: 8px;
+  padding: 6px;
+  background: rgba(255, 253, 248, 0.9);
+}
+
+.samira-tip-upload-row img {
+  display: block;
+  width: 58px;
+  height: 46px;
+  border-radius: 5px;
+  background: #211d1d;
+  object-fit: contain;
+}
+
+.samira-tip-upload-row p {
+  margin: 0;
+  overflow: hidden;
+  color: var(--samira-ink);
+  font-size: 12px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.samira-tip-upload-row .samira-tip-upload-state {
+  margin-top: 2px;
+  color: var(--samira-muted);
+}
+
+.samira-tip-upload-row.is-complete {
+  border-color: rgba(71, 112, 88, 0.36);
+}
+
+.samira-tip-upload-row.is-error {
+  border-color: rgba(139, 67, 62, 0.45);
+}
+
+.samira-tip-summary {
+  min-width: 0;
+  min-height: 104px;
+  border: 1px solid var(--samira-line);
+  border-left: 3px solid var(--samira-gold);
+  border-radius: 9px;
+  padding: 13px 16px;
+  background: rgba(255, 253, 248, 0.88);
+}
+
+.samira-tip-summary h2,
+.samira-library-head h2 {
+  margin: 0;
+  color: var(--samira-ink);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.samira-tip-summary ul {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0 0;
+  padding-left: 19px;
+  color: var(--samira-ink);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.samira-library-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 17px 0 9px;
+}
+
+.samira-text-button {
+  min-height: 44px;
+  border: 0;
+  padding: 0 4px;
+  background: transparent;
+  color: var(--samira-burgundy);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.samira-tip-image-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.samira-tip-image-list[data-count="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.samira-tip-image-list[data-count="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.samira-tip-card {
+  display: grid;
+  min-width: 0;
+  align-self: start;
+  overflow: hidden;
+  border: 1px solid var(--samira-line);
+  border-radius: 9px;
+  background: rgba(255, 253, 248, 0.94);
+  box-shadow: 0 8px 20px rgba(52, 42, 32, 0.045);
+}
+
+.samira-tip-image-list[data-count="1"] .samira-tip-card {
+  grid-template-columns: minmax(300px, 36%) minmax(0, 1fr);
+  height: 220px;
+}
+
+.samira-tip-media {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 16 / 9;
+  place-items: center;
+  overflow: hidden;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
+  background: #211d1d;
+  cursor: pointer;
+}
+
+.samira-tip-image-list[data-count="1"] .samira-tip-media {
+  height: 220px;
+  min-height: 100%;
+  aspect-ratio: auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 0;
+}
+
+.samira-tip-image-list[data-count="1"] .samira-tip-card-body {
+  align-content: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 18px;
+}
+
+.samira-tip-image-list[data-count="1"] .samira-tip-card-body > :not(.samira-card-actions) {
+  grid-column: 1;
+}
+
+.samira-tip-image-list[data-count="1"] .samira-tip-card-body > .samira-card-actions {
+  grid-column: 2;
+  grid-row: 1 / 5;
+  align-self: center;
+  justify-content: end;
+}
+
+.samira-tip-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.samira-tip-card-body {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+  padding: 12px;
+}
+
+.samira-tip-card-meta,
+.samira-tip-card-summary,
+.samira-tip-card-state {
+  margin: 0;
+}
+
+.samira-tip-card-meta {
+  color: var(--samira-muted);
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+.samira-tip-card-summary {
+  color: var(--samira-ink);
+  font-size: 14px;
+  font-weight: 590;
+  line-height: 1.35;
+}
+
+.samira-tip-card-tips {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+  color: #342d28;
+  font-size: 13px;
+  line-height: 1.36;
+}
+
+.samira-tip-card-state {
+  color: var(--samira-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.samira-copy-coach,
+.samira-note-actions button,
+.samira-open-entry,
+.samira-pdf-action,
+.samira-delete-note,
+.samira-tip-action,
+.samira-dialog-close {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0 13px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 620;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.samira-copy-coach,
+.samira-note-actions button,
+.samira-open-entry,
+.samira-tip-action:not(.is-secondary):not(.is-danger) {
+  background: var(--samira-burgundy);
+  color: #fffaf2;
+}
+
+.samira-copy-coach:hover,
+.samira-note-actions button:hover,
+.samira-open-entry:hover,
+.samira-tip-action:not(.is-secondary):not(.is-danger):hover {
+  background: var(--samira-burgundy-dark);
+}
+
+.samira-pdf-action,
+.samira-delete-note,
+.samira-tip-action.is-secondary,
+.samira-tip-action.is-danger,
+.samira-dialog-close {
+  border-color: var(--samira-line-strong);
+  background: transparent;
+  color: var(--samira-ink);
+}
+
+.samira-tip-action.is-danger,
+.samira-delete-note {
+  color: #744e46;
+}
+
+.samira-tip-action.is-confirming {
+  border-color: #8b433e;
+  background: #8b433e;
+  color: #fff;
+}
+
+.samira-card-actions,
+.samira-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+}
+
+.samira-coach-primary {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.samira-coach-primary .samira-note-form {
+  display: grid;
+  grid-column: auto;
+  grid-row: auto;
+  width: 100%;
+  max-width: none;
+  gap: 8px;
+  margin: 0;
+  border: 1px solid var(--samira-line);
+  border-radius: 9px;
+  padding: 11px;
+  background: rgba(255, 253, 248, 0.92);
+}
+
+.samira-coach-primary .samira-note-form label {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  color: var(--samira-ink);
+  font-size: 13px;
+  font-weight: 620;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.samira-coach-primary .samira-note-form textarea {
+  width: 100%;
+  height: 124px;
+  min-height: 124px;
+  max-height: min(48vh, 420px);
+  resize: vertical;
+  border: 1px solid var(--samira-line-strong);
+  border-radius: 7px;
+  padding: 10px 11px;
+  background: var(--samira-paper);
+  color: var(--samira-ink);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.samira-note-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.samira-note-status {
+  margin: 0;
+  color: var(--samira-muted);
+  font-size: 12px;
+}
+
+.samira-main-takeaway {
+  display: block;
+  grid-column: auto;
+  grid-row: auto;
+  min-width: 0;
+  min-height: 0;
+  align-self: start;
+  margin: 0;
+  border: 1px solid var(--samira-line);
+  border-left: 3px solid var(--samira-gold);
+  border-radius: 9px;
+  padding: 14px 16px;
+  background: rgba(255, 253, 248, 0.88);
+  color: var(--samira-ink);
+  font-size: clamp(17px, 1.5vw, 21px);
+  font-weight: 460;
+  line-height: 1.28;
+  text-wrap: pretty;
+}
+
+.samira-coach-insights {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+}
+
+.samira-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.samira-chart-grid .samira-rank-trend,
+.samira-chart-grid .samira-cs-trend {
+  display: block;
+  min-width: 0;
+  max-width: none;
+  grid-column: auto;
+  grid-row: auto;
+  align-self: start;
+  overflow: hidden;
+  border: 1px solid var(--samira-line);
+  border-radius: 9px;
+  padding: 10px 12px 8px;
+  background: rgba(255, 253, 248, 0.9);
+  box-shadow: 0 8px 20px rgba(52, 42, 32, 0.04);
+}
+
+.samira-chart-grid .rank-trend-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 4px;
+}
+
+.samira-chart-grid .rank-trend-head h2 {
+  margin: 0;
+  color: var(--samira-ink);
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.samira-chart-grid .rank-trend-head p,
+.samira-chart-grid .rank-trend-empty {
+  margin: 0;
+  color: var(--samira-muted);
+  font-size: 11.5px;
+  font-weight: 430;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.samira-chart-grid .rank-trend-empty {
+  min-height: 42px;
+  display: grid;
+  place-items: center start;
+  text-align: left;
+}
+
+.samira-chart-grid .rank-trend-chart {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+.samira-chart-grid svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 210px;
+}
+
+.samira-chart-grid .rank-trend-y-label,
+.samira-chart-grid .rank-trend-cs-y-label,
+.samira-chart-grid .rank-trend-x-label {
+  font-size: 12px;
+}
+
+.samira-coach-workspace > .samira-library-head {
+  margin-top: 16px;
+}
+
+.samira-note-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.samira-note-list .samira-pdf-card {
+  display: grid;
+  min-width: 0;
+  align-self: start;
+  border: 1px solid var(--samira-line);
+  border-radius: 9px;
+  padding: 12px;
+  background: rgba(255, 253, 248, 0.92);
+  box-shadow: 0 8px 20px rgba(52, 42, 32, 0.04);
+}
+
+.samira-note-list .samira-pdf-main {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 9px;
+  align-content: start;
+}
+
+.samira-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: baseline;
+}
+
+.samira-card-meta time,
+.samira-pdf-rank,
+.samira-game-meta {
+  color: var(--samira-muted);
+  font-size: 11.5px;
+  font-weight: 430;
+  line-height: 1.3;
+}
+
+.samira-pdf-rank {
+  color: var(--samira-burgundy);
+}
+
+.samira-card-description {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--samira-ink);
+  font-size: 13px;
+  font-weight: 430;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 7;
+}
+
+.page-intake .notice {
+  margin: 22px 0 0;
+  color: var(--samira-muted);
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.samira-dialog {
+  width: min(880px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  overflow: auto;
+  border: 0;
+  border-radius: 11px;
+  padding: 0;
+  background: var(--samira-paper);
+  color: var(--samira-ink);
+  box-shadow: 0 26px 80px rgba(42, 31, 25, 0.28);
+}
+
+.samira-entry-dialog {
+  width: min(1040px, calc(100vw - 32px));
+}
+
+.samira-dialog::backdrop {
+  background: rgba(34, 27, 24, 0.56);
+  backdrop-filter: blur(2px);
+}
+
+.samira-dialog-shell {
+  padding: 16px;
+}
+
+.samira-dialog-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.samira-dialog-head h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 650;
+  line-height: 1.15;
+}
+
+.samira-dialog-head p {
+  margin: 4px 0 0;
+  color: var(--samira-muted);
+  font-size: 12px;
+}
+
+.samira-dialog-close {
+  flex: 0 0 auto;
+}
+
+.samira-tip-dialog-image {
+  display: block;
+  width: 100%;
+  max-height: 54dvh;
+  border-radius: 8px;
+  background: #211d1d;
+  object-fit: contain;
+}
+
+.samira-tip-dialog-copy,
+.samira-entry-dialog-copy {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.samira-dialog-actions {
+  margin-top: 14px;
+}
+
+.samira-entry-section {
+  min-width: 0;
+}
+
+.samira-entry-section + .samira-entry-section {
+  padding-top: 13px;
+  border-top: 1px solid var(--samira-line);
+}
+
+.samira-entry-section h3 {
+  margin: 0 0 7px;
+  color: var(--samira-burgundy);
+  font-size: 15px;
+  font-weight: 680;
+}
+
+.samira-entry-section p,
+.samira-entry-section ul,
+.samira-entry-section dl,
+.samira-dialog-message {
+  margin: 0;
+  color: var(--samira-ink);
+  font-size: 13.5px;
+  line-height: 1.48;
+}
+
+.samira-entry-section ul {
+  display: grid;
+  gap: 5px;
+  padding-left: 20px;
+}
+
+.samira-entry-section li > span {
+  display: inline;
+}
+
+.samira-entry-section dl {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.28fr) minmax(0, 1fr);
+  gap: 6px 14px;
+}
+
+.samira-entry-section dt {
+  color: var(--samira-muted);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+.samira-entry-section dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.samira-entry-section dd dl {
+  margin-top: 4px;
+}
+
+.samira-entry-raw {
+  padding-top: 13px;
+  border-top: 1px solid var(--samira-line);
+}
+
+.samira-entry-raw summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--samira-burgundy);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.samira-entry-raw pre {
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--samira-ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.samira-copy-dialog textarea {
+  display: block;
+  width: 100%;
+  height: min(48dvh, 360px);
+  resize: none;
+  border: 1px solid var(--samira-line-strong);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--samira-paper-soft);
+  color: var(--samira-ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.samira-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+
+.samira-workspace button:focus-visible,
+.samira-workspace a:focus-visible,
+.samira-workspace textarea:focus-visible,
+.samira-tip-dropzone:focus-visible,
+.samira-dialog button:focus-visible,
+.samira-dialog a:focus-visible,
+.samira-dialog textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--samira-focus) 72%, white);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1179px) {
+  .samira-tip-image-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1119px) {
+  .samira-note-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1079px) {
+  .samira-chart-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 899px) {
+  .samira-workspace.page-intake {
+    width: min(100%, calc(100% - 32px));
+  }
+
+  .samira-tip-primary,
+  .samira-coach-primary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .samira-tip-summary {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 759px) {
+  .samira-tip-image-list,
+  .samira-tip-image-list[data-count="1"],
+  .samira-tip-image-list[data-count="2"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .samira-tip-image-list[data-count="1"] .samira-tip-card {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+  }
+
+  .samira-tip-image-list[data-count="1"] .samira-tip-card-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .samira-tip-image-list[data-count="1"] .samira-tip-card-body > .samira-card-actions {
+    grid-column: auto;
+    grid-row: auto;
+    justify-content: start;
+  }
+
+  .samira-tip-image-list[data-count="1"] .samira-tip-media {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .samira-entry-section dl {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+  }
+
+  .samira-entry-section dd + dt {
+    margin-top: 7px;
+  }
+}
+
+@media (max-width: 699px) {
+  .samira-note-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 599px) {
+  .paper-strip-compact {
+    min-height: 42px;
+    padding: 5px 12px;
+  }
+
+  .paper-strip-compact .paper-title {
+    -webkit-line-clamp: 1;
+    font-size: 11.5px;
+  }
+
+  .samira-workspace.page-intake {
+    width: calc(100% - 24px);
+    padding-top: 13px;
+  }
+
+  .samira-workspace-head {
+    align-items: stretch;
+    margin-bottom: 11px;
+  }
+
+  .samira-workspace-head h1,
+  .samira-workspace-head h2 {
+    font-size: 22px;
+  }
+
+  .samira-coach-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .samira-copy-coach {
+    width: 100%;
+  }
+
+  .samira-tip-primary {
+    gap: 10px;
+  }
+
+  .samira-tip-dropzone {
+    min-height: 96px;
+    padding: 12px;
+  }
+
+  .samira-tip-summary {
+    padding: 10px 12px;
+  }
+
+  .samira-tip-summary ul {
+    gap: 3px;
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.28;
+  }
+
+  .samira-library-head {
+    margin: 12px 0 7px;
+  }
+
+  .samira-tip-card,
+  .samira-tip-image-list[data-count="1"] .samira-tip-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .samira-tip-media,
+  .samira-tip-image-list[data-count="1"] .samira-tip-media {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .samira-tip-card-body {
+    gap: 6px;
+    padding: 9px;
+  }
+
+  .samira-tip-card-summary {
+    font-size: 13px;
+  }
+
+  .samira-tip-card-tips {
+    gap: 2px;
+    padding-left: 16px;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .samira-tip-card-tips li:nth-child(n + 3) {
+    display: none;
+  }
+
+  .samira-tip-card .samira-card-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .samira-tip-card .samira-tip-action {
+    width: 100%;
+    min-width: 0;
+    padding: 0 4px;
+    font-size: 10.5px;
+    white-space: normal;
+  }
+
+  .samira-coach-workspace.samira-intake {
+    margin-top: 23px;
+    padding-top: 20px;
+  }
+
+  .samira-coach-primary .samira-note-form textarea {
+    height: 116px;
+    min-height: 116px;
+  }
+
+  .samira-main-takeaway,
+  .samira-chart-grid,
+  .samira-chart-grid .samira-rank-trend,
+  .samira-chart-grid .samira-cs-trend {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .samira-chart-grid .rank-trend-head {
+    align-items: start;
+  }
+
+  .samira-chart-grid .rank-trend-head p {
+    max-width: 58%;
+  }
+
+  .samira-chart-grid .rank-trend-y-label,
+  .samira-chart-grid .rank-trend-cs-y-label,
+  .samira-chart-grid .rank-trend-x-label {
+    font-size: 11px;
+  }
+
+  .samira-dialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+
+  .samira-dialog-shell {
+    padding: 12px;
+  }
+
+  .samira-dialog-head {
+    gap: 9px;
+  }
+
+  .samira-dialog-head h2 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 359px) {
+  .samira-tip-card .samira-card-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .samira-copy-coach,
+  .samira-note-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .samira-tip-dropzone {
+    transition: none;
+  }
+}
