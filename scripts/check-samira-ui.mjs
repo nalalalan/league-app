@@ -85,7 +85,7 @@ assert(/\.samira-tip-media img\s*\{[\s\S]*?object-fit:\s*contain/.test(css), "Ti
 assert(/\.samira-tip-image-list\[data-count="1"\] \.samira-tip-card\s*\{[\s\S]*?height:\s*220px/.test(css) && /\.samira-tip-image-list\[data-count="1"\] \.samira-tip-card-body > \.samira-card-actions\s*\{[\s\S]*?grid-column:\s*2/.test(css), "The literal full-row one-record card does not keep its internal state/actions dense.");
 assert(/html\.samira-prepaint \.samira-workspace\s*\{[\s\S]*?visibility:\s*hidden/.test(css), "The cold-cache bootstrap cannot hold the work surface until its final first paint.");
 assert(/@media \(max-width: 759px\)[\s\S]*?\.samira-tip-card-summary\s*\{[\s\S]*?display:\s*none[\s\S]*?\.samira-tip-card-tips li:nth-child\(n \+ 3\)\s*\{[\s\S]*?display:\s*none/.test(css), "A ready mobile screenshot card can still push the coach workflow below the 390x844 acceptance viewport.");
-assert(/@media \(max-width: 599px\)[\s\S]*?\.samira-tip-image-list\[data-count="1"\] \.samira-tip-media\s*\{[\s\S]*?height:\s*128px[\s\S]*?aspect-ratio:\s*auto/.test(css), "The single ready mobile thumbnail is not height-bounded while remaining uncropped.");
+assert(/@media \(max-width: 599px\)[\s\S]*?\.samira-tip-image-list\[data-count="1"\] \.samira-tip-media\s*\{[\s\S]*?height:\s*120px[\s\S]*?aspect-ratio:\s*auto/.test(css), "The single ready mobile thumbnail is not height-bounded while remaining uncropped.");
 assert(/@media \(prefers-reduced-motion: reduce\)/.test(css), "The Samira interface does not honor reduced motion.");
 
 console.log(`Samira UI contract passed. Coach artifact 48317 SHA-256 ${coachMessageHash}.`);

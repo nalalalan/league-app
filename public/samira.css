@@ -950,7 +950,7 @@ body::before {
   }
 
   .samira-tip-image-list[data-count="1"] .samira-tip-media {
-    height: 128px;
+    height: 120px;
     min-height: 0;
     aspect-ratio: auto;
     border-right: 0;
@@ -1010,7 +1010,7 @@ body::before {
   .samira-coach-head {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 9px;
+    gap: 8px;
   }
 
   .samira-copy-coach {
@@ -1048,7 +1048,7 @@ body::before {
 
   .samira-tip-media,
   .samira-tip-image-list[data-count="1"] .samira-tip-media {
-    height: 128px;
+    height: 120px;
     min-height: 0;
     aspect-ratio: auto;
     border-right: 0;
