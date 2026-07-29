@@ -11,6 +11,10 @@
   --samira-focus: #704a87;
 }
 
+html.samira-prepaint .samira-workspace {
+  visibility: hidden;
+}
+
 html,
 body {
   min-width: 0;
@@ -946,11 +950,19 @@ body::before {
   }
 
   .samira-tip-image-list[data-count="1"] .samira-tip-media {
-    height: auto;
+    height: 128px;
     min-height: 0;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: auto;
     border-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .samira-tip-card-summary {
+    display: none;
+  }
+
+  .samira-tip-card-tips li:nth-child(n + 3) {
+    display: none;
   }
 
   .samira-entry-section dl {
@@ -1036,9 +1048,9 @@ body::before {
 
   .samira-tip-media,
   .samira-tip-image-list[data-count="1"] .samira-tip-media {
-    height: auto;
+    height: 128px;
     min-height: 0;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: auto;
     border-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
@@ -1078,8 +1090,8 @@ body::before {
   }
 
   .samira-coach-workspace.samira-intake {
-    margin-top: 23px;
-    padding-top: 20px;
+    margin-top: 8px;
+    padding-top: 8px;
   }
 
   .samira-coach-primary .samira-note-form textarea {
